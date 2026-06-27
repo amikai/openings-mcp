@@ -1,0 +1,260 @@
+openapi: 3.0.3
+
+info:
+  title: Cake.me Minimal Job Description API
+  description: >
+    Minimal client API surface needed to search Cake.me jobs and fetch the full
+    job description. The search endpoint returns enough data to discover job
+    paths. The detail endpoint returns the full HTML description and
+    requirements for a selected job.
+
+    Observed website route: the public job page is
+    `https://www.cake.me/companies/{page_path}/jobs/{path}`, while the JSON
+    detail data is fetched from `https://api.cake.me/api/client/v1/jobs/{path}`.
+  version: "1.0.0"
+
+servers:
+  - url: https://api.cake.me
+    description: Production
+
+tags:
+  - name: Jobs
+    description: Minimal job search and detail endpoints
+
+paths:
+  /api/client/v1/jobs/search:
+    post:
+      tags: [Jobs]
+      summary: Search jobs
+      description: >
+        Searches jobs by keyword and returns paginated results. For the minimal
+        job-description workflow, callers only need each result's `path` to
+        request the full detail from `/api/client/v1/jobs/{path}`.
+
+        Observed minimal request requirements:
+        `query`, `sort_by`, and `filters` are required. `page` is optional and
+        defaults to page 1. Use `filters: {}` when no filters are needed.
+      operationId: searchJobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobSearchRequest"
+            examples:
+              minimal:
+                summary: Minimal keyword search
+                value:
+                  query: "Golang"
+                  sort_by: "popularity"
+                  filters: {}
+              paginated:
+                summary: Fetch a later page
+                value:
+                  query: "Golang"
+                  page: 2
+                  sort_by: "popularity"
+                  filters: {}
+              filtered:
+                summary: Optional normal filter usage
+                value:
+                  query: "Golang"
+                  page: 1
+                  sort_by: "popularity"
+                  filters:
+                    locations: ["Taiwan"]
+      responses:
+        "200":
+          description: Search succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobSearchResponse"
+        "422":
+          description: Required search fields are missing or invalid.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationError"
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/client/v1/jobs/{path}:
+    get:
+      tags: [Jobs]
+      summary: Get job detail
+      description: >
+        Fetches a single job by the `path` returned from the search endpoint.
+        This is the minimal endpoint needed for the full job description:
+        `description` and `requirements` are returned as HTML strings.
+      operationId: getJobDetail
+      parameters:
+        - name: path
+          in: path
+          required: true
+          description: Job path returned by `data[].path` from the search endpoint.
+          schema:
+            type: string
+          example: "senior-golang-web-backend-engineer-taoyuan"
+      responses:
+        "200":
+          description: Job detail found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetail"
+        "404":
+          description: Job path was not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    JobSearchRequest:
+      type: object
+      required: [query, sort_by, filters]
+      properties:
+        query:
+          type: string
+          description: >
+            Search keyword. Use an empty string to browse jobs without a keyword.
+          example: "Golang"
+        page:
+          type: integer
+          minimum: 1
+          description: >
+            1-based page number. Observed as optional; omitting it returns page 1.
+            The API currently returns 20 jobs per page.
+          example: 1
+        sort_by:
+          type: string
+          enum: [popularity, latest]
+          description: Sort order for the search results.
+          example: "popularity"
+        filters:
+          type: object
+          description: >
+            Filter object. Use `{}` for the minimal job-description workflow.
+            Normal filter values should come from Cake.me's own facet UI/API
+            rather than being guessed by clients.
+          additionalProperties: true
+          example: {}
+
+    JobSearchResponse:
+      type: object
+      description: >
+        Search response. The production API returns additional fields such as
+        `available_facets` and `query_id`; they are not required for the minimal
+        search-then-detail workflow.
+      required: [total_entries, total_pages, per_page, current_page, data]
+      properties:
+        total_entries:
+          type: integer
+          example: 360
+        total_pages:
+          type: integer
+          example: 18
+        per_page:
+          type: integer
+          description: Observed page size. Currently 20.
+          example: 20
+        current_page:
+          type: integer
+          example: 1
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobSearchItem"
+
+    JobSearchItem:
+      type: object
+      description: >
+        Minimal job search item. `description` is useful for previews, but the
+        detail endpoint returns a fuller HTML description and requirements.
+      required: [path, title, description]
+      properties:
+        path:
+          type: string
+          description: Path used to fetch full job detail.
+          example: "senior-golang-web-backend-engineer-taoyuan"
+        title:
+          type: string
+          example: "資深 Golang 網頁後端工程師(桃園)"
+        description:
+          type: string
+          description: Plain-text search-result description or preview.
+          example: "【職務內容】\n維護現有系統與功能、新專案開發..."
+
+    JobDetail:
+      type: object
+      description: >
+        Minimal job detail payload. The production API returns many more fields;
+        these fields are enough to retrieve the full job description content.
+      required: [id, path, page_path, title, description, requirements]
+      properties:
+        id:
+          type: integer
+          example: 46590
+        path:
+          type: string
+          example: "senior-golang-web-backend-engineer-taoyuan"
+        page_path:
+          type: string
+          description: >
+            Company/page slug associated with the job. Together with `path`,
+            this forms the public website URL:
+            `https://www.cake.me/companies/{page_path}/jobs/{path}`.
+          example: "lctech_"
+        title:
+          type: string
+          example: "資深 Golang 網頁後端工程師(桃園)"
+        description:
+          type: string
+          description: Full job description as an HTML string.
+          example: "<p>【職務內容】</p><p>維護現有系統與功能...</p>"
+        requirements:
+          type: string
+          description: Job requirements as an HTML string. May be an empty string.
+          example: "<p><strong>【基本條件】</strong></p>"
+
+    ValidationError:
+      allOf:
+        - $ref: "#/components/schemas/ErrorResponse"
+      example:
+        error_code: null
+        msg: "Unprocessable entity"
+        error: "Unprocessable entity"
+        detail:
+          filters: "Field required"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error_code:
+          type: string
+          nullable: true
+          example: null
+        msg:
+          type: string
+          example: "Resource not found"
+        error:
+          type: string
+          example: "Resource not found"
+        detail:
+          type: object
+          nullable: true
+          description: Error detail. Often null, or an object for validation errors.
+          additionalProperties: true
+      additionalProperties: true

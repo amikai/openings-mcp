@@ -1,0 +1,493 @@
+{
+  "id": 46590,
+  "path": "senior-golang-web-backend-engineer-taoyuan",
+  "page_path": "lctech_",
+  "title": "資深 Golang 網頁後端工程師(桃園)",
+  "profession_v2": "it_back-end-engineer",
+  "job_type": "full_time",
+  "seniority_level": "mid_senior_level",
+  "min_work_exp_year": 4,
+  "locations": [
+    {
+      "id": 6514,
+      "locale": "zh-TW",
+      "full_name": "中壢區, 桃園市, 台灣",
+      "country_code": "TW",
+      "location_info": {
+        "country_name": "台灣",
+        "admin_level_1_name": "台灣",
+        "admin_level_2_name": "桃園市",
+        "admin_level_3_name": "中壢區"
+      },
+      "full_name_en": "Zhongli District, Taoyuan City, Taiwan",
+      "location_info_en": {
+        "country_name": "Taiwan",
+        "admin_level_1_name": "Taiwan",
+        "admin_level_2_name": "Taoyuan City",
+        "admin_level_3_name": "Zhongli District"
+      },
+      "location_token": "AdminLevel3#281587"
+    }
+  ],
+  "remote": "partial_remote_work",
+  "number_of_management": "none",
+  "number_of_openings": 2,
+  "salary_min": "990000.00",
+  "salary_max": "1330000.00",
+  "salary_currency": "TWD",
+  "salary_type": "per_year",
+  "inclusivity_traits": [],
+  "tags": [
+    "PostgreSQL",
+    "HTTP",
+    "HTML",
+    "Go",
+    "Github",
+    "GCP"
+  ],
+  "description": "<p>【職務內容】</p>\n<p>維護現有系統與功能、新專案開發、跨部門團隊需求</p>\n<p>標配MAC電腦</p>\n<p>(本職務辦公室位於桃園，遠端工作需求面議)<br></p>\n<p>【上班時間】</p>\n<p>早上 9 點至下午 6 點並且有 30 分鐘彈性上下班</p>\n<p></p>\n<p>【公司福利】</p>\n<p>勞健保、三節、尾牙、生日禮金。</p>\n<p>我們公司設有咖啡休息區，免費零食、飲料、餐點，飲品，備有微波爐。</p>\n<p>不定時員工聚餐與每年都有員工旅遊。</p>",
+  "requirements": "<p><strong></strong><strong>【基本條件】</strong></p>\n<p>※ 應徵者務必附上作品或相關連結</p>\n<p>※ 溝通上有耐心、邏輯思路清晰、團隊合作</p>\n<p>※ 有耐心 troubleshooting<br></p>\n<p>※ 理解通達 Go 1.23 以上<br></p>\n<p>※ 理解通達 Protocol Buffers, Proto Validation, gRPC</p>\n<p>※ 理解通達 HTTP/1.1, HTTP/2, HTTP/3<br></p>\n<p>※ 理解通達 SA / SD, Event Sourcing, Hexagonal Architecture, Saga Pattern<br></p>\n<p>※ 理解通達 PostgreSQL, Redis, Transaction processing</p>\n<p>※ 理解通達 Github, Gitflow, Trunk-based workflow<br></p>\n<p>※ 理解通達 Unit Testing, Integration Testing, Mock Testing, Load Testing<br></p>\n<p>※ 有耐心與商務團隊協作以及提供支援</p>\n<p>※ 理解通達產品研發迭代的工作模式<br></p>\n<p>※ 有耐心參與團隊事務互動以推動整體團隊工作<br></p>\n<p>※ 能夠依據商業需求驅動開發工作</p>\n<p>※ 理解通達職場禮節(workplace etiquette)</p>\n<p>※ 能提出有效系統設計方案</p>\n<p>※ 能提升開發小組整體品質與效率且降低開發成本</p>\n<p>※ 能最佳化整體系統資源利用率</p>\n<p>※ 完成主管交辦事項</p>\n<p><br></p><p><br></p>\n<p><strong>【加分條件】</strong></p>\n<p>※ 對 DDD、BDD、TDD、Gherkin 有一定程度認知</p>\n<p>※ 對主流市場、產品、設計具有強烈方向感</p>\n<p>※ 對專業技術具高度敏感與高度自主學習力</p>\n<p><strong>【什麼人適合我們】</strong></p>\n<p>為人誠信、態度認真負責、充滿熱情與理想、擁有毅力與耐力，出眾的專業能力，歡迎來公司聊聊，期待你的加入！</p>\n<p>(年薪固定或變動薪資因個人資歷或績效而異)<br></p>",
+  "category": "technology",
+  "hide_salary_completely": false,
+  "hide_salary_max": false,
+  "year_of_seniority": "3_5",
+  "lang": "zh",
+  "signing_bonus": "0",
+  "unique_impression_count": 1928,
+  "cached_votes_up": 44,
+  "content_updated_at": "2026-06-12T09:25:12.244068Z",
+  "metadata": {
+    "images": []
+  },
+  "sponsored": null,
+  "external_url": null,
+  "impression_count": 2107,
+  "interview_process": "",
+  "created_at": "2022-09-20T09:12:50.320209Z",
+  "updated_at": "2026-06-17T08:46:39.368179Z",
+  "liked": false,
+  "job_recruiters": [
+    {
+      "username": "hr-ef5200",
+      "avatar": null,
+      "name": "HR",
+      "title": "HR"
+    }
+  ],
+  "job_questions": [],
+  "noindex": false,
+  "processed_description": "【職務內容】\n維護現有系統與功能、新專案開發、跨部門團隊需求\n標配MAC電腦\n(本職務辦公室位於桃園，遠端工作需求面議)\n【上班時間】\n早上 9 點至下午 6 點並且有 30 分鐘彈性上下班\n\n【公司...",
+  "impression_token": "LxpXE2OKqD+vTWK/QGIcDT7Tu2bmGmIpZnbdW8C4PFA=",
+  "common_applied_jobs": [
+    {
+      "path": "cocos2d-x-front-end-game-engineer",
+      "title": "手機遊戲工程師【歡迎應屆畢業生】",
+      "locations": [
+        {
+          "id": 3373,
+          "locale": "zh-TW",
+          "full_name": "中正區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "中正區"
+          },
+          "full_name_en": "Zhongzheng District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Zhongzheng District"
+          },
+          "location_token": "AdminLevel3#281618"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 2,
+      "seniority_level": "entry_level",
+      "hide_salary_completely": true,
+      "hide_salary_max": false,
+      "salary_min": "0.00",
+      "salary_max": "0.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "gamesofa",
+        "name": "慧邦科技股份有限公司",
+        "logo": "v1541404416/csjmltpmrgqc2hkyz3de.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "senior-front-end-engineer-senior-front-end-software-engineer",
+      "title": "資深前端工程師｜Senior Frontend Engineer",
+      "locations": [
+        {
+          "id": 11,
+          "locale": "zh-TW",
+          "full_name": "台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": ""
+          },
+          "full_name_en": "Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": ""
+          },
+          "location_token": "AdminLevel2#68069"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "mid_senior_level",
+      "hide_salary_completely": true,
+      "hide_salary_max": false,
+      "salary_min": "0.00",
+      "salary_max": "0.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "omnichat.ai",
+        "name": "Omnichat",
+        "logo": "v1658128844/gjkluemw6bahwi1ametr.png",
+        "country": "HK"
+      }
+    },
+    {
+      "path": "software-engineer-full-end-engineer",
+      "title": "Software Engineer / Programmer 軟體工程師(台北)",
+      "locations": [
+        {
+          "id": 2312,
+          "locale": "zh-TW",
+          "full_name": "南港區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "南港區"
+          },
+          "full_name_en": "Nangang District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Nangang District"
+          },
+          "location_token": "AdminLevel3#281447"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 6,
+      "seniority_level": "entry_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "59000.00",
+      "salary_max": "86000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "titansoft-tw",
+        "name": "新加坡商鈦坦科技",
+        "logo": "v1659319809/ryrsxz5sjhprengnk5qs.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "software-engineer-full-end-engineer-f1cfca",
+      "title": "Software Engineer / Programmer 軟體工程師(台中市政府旁)",
+      "locations": [
+        {
+          "id": 7377,
+          "locale": "zh-TW",
+          "full_name": "西屯里, 臺中市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "臺中市",
+            "admin_level_3_name": "西屯里"
+          },
+          "full_name_en": "Xitun District, Taichung City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taichung City",
+            "admin_level_3_name": "Xitun District"
+          },
+          "location_token": "AdminLevel3#281553"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 5,
+      "seniority_level": "entry_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "58000.00",
+      "salary_max": "77000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "titansoft-tw",
+        "name": "新加坡商鈦坦科技",
+        "logo": "v1659319809/ryrsxz5sjhprengnk5qs.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "data-analyst-data-analyst",
+      "title": "數位醫療資深數據科學家/工程師｜Sr. Data Scientist/ Data Engineer",
+      "locations": [
+        {
+          "id": 3039,
+          "locale": "zh-TW",
+          "full_name": "內湖區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "內湖區"
+          },
+          "full_name_en": "Neihu District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Neihu District"
+          },
+          "location_token": "AdminLevel3#281445"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "mid_senior_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": true,
+      "salary_min": "1100000.00",
+      "salary_max": "0.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_year",
+      "page": {
+        "path": "h2-inc",
+        "name": "H2 Inc. 英屬開曼群島商慧康生活科技股份有限公司台灣分公司",
+        "logo": "v1655278333/i5ozdkkhp54i320flvbt.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "senior-frontend-engineer-02ea8a",
+      "title": "Senior Frontend Engineer（每月有遠端日）",
+      "locations": [
+        {
+          "id": 3038,
+          "locale": "zh-TW",
+          "full_name": "松山區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "松山區"
+          },
+          "full_name_en": "Songshan District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Songshan District"
+          },
+          "location_token": "AdminLevel3#281388"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "mid_senior_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "900000.00",
+      "salary_max": "1300000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_year",
+      "page": {
+        "path": "bitogroup",
+        "name": "BitoGroup 幣託科技股份有限公司",
+        "logo": "v1673231127/ecf5ara1rpsdm8qotpa4.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "web-senior-front-end-engineer-198cb3",
+      "title": "資深網頁前端工程師 (保證年薪 1.12M - 1.68M)",
+      "locations": [
+        {
+          "id": 3038,
+          "locale": "zh-TW",
+          "full_name": "松山區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "松山區"
+          },
+          "full_name_en": "Songshan District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Songshan District"
+          },
+          "location_token": "AdminLevel3#281388"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "mid_senior_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "80000.00",
+      "salary_max": "120000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "universetech",
+        "name": "天瀚國際科技有限公司",
+        "logo": "v1750671990/txpkx9ctjrxcd5lroi2e.jpg",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "product-owner-product-owner",
+      "title": "Product Owner 產品負責人(台北)",
+      "locations": [
+        {
+          "id": 2312,
+          "locale": "zh-TW",
+          "full_name": "南港區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "南港區"
+          },
+          "full_name_en": "Nangang District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Nangang District"
+          },
+          "location_token": "AdminLevel3#281447"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "entry_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": true,
+      "salary_min": "50000.00",
+      "salary_max": "0.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_month",
+      "page": {
+        "path": "titansoft-tw",
+        "name": "新加坡商鈦坦科技",
+        "logo": "v1659319809/ryrsxz5sjhprengnk5qs.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "devops-engineer-092c5c",
+      "title": "數位醫療維運工程師｜Digital Healthcare DevOps Engineer",
+      "locations": [
+        {
+          "id": 3039,
+          "locale": "zh-TW",
+          "full_name": "內湖區, 台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": "內湖區"
+          },
+          "full_name_en": "Neihu District, Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": "Neihu District"
+          },
+          "location_token": "AdminLevel3#281445"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 1,
+      "seniority_level": "entry_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "1000000.00",
+      "salary_max": "1400000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_year",
+      "page": {
+        "path": "h2-inc",
+        "name": "H2 Inc. 英屬開曼群島商慧康生活科技股份有限公司台灣分公司",
+        "logo": "v1655278333/i5ozdkkhp54i320flvbt.png",
+        "country": "TW"
+      }
+    },
+    {
+      "path": "backend-engineer-backend-engineer-c8ad8f",
+      "title": "Backend Engineer",
+      "locations": [
+        {
+          "id": 11,
+          "locale": "zh-TW",
+          "full_name": "台北市, 台灣",
+          "country_code": "TW",
+          "location_info": {
+            "country_name": "台灣",
+            "admin_level_1_name": "台灣",
+            "admin_level_2_name": "台北市",
+            "admin_level_3_name": ""
+          },
+          "full_name_en": "Taipei City, Taiwan",
+          "location_info_en": {
+            "country_name": "Taiwan",
+            "admin_level_1_name": "Taiwan",
+            "admin_level_2_name": "Taipei City",
+            "admin_level_3_name": ""
+          },
+          "location_token": "AdminLevel2#68069"
+        }
+      ],
+      "job_type": "full_time",
+      "number_of_openings": 5,
+      "seniority_level": "mid_senior_level",
+      "hide_salary_completely": false,
+      "hide_salary_max": false,
+      "salary_min": "1000000.00",
+      "salary_max": "2000000.00",
+      "salary_currency": "TWD",
+      "salary_type": "per_year",
+      "page": {
+        "path": "opennet-limited",
+        "name": "OpenNet 開網有限公司",
+        "logo": "v1574663536/bzaybcelyff1kqaqhhmr.png",
+        "country": "TW"
+      }
+    }
+  ]
+}
