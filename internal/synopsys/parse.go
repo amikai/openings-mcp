@@ -270,7 +270,7 @@ func textContent(n *html.Node) string {
 
 var htmlTagRe = regexp.MustCompile(`<[^>]+>`)
 
-func StripHTML(s string) string {
+func stripHTML(s string) string {
 	s = htmlTagRe.ReplaceAllString(s, "")
 	s = strings.ReplaceAll(s, "&lt;", "<")
 	s = strings.ReplaceAll(s, "&gt;", ">")

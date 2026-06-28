@@ -122,7 +122,7 @@ func TestStripHTML(t *testing.T) {
 		{"", ""},
 	}
 	for _, c := range cases {
-		got := StripHTML(c.in)
+		got := stripHTML(c.in)
 		assert.Equal(t, c.want, got, "input: %q", c.in)
 	}
 }
