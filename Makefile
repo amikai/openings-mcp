@@ -1,10 +1,10 @@
 .PHONY: ut validate-openapi
 
 OPENAPI_SPECS := \
-	internal/cake/openapi.yaml \
-	internal/google/openapi.yaml \
-	internal/synopsys/openapi.yaml \
-	internal/tsmc/openapi.yaml
+	internal/provider/cake/openapi.yaml \
+	internal/provider/google/openapi.yaml \
+	internal/provider/synopsys/openapi.yaml \
+	internal/provider/tsmc/openapi.yaml
 
 ut:
 	go test $(shell go list ./... | grep -vE '/cmd($|/)')

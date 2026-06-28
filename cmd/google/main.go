@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	google "github.com/amikai/job-mcp/internal/google"
+	google "github.com/amikai/job-mcp/internal/provider/google"
 )
 
 func main() {

@@ -3,7 +3,7 @@ package jobmcp
 import (
 	"testing"
 
-	"github.com/amikai/job-mcp/internal/tsmc"
+	"github.com/amikai/job-mcp/internal/provider/tsmc"
 )
 
 func TestTSMCToRequest(t *testing.T) {

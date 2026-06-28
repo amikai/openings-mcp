@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	job104 "github.com/amikai/job-mcp/internal/104"
+	job104 "github.com/amikai/job-mcp/internal/provider/104"
 )
 
 func main() {

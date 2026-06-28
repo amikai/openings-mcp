@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	cake "github.com/amikai/job-mcp/internal/cake"
+	cake "github.com/amikai/job-mcp/internal/provider/cake"
 )
 
 var tagRE = regexp.MustCompile(`<[^>]+>`)

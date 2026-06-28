@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	job104 "github.com/amikai/job-mcp/internal/104"
 	"github.com/amikai/job-mcp/internal/jobmcp"
-	"github.com/amikai/job-mcp/internal/tsmc"
+	job104 "github.com/amikai/job-mcp/internal/provider/104"
+	"github.com/amikai/job-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 

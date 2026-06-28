@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	cake "github.com/amikai/job-mcp/internal/cake"
+	cake "github.com/amikai/job-mcp/internal/provider/cake"
 )
 
 func TestFormatReportIncludesEveryJobDetail(t *testing.T) {

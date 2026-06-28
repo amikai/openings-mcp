@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/amikai/job-mcp/internal/synopsys"
+	"github.com/amikai/job-mcp/internal/provider/synopsys"
 )
 
 func main() {
