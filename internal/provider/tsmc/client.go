@@ -8,7 +8,6 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 const defaultBaseURL = "https://careers.tsmc.com"
@@ -98,11 +97,6 @@ const (
 	EmployApprenticeship = "4348108"
 )
 
-type Config struct {
-	HTTPClient *http.Client
-	BaseURL    string
-}
-
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
@@ -147,14 +141,14 @@ type JobDetailResponse struct {
 	Qualifications   string
 }
 
-func NewClient(cfg Config) *Client {
+func NewClient(httpClient *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(cfg.HTTPClient, http.DefaultClient),
-		baseURL:    strings.TrimRight(cmp.Or(cfg.BaseURL, defaultBaseURL), "/"),
+		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		baseURL:    defaultBaseURL,
 	}
 }
 
-func (c *Client) searchURL(p *JobsRequest) (string, error) {
+func (c *Client) jobsURL(p *JobsRequest) (string, error) {
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
 		return "", err
@@ -196,7 +190,7 @@ func (c *Client) searchURL(p *JobsRequest) (string, error) {
 }
 
 func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
-	rawURL, err := c.searchURL(p)
+	rawURL, err := c.jobsURL(p)
 	if err != nil {
 		return nil, err
 	}

@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	client := google.NewClient(google.Config{})
+	client := google.NewClient(http.DefaultClient)
 	search, err := client.Jobs(ctx, defaultSearchParams(keyword))
 	if err != nil {
 		return err

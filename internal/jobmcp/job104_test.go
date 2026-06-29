@@ -12,7 +12,7 @@ import (
 func TestRegisterJob104(t *testing.T) {
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
 
-	RegisterJob104(server, job104.NewClient(job104.Config{HTTPClient: http.DefaultClient}))
+	RegisterJob104(server, job104.NewClient(http.DefaultClient))
 
 	assertTools(t, server, "104_search_jobs", "104_get_job_detail")
 }

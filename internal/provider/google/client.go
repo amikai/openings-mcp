@@ -59,10 +59,10 @@ type JobDetailResponse struct {
 	Responsibilities string
 }
 
-func NewClient(cfg Config) *Client {
+func NewClient(httpClient *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(cfg.HTTPClient, http.DefaultClient),
-		baseURL:    strings.TrimRight(cmp.Or(cfg.BaseURL, defaultBaseURL), "/"),
+		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		baseURL:    defaultBaseURL,
 	}
 }
 
