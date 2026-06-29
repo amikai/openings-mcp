@@ -94,11 +94,7 @@ func buildSearchQuery(p *JobsRequest) url.Values {
 		q.Set(prefix+"FacetType", strconv.Itoa(f.FacetType))
 		q.Set(prefix+"Display", f.Display)
 		q.Set(prefix+"Count", strconv.Itoa(f.Count))
-		isApplied := "false"
-		if f.IsApplied {
-			isApplied = "true"
-		}
-		q.Set(prefix+"IsApplied", isApplied)
+		q.Set(prefix+"IsApplied", strconv.FormatBool(f.IsApplied))
 		q.Set(prefix+"FieldName", f.FieldName)
 		if f.ID != "" {
 			q.Set("ActiveFacetID", f.ID)

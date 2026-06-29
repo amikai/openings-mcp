@@ -18,10 +18,6 @@ const (
 	jobDetailPath  = "/jobs/results/%s" // id
 )
 
-type Config struct {
-	HTTPClient *http.Client
-}
-
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
