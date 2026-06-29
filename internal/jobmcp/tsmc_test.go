@@ -1,10 +1,20 @@
 package jobmcp
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/amikai/job-mcp/internal/provider/tsmc"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
+
+func TestRegisterTSMC(t *testing.T) {
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
+
+	RegisterTSMC(server, tsmc.NewClient(tsmc.Config{HTTPClient: http.DefaultClient}))
+
+	assertTools(t, server, "tsmc_search_jobs", "tsmc_get_job_detail")
+}
 
 func TestTSMCToRequest(t *testing.T) {
 	in := tsmcSearchInput{
