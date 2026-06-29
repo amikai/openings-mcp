@@ -41,7 +41,7 @@ var wantDetail = &JobDetailResponse{
 }
 
 func TestParseSearchHTML(t *testing.T) {
-	data, err := os.ReadFile("testdata/search_jobs_rsp.html")
+	data, err := os.ReadFile("testdata/jobs_rsp.html")
 	require.NoError(t, err)
 
 	gotJobs, gotTotal := parseSearchHTML(string(data))

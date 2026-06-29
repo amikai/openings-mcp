@@ -6,35 +6,35 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/net/html"
 )
 
 var wantJobs = []Job{
-	{ID: "106863362666570438", Path: "106863362666570438-software-engineer-gpu-system-software", Title: "Software Engineer, GPU System Software", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "82975510480462534", Path: "82975510480462534-soc-product-engineer-google-cloud", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan"},
-	{ID: "81991011634422470", Path: "81991011634422470-silicon-physical-design-cad-engineer", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "143985660506579654", Path: "143985660506579654-senior-signal-and-power-integrity-engineer-pixel", Title: "Senior Signal and Power Integrity Engineer, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "78019461818262214", Path: "78019461818262214-software-engineering-manager-release-engineering-google-cloud-platforms", Title: "Software Engineering Manager, Release Engineering, Google Cloud Platforms", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "112498222319968966", Path: "112498222319968966-firmware-engineer-pixel-systems-power", Title: "Firmware Engineer, Pixel Systems Power", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "123677700068909766", Path: "123677700068909766-supplier-quality-engineer-memory", Title: "Supplier Quality Engineer, Memory", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "77507329917887174", Path: "77507329917887174-software-engineering-manager-pixel-camera", Title: "Software Engineering Manager, Pixel Camera", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "126487124076569286", Path: "126487124076569286-developer-relations-engineer-android-play-games", Title: "Developer Relations Engineer, Android, Play, Games", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "110315781933146822", Path: "110315781933146822-software-engineer-android-apps-pixel", Title: "Software Engineer, Android Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "120702421604147910", Path: "120702421604147910-firmware-engineer-wifi-pixel-connectivity", Title: "Firmware Engineer, Wi-Fi, Pixel Connectivity", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "84295530024182470", Path: "84295530024182470-senior-product-design-engineer-trackers-and-home", Title: "Senior Product Design Engineer, Trackers and Home", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "76806086312501958", Path: "76806086312501958-software-engineer-apps-pixel", Title: "Software Engineer, Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "92642283567882950", Path: "92642283567882950-test-engineer-user-experience-quality", Title: "Test Engineer, User Experience Quality", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "74113863372415686", Path: "74113863372415686-staff-hardware-system-engineer-home-and-health", Title: "Staff Hardware System Engineer, Home and Health", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "103770758580183750", Path: "103770758580183750-cpu-rtl-design-engineer", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "87506232826307270", Path: "87506232826307270-software-engineer-manager-ii-silicon-tools", Title: "Software Engineer Manager II, Silicon Tools", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "109039274703102662", Path: "109039274703102662-product-quality-engineer-global-hardware-quality-and-reliability", Title: "Product Quality Engineer, Global Hardware Quality and Reliability", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "107666671874777798", Path: "107666671874777798-test-development-engineer-global-manufacturing-engineering", Title: "Test Development Engineer, Global Manufacturing Engineering", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "141781579927036614", Path: "141781579927036614-senior-software-engineer-emerging-onprem-ai-infrastructure", Title: "Senior Software Engineer, Emerging On-prem AI Infrastructure", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "106863362666570438", Title: "Software Engineer, GPU System Software", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "82975510480462534", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan"},
+	{ID: "81991011634422470", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "143985660506579654", Title: "Senior Signal and Power Integrity Engineer, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "78019461818262214", Title: "Software Engineering Manager, Release Engineering, Google Cloud Platforms", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "112498222319968966", Title: "Firmware Engineer, Pixel Systems Power", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "123677700068909766", Title: "Supplier Quality Engineer, Memory", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "77507329917887174", Title: "Software Engineering Manager, Pixel Camera", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "126487124076569286", Title: "Developer Relations Engineer, Android, Play, Games", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "110315781933146822", Title: "Software Engineer, Android Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "120702421604147910", Title: "Firmware Engineer, Wi-Fi, Pixel Connectivity", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "84295530024182470", Title: "Senior Product Design Engineer, Trackers and Home", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "76806086312501958", Title: "Software Engineer, Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "92642283567882950", Title: "Test Engineer, User Experience Quality", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "74113863372415686", Title: "Staff Hardware System Engineer, Home and Health", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "103770758580183750", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "87506232826307270", Title: "Software Engineer Manager II, Silicon Tools", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
+	{ID: "109039274703102662", Title: "Product Quality Engineer, Global Hardware Quality and Reliability", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "107666671874777798", Title: "Test Development Engineer, Global Manufacturing Engineering", Company: "Google", Location: "Taipei, Taiwan"},
+	{ID: "141781579927036614", Title: "Senior Software Engineer, Emerging On-prem AI Infrastructure", Company: "Google", Location: "Taipei, Taiwan"},
 }
 
 var wantDetail = &JobDetailResponse{
-	ID:       "106863362666570438",
-	Path:     "106863362666570438-software-engineer-gpu-system-software",
-	Title:    "Software Engineer, GPU System Software",
+	ID:    "106863362666570438",
+	Title: "Software Engineer, GPU System Software",
 	Company:  "Google",
 	Location: "Taipei, Taiwan",
 	About: `About the job
@@ -79,21 +79,28 @@ Develop test suites that enable unit, integration and system level testing of ou
 }
 
 func TestParseSearchHTML(t *testing.T) {
-	data, err := os.ReadFile("testdata/search_jobs_rsp.html")
+	f, err := os.Open("testdata/jobs_rsp.html")
+	require.NoError(t, err)
+	defer f.Close()
+
+	doc, err := html.Parse(f)
 	require.NoError(t, err)
 
-	got := parseSearchHTML(string(data))
+	got := parseJobsHTML(doc)
 	assert.Equal(t, wantJobs, got)
 }
 
 func TestParseDetailHTML(t *testing.T) {
-	data, err := os.ReadFile("testdata/job_detail_rsp.html")
+	f, err := os.Open("testdata/job_detail_rsp.html")
+	require.NoError(t, err)
+	defer f.Close()
+
+	doc, err := html.Parse(f)
 	require.NoError(t, err)
 
-	got, ok := parseDetailHTML(string(data), "106863362666570438")
+	id := "106863362666570438"
+	got, ok := parseJobDetailHTML(doc, id)
 	require.True(t, ok)
 
-	// path is set by client, not by parser
-	got.Path = wantDetail.Path
-	assert.Equal(t, *wantDetail, got)
+	assert.Equal(t, *wantDetail, *got)
 }

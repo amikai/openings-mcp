@@ -25,7 +25,7 @@ func stripHTML(s string) string {
 }
 
 func TestParseJobsResponse(t *testing.T) {
-	data, err := os.ReadFile("testdata/search_jobs_rsp.json")
+	data, err := os.ReadFile("testdata/jobs_rsp.json")
 	require.NoError(t, err)
 
 	var raw struct {

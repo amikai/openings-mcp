@@ -35,7 +35,7 @@ func main() {
 	jobs := jobsForDetail(search.Jobs)
 	details := make(map[string]*google.JobDetailResponse, len(jobs))
 	for _, job := range jobs {
-		detail, err := client.JobDetail(ctx, job.Path)
+		detail, err := client.JobDetail(ctx, job.ID)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -71,7 +71,7 @@ func writeReport(w io.Writer, keyword string, search *google.JobsResponse, jobs 
 
 	for i, job := range jobs {
 		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.ID, job.Title)
-		fmt.Fprintf(w, "URL: https://www.google.com/about/careers/applications/jobs/results/%s\n", job.Path)
+		fmt.Fprintf(w, "URL: https://www.google.com/about/careers/applications/jobs/results/%s\n", job.ID)
 		if job.Company != "" {
 			fmt.Fprintf(w, "Company: %s\n", job.Company)
 		}

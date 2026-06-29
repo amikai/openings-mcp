@@ -11,13 +11,13 @@ import (
 func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 	search := &google.JobsResponse{
 		Jobs: []google.Job{
-			{ID: "104030745835512518", Path: "104030745835512518-model-ux-designer", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA"},
-			{ID: "126340255522398918", Path: "126340255522398918-senior-engineer-gdc", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA"},
+			{ID: "104030745835512518", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA"},
+			{ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA"},
 		},
 	}
 	details := map[string]*google.JobDetailResponse{
-		"104030745835512518": {ID: "104030745835512518", Path: "104030745835512518-model-ux-designer", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA", About: "Design AI product UX.", Qualifications: "Bachelor's degree.", Responsibilities: "Create model UX flows."},
-		"126340255522398918": {ID: "126340255522398918", Path: "126340255522398918-senior-engineer-gdc", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA", About: "Build backend services."},
+		"104030745835512518": {ID: "104030745835512518", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA", About: "Design AI product UX.", Qualifications: "Bachelor's degree.", Responsibilities: "Create model UX flows."},
+		"126340255522398918": {ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA", About: "Build backend services."},
 	}
 
 	var buf bytes.Buffer

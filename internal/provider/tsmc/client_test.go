@@ -13,8 +13,8 @@ import (
 func newMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
-	mux.HandleFunc("/zh_TW/careers/SearchJobs/", serveTestdata("testdata/search_jobs_rsp.html"))
-	mux.HandleFunc("/zh_TW/careers/SearchJobs", serveTestdata("testdata/search_jobs_rsp.html"))
+	mux.HandleFunc("/zh_TW/careers/SearchJobs/", serveTestdata("testdata/jobs_rsp.html"))
+	mux.HandleFunc("/zh_TW/careers/SearchJobs", serveTestdata("testdata/jobs_rsp.html"))
 	mux.HandleFunc("/zh_TW/careers/JobDetail", serveTestdata("testdata/job_detail_rsp.html"))
 	return httptest.NewServer(mux)
 }

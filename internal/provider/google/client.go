@@ -4,18 +4,20 @@ import (
 	"cmp"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
-	"strings"
+
+	"golang.org/x/net/html"
 )
 
-const defaultBaseURL = "https://www.google.com/about/careers/applications"
+const (
+	defaultBaseURL = "https://www.google.com/about/careers/applications"
+	jobsPath       = "/jobs/results"
+)
 
 type Config struct {
 	HTTPClient *http.Client
-	BaseURL    string
 }
 
 type Client struct {
@@ -42,7 +44,6 @@ type JobsResponse struct {
 
 type Job struct {
 	ID       string
-	Path     string
 	Title    string
 	Company  string
 	Location string
@@ -50,7 +51,6 @@ type Job struct {
 
 type JobDetailResponse struct {
 	ID               string
-	Path             string
 	Title            string
 	Company          string
 	Location         string
@@ -59,70 +59,78 @@ type JobDetailResponse struct {
 	Responsibilities string
 }
 
-func NewClient(httpClient *http.Client) *Client {
+func NewClient(c *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		httpClient: cmp.Or(c, http.DefaultClient),
 		baseURL:    defaultBaseURL,
 	}
 }
 
-func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
-	u, err := url.Parse(c.baseURL + "/jobs/results")
+func (c *Client) jobsRawURL(req *JobsRequest) (string, error) {
+	ru, err := url.JoinPath(c.baseURL, jobsPath)
 	if err != nil {
-		return nil, err
+		return "", fmt.Errorf("join path %s, %s: %w", c.baseURL, jobsPath, err)
 	}
+
+	u, err := url.Parse(ru)
+	if err != nil {
+		return "", fmt.Errorf("parse url %s: %w", ru, err)
+	}
+
 	q := u.Query()
-	if p.Query != "" {
-		q.Set("q", p.Query)
+	if req.Query != "" {
+		q.Set("q", req.Query)
 	}
-	addAll(q, "location", p.Locations)
-	if p.HasRemote {
+	addAll(q, "location", req.Locations)
+	if req.HasRemote {
 		q.Set("has_remote", "true")
 	}
-	addAll(q, "target_level", p.TargetLevels)
-	if p.Skills != "" {
-		q.Set("skills", p.Skills)
+	addAll(q, "target_level", req.TargetLevels)
+	if req.Skills != "" {
+		q.Set("skills", req.Skills)
 	}
-	addAll(q, "degree", p.Degrees)
-	addAll(q, "employment_type", p.EmploymentType)
-	addAll(q, "company", p.Companies)
-	if p.SortBy != "" {
-		q.Set("sort_by", p.SortBy)
+	addAll(q, "degree", req.Degrees)
+	addAll(q, "employment_type", req.EmploymentType)
+	addAll(q, "company", req.Companies)
+	if req.SortBy != "" {
+		q.Set("sort_by", req.SortBy)
 	}
-	if p.Page > 0 {
-		q.Set("page", strconv.Itoa(p.Page))
+	if req.Page > 0 {
+		q.Set("page", strconv.Itoa(req.Page))
 	}
 	u.RawQuery = q.Encode()
+	return u.String(), nil
+}
 
-	body, err := c.getHTML(ctx, u.String(), c.baseURL+"/jobs")
+func (c *Client) Jobs(ctx context.Context, req *JobsRequest) (*JobsResponse, error) {
+	u, err := c.jobsRawURL(req)
+	if err != nil {
+		return nil, fmt.Errorf("build jobs raw url: %w", err)
+	}
+	doc, err := c.getHTML(ctx, u, c.baseURL+"/jobs")
 	if err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
-	return &JobsResponse{Jobs: parseSearchHTML(body)}, nil
+	return &JobsResponse{Jobs: parseJobsHTML(doc)}, nil
 }
 
-func (c *Client) JobDetail(ctx context.Context, jobIDOrPath string) (*JobDetailResponse, error) {
-	path := strings.Trim(jobIDOrPath, "/")
-	u := c.baseURL + "/jobs/results/" + path
-	body, err := c.getHTML(ctx, u, c.baseURL+"/jobs/results")
+func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
+	u := c.baseURL + "/jobs/results/" + jobID
+	doc, err := c.getHTML(ctx, u, c.baseURL+"/jobs/results")
 	if err != nil {
-		return nil, fmt.Errorf("job detail %s: %w", jobIDOrPath, err)
+		return nil, fmt.Errorf("job detail %s: %w", jobID, err)
 	}
-	id := numericID(path)
-	detail, ok := parseDetailHTML(body, id)
+	detail, ok := parseJobDetailHTML(doc, jobID)
 	if !ok {
-		return nil, fmt.Errorf("job detail %s: not found in response", jobIDOrPath)
+		return nil, fmt.Errorf("job detail %s: not found in response", jobID)
 	}
-	if detail.Path == "" {
-		detail.Path = path
-	}
-	return &detail, nil
+	return detail, nil
 }
 
-func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (string, error) {
+func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Node, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
@@ -132,17 +140,18 @@ func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (string, e
 	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	b, err := io.ReadAll(resp.Body)
+
+	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("parse html: %w", err)
 	}
-	return string(b), nil
+	return doc, nil
 }
 
 func addAll(q url.Values, key string, values []string) {

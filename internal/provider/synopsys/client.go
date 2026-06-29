@@ -8,9 +8,9 @@ import (
 	"net/http"
 )
 
-const baseURL = "https://careers.synopsys.com"
+const defaultBaseURL = "https://careers.synopsys.com"
 
-var baseHeader = http.Header{
+var defaultHeader = http.Header{
 	"User-Agent": {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"},
 	"Accept":     {"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"},
 }
@@ -23,7 +23,7 @@ type Client struct {
 func NewClient(httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
-		baseURL:    baseURL,
+		baseURL:    defaultBaseURL,
 	}
 }
 
@@ -32,7 +32,7 @@ func newRequest(ctx context.Context, method, rawURL string) (*http.Request, erro
 	if err != nil {
 		return nil, err
 	}
-	for key, values := range baseHeader {
+	for key, values := range defaultHeader {
 		for _, v := range values {
 			req.Header.Add(key, v)
 		}

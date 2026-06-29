@@ -6,42 +6,17 @@ import (
 	"golang.org/x/net/html"
 )
 
-// parseSearchHTML parses job cards from search results HTML.
+// parseJobsHTML parses job cards from search results HTML.
 // xq -q "li.lLd3Je" -a "ssk" --html → "18:{jobID}"
 // xq -q "li.lLd3Je h3.QJPWVe" --html → title
 // xq -q "li.lLd3Je span.RP7SMd span" --html → company (inner span, skips icon)
 // xq -q "li.lLd3Je span.r0wTof" --html → primary location (first match)
-// xq -q "a[href^='jobs/results/']" -a "href" --html → paths (strip query string)
-func parseSearchHTML(body string) []Job {
-	doc, err := html.Parse(strings.NewReader(body))
-	if err != nil {
-		return nil
-	}
-
-	paths := make(map[string]string)
-	var collectPaths func(*html.Node)
-	collectPaths = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "a" {
-			href := attrVal(n, "href")
-			if strings.HasPrefix(href, "jobs/results/") {
-				seg, _, _ := strings.Cut(strings.TrimPrefix(href, "jobs/results/"), "?")
-				id := numericID(seg)
-				if _, ok := paths[id]; !ok {
-					paths[id] = seg
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			collectPaths(c)
-		}
-	}
-	collectPaths(doc)
-
+func parseJobsHTML(doc *html.Node) []Job {
 	var jobs []Job
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
 		if n.Type == html.ElementNode && n.Data == "li" && hasClass(n, "lLd3Je") {
-			if job, ok := parseJobCard(n, paths); ok {
+			if job, ok := parseJobCard(n); ok {
 				jobs = append(jobs, job)
 			}
 			return
@@ -54,7 +29,7 @@ func parseSearchHTML(body string) []Job {
 	return jobs
 }
 
-func parseJobCard(li *html.Node, paths map[string]string) (Job, bool) {
+func parseJobCard(li *html.Node) (Job, bool) {
 	ssk := attrVal(li, "ssk")
 	_, id, _ := strings.Cut(ssk, ":")
 	if id == "" {
@@ -86,26 +61,17 @@ func parseJobCard(li *html.Node, paths map[string]string) (Job, bool) {
 	}
 	walk(li)
 
-	path := paths[id]
-	if path == "" {
-		path = id
-	}
-	return Job{ID: id, Path: path, Title: title, Company: company, Location: location}, title != ""
+	return Job{ID: id, Title: title, Company: company, Location: location}, title != ""
 }
 
-// parseDetailHTML parses a single job detail page.
+// parseJobDetailHTML parses a single job detail page.
 // xq -q "title" --html → title (strip " — Google Careers" suffix)
 // xq -q "main span.RP7SMd span" --html → company (inner span, skips icon)
 // xq -q "main span.r0wTof" --html → location (scoped to <main> to exclude sidebar)
 // xq -q "main div.aG5W3" --html → About the job section
 // xq -q "main div.BDNOWe" --html → Responsibilities section
 // xq -q "h3" --html (matched by text prefix "Minimum/Preferred qualifications") → Qualifications
-func parseDetailHTML(body, id string) (JobDetailResponse, bool) {
-	doc, err := html.Parse(strings.NewReader(body))
-	if err != nil {
-		return JobDetailResponse{}, false
-	}
-
+func parseJobDetailHTML(doc *html.Node, id string) (*JobDetailResponse, bool) {
 	detail := JobDetailResponse{ID: id}
 	var inMain bool
 
@@ -183,7 +149,7 @@ func parseDetailHTML(body, id string) (JobDetailResponse, bool) {
 	}
 	walk(doc)
 
-	return detail, detail.Title != ""
+	return &detail, detail.Title != ""
 }
 
 func appendNodeText(sb *strings.Builder, n *html.Node) {
@@ -259,7 +225,3 @@ func spanChildText(n *html.Node) string {
 	return ""
 }
 
-func numericID(path string) string {
-	id, _, _ := strings.Cut(path, "-")
-	return id
-}

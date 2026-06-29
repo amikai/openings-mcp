@@ -14,7 +14,7 @@ func newMockServer(t *testing.T) *httptest.Server {
 	t.Helper()
 	mux := http.NewServeMux()
 	mux.HandleFunc("/jobs/results/", serveTestdata("testdata/job_detail_rsp.html"))
-	mux.HandleFunc("/jobs/results", serveTestdata("testdata/search_jobs_rsp.html"))
+	mux.HandleFunc("/jobs/results", serveTestdata("testdata/jobs_rsp.html"))
 	return httptest.NewServer(mux)
 }
 
@@ -53,7 +53,7 @@ func TestJobDetail(t *testing.T) {
 	defer srv.Close()
 	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
-	got, err := c.JobDetail(t.Context(), "106863362666570438-software-engineer-gpu-system-software")
+	got, err := c.JobDetail(t.Context(), "106863362666570438")
 	require.NoError(t, err)
 
 	assert.Equal(t, wantDetail, got)

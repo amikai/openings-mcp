@@ -10,7 +10,7 @@ import (
 	"strconv"
 )
 
-const baseURL = "https://www.104.com.tw"
+const defaultBaseURL = "https://www.104.com.tw"
 
 var baseHeader = http.Header{
 	"User-Agent":      {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"},
@@ -42,7 +42,7 @@ type Client struct {
 func NewClient(httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
-		baseURL:    baseURL,
+		baseURL:    defaultBaseURL,
 	}
 }
 
