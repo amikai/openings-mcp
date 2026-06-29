@@ -29,7 +29,7 @@ func run() error {
 
 	c := synopsys.NewClient(synopsys.Config{})
 
-	results, err := c.Jobs(ctx, &synopsys.JobRequest{
+	results, err := c.Jobs(ctx, &synopsys.JobsRequest{
 		Keywords:       keyword,
 		RecordsPerPage: 15,
 	})

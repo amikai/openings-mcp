@@ -115,13 +115,13 @@ func parseJobCard(article *html.Node) (Job, bool) {
 // xq -q "article.article--details .article__content__view__field__value" --html → field value
 // Field labels (zh_TW): "公司名稱", "工作地點", "專業領域", "職別", "職務類型", "職務張貼日"
 // Field labels (zh_TW): "職務說明" (Responsibilities), "職務要求" (Qualifications) → multiline div children
-func parseDetailHTML(body string) (JobDetail, bool) {
+func parseDetailHTML(body string) (JobDetailResponse, bool) {
 	doc, err := html.Parse(strings.NewReader(body))
 	if err != nil {
-		return JobDetail{}, false
+		return JobDetailResponse{}, false
 	}
 
-	var detail JobDetail
+	var detail JobDetailResponse
 
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
@@ -144,7 +144,7 @@ func parseDetailHTML(body string) (JobDetail, bool) {
 	return detail, detail.Title != ""
 }
 
-func parseDetailArticle(article *html.Node, detail *JobDetail) {
+func parseDetailArticle(article *html.Node, detail *JobDetailResponse) {
 	// Collect label-value pairs from field divs.
 	var label string
 	var walk func(*html.Node)

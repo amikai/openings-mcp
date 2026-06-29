@@ -108,7 +108,7 @@ type Client struct {
 	baseURL    string
 }
 
-type JobRequest struct {
+type JobsRequest struct {
 	Keyword         string
 	Locations       []string
 	Categories      []string
@@ -118,7 +118,7 @@ type JobRequest struct {
 	PerPage         int
 }
 
-type SearchResponse struct {
+type JobsResponse struct {
 	Total int
 	Jobs  []Job
 }
@@ -133,7 +133,7 @@ type Job struct {
 	Posted         string
 }
 
-type JobDetail struct {
+type JobDetailResponse struct {
 	ID               string
 	Slug             string
 	Title            string
@@ -154,7 +154,7 @@ func NewClient(cfg Config) *Client {
 	}
 }
 
-func (c *Client) searchURL(p *JobRequest) (string, error) {
+func (c *Client) searchURL(p *JobsRequest) (string, error) {
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
 		return "", err
@@ -195,7 +195,7 @@ func (c *Client) searchURL(p *JobRequest) (string, error) {
 	return u.String(), nil
 }
 
-func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResponse, error) {
+func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	rawURL, err := c.searchURL(p)
 	if err != nil {
 		return nil, err
@@ -205,10 +205,10 @@ func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResponse, erro
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
 	jobs, total := parseSearchHTML(body)
-	return &SearchResponse{Total: total, Jobs: jobs}, nil
+	return &JobsResponse{Total: total, Jobs: jobs}, nil
 }
 
-func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetail, error) {
+func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	u := c.baseURL + pathJobDetail + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
 	body, err := c.getHTML(ctx, u, c.baseURL+pathSearchJobs)
 	if err != nil {

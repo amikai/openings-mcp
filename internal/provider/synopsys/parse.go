@@ -11,13 +11,13 @@ import (
 	"golang.org/x/net/html"
 )
 
-func parseSearchResults(resultsHTML string) (*SearchResults, error) {
+func parseSearchResults(resultsHTML string) (*JobsResponse, error) {
 	doc, err := html.Parse(strings.NewReader(resultsHTML))
 	if err != nil {
 		return nil, err
 	}
 
-	var result SearchResults
+	var result JobsResponse
 
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
@@ -99,7 +99,7 @@ func parseJobCard(li *html.Node) (Job, bool) {
 
 var jsonLDRe = regexp.MustCompile(`(?s)<script[^>]+application/ld\+json[^>]*>(.*?)</script>`)
 
-func parseJobDetail(r io.Reader) (*JobDetail, error) {
+func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 	body, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
@@ -135,7 +135,7 @@ func parseJobDetail(r io.Reader) (*JobDetail, error) {
 
 	category, hireType, remoteEligible, description := parseAtsDesc(body)
 
-	return &JobDetail{
+	return &JobDetailResponse{
 		Title:          ld.Title,
 		DatePosted:     ld.DatePosted,
 		Locations:      locs,

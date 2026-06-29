@@ -45,7 +45,7 @@ func newRequest(ctx context.Context, method, rawURL string) (*http.Request, erro
 	return req, nil
 }
 
-func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResults, error) {
+func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	q := buildSearchQuery(p)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/results?"+q.Encode())
 	if err != nil {
@@ -77,7 +77,7 @@ func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResults, error
 	return result, nil
 }
 
-func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobDetail, error) {
+func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobDetailResponse, error) {
 	path := fmt.Sprintf("/job/%s/%s/44408/%s", city, slug, jobID)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+path)
 	if err != nil {

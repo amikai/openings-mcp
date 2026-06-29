@@ -100,13 +100,13 @@ func parseJobCard(li *html.Node, paths map[string]string) (Job, bool) {
 // xq -q "main div.aG5W3" --html → About the job section
 // xq -q "main div.BDNOWe" --html → Responsibilities section
 // xq -q "h3" --html (matched by text prefix "Minimum/Preferred qualifications") → Qualifications
-func parseDetailHTML(body, id string) (JobDetail, bool) {
+func parseDetailHTML(body, id string) (JobDetailResponse, bool) {
 	doc, err := html.Parse(strings.NewReader(body))
 	if err != nil {
-		return JobDetail{}, false
+		return JobDetailResponse{}, false
 	}
 
-	detail := JobDetail{ID: id}
+	detail := JobDetailResponse{ID: id}
 	var inMain bool
 
 	var walk func(*html.Node)

@@ -71,9 +71,9 @@ func keywordFromInput(args []string, stdin *os.File) (string, error) {
 	return keyword, nil
 }
 
-func defaultSearchParams(keyword string) *job104.JobRequest {
+func defaultSearchParams(keyword string) *job104.JobsRequest {
 	fullTime := 0
-	return &job104.JobRequest{
+	return &job104.JobsRequest{
 		Keyword: keyword,
 		RO:      &fullTime,
 	}
@@ -103,7 +103,7 @@ func jobsForDetail(jobs []job104.Job) []job104.Job {
 	return limited
 }
 
-func formatReport(keyword string, search *job104.SearchJobResponse, jobs []job104.Job, details map[string]*job104.JobDetailResponse) string {
+func formatReport(keyword string, search *job104.JobsResponse, jobs []job104.Job, details map[string]*job104.JobDetailResponse) string {
 	var sb strings.Builder
 	p := search.Metadata.Pagination
 	fmt.Fprintf(&sb, "104 Jobs Report\n")

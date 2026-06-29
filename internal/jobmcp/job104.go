@@ -35,8 +35,8 @@ var (
 	job104Remote  = map[string]int{"none": 0, "partial": 1, "full": 2}
 )
 
-func job104ToRequest(in job104SearchInput) (*job104.JobRequest, error) {
-	r := &job104.JobRequest{Keyword: in.Keyword}
+func job104ToRequest(in job104SearchInput) (*job104.JobsRequest, error) {
+	r := &job104.JobsRequest{Keyword: in.Keyword}
 	if in.Area != "" {
 		code, ok := job104Areas[in.Area]
 		if !ok {
@@ -86,7 +86,7 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return textResult(job104.FormatSearchJobResponse(resp)), nil, nil
+		return nil, resp, nil
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
@@ -97,6 +97,6 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return textResult(job104.FormatJobDetail(resp, in.JobCode)), nil, nil
+		return nil, resp, nil
 	})
 }

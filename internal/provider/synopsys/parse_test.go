@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseSearchResults(t *testing.T) {
+func TestParseJobsResponse(t *testing.T) {
 	data, err := os.ReadFile("testdata/search_jobs_rsp.json")
 	require.NoError(t, err)
 
@@ -21,7 +21,7 @@ func TestParseSearchResults(t *testing.T) {
 	got, err := parseSearchResults(raw.Results)
 	require.NoError(t, err)
 
-	want := &SearchResults{
+	want := &JobsResponse{
 		TotalResults: 604,
 		TotalPages:   300,
 		CurrentPage:  1,
@@ -33,7 +33,7 @@ func TestParseSearchResults(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestParseJobDetail(t *testing.T) {
+func TestParseJobDetailResponse(t *testing.T) {
 	f, err := os.Open("testdata/job_detail_rsp.html")
 	require.NoError(t, err)
 	defer f.Close()
@@ -43,7 +43,7 @@ func TestParseJobDetail(t *testing.T) {
 
 	require.NoError(t, err)
 
-	want := &JobDetail{
+	want := &JobDetailResponse{
 		Title:          "Staff Software Engineer",
 		DatePosted:     "2026-4-1",
 		Locations:      []string{"Bengaluru, India"},

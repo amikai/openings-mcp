@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
-	"strings"
 )
 
 const orgID = "44408"
@@ -19,7 +18,7 @@ type FacetFilter struct {
 	FieldName string
 }
 
-type JobRequest struct {
+type JobsRequest struct {
 	Keywords       string
 	Location       string
 	Page           int
@@ -44,7 +43,7 @@ func (j Job) URL() string {
 	return "https://careers.synopsys.com/job/" + j.City + "/" + j.Slug + "/" + orgID + "/" + j.JobID
 }
 
-type SearchResults struct {
+type JobsResponse struct {
 	TotalResults int
 	TotalPages   int
 	CurrentPage  int
@@ -53,7 +52,7 @@ type SearchResults struct {
 	HasContent   bool
 }
 
-type JobDetail struct {
+type JobDetailResponse struct {
 	Title          string
 	DatePosted     string
 	Locations      []string
@@ -64,7 +63,7 @@ type JobDetail struct {
 	DisplayID      string
 }
 
-func buildSearchQuery(p *JobRequest) url.Values {
+func buildSearchQuery(p *JobsRequest) url.Values {
 	q := url.Values{
 		"SearchType":              {"5"},
 		"ResultsType":             {"0"},
@@ -108,39 +107,3 @@ func buildSearchQuery(p *JobRequest) url.Values {
 	return q
 }
 
-func FormatSearchResults(r *SearchResults) string {
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "Found %d jobs (page %d/%d)\n\n", r.TotalResults, r.CurrentPage, r.TotalPages)
-	for _, job := range r.Jobs {
-		fmt.Fprintf(&sb, "[%s] %s\n", job.DisplayID, job.Title)
-		fmt.Fprintf(&sb, "  Location: %s\n", job.Location)
-		fmt.Fprintf(&sb, "  Category: %s\n", job.Category)
-		fmt.Fprintf(&sb, "  Posted: %s\n", job.Posted)
-		fmt.Fprintf(&sb, "  URL: %s\n", job.URL())
-		sb.WriteByte('\n')
-	}
-	return sb.String()
-}
-
-func FormatJobDetail(d *JobDetail) string {
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "=== %s ===\n", d.Title)
-	if len(d.Locations) > 0 {
-		fmt.Fprintf(&sb, "Location: %s\n", strings.Join(d.Locations, ", "))
-	}
-	fmt.Fprintf(&sb, "Posted: %s\n", d.DatePosted)
-	if d.DisplayID != "" {
-		fmt.Fprintf(&sb, "Job ID: %s\n", d.DisplayID)
-	}
-	if d.Category != "" {
-		fmt.Fprintf(&sb, "Category: %s\n", d.Category)
-	}
-	if d.HireType != "" {
-		fmt.Fprintf(&sb, "Hire Type: %s\n", d.HireType)
-	}
-	if d.RemoteEligible != "" {
-		fmt.Fprintf(&sb, "Remote Eligible: %s\n", d.RemoteEligible)
-	}
-	fmt.Fprintf(&sb, "\n--- Job Description ---\n%s\n", d.Description)
-	return sb.String()
-}

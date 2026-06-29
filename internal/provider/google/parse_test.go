@@ -31,7 +31,7 @@ var wantJobs = []Job{
 	{ID: "141781579927036614", Path: "141781579927036614-senior-software-engineer-emerging-onprem-ai-infrastructure", Title: "Senior Software Engineer, Emerging On-prem AI Infrastructure", Company: "Google", Location: "Taipei, Taiwan"},
 }
 
-var wantDetail = &JobDetail{
+var wantDetail = &JobDetailResponse{
 	ID:       "106863362666570438",
 	Path:     "106863362666570438-software-engineer-gpu-system-software",
 	Title:    "Software Engineer, GPU System Software",

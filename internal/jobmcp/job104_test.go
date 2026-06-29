@@ -35,7 +35,7 @@ func TestJob104ToRequest(t *testing.T) {
 	order := 15
 	remoteWork := 2
 	page := 2
-	want := &job104.JobRequest{
+	want := &job104.JobsRequest{
 		Keyword:    "golang",
 		Area:       job104.AreaTaipei,
 		RO:         &ro,

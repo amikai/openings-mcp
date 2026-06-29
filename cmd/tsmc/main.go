@@ -28,7 +28,7 @@ func run() error {
 	defer cancel()
 
 	client := tsmc.NewClient(tsmc.Config{})
-	search, err := client.Jobs(ctx, &tsmc.JobRequest{
+	search, err := client.Jobs(ctx, &tsmc.JobsRequest{
 		Keyword:         keyword,
 		Locations:       []string{tsmc.LocTaiwan},
 		EmploymentTypes: []string{tsmc.EmployRegular},
@@ -41,7 +41,7 @@ func run() error {
 	if len(jobs) > 10 {
 		jobs = jobs[:10]
 	}
-	details := make(map[string]*tsmc.JobDetail, len(jobs))
+	details := make(map[string]*tsmc.JobDetailResponse, len(jobs))
 	for _, job := range jobs {
 		detail, err := client.JobDetail(ctx, job.ID)
 		if err != nil {
@@ -73,7 +73,7 @@ func keywordFromInput(args []string, stdin *os.File) (string, error) {
 	return keyword, nil
 }
 
-func formatReport(keyword string, search *tsmc.SearchResponse, jobs []tsmc.Job, details map[string]*tsmc.JobDetail) string {
+func formatReport(keyword string, search *tsmc.JobsResponse, jobs []tsmc.Job, details map[string]*tsmc.JobDetailResponse) string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "TSMC Jobs Report\n")
 	fmt.Fprintf(&sb, "Keyword: %s\n", keyword)

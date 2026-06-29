@@ -39,10 +39,10 @@ func TestJobs(t *testing.T) {
 	defer srv.Close()
 	c := NewClient(Config{BaseURL: srv.URL})
 
-	got, err := c.Jobs(t.Context(), &JobRequest{Keywords: "software engineer"})
+	got, err := c.Jobs(t.Context(), &JobsRequest{Keywords: "software engineer"})
 	require.NoError(t, err)
 
-	want := &SearchResults{
+	want := &JobsResponse{
 		TotalResults: 604,
 		TotalPages:   300,
 		CurrentPage:  1,
@@ -64,7 +64,7 @@ func TestJobDetail(t *testing.T) {
 	got, err := c.JobDetail(t.Context(), "bengaluru", "staff-software-engineer", "93498496944")
 	require.NoError(t, err)
 
-	want := &JobDetail{
+	want := &JobDetailResponse{
 		Title:          "Staff Software Engineer",
 		DatePosted:     "2026-4-1",
 		Locations:      []string{"Bengaluru, India"},

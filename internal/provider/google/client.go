@@ -23,7 +23,7 @@ type Client struct {
 	baseURL    string
 }
 
-type JobRequest struct {
+type JobsRequest struct {
 	Query          string
 	Locations      []string
 	HasRemote      bool
@@ -36,7 +36,7 @@ type JobRequest struct {
 	Page           int
 }
 
-type SearchResponse struct {
+type JobsResponse struct {
 	Jobs []Job
 }
 
@@ -48,7 +48,7 @@ type Job struct {
 	Location string
 }
 
-type JobDetail struct {
+type JobDetailResponse struct {
 	ID               string
 	Path             string
 	Title            string
@@ -66,7 +66,7 @@ func NewClient(cfg Config) *Client {
 	}
 }
 
-func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResponse, error) {
+func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	u, err := url.Parse(c.baseURL + "/jobs/results")
 	if err != nil {
 		return nil, err
@@ -98,10 +98,10 @@ func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchResponse, erro
 	if err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
-	return &SearchResponse{Jobs: parseSearchHTML(body)}, nil
+	return &JobsResponse{Jobs: parseSearchHTML(body)}, nil
 }
 
-func (c *Client) JobDetail(ctx context.Context, jobIDOrPath string) (*JobDetail, error) {
+func (c *Client) JobDetail(ctx context.Context, jobIDOrPath string) (*JobDetailResponse, error) {
 	path := strings.Trim(jobIDOrPath, "/")
 	u := c.baseURL + "/jobs/results/" + path
 	body, err := c.getHTML(ctx, u, c.baseURL+"/jobs/results")

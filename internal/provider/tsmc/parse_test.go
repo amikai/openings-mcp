@@ -21,7 +21,7 @@ var wantJobs = []Job{
 	{ID: "6154", Slug: "R-D-Module-Engineer", Title: "R&D Module Engineer", Location: "台灣", CareerArea: "研究發展", EmploymentType: "正職", Posted: "2026/03/17"},
 }
 
-var wantDetail = &JobDetail{
+var wantDetail = &JobDetailResponse{
 	ID:             "21826",
 	Title:          "R&D Advanced Packaging Integration Engineer",
 	Company:        "台灣積體電路製造股份有限公司",

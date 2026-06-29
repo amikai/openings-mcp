@@ -8,7 +8,7 @@ import (
 )
 
 func TestFormatReportIncludesEveryJobDetail(t *testing.T) {
-	search := &job104.SearchJobResponse{}
+	search := &job104.JobsResponse{}
 	search.Metadata.Pagination.Total = 2
 	search.Metadata.Pagination.CurrentPage = 1
 	search.Metadata.Pagination.LastPage = 1

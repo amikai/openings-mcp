@@ -3,7 +3,6 @@ package jobmcp
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/amikai/job-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -96,8 +95,8 @@ func mapCodes(field string, labels []string, m map[string]string) ([]string, err
 	return out, nil
 }
 
-func tsmcToRequest(in tsmcSearchInput) (*tsmc.JobRequest, error) {
-	r := &tsmc.JobRequest{Keyword: in.Keyword, Page: in.Page}
+func tsmcToRequest(in tsmcSearchInput) (*tsmc.JobsRequest, error) {
+	r := &tsmc.JobsRequest{Keyword: in.Keyword, Page: in.Page}
 	var err error
 	if r.Locations, err = mapCodes("location", in.Locations, tsmcLocations); err != nil {
 		return nil, err
@@ -114,26 +113,6 @@ func tsmcToRequest(in tsmcSearchInput) (*tsmc.JobRequest, error) {
 	return r, nil
 }
 
-func formatTSMCSearch(r *tsmc.SearchResponse) string {
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "Found %d jobs (showing %d)\n\n", r.Total, len(r.Jobs))
-	for i, j := range r.Jobs {
-		fmt.Fprintf(&sb, "%d. [%s] %s\n", i+1, j.ID, j.Title)
-		fmt.Fprintf(&sb, "   Location: %s | Area: %s | %s | Posted: %s\n\n",
-			j.Location, j.CareerArea, j.EmploymentType, j.Posted)
-	}
-	return sb.String()
-}
-
-func formatTSMCDetail(d *tsmc.JobDetail) string {
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "%s\n", d.Title)
-	fmt.Fprintf(&sb, "Company: %s | Location: %s | Area: %s\n", d.Company, d.Location, d.CareerArea)
-	fmt.Fprintf(&sb, "Type: %s | Employment: %s | Posted: %s\n\n", d.JobType, d.EmploymentType, d.Posted)
-	fmt.Fprintf(&sb, "Responsibilities:\n%s\n\nQualifications:\n%s\n", d.Responsibilities, d.Qualifications)
-	return sb.String()
-}
-
 // RegisterTSMC registers the tsmc search and job-detail tools.
 func RegisterTSMC(s *mcp.Server, c *tsmc.Client) {
 	mcp.AddTool(s, &mcp.Tool{
@@ -148,7 +127,7 @@ func RegisterTSMC(s *mcp.Server, c *tsmc.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return textResult(formatTSMCSearch(resp)), nil, nil
+		return nil, resp, nil
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
@@ -159,6 +138,6 @@ func RegisterTSMC(s *mcp.Server, c *tsmc.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return textResult(formatTSMCDetail(resp)), nil, nil
+		return nil, resp, nil
 	})
 }

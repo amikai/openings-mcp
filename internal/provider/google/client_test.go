@@ -35,7 +35,7 @@ func TestJobs(t *testing.T) {
 	defer srv.Close()
 	c := NewClient(Config{BaseURL: srv.URL})
 
-	got, err := c.Jobs(t.Context(), &JobRequest{
+	got, err := c.Jobs(t.Context(), &JobsRequest{
 		Query:          "software engineer",
 		Locations:      []string{"Taiwan"},
 		EmploymentType: []string{"FULL_TIME"},
@@ -44,7 +44,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &SearchResponse{Jobs: wantJobs}
+	want := &JobsResponse{Jobs: wantJobs}
 	assert.Equal(t, want, got)
 }
 

@@ -51,7 +51,7 @@ func NewClient(cfg Config) *Client {
 	}
 }
 
-func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchJobResponse, error) {
+func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	q := url.Values{}
 	if p.Keyword != "" {
 		q.Set("keyword", p.Keyword)
@@ -92,7 +92,7 @@ func (c *Client) Jobs(ctx context.Context, p *JobRequest) (*SearchJobResponse, e
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("jobs: HTTP %d", resp.StatusCode)
 	}
-	var result SearchJobResponse
+	var result JobsResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("jobs: decode: %w", err)
 	}
@@ -119,7 +119,7 @@ func (c *Client) JobDetail(ctx context.Context, jobCode string) (*JobDetailRespo
 	return &result, nil
 }
 
-func (c *Client) Companies(ctx context.Context, p SearchCompaniesParams) (*SearchCompanyResponse, error) {
+func (c *Client) Companies(ctx context.Context, p *CompaniesRequest) (*CompaniesResponse, error) {
 	page := max(p.Page, 1)
 	pageSize := p.PageSize
 	if pageSize == 0 {
@@ -142,7 +142,7 @@ func (c *Client) Companies(ctx context.Context, p SearchCompaniesParams) (*Searc
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("companies: HTTP %d", resp.StatusCode)
 	}
-	var result SearchCompanyResponse
+	var result CompaniesResponse
 	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
 		return nil, fmt.Errorf("companies: decode: %w", err)
 	}

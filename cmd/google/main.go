@@ -34,7 +34,7 @@ func run() error {
 	}
 
 	jobs := jobsForDetail(search.Jobs)
-	details := make(map[string]*google.JobDetail, len(jobs))
+	details := make(map[string]*google.JobDetailResponse, len(jobs))
 	for _, job := range jobs {
 		detail, err := client.JobDetail(ctx, job.Path)
 		if err != nil {
@@ -66,8 +66,8 @@ func keywordFromInput(args []string, stdin *os.File) (string, error) {
 	return keyword, nil
 }
 
-func defaultSearchParams(keyword string) *google.JobRequest {
-	return &google.JobRequest{
+func defaultSearchParams(keyword string) *google.JobsRequest {
+	return &google.JobsRequest{
 		Query:          keyword,
 		EmploymentType: []string{"FULL_TIME"},
 		SortBy:         "date",
@@ -82,7 +82,7 @@ func jobsForDetail(jobs []google.Job) []google.Job {
 	return jobs
 }
 
-func formatReport(keyword string, search *google.SearchResponse, jobs []google.Job, details map[string]*google.JobDetail) string {
+func formatReport(keyword string, search *google.JobsResponse, jobs []google.Job, details map[string]*google.JobDetailResponse) string {
 	var sb strings.Builder
 	fmt.Fprintf(&sb, "Google Jobs Report\n")
 	fmt.Fprintf(&sb, "Keyword: %s\n", keyword)
@@ -106,7 +106,7 @@ func formatReport(keyword string, search *google.SearchResponse, jobs []google.J
 	return sb.String()
 }
 
-func writeGoogleDetail(sb *strings.Builder, detail *google.JobDetail) {
+func writeGoogleDetail(sb *strings.Builder, detail *google.JobDetailResponse) {
 	if detail.About != "" {
 		fmt.Fprintf(sb, "About: %s\n", detail.About)
 	}
