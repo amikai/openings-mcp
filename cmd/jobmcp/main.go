@@ -6,7 +6,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/amikai/job-mcp/internal/jobmcp"
@@ -30,7 +29,7 @@ func runWithTransport(transport mcp.Transport) error {
 	cTSMC := tsmc.NewClient(hc)
 	server := newServer(c104, cTSMC)
 
-	if err := server.Run(context.Background(), transport); err != nil && !isCleanClose(err) {
+	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
 	}
 	return nil
@@ -43,6 +42,3 @@ func newServer(c104 *job104.Client, cTSMC *tsmc.Client) *mcp.Server {
 	return server
 }
 
-func isCleanClose(err error) bool {
-	return errors.Is(err, io.EOF) || strings.Contains(err.Error(), "EOF")
-}
