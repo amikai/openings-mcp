@@ -21,8 +21,8 @@ func (writeCloser) Close() error { return nil }
 func TestServerListsJobTools(t *testing.T) {
 	ctx := context.Background()
 	server := newServer(
-		job104.NewClient(job104.Config{HTTPClient: http.DefaultClient}),
-		tsmc.NewClient(tsmc.Config{HTTPClient: http.DefaultClient}),
+		job104.NewClient(http.DefaultClient),
+		tsmc.NewClient(http.DefaultClient),
 	)
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()

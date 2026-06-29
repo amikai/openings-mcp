@@ -39,7 +39,7 @@ func serveTestdata(path string) http.HandlerFunc {
 func TestJobs(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	r, err := c.Jobs(t.Context(), &JobsRequest{Keyword: "Golang", Area: AreaTaipei})
 	if err != nil {
@@ -71,7 +71,7 @@ func TestJobs(t *testing.T) {
 func TestJobDetail(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	r, err := c.Jobs(t.Context(), &JobsRequest{})
 	if err != nil || len(r.Data) == 0 {
@@ -101,7 +101,7 @@ func TestJobDetail(t *testing.T) {
 func TestCompanies(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	r, err := c.Companies(t.Context(), &CompaniesRequest{Keyword: "科技"})
 	if err != nil {
@@ -127,7 +127,7 @@ func TestCompanies(t *testing.T) {
 func TestCompanyDetail(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	// TSMC
 	d, err := c.CompanyDetail(t.Context(), "a5h92m0")
@@ -145,7 +145,7 @@ func TestCompanyDetail(t *testing.T) {
 func TestCompanyJobs(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	// TSMC
 	jobs, err := c.CompanyJobs(t.Context(), "a5h92m0")

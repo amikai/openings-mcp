@@ -26,8 +26,8 @@ func runWithTransport(transport mcp.Transport) error {
 	// fails that call instead of stalling the MCP session.
 	hc := &http.Client{Timeout: 30 * time.Second}
 
-	c104 := job104.NewClient(job104.Config{HTTPClient: hc})
-	cTSMC := tsmc.NewClient(tsmc.Config{HTTPClient: hc})
+	c104 := job104.NewClient(hc)
+	cTSMC := tsmc.NewClient(hc)
 	server := newServer(c104, cTSMC)
 
 	if err := server.Run(context.Background(), transport); err != nil && !isCleanClose(err) {

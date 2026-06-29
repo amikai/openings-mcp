@@ -7,7 +7,7 @@ OPENAPI_SPECS := \
 	internal/provider/tsmc/openapi.yaml
 
 ut:
-	go test $(shell go list ./... | grep -vE '/cmd($|/)')
+	go test -race -vet=all $(shell go list ./... | grep -vE '/cmd($|/)')
 
 validate-openapi: $(OPENAPI_SPECS)
 	@for spec in $^; do \

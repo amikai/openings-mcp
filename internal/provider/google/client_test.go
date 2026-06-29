@@ -33,7 +33,7 @@ func serveTestdata(path string) http.HandlerFunc {
 func TestJobs(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	got, err := c.Jobs(t.Context(), &JobsRequest{
 		Query:          "software engineer",
@@ -51,7 +51,7 @@ func TestJobs(t *testing.T) {
 func TestJobDetail(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	got, err := c.JobDetail(t.Context(), "106863362666570438-software-engineer-gpu-system-software")
 	require.NoError(t, err)

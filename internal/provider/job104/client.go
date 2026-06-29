@@ -34,20 +34,15 @@ func newRequest(ctx context.Context, method, rawURL, referer string) (*http.Requ
 	return req, nil
 }
 
-type Config struct {
-	HTTPClient *http.Client
-	BaseURL    string
-}
-
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
 }
 
-func NewClient(cfg Config) *Client {
+func NewClient(httpClient *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(cfg.HTTPClient, http.DefaultClient),
-		baseURL:    cmp.Or(cfg.BaseURL, baseURL),
+		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		baseURL:    baseURL,
 	}
 }
 

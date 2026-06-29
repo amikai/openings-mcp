@@ -37,7 +37,7 @@ func serveTestdata(path string) http.HandlerFunc {
 func TestJobs(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	got, err := c.Jobs(t.Context(), &JobsRequest{Keywords: "software engineer"})
 	require.NoError(t, err)
@@ -59,7 +59,7 @@ func TestJobs(t *testing.T) {
 func TestJobDetail(t *testing.T) {
 	srv := newMockServer(t)
 	defer srv.Close()
-	c := NewClient(Config{BaseURL: srv.URL})
+	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
 	got, err := c.JobDetail(t.Context(), "bengaluru", "staff-software-engineer", "93498496944")
 	require.NoError(t, err)

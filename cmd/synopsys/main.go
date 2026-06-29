@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ func run() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
-	c := synopsys.NewClient(synopsys.Config{})
+	c := synopsys.NewClient(http.DefaultClient)
 
 	results, err := c.Jobs(ctx, &synopsys.JobsRequest{
 		Keywords:       keyword,

@@ -15,20 +15,15 @@ var baseHeader = http.Header{
 	"Accept":     {"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"},
 }
 
-type Config struct {
-	HTTPClient *http.Client
-	BaseURL    string
-}
-
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
 }
 
-func NewClient(cfg Config) *Client {
+func NewClient(httpClient *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(cfg.HTTPClient, http.DefaultClient),
-		baseURL:    cmp.Or(cfg.BaseURL, baseURL),
+		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		baseURL:    baseURL,
 	}
 }
 
