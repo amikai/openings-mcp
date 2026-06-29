@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	job104 "github.com/amikai/job-mcp/internal/provider/job104"
+	"github.com/amikai/job-mcp/internal/provider/job104"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 

@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	job104 "github.com/amikai/job-mcp/internal/provider/job104"
+	"github.com/amikai/job-mcp/internal/provider/job104"
 )
 
 func TestFormatReportIncludesEveryJobDetail(t *testing.T) {
