@@ -120,6 +120,19 @@ func parseDetailHTML(doc *html.Node) (JobDetailResponse, bool) {
 	walk = func(n *html.Node) {
 		if n.Type == html.ElementNode {
 			switch {
+			case n.Data == "link" && attrVal(n, "rel") == "canonical":
+				href := attrVal(n, "href")
+				if href != "" {
+					u, err := url.Parse(href)
+					if err == nil {
+						parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+						if len(parts) >= 2 {
+							detail.ID = parts[len(parts)-1]
+							detail.Slug = parts[len(parts)-2]
+						}
+					}
+				}
+				return
 			case n.Data == "h2" && hasClass(n, "banner__text__title"):
 				// xq -q "h2.banner__text__title" --html
 				detail.Title = strings.TrimSpace(textContent(n))

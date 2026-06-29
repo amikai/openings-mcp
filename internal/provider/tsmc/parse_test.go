@@ -24,6 +24,7 @@ var wantJobs = []Job{
 
 var wantDetail = &JobDetailResponse{
 	ID:             "21826",
+	Slug:           "R-D-Advanced-Packaging-Integration-Engineer",
 	Title:          "R&D Advanced Packaging Integration Engineer",
 	Company:        "台灣積體電路製造股份有限公司",
 	Location:       "台灣",
@@ -63,7 +64,5 @@ func TestParseDetailHTML(t *testing.T) {
 	got, ok := parseDetailHTML(doc)
 	require.True(t, ok)
 
-	got.ID = wantDetail.ID
-	got.Slug = wantDetail.Slug
 	assert.Equal(t, *wantDetail, got)
 }

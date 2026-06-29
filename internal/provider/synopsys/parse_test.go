@@ -48,25 +48,15 @@ func TestParseJobsResponse(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-func TestParseJobDetailResponse(t *testing.T) {
-	f, err := os.Open("testdata/job_detail_rsp.html")
-	require.NoError(t, err)
-	defer f.Close()
-
-	got, err := parseJobDetail(f)
-	require.NoError(t, err)
-
-	require.NoError(t, err)
-
-	want := &JobDetailResponse{
-		Title:          "Staff Software Engineer",
-		DatePosted:     "2026-4-1",
-		Locations:      []string{"Bengaluru, India"},
-		DisplayID:      "16567",
-		Category:       "Engineering",
-		HireType:       "Employee",
-		RemoteEligible: "No",
-		Description: `We Are:
+var wantJobDetail = &JobDetailResponse{
+	Title:          "Staff Software Engineer",
+	DatePosted:     "2026-4-1",
+	Locations:      []string{"Bengaluru, India"},
+	DisplayID:      "16567",
+	Category:       "Engineering",
+	HireType:       "Employee",
+	RemoteEligible: "No",
+	Description: `We Are:
 
 At Synopsys, we drive the innovations that shape the way we live and connect. Our technology is central to the Era of Pervasive Intelligence, from self-driving cars to learning machines. We lead in chip design, verification, and IP integration, empowering the creation of high-performance silicon chips and software content. Join us to transform the future through continuous technological innovation.
 
@@ -120,8 +110,17 @@ We offer a comprehensive range of health, wellness, and financial benefits to ca
 
 
 At Synopsys, we want talented people of every background to feel valued and supported to do their best work. Synopsys considers all applicants for employment without regard to race, color, religion, national origin, gender, sexual orientation, age, military veteran status, or disability.`,
-	}
-	assert.Equal(t, want, got)
+}
+
+func TestParseJobDetailResponse(t *testing.T) {
+	f, err := os.Open("testdata/job_detail_rsp.html")
+	require.NoError(t, err)
+	defer f.Close()
+
+	got, err := parseJobDetail(f)
+	require.NoError(t, err)
+
+	assert.Equal(t, wantJobDetail, got)
 }
 
 func TestStripHTML(t *testing.T) {

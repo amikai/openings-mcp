@@ -2,11 +2,11 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"strings"
 	"testing"
 
 	cake "github.com/amikai/job-mcp/internal/provider/cake"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFormatReportIncludesEveryJobDetail(t *testing.T) {
@@ -55,22 +55,14 @@ func TestJobsForDetailLimitsToTen(t *testing.T) {
 }
 
 func TestDefaultSearchRequestUsesFullTimeAndNoRemote(t *testing.T) {
-	req := defaultSearchRequest("Golang")
-	if req.Query != "Golang" {
-		t.Fatalf("Query = %q", req.Query)
+	got := defaultSearchRequest("Golang")
+	want := cake.JobSearchRequest{
+		Query:  "Golang",
+		SortBy: cake.JobSearchRequestSortByPopularity,
+		Filters: cake.JobSearchRequestFilters{
+			"job_types": []byte(`["full_time"]`),
+			"remote":    []byte(`["no_remote_work"]`),
+		},
 	}
-	if req.SortBy != cake.JobSearchRequestSortByPopularity {
-		t.Fatalf("SortBy = %q", req.SortBy)
-	}
-
-	raw, err := json.Marshal(req.Filters)
-	if err != nil {
-		t.Fatal(err)
-	}
-	got := string(raw)
-	for _, want := range []string{`"job_types":["full_time"]`, `"remote":["no_remote_work"]`} {
-		if !strings.Contains(got, want) {
-			t.Fatalf("filters %s missing %s", got, want)
-		}
-	}
+	assert.Equal(t, want, got)
 }
