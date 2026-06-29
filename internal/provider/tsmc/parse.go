@@ -19,12 +19,7 @@ var totalRE = regexp.MustCompile(`\d+\s*-\s*\d+\s*of\s*(\d+)`)
 // xq -q "article.article--result span.list-item-employmentType" --html → employment type
 // xq -q "article.article--result span.list-item-posted" --html → posted date (strip "Posted: ")
 // xq -q "article.article--result a[id^='shareButton--email']" -a "href" --html → slug (URL-decode body path)
-func parseSearchHTML(body string) ([]Job, int) {
-	doc, err := html.Parse(strings.NewReader(body))
-	if err != nil {
-		return nil, 0
-	}
-
+func parseSearchHTML(doc *html.Node) ([]Job, int) {
 	total := 0
 	var jobs []Job
 
@@ -118,18 +113,26 @@ func parseJobCard(article *html.Node) (Job, bool) {
 // xq -q "article.article--details .article__content__view__field__value" --html → field value
 // Field labels (zh_TW): "公司名稱", "工作地點", "專業領域", "職別", "職務類型", "職務張貼日"
 // Field labels (zh_TW): "職務說明" (Responsibilities), "職務要求" (Qualifications) → multiline div children
-func parseDetailHTML(body string) (JobDetailResponse, bool) {
-	doc, err := html.Parse(strings.NewReader(body))
-	if err != nil {
-		return JobDetailResponse{}, false
-	}
-
+func parseDetailHTML(doc *html.Node) (JobDetailResponse, bool) {
 	var detail JobDetailResponse
 
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
 		if n.Type == html.ElementNode {
 			switch {
+			case n.Data == "link" && attrVal(n, "rel") == "canonical":
+				href := attrVal(n, "href")
+				if href != "" {
+					u, err := url.Parse(href)
+					if err == nil {
+						parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+						if len(parts) >= 2 {
+							detail.ID = parts[len(parts)-1]
+							detail.Slug = parts[len(parts)-2]
+						}
+					}
+				}
+				return
 			case n.Data == "h2" && hasClass(n, "banner__text__title"):
 				// xq -q "h2.banner__text__title" --html
 				detail.Title = strings.TrimSpace(textContent(n))

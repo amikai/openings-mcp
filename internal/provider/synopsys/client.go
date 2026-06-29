@@ -44,16 +44,16 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	q := buildSearchQuery(p)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/results?"+q.Encode())
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: search: %w", err)
+		return nil, fmt.Errorf("search jobs: %w", err)
 	}
 	req.Header.Set("Accept", "application/json")
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: search: %w", err)
+		return nil, fmt.Errorf("search jobs: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("synopsys: search: HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("search jobs: HTTP %d", resp.StatusCode)
 	}
 	var raw struct {
 		Results    string `json:"results"`
@@ -61,11 +61,11 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 		HasContent bool   `json:"hasContent"`
 	}
 	if err := json.NewDecoder(resp.Body).Decode(&raw); err != nil {
-		return nil, fmt.Errorf("synopsys: search: decode: %w", err)
+		return nil, fmt.Errorf("search jobs: decode: %w", err)
 	}
 	result, err := parseSearchResults(raw.Results)
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: search: parse: %w", err)
+		return nil, fmt.Errorf("search jobs: parse: %w", err)
 	}
 	result.HasJobs = raw.HasJobs
 	result.HasContent = raw.HasContent
@@ -76,19 +76,19 @@ func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobD
 	path := fmt.Sprintf("/job/%s/%s/44408/%s", city, slug, jobID)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+path)
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: job detail: %w", err)
+		return nil, fmt.Errorf("job detail: %w", err)
 	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: job detail: %w", err)
+		return nil, fmt.Errorf("job detail: %w", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("synopsys: job detail: HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("job detail: HTTP %d", resp.StatusCode)
 	}
 	result, err := parseJobDetail(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("synopsys: job detail: parse: %w", err)
+		return nil, fmt.Errorf("job detail: parse: %w", err)
 	}
 	return result, nil
 }

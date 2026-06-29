@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/amikai/job-mcp/internal/provider/job104"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFormatReportIncludesEveryJobDetail(t *testing.T) {
@@ -76,23 +77,19 @@ func TestJobsForDetailSkipsRemoteJobs(t *testing.T) {
 	}
 
 	got := jobsForDetail(jobs)
-	if len(got) != 2 {
-		t.Fatalf("jobsForDetail returned %d jobs, want 2", len(got))
+	want := []job104.Job{
+		{JobName: "Onsite"},
+		{JobName: "Another Onsite"},
 	}
-	if got[0].JobName != "Onsite" || got[1].JobName != "Another Onsite" {
-		t.Fatalf("jobsForDetail returned remote jobs: %#v", got)
-	}
+	assert.Equal(t, want, got)
 }
 
 func TestDefaultSearchParamsUseFullTime(t *testing.T) {
-	params := defaultSearchParams("Golang")
-	if params.Keyword != "Golang" {
-		t.Fatalf("Keyword = %q", params.Keyword)
+	got := defaultSearchParams("Golang")
+	ro := 0
+	want := &job104.JobsRequest{
+		Keyword: "Golang",
+		RO:      &ro,
 	}
-	if params.RO == nil || *params.RO != 0 {
-		t.Fatalf("RO = %v, want full-time 0", params.RO)
-	}
-	if params.RemoteWork != nil {
-		t.Fatalf("RemoteWork = %v, want nil because 104 API only accepts 1=partial or 2=full", params.RemoteWork)
-	}
+	assert.Equal(t, want, got)
 }

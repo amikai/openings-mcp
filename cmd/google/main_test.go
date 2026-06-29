@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	google "github.com/amikai/job-mcp/internal/provider/google"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
@@ -53,17 +54,12 @@ func TestJobsForDetailLimitsGoogleJobsToTen(t *testing.T) {
 }
 
 func TestDefaultSearchParamsUsesFullTimeNewest(t *testing.T) {
-	params := defaultSearchParams("software engineer")
-	if params.Query != "software engineer" {
-		t.Fatalf("Query = %q", params.Query)
+	got := defaultSearchParams("software engineer")
+	want := &google.JobsRequest{
+		Query:          "software engineer",
+		SortBy:         "date",
+		EmploymentType: []string{"FULL_TIME"},
+		Page:           1,
 	}
-	if params.SortBy != "date" {
-		t.Fatalf("SortBy = %q", params.SortBy)
-	}
-	if len(params.EmploymentType) != 1 || params.EmploymentType[0] != "FULL_TIME" {
-		t.Fatalf("EmploymentType = %#v", params.EmploymentType)
-	}
-	if params.Page != 1 {
-		t.Fatalf("Page = %d", params.Page)
-	}
+	assert.Equal(t, want, got)
 }

@@ -6,6 +6,8 @@ import (
 
 	"github.com/amikai/job-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRegisterTSMC(t *testing.T) {
@@ -26,25 +28,17 @@ func TestTSMCToRequest(t *testing.T) {
 		Page:            3,
 	}
 	got, err := tsmcToRequest(in)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
+	require.NoError(t, err)
+
+	want := &tsmc.JobsRequest{
+		Keyword:         "process engineer",
+		Locations:       []string{tsmc.LocTaiwan, tsmc.LocJapanOsaka},
+		Categories:      []string{tsmc.CatRD},
+		JobTypes:        []string{tsmc.JobTypeEngineer},
+		EmploymentTypes: []string{tsmc.EmployRegular},
+		Page:            3,
 	}
-	if got.Keyword != "process engineer" || got.Page != 3 {
-		t.Errorf("Keyword/Page = %q/%d", got.Keyword, got.Page)
-	}
-	wantLoc := []string{tsmc.LocTaiwan, tsmc.LocJapanOsaka}
-	if len(got.Locations) != 2 || got.Locations[0] != wantLoc[0] || got.Locations[1] != wantLoc[1] {
-		t.Errorf("Locations = %v, want %v", got.Locations, wantLoc)
-	}
-	if len(got.Categories) != 1 || got.Categories[0] != tsmc.CatRD {
-		t.Errorf("Categories = %v, want [%s]", got.Categories, tsmc.CatRD)
-	}
-	if len(got.JobTypes) != 1 || got.JobTypes[0] != tsmc.JobTypeEngineer {
-		t.Errorf("JobTypes = %v, want [%s]", got.JobTypes, tsmc.JobTypeEngineer)
-	}
-	if len(got.EmploymentTypes) != 1 || got.EmploymentTypes[0] != tsmc.EmployRegular {
-		t.Errorf("EmploymentTypes = %v", got.EmploymentTypes)
-	}
+	assert.Equal(t, want, got)
 }
 
 func TestTSMCToRequestInvalidLocation(t *testing.T) {

@@ -4,10 +4,11 @@ import (
 	"cmp"
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"golang.org/x/net/html"
 )
 
 const defaultBaseURL = "https://careers.tsmc.com"
@@ -194,21 +195,21 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	if err != nil {
 		return nil, err
 	}
-	body, err := c.getHTML(ctx, rawURL, c.baseURL+pathSearchJobs)
+	doc, err := c.getHTML(ctx, rawURL, c.baseURL+pathSearchJobs)
 	if err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
-	jobs, total := parseSearchHTML(body)
+	jobs, total := parseSearchHTML(doc)
 	return &JobsResponse{Total: total, Jobs: jobs}, nil
 }
 
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	u := c.baseURL + pathJobDetail + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
-	body, err := c.getHTML(ctx, u, c.baseURL+pathSearchJobs)
+	doc, err := c.getHTML(ctx, u, c.baseURL+pathSearchJobs)
 	if err != nil {
 		return nil, fmt.Errorf("job detail %s: %w", jobID, err)
 	}
-	detail, ok := parseDetailHTML(body)
+	detail, ok := parseDetailHTML(doc)
 	if !ok {
 		return nil, fmt.Errorf("job detail %s: not found in response", jobID)
 	}
@@ -216,10 +217,10 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	return &detail, nil
 }
 
-func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (string, error) {
+func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Node, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
@@ -229,15 +230,15 @@ func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (string, e
 	}
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	b, err := io.ReadAll(resp.Body)
+	doc, err := html.Parse(resp.Body)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("parse html: %w", err)
 	}
-	return string(b), nil
+	return doc, nil
 }
