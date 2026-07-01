@@ -34,12 +34,12 @@ func main() {
 		searchText   = fs.StringLong("search-text", "", "free-text keyword search")
 		limit        = fs.IntLong("limit", 20, "page size (server caps this at 20)")
 		offset       = fs.IntLong("offset", 0, "zero-based result offset")
-		jobCategory  = fs.StringEnumLong("job-category", usageWithChoices("Job Category label", nvidia.JobCategoryIDs), labels(nvidia.JobCategoryIDs)...)
-		jobType      = fs.StringEnumLong("job-type", usageWithChoices("Job Type label", nvidia.JobTypeIDs), labels(nvidia.JobTypeIDs)...)
-		timeType     = fs.StringEnumLong("time-type", usageWithChoices("Time Type label", nvidia.TimeTypeIDs), labels(nvidia.TimeTypeIDs)...)
-		locationType = fs.StringEnumLong("location-type", usageWithChoices("Location Type label", nvidia.LocationTypeIDs), labels(nvidia.LocationTypeIDs)...)
-		country      = fs.StringEnumLong("country", usageWithChoices("Country label", nvidia.CountryIDs), labels(nvidia.CountryIDs)...)
-		site         = fs.StringEnumLong("site", usageWithChoices("City-level site label", nvidia.SiteIDs), labels(nvidia.SiteIDs)...)
+		jobCategory  = fs.StringEnumLong("job-category", usageWithChoices("Job Category", nvidia.JobCategoryIDs), labels(nvidia.JobCategoryIDs)...)
+		jobType      = fs.StringEnumLong("job-type", usageWithChoices("Job Type", nvidia.JobTypeIDs), labels(nvidia.JobTypeIDs)...)
+		timeType     = fs.StringEnumLong("time-type", usageWithChoices("Time Type", nvidia.TimeTypeIDs), labels(nvidia.TimeTypeIDs)...)
+		locationType = fs.StringEnumLong("location-type", usageWithChoices("Location Type", nvidia.LocationTypeIDs), labels(nvidia.LocationTypeIDs)...)
+		country      = fs.StringEnumLong("country", usageWithChoices("Country", nvidia.CountryIDs), labels(nvidia.CountryIDs)...)
+		site         = fs.StringEnumLong("site", usageWithChoices("City-level site", nvidia.SiteIDs), labels(nvidia.SiteIDs)...)
 	)
 	if err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("NVIDIA")); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
@@ -139,22 +139,22 @@ func main() {
 func buildAppliedFacets(jobCategory, jobType, timeType, locationType, country, site string) nvidia.AppliedFacets {
 	var af nvidia.AppliedFacets
 	if jobCategory != "" {
-		af.JobFamilyGroup = []nvidia.AppliedFacetsJobFamilyGroupItem{nvidia.AppliedFacetsJobFamilyGroupItem(nvidia.JobCategoryIDs[jobCategory])}
+		af.JobFamilyGroup = []nvidia.AppliedFacetsJobFamilyGroupItem{nvidia.JobCategoryIDs[jobCategory]}
 	}
 	if jobType != "" {
-		af.WorkerSubType = []nvidia.AppliedFacetsWorkerSubTypeItem{nvidia.AppliedFacetsWorkerSubTypeItem(nvidia.JobTypeIDs[jobType])}
+		af.WorkerSubType = []nvidia.AppliedFacetsWorkerSubTypeItem{nvidia.JobTypeIDs[jobType]}
 	}
 	if timeType != "" {
-		af.TimeType = []nvidia.AppliedFacetsTimeTypeItem{nvidia.AppliedFacetsTimeTypeItem(nvidia.TimeTypeIDs[timeType])}
+		af.TimeType = []nvidia.AppliedFacetsTimeTypeItem{nvidia.TimeTypeIDs[timeType]}
 	}
 	if locationType != "" {
-		af.LocationHierarchy2 = []nvidia.AppliedFacetsLocationHierarchy2Item{nvidia.AppliedFacetsLocationHierarchy2Item(nvidia.LocationTypeIDs[locationType])}
+		af.LocationHierarchy2 = []nvidia.AppliedFacetsLocationHierarchy2Item{nvidia.LocationTypeIDs[locationType]}
 	}
 	if country != "" {
-		af.LocationHierarchy1 = []nvidia.AppliedFacetsLocationHierarchy1Item{nvidia.AppliedFacetsLocationHierarchy1Item(nvidia.CountryIDs[country])}
+		af.LocationHierarchy1 = []nvidia.AppliedFacetsLocationHierarchy1Item{nvidia.CountryIDs[country]}
 	}
 	if site != "" {
-		af.Locations = []nvidia.AppliedFacetsLocationsItem{nvidia.AppliedFacetsLocationsItem(nvidia.SiteIDs[site])}
+		af.Locations = []nvidia.AppliedFacetsLocationsItem{nvidia.SiteIDs[site]}
 	}
 	return af
 }
@@ -163,7 +163,7 @@ func buildAppliedFacets(jobCategory, jobType, timeType, locationType, country, s
 // "" so an ff.StringEnumLong flag can default to unset (no filter) instead
 // of silently falling back to the first real label — ffval.Enum's zero
 // Default only survives initialize() if it's itself in the Valid list.
-func labels(table map[string]string) []string {
+func labels[V any](table map[string]V) []string {
 	l := make([]string, 0, len(table)+1)
 	l = append(l, "")
 	for label := range table {
@@ -176,7 +176,7 @@ func labels(table map[string]string) []string {
 // usageWithChoices appends a comma-separated "one of: ..." list to base.
 // ffhelp never introspects an ff.StringEnumLong's valid values on its own, so
 // small enough choice sets are spelled out here to make -h self-documenting.
-func usageWithChoices(base string, table map[string]string) string {
+func usageWithChoices[V any](base string, table map[string]V) string {
 	choices := labels(table)[1:] // drop the leading "" no-filter sentinel
 	// " | " (not ", ") because some labels (e.g. site names like
 	// "US, CA, Santa Clara") contain commas themselves.
