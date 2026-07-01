@@ -9,39 +9,46 @@ import (
 )
 
 type job104SearchInput struct {
-	Keyword string `json:"keyword" jsonschema:"search keyword, required"`
-	Area    string `json:"area,omitempty" jsonschema:"city filter; one of: taipei, new_taipei, taoyuan, taichung, tainan, kaohsiung"`
-	JobType string `json:"job_type,omitempty" jsonschema:"employment basis; one of: full, part"`
-	Sort    string `json:"sort,omitempty" jsonschema:"result order; one of: newest, relevance"`
-	Remote  string `json:"remote,omitempty" jsonschema:"remote work; one of: partial, full (there is no explicit 'none' value — omit this field for that)"`
-	Page    int    `json:"page,omitempty" jsonschema:"1-based page number"`
+	Keyword string   `json:"keyword,omitempty"`
+	Area    string   `json:"area,omitempty"`
+	JobType string   `json:"job_type,omitempty"`
+	Sort    string   `json:"sort,omitempty"`
+	Remote  string   `json:"remote,omitempty"`
+	Edu     []string `json:"edu,omitempty"`
+	Shift   []string `json:"shift,omitempty"`
+	Page    int      `json:"page,omitempty"`
 }
 
 type job104DetailInput struct {
 	JobCode string `json:"job_code" jsonschema:"104 job code (jobNo), required"`
 }
 
-// Areas keyed by the MCP tool's public "taipei"/"new_taipei"/... vocabulary,
-// pointing at job104.AreaIDs (which uses "Taipei"/"NewTaipei"/... labels).
-var job104AreaAliases = map[string]string{
-	"taipei":     "Taipei",
-	"new_taipei": "NewTaipei",
-	"taoyuan":    "Taoyuan",
-	"taichung":   "Taichung",
-	"tainan":     "Tainan",
-	"kaohsiung":  "Kaohsiung",
+// lookupCode translates one human label to its typed code, erroring with the
+// field name on unknown labels.
+func lookupCode[T any](field, label string, m map[string]T) (T, error) {
+	code, ok := m[label]
+	if !ok {
+		var zero T
+		return zero, fmt.Errorf("invalid %s %q", field, label)
+	}
+	return code, nil
 }
 
-// JobType/Sort/Remote keyed by the MCP tool's public "full"/"part"/...
-// vocabulary, pointing at job104.RoIDs/OrderIDs/RemoteWorkIDs (which use
-// "Full-time"/"Newest"/... labels) — the canonical id values live only
-// there, not duplicated here (that duplication is exactly how RO/RemoteWork
-// ended up wrong in an earlier version of this file).
-var (
-	job104JobTypeAliases = map[string]string{"full": "Full-time", "part": "Part-time"}
-	job104SortAliases    = map[string]string{"newest": "Newest", "relevance": "Relevance"}
-	job104RemoteAliases  = map[string]string{"partial": "Partial", "full": "Full"}
-)
+// lookupCodes is lookupCode over a multi-select field.
+func lookupCodes[T any](field string, labels []string, m map[string]T) ([]T, error) {
+	if len(labels) == 0 {
+		return nil, nil
+	}
+	out := make([]T, 0, len(labels))
+	for _, label := range labels {
+		code, err := lookupCode(field, label, m)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, code)
+	}
+	return out, nil
+}
 
 func job104ToRequest(in job104SearchInput) (job104.SearchJobsParams, error) {
 	var params job104.SearchJobsParams
@@ -49,32 +56,39 @@ func job104ToRequest(in job104SearchInput) (job104.SearchJobsParams, error) {
 		params.Keyword = job104.NewOptString(in.Keyword)
 	}
 	if in.Area != "" {
-		label, ok := job104AreaAliases[in.Area]
-		if !ok {
-			return params, fmt.Errorf("invalid area %q (want taipei|new_taipei|taoyuan|taichung|tainan|kaohsiung)", in.Area)
+		code, err := lookupCode("area", in.Area, job104.AreaIDs)
+		if err != nil {
+			return params, err
 		}
-		params.Area = job104.NewOptSearchJobsArea(job104.AreaIDs[label])
+		params.Area = job104.NewOptSearchJobsArea(code)
 	}
 	if in.JobType != "" {
-		label, ok := job104JobTypeAliases[in.JobType]
-		if !ok {
-			return params, fmt.Errorf("invalid job_type %q (want full|part)", in.JobType)
+		code, err := lookupCode("job_type", in.JobType, job104.RoIDs)
+		if err != nil {
+			return params, err
 		}
-		params.Ro = job104.NewOptSearchJobsRo(job104.RoIDs[label])
+		params.Ro = job104.NewOptSearchJobsRo(code)
 	}
 	if in.Sort != "" {
-		label, ok := job104SortAliases[in.Sort]
-		if !ok {
-			return params, fmt.Errorf("invalid sort %q (want newest|relevance)", in.Sort)
+		code, err := lookupCode("sort", in.Sort, job104.OrderIDs)
+		if err != nil {
+			return params, err
 		}
-		params.Order = job104.NewOptSearchJobsOrder(job104.OrderIDs[label])
+		params.Order = job104.NewOptSearchJobsOrder(code)
 	}
 	if in.Remote != "" {
-		label, ok := job104RemoteAliases[in.Remote]
-		if !ok {
-			return params, fmt.Errorf("invalid remote %q (want partial|full)", in.Remote)
+		code, err := lookupCode("remote", in.Remote, job104.RemoteWorkIDs)
+		if err != nil {
+			return params, err
 		}
-		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(job104.RemoteWorkIDs[label])
+		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(code)
+	}
+	var err error
+	if params.Edu, err = lookupCodes("edu", in.Edu, job104.EduIDs); err != nil {
+		return params, err
+	}
+	if params.S9, err = lookupCodes("shift", in.Shift, job104.S9IDs); err != nil {
+		return params, err
 	}
 	if in.Page > 0 {
 		params.Page = job104.NewOptInt(in.Page)
