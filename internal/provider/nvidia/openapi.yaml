@@ -1,0 +1,494 @@
+openapi: 3.1.0
+
+info:
+  title: NVIDIA Careers Minimal Job Search API
+  version: "1.0.0"
+  description: >
+    Minimal client API surface needed to search NVIDIA Careers jobs
+    (https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite) and fetch a
+    full job description. Powered by Workday's Candidate Experience (CXS)
+    platform.
+
+    Observed filter parameters: `POST /jobs` accepts `appliedFacets`, a map of
+    facet parameter name to an array of selected value ids. Known parameter
+    names and their observed values:
+
+    | facetParameter       | UI label      | Example values (descriptor → id)                                   |
+    |----------------------|---------------|---------------------------------------------------------------------|
+    | `jobFamilyGroup`     | Job Category  | Engineering → `0c40f6bd1d8f10ae43ffaefd46dc7e78`, Sales → `0c40f6bd1d8f10ae43ffcac5bbec7e90` |
+    | `workerSubType`      | Job Type      | Regular Employee → `0c40f6bd1d8f10adf6dae161b1844a15`, Intern (Fixed Term) → observed via UI |
+    | `timeType`           | Time Type     | Full time → `5509c0b5959810ac0029943377d47364`, Part time → `5509c0b5959810ac00299430e7947363` |
+    | `locationHierarchy2` | Location Type | Office → `0c3f5f117e9a0101f6422f0fe79d0000`, Remote → `0c3f5f117e9a0101f63dc469c3010000` |
+    | `locationHierarchy1` | Location      | Country name → opaque id, e.g. United States → `2fcb99c455831013ea52fb338f2932d8` |
+
+    These ids are opaque Workday GUIDs and not derivable from their labels.
+    The full, current set (all countries, categories, etc.) is returned as
+    `facets` on every `/jobs` response; treat the table above as a seed for
+    common values rather than an exhaustive list, and prefer reading ids from
+    a live response over hardcoding them.
+
+servers:
+  - url: https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite
+    description: NVIDIA Careers (Workday CXS)
+
+tags:
+  - name: Jobs
+    description: Minimal job search and detail endpoints
+
+paths:
+  /jobs:
+    post:
+      tags: [Jobs]
+      summary: Search / filter / paginate jobs
+      description: >
+        Searches jobs by keyword and/or facet filters, paginated via
+        `limit`/`offset`. `limit` is capped server-side at 20; a higher value
+        returns HTTP 400.
+
+        Observed minimal request requirements: `appliedFacets`, `limit`,
+        `offset`, and `searchText` are all required by the API (send `{}`
+        for `appliedFacets` and `""` for `searchText` when unused).
+      operationId: searchJobs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobsRequest"
+            examples:
+              minimal:
+                summary: Unfiltered keyword search
+                value:
+                  appliedFacets: {}
+                  limit: 20
+                  offset: 0
+                  searchText: "CUDA"
+              filtered:
+                summary: Engineering + Remote + United States
+                value:
+                  appliedFacets:
+                    jobFamilyGroup: ["0c40f6bd1d8f10ae43ffaefd46dc7e78"]
+                    locationHierarchy2: ["0c3f5f117e9a0101f63dc469c3010000"]
+                    locationHierarchy1: ["2fcb99c455831013ea52fb338f2932d8"]
+                  limit: 20
+                  offset: 0
+                  searchText: ""
+              paginated:
+                summary: Second page of results
+                value:
+                  appliedFacets: {}
+                  limit: 20
+                  offset: 20
+                  searchText: ""
+      responses:
+        "200":
+          description: Search succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobsResponse"
+        "400":
+          description: >
+            Malformed request — e.g. `limit` above 20, or an unknown facet
+            parameter/value id.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /job/{location}/{titleSlug}:
+    get:
+      tags: [Jobs]
+      summary: Get job detail
+      description: >
+        Fetches a single job posting. `externalPath` returned from the search
+        endpoint always has the form `/job/{location}/{titleSlug}` (exactly
+        two segments after `/job/`); split it on the first `/` to get these
+        two path parameters. A single combined path parameter does not work
+        here — standard URI encoders percent-encode the `/` inside it,
+        producing an invalid URL that the server rejects with HTTP 400.
+      operationId: getJobDetail
+      parameters:
+        - name: location
+          in: path
+          required: true
+          description: Location slug segment, e.g. `US-CA-Remote`.
+          schema:
+            type: string
+          example: "US-CA-Remote"
+        - name: titleSlug
+          in: path
+          required: true
+          description: Title-and-requisition-id segment, e.g. `Software-Engineer--CUDA-Q_JR2011649`.
+          schema:
+            type: string
+          example: "Software-Engineer--CUDA-Q_JR2011649"
+      responses:
+        "200":
+          description: Job detail found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailResponse"
+        "404":
+          description: Job posting not found or no longer active.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        default:
+          description: Unexpected error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    JobsRequest:
+      type: object
+      required: [appliedFacets, limit, offset, searchText]
+      properties:
+        appliedFacets:
+          $ref: "#/components/schemas/AppliedFacets"
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 20
+          description: Page size. Server caps this at 20.
+          example: 20
+        offset:
+          type: integer
+          minimum: 0
+          description: Zero-based result offset for pagination.
+          example: 0
+        searchText:
+          type: string
+          description: Free-text keyword search across job title and description.
+          example: "CUDA"
+
+    AppliedFacets:
+      type: object
+      description: >
+        One property per known facet parameter (see the parameter table
+        above). Each holds an array of selected value ids: OR'd within a
+        facet, AND'd across facets. Omit a property (or leave its array
+        empty) to leave that dimension unfiltered. Value ids are opaque
+        Workday GUIDs — resolve them from a facet label via the
+        JobCategoryIDs / JobTypeIDs / TimeTypeIDs / LocationTypeIDs /
+        CountryIDs / SiteIDs lookup tables rather than guessing.
+      properties:
+        jobFamilyGroup:
+          type: array
+          items:
+            type: string
+            enum:
+              - "0c40f6bd1d8f10ae43ffaefd46dc7e78" # Engineering
+              - "0c40f6bd1d8f10ae43ffcac5bbec7e90" # Sales
+              - "0c40f6bd1d8f10ae43ffc3fc7d8c7e8a" # Operations
+              - "0c40f6bd1d8f10ae43ffc668c6847e8c" # Program Manager
+              - "0c40f6bd1d8f10ae43ffc19725ec7e88" # Marketing
+              - "0c40f6bd1d8f10ae43ffc8817cf47e8e" # Research
+              - "0c40f6bd1d8f10ae43ffbd1459047e84" # IT - Information Technology
+              - "0c40f6bd1d8f10ae43ffda1e8d447e94" # Univ Employment
+              - "0c40f6bd1d8f10ae43ffb5dd06f47e7e" # Finance
+              - "e8bdc341a93101bd5f4d2b0a1c005e36" # Professional Services
+              - "0c40f6bd1d8f10ae43ffbac3680c7e82" # Human Resources
+              - "0c40f6bd1d8f10ae43ffbf4412147e86" # Legal
+              - "0c40f6bd1d8f10ae43ffb3a6aaac7e7c" # Facilities
+              - "0c40f6bd1d8f10ae43ffac5fdfac7e76" # Business Development
+        workerSubType:
+          type: array
+          items:
+            type: string
+            enum:
+              - "0c40f6bd1d8f10adf6dae161b1844a15" # Regular Employee
+              - "0c40f6bd1d8f10adf6dae2cd57444a16" # Management
+              - "ab40a98049581037a3ada55b087049b7" # New College Graduate
+              - "0c40f6bd1d8f10adf6dae42e46d44a17" # Intern (Fixed Term)
+              - "cc40d60d614c01809d56fe967144ce2c" # Regular Employee (Fixed Term)
+              - "ec9560ee6dc71001d6f3cf17ea640000" # Academic (Fixed Term)
+        timeType:
+          type: array
+          description: >
+            Time Type value ids. One of: Full time, Part time (see TimeTypeIDs).
+          items:
+            type: string
+            enum:
+              - "5509c0b5959810ac0029943377d47364" # Full time
+              - "5509c0b5959810ac00299430e7947363" # Part time
+        locationHierarchy2:
+          type: array
+          description: >
+            Location Type value ids. One of: Office, Remote (see LocationTypeIDs).
+          items:
+            type: string
+            enum:
+              - "0c3f5f117e9a0101f6422f0fe79d0000" # Office
+              - "0c3f5f117e9a0101f63dc469c3010000" # Remote
+        locationHierarchy1:
+          type: array
+          items:
+            type: string
+            enum:
+              - "d21cf68980ad0128000fd2c6b107c000" # Armenia
+              - "2fcb99c455831013ea528dce556b3224" # Australia
+              - "2fcb99c455831013ea5298c9e1f63230" # Brazil
+              - "2fcb99c455831013ea529c3b93ba3236" # Canada
+              - "2fcb99c455831013ea529fe151e3323c" # China
+              - "2fcb99c455831013ea52a358b3d53242" # Czechia
+              - "d21cf68980ad0121a67d319db107a200" # Denmark
+              - "2fcb99c455831013ea52a6cbc15f3248" # Finland
+              - "2fcb99c455831013ea52aa2df70e324e" # France
+              - "2fcb99c455831013ea52adc65f5d3254" # Germany
+              - "c498fba66f4e01b7b7931c0fd400ab04" # Greece
+              - "2fcb99c455831013ea52b157d0d6325a" # Hong Kong
+              - "7bcfe8379f6b01ad4d347d1ca87689a6" # Hungary
+              - "2fcb99c455831013ea52b82135ba3266" # India
+              - "2fcb99c455831013ea52bbe14cf9326c" # Israel
+              - "2fcb99c455831013ea52bf52796c3272" # Italy
+              - "2fcb99c455831013ea52c29d2e923278" # Japan
+              - "2fcb99c455831013ea52c61ded6e327e" # Korea
+              - "2fcb99c455831013ea52cd244532328a" # Mexico
+              - "2fcb99c455831013ea52d0e0e4583290" # Netherlands
+              - "970bf8c909a701f9c086d363d300fa06" # Palestine
+              - "2fcb99c455831013ea52d8783aa0329c" # Poland
+              - "e5375aecc8d9103bebfb513cb69200d4" # Romania
+              - "e4c3fe651a5b01ddbafb67d7d001b447" # Saudi Arabia
+              - "2fcb99c455831013ea52df1adb7432a8" # Singapore
+              - "2fcb99c455831013ea52e31a43e832ae" # Spain
+              - "2fcb99c455831013ea52e6c3067832b4" # Sweden
+              - "2fcb99c455831013ea52e9ef1a0032ba" # Switzerland
+              - "2fcb99c455831013ea52ed162d4932c0" # Taiwan
+              - "2fcb99c455831013ea52f07ea4c732c6" # Thailand
+              - "970bf8c909a7012c3733f063d3000107" # Ukraine
+              - "2fcb99c455831013ea52f3d5d2c232cc" # United Arab Emirates
+              - "2fcb99c455831013ea52f785717432d2" # United Kingdom
+              - "2fcb99c455831013ea52fb338f2932d8" # United States
+              - "2fcb99c455831013ea52fea3f8d732de" # Vietnam
+        locations:
+          type: array
+          items:
+            type: string
+            enum:
+              - "c0ed409f79231000eaff724467330000" # Armenia, Yerevan
+              - "91336993fab910af6d70362ab49cc2f7" # Australia, Remote
+              - "0d86a8e04eda011538f0ac5d90019611" # Australia, Sydney
+              - "91336993fab910af6d7115f6c23cc357" # Brazil, Remote
+              - "91336993fab910af6d7113d4a58cc352" # Brazil, Sao Paulo
+              - "91336993fab910af6d7111b9ef64c34d" # Canada, Remote
+              - "4205b8279d1110811b5e0a9820d6693a" # Canada, Toronto
+              - "91336993fab910af6d710912773cc339" # China, Beijing
+              - "a91ba405af43014cbf6c6d9e38015a54" # China, Guangzhou
+              - "b4fd8272c6061070475410ad248007f0" # China, Remote
+              - "91336993fab910af6d710b3449b4c33e" # China, Shanghai
+              - "91336993fab910af6d7106eea8f4c334" # China, Shenzhen
+              - "91336993fab910af6d70ecbaa6f4c2fd" # Czechia, Remote
+              - "c498fba66f4e01c0944dde87d5005f05" # Denmark, Roskilde
+              - "91336993fab910af6d6fdb4a260cc22a" # Finland, Helsinki
+              - "91336993fab910af6d6fd9177efcc225" # Finland, Remote
+              - "91336993fab910af6d6fd25f3c44c216" # France, Courbevoie
+              - "91336993fab910af6d6fd6c8476cc220" # France, Remote
+              - "91336993fab910af6d6fc2799054c1f3" # Germany, Berlin
+              - "91336993fab910af6d6fc4f707bcc1f8" # Germany, Munich
+              - "91336993fab910af6d6fc96a405cc202" # Germany, Remote
+              - "91336993fab910af6d6fc737d3e4c1fd" # Germany, Wuerselen
+              - "d01f8704a10b0121fa6766dd38019c82" # Greece, Athens
+              - "91336993fab910af6d6fc02e0a14c1ee" # Hong Kong, STP
+              - "fc94d97a3a280100b73f626fd1610000" # Hungary, Budapest
+              - "7bcfe8379f6b017176531c86a87649a7" # Hungary, Remote
+              - "91336993fab910af6d6fb9748af4c1df" # India, Bengaluru
+              - "f28ae3c49d2601aff203e114d301695f" # India, Gurugram
+              - "91336993fab910af6d6fb2be0974c1d0" # India, Hyderabad
+              - "91336993fab910af6d6fabbb968cc1c1" # India, Mumbai
+              - "91336993fab910af6d6fb0782884c1cb" # India, Pune
+              - "91336993fab910af6d6fb4ee7634c1d5" # India, Remote
+              - "970bf8c909a701bb080521ddd400ae07" # Israel, Beer Sheva
+              - "970bf8c909a7013ea54a57dcd4008107" # Israel, Raanana
+              - "c7769ee377291036b08490819096b8bf" # Israel, Tel Aviv
+              - "970bf8c909a7016a7d893ddcd4007c07" # Israel, Tel Hai
+              - "970bf8c909a701c749f87bdcd4008607" # Israel, Yokneam
+              - "91336993fab910af6d6fa203fa6cc1ad" # Italy, Remote
+              - "b00b3256ed551015d42d2bebe06b02b7" # Japan, Remote
+              - "91336993fab910af6d6f9a47b91cc19e" # Japan, Tokyo
+              - "91336993fab910af6d71963a259cc46f" # Korea, Remote
+              - "91336993fab910af6d6f3f56714cc112" # Korea, Seoul
+              - "91336993fab910af6d6f97e94b04c199" # Mexico, Remote
+              - "42289dda31210100f43ca5dad0ff0000" # Netherlands, Amsterdam
+              - "5f84e8157c6a101b415772d270da2de1" # Netherlands, Remote
+              - "30350996b69b01a7dbccf4403c0174a8" # Palestine, Rawabi
+              - "91336993fab910af6d6f931ae68cc18f" # Poland, Remote
+              - "811700f7388d0103b8ceed030d490e48" # Poland, Warsaw
+              - "bf8aa7d10cd61000fb56e1988f3b0000" # Romania, Iasi
+              - "5f84e8157c6a101b435468d5d0e34bd9" # Romania, Remote
+              - "e4c3fe651a5b01f48e294d9ad1015e4b" # Saudi Arabia, Remote
+              - "91336993fab910af6d6f8a1a368cc17b" # Singapore, Remote
+              - "c498fba66f4e01971ba26688d5008705" # Singapore, Singapore-Suntec Tower
+              - "91336993fab910af6d6f87de293cc176" # Spain, Remote
+              - "c18da66b8c3f01e4f8939069de3534f8" # Sweden, Gothenburg
+              - "91336993fab910af6d6f859de1e4c171" # Sweden, Lund
+              - "91336993fab910af6d6f8342ac04c16c" # Sweden, Remote
+              - "91336993fab910af6d6f7e35a07cc162" # Switzerland, Remote
+              - "91336993fab910af6d6f80c09504c167" # Switzerland, Zurich
+              - "91336993fab910af6d6f7933b49cc158" # Taiwan, Hsinchu
+              - "91336993fab910af6d6f56c5409cc13f" # Taiwan, Remote
+              - "91336993fab910af6d6f5eaae3acc14e" # Taiwan, Taipei
+              - "f57d67c891a11057224421d76bc979ab" # Thailand, Remote
+              - "91336993fab910af6d6f516bf58cc135" # UAE, Dubai
+              - "970bf8c909a7015f56c618ded400e007" # UK, Belfast
+              - "91336993fab910af6d6f41d01ff4c117" # UK, Bristol
+              - "91336993fab910af6d6f445436acc11c" # UK, Cambridge
+              - "91336993fab910af6d6f4c211db4c12b" # UK, Reading
+              - "91336993fab910af6d6f4954559cc126" # UK, Remote
+              - "970bf8c909a701acf1aa08ded400db07" # Ukraine, Kyiv
+              - "970bf8c909a70104bdbe3eddd400bd07" # Ukraine, Remote
+              - "91336993fab910af6d7140d48764c3b6" # US, AL, Madison
+              - "91336993fab910af6d7170a1a684c41f" # US, AL, Remote
+              - "df27165dab550120b41aa51fc701619d" # US, AR, Remote
+              - "91336993fab910af6d7013ca699cc2a7" # US, AZ, Remote
+              - "91336993fab910af6d716528e9d4c406" # US, CA, Remote
+              - "895d7243647101d8c9619dd37377338f" # US, CA, San Jose
+              - "91336993fab910af6d702fae0bb4c2e8" # US, CA, Santa Clara
+              - "91336993fab910af6d712ddeebf4c38e" # US, CO, Boulder
+              - "91336993fab910af6d716c1bb8d4c415" # US, CO, Remote
+              - "91336993fab910af6d715e41b394c3f7" # US, CT, Remote
+              - "91336993fab910af6d713a0f5044c3a7" # US, DC, Remote
+              - "851660e123f40195e5fbfb9dce1137a2" # US, DC, Washington
+              - "91336993fab910af6d7020bf3b14c2c5" # US, FL, Remote
+              - "91336993fab910af6d6fe4b908fcc23e" # US, GA, Remote
+              - "3f056d7dcee210447f581d1002c2e672" # US, IL, Champaign
+              - "91336993fab910af6d714794d4b4c3c5" # US, IL, Remote
+              - "91336993fab910af6d702d89918cc2e3" # US, MA, Remote
+              - "91336993fab910af6d7008ff1774c28e" # US, MA, Westford
+              - "91336993fab910af6d719855647cc474" # US, MD, Remote
+              - "91336993fab910af6d6fe9a03534c248" # US, MI, Remote
+              - "91336993fab910af6d700b282d4cc293" # US, MN, Remote
+              - "91336993fab910af6d7130bb158cc393" # US, MO, St. Louis
+              - "91336993fab910af6d7022e347dcc2ca" # US, NC, Durham
+              - "91336993fab910af6d7006cdf31cc289" # US, NC, Remote
+              - "91336993fab910af6d6ffd32b89cc275" # US, NH, Remote
+              - "91336993fab910af6d7152b6749cc3de" # US, NJ, Remote
+              - "91336993fab910af6d712b900a54c389" # US, NM, Remote
+              - "91336993fab910af6d7015dee21cc2ac" # US, NV, Remote
+              - "d2088e737cbb01293f745dc7ce017070" # US, NY, New York
+              - "91336993fab910af6d6ff2800b0cc25c" # US, NY, Remote
+              - "91336993fab910af6d700d4fc83cc298" # US, OH, Remote
+              - "91336993fab910af6d7027195454c2d4" # US, OR, Hillsboro
+              - "91336993fab910af6d6ff05591bcc257" # US, OR, Remote
+              - "91336993fab910af6d700193f3c4c27f" # US, PA, Remote
+              - "16fc4607fc4310011e929f7115f90000" # US, Remote
+              - "91336993fab910af6d6ffb099324c270" # US, SC, Remote
+              - "91336993fab910af6d7122ef682cc375" # US, TN, Remote
+              - "91336993fab910af6d702b631b94c2de" # US, TX, Austin
+              - "10b0744835e11001030c2489586f0000" # US, TX, Houston
+              - "91336993fab910af6d702939a7fcc2d9" # US, TX, Remote
+              - "91336993fab910af6d6fee30ae1cc252" # US, UT, Remote
+              - "91336993fab910af6d6ff8e9d004c26b" # US, UT, Salt Lake City
+              - "c498fba66f4e012b5a8a2e88d5007805" # US, VA, Herndon
+              - "91336993fab910af6d7159be65c4c3ed" # US, VA, Remote
+              - "91336993fab910af6d701e82d004c2c0" # US, WA, Redmond
+              - "91336993fab910af6d7169a81124c410" # US, WA, Remote
+              - "d2088e737cbb01d5e2be9e52ce01926f" # US, WA, Seattle
+              - "dd4916e138561000a8f8afa559f50000" # Vietnam, Hanoi
+              - "229b3d23e3f91000aa5f712809fa0000" # Vietnam, Ho Chi Minh City
+              - "7ae28cf24c8b10874977c2d1387c19b0" # Vietnam, Remote
+
+    JobsResponse:
+      type: object
+      description: >
+        The production API also returns `facets`, the full current facet tree
+        with live counts; it is not required for the minimal search-then-detail
+        workflow and is omitted here. See the parameter table above for known
+        facet parameter names and values.
+      required: [total, jobPostings]
+      properties:
+        total:
+          type: integer
+          description: >
+            Total matching job count. Capped at 2000 when no facets or search
+            text are applied; exact once any filter narrows the result set.
+          example: 508
+        jobPostings:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobSummary"
+
+    JobSummary:
+      type: object
+      description: >
+        Observed job listing entries occasionally omit title/externalPath
+        entirely (leaving only bulletFields) — likely an incomplete/transient
+        posting on Workday's side. Neither field is marked required so
+        decoding tolerates that; callers should skip entries with an empty
+        externalPath rather than assume every entry is fetchable.
+      properties:
+        title:
+          type: string
+          example: "Software Engineer, CUDA-Q"
+        externalPath:
+          type: string
+          description: Path for `GET /job/{externalPath}` (leading slash included).
+          example: "/job/US-CA-Remote/Software-Engineer--CUDA-Q_JR2011649"
+        locationsText:
+          type: string
+          description: Human-readable location summary, e.g. a city or "N Locations".
+          example: "2 Locations"
+        postedOn:
+          type: string
+          description: Human-readable relative posting date.
+          example: "Posted 30+ Days Ago"
+
+    JobDetailResponse:
+      type: object
+      required: [jobPostingInfo]
+      properties:
+        jobPostingInfo:
+          $ref: "#/components/schemas/JobPostingInfo"
+
+    JobPostingInfo:
+      type: object
+      required: [title, jobDescription]
+      properties:
+        title:
+          type: string
+          example: "Software Engineer, CUDA-Q"
+        jobDescription:
+          type: string
+          description: Full HTML job description.
+        location:
+          type: string
+          example: "US, CA, Remote"
+        additionalLocations:
+          type: array
+          items:
+            type: string
+        postedOn:
+          type: string
+          example: "Posted 30+ Days Ago"
+        timeType:
+          type: string
+          example: "Full time"
+        jobReqId:
+          type: string
+          example: "JR2011649"
+        externalUrl:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          example: "HTTP_400"
+        httpStatus:
+          type: integer
+          example: 400
+        message:
+          type: string
+      additionalProperties: true
