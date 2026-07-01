@@ -1,0 +1,81 @@
+{
+  "jobPostingInfo": {
+    "id": "e0a0ed895247100fdef7b5bd52ac0000",
+    "title": "Senior Software Golang Kubernetes Engineer",
+    "jobDescription": "<p>NVIDIA Networking is looking for an excellent Software Developer to work on NVIDIA cloud platforms based on Kubernetes. We are seeking an experienced engineer who is deeply technical, hands-on, and has a wide system view. You will design, build and deploy high-performance and scalable clouds based on NVIDIA&#39;s superior ConnectX and Bluefield NICs and SpectrumX AI platform. We want to grow our teams with the smartest people in the world. If you&#39;re creative and autonomous, we want to hear from you!</p><p></p><p><b>What you&#39;ll be doing:</b></p><ul><li><p>Design and implement new features to accelerate Network and Storage</p></li><li><p>Work closely with open source communities, participate in the relevant working groups</p></li><li><p>Work with different teams across NVIDIA</p></li><li><p>Mentor members of the team, enabling them to deliver high-quality software</p></li></ul><p></p><p><b>What we need to see:</b></p><ul><li><p>BSc in Computer Science or equivalent program</p></li><li><p>5&#43; years of hands-on experience in software development, preferably with Python/Golang</p></li><li><p>Highly motivated with strong communication skills, the ability to work successfully with multi-functional teams, developers, and architects</p></li><li><p>Coordinate effectively across organizational boundaries and geographies</p></li><li><p>Strong self-initiative, independence, and flexibility to a new technology</p></li><li><p>Deep understanding of network protocols, virtualization, and containers</p></li><li><p>Strong background in designing, implementing, and debugging complex software</p></li><li><p><span>Hands-on experience with Kubernetes</span></p></li></ul><p></p><p><b>Ways to stand out from the crowd:</b></p><ul><li><p>Experience with working on open source projects</p></li><li><p>Background with SR-IOV, DPDK, ROCE technologies</p></li><li><p>Experience in developing Kubernetes Operators, CSI plugins, CNI Plugins</p></li></ul><p><br />We are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, sex, gender, gender expression, sexual orientation, age, marital status, veteran status, or disability status. We will ensure that individuals with disabilities are provided reasonable accommodation to participate in the job application or interview process, perform essential job functions, and receive other benefits and privileges of employment.</p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p>",
+    "location": "Israel, Yokneam",
+    "additionalLocations": [
+      "Israel, Raanana",
+      "Israel, Tel Aviv"
+    ],
+    "postedOn": "Posted 30+ Days Ago",
+    "startDate": "2026-04-24",
+    "timeType": "Full time",
+    "jobReqId": "JR2015916",
+    "jobPostingId": "Senior-Software-Golang-Kubernetes-Engineer_JR2015916",
+    "jobPostingSiteId": "NVIDIAExternalCareerSite",
+    "country": {
+      "descriptor": "Israel",
+      "id": "084562884af243748dad7c84c304d89a"
+    },
+    "canApply": true,
+    "posted": true,
+    "includeResumeParsing": true,
+    "jobRequisitionLocation": {
+      "descriptor": "Israel, Yokneam",
+      "country": {
+        "descriptor": "Israel",
+        "id": "084562884af243748dad7c84c304d89a",
+        "alpha2Code": "IL"
+      }
+    },
+    "externalUrl": "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite/job/Israel-Yokneam/Senior-Software-Golang-Kubernetes-Engineer_JR2015916"
+  },
+  "hiringOrganization": {
+    "name": "IL00 Mellanox Technologies, Ltd.",
+    "url": ""
+  },
+  "similarJobs": [
+    {
+      "title": "Senior Software Golang Kubernetes Engineer",
+      "externalPath": "/job/Israel-Tel-Aviv/Senior-Software-Golang-Kubernetes-Engineer_JR2016621",
+      "timeType": "Full time",
+      "locationsText": "3 Locations",
+      "postedOn": "Posted 30+ Days Ago",
+      "startDate": "2026-04-24"
+    },
+    {
+      "title": "Senior Software Engineer, Tools",
+      "externalPath": "/job/Israel-Yokneam/Senior-Software-Engineer--Tools_JR2016533",
+      "timeType": "Full time",
+      "locationsText": "2 Locations",
+      "postedOn": "Posted 23 Days Ago",
+      "startDate": "2026-06-08"
+    },
+    {
+      "title": "Senior Software Engineer, Platforms",
+      "externalPath": "/job/Israel-Tel-Aviv/Senior-Software-Engineer--Platforms_JR2015953",
+      "timeType": "Full time",
+      "locationsText": "Israel, Tel Aviv",
+      "postedOn": "Posted 17 Days Ago",
+      "startDate": "2026-06-14"
+    },
+    {
+      "title": "Senior Software Engineer, Hardware-Oriented",
+      "externalPath": "/job/Israel-Yokneam/Senior-Software-Engineer--Hardware-Oriented_JR2007649",
+      "timeType": "Full time",
+      "locationsText": "Israel, Yokneam",
+      "postedOn": "Posted 30+ Days Ago",
+      "startDate": "2025-11-19"
+    },
+    {
+      "title": "Senior Software Engineer, DOCA",
+      "externalPath": "/job/Israel-Raanana/Senior-Software-Engineer--DOCA_JR2000097",
+      "timeType": "Full time",
+      "locationsText": "2 Locations",
+      "postedOn": "Posted Yesterday",
+      "startDate": "2026-06-30"
+    }
+  ],
+  "userAuthenticated": false
+}
