@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 )
 
 const defaultBaseURL = "https://careers.synopsys.com"
@@ -72,8 +73,33 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	return result, nil
 }
 
+// ResolveLocation geocodes a partial place name typed by the user. Its result
+// must be passed as JobsRequest.Location (via LocationSuggestion.AsFilter) for
+// location filtering to have any effect on Jobs — see package docs.
+func (c *Client) ResolveLocation(ctx context.Context, term string) ([]LocationSuggestion, error) {
+	q := url.Values{"term": {term}, "countryCodes": {""}, "lat": {""}, "lon": {""}}
+	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/locations?"+q.Encode())
+	if err != nil {
+		return nil, fmt.Errorf("resolve location: %w", err)
+	}
+	req.Header.Set("Accept", "application/json")
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("resolve location: %w", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("resolve location: HTTP %d", resp.StatusCode)
+	}
+	var suggestions []LocationSuggestion
+	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
+		return nil, fmt.Errorf("resolve location: decode: %w", err)
+	}
+	return suggestions, nil
+}
+
 func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobDetailResponse, error) {
-	path := fmt.Sprintf("/job/%s/%s/44408/%s", city, slug, jobID)
+	path := fmt.Sprintf("/job/%s/%s/%s/%s", city, slug, orgID, jobID)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+path)
 	if err != nil {
 		return nil, fmt.Errorf("job detail: %w", err)

@@ -7,6 +7,9 @@ import (
 	"strconv"
 )
 
+// orgID is Synopsys's company ID on the TalentBrew ATS platform (a multi-tenant
+// system shared across many employers' career sites). It identifies which
+// company's job data to query and is fixed, not user-supplied.
 const orgID = "44408"
 
 type FacetFilter struct {
@@ -20,12 +23,51 @@ type FacetFilter struct {
 
 type JobsRequest struct {
 	Keywords       string
-	Location       string
+	Location       *Location
 	Page           int
 	RecordsPerPage int
 	SortCriteria   int // 0=Most Relevant, 13=Most Recent
 	IsPagination   bool
 	FacetFilters   []FacetFilter
+}
+
+// Location filters search results to a geocoded place. Free-text alone does
+// nothing on this API; all four fields must be sent together, resolved via
+// Client.ResolveLocation. Build one from a LocationSuggestion with AsFilter.
+type Location struct {
+	Display   string // human-readable label, cosmetic only
+	Latitude  float64
+	Longitude float64
+	Type      int    // suggestion's "lt" field
+	Path      string // suggestion's "lp" field, dash-separated ancestor IDs
+}
+
+// LocationSuggestion is one geocoded candidate returned by
+// Client.ResolveLocation for a partial place name typed by the user.
+type LocationSuggestion struct {
+	ID           int     `json:"id"`
+	Value        string  `json:"value"`
+	Latitude     float64 `json:"lat"`
+	Longitude    float64 `json:"lon"`
+	Type         int     `json:"type"`
+	City         string  `json:"city"`
+	Division1    string  `json:"division1"`
+	Country      string  `json:"country"`
+	Path         string  `json:"lp"`
+	LocationType int     `json:"lt"`
+	PostalCode   string  `json:"pc"`
+}
+
+// AsFilter converts a suggestion into the Location filter accepted by
+// JobsRequest.
+func (s LocationSuggestion) AsFilter() *Location {
+	return &Location{
+		Display:   s.Value,
+		Latitude:  s.Latitude,
+		Longitude: s.Longitude,
+		Type:      s.LocationType,
+		Path:      s.Path,
+	}
 }
 
 type Job struct {
@@ -64,6 +106,8 @@ type JobDetailResponse struct {
 }
 
 func buildSearchQuery(p *JobsRequest) url.Values {
+	// Fixed params the TalentBrew /search-jobs/results endpoint expects on every
+	// call, regardless of query; not user-controllable.
 	q := url.Values{
 		"SearchType":              {"5"},
 		"ResultsType":             {"0"},
@@ -77,8 +121,12 @@ func buildSearchQuery(p *JobsRequest) url.Values {
 	if p.Keywords != "" {
 		q.Set("Keywords", p.Keywords)
 	}
-	if p.Location != "" {
-		q.Set("Location", p.Location)
+	if p.Location != nil {
+		q.Set("Location", p.Location.Display)
+		q.Set("Latitude", strconv.FormatFloat(p.Location.Latitude, 'f', -1, 64))
+		q.Set("Longitude", strconv.FormatFloat(p.Location.Longitude, 'f', -1, 64))
+		q.Set("LocationType", strconv.Itoa(p.Location.Type))
+		q.Set("LocationPath", p.Location.Path)
 	}
 	q.Set("CurrentPage", strconv.Itoa(cmp.Or(p.Page, 1)))
 	q.Set("RecordsPerPage", strconv.Itoa(cmp.Or(p.RecordsPerPage, 15)))
@@ -102,4 +150,3 @@ func buildSearchQuery(p *JobsRequest) url.Values {
 	}
 	return q
 }
-

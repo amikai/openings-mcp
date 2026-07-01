@@ -25,6 +25,14 @@ info:
       fully SSR. Navigating to the detail URL triggers a complete page load; no
       additional AJAX request is made for the job content.
 
+    - **Location filtering** (`GET /search-jobs/locations`) is a two-step flow, not a
+      plain text match. Free-text `Location`/`l` is cosmetic only. To actually filter
+      by place, first call `/search-jobs/locations?term=...` to geocode the typed
+      text, then forward the chosen candidate's `lat`/`lon`/`lt`/`lp` as
+      `Latitude`/`Longitude`/`LocationType`/`LocationPath` on `/search-jobs/results`.
+      Omitting any of the latter three silently makes the server ignore location
+      entirely and return unfiltered results.
+
     ## Facet Types
 
     Filter checkboxes carry `data-facet-type` and `data-id` attributes that map
@@ -154,10 +162,58 @@ paths:
         - name: Location
           in: query
           required: false
-          description: Location text (mirrors `l` on the SSR page).
+          description: |
+            Display text for the location filter (mirrors `l` on the SSR page).
+            Cosmetic only — sending this alone does NOT filter results. Real
+            filtering requires `Latitude`, `Longitude`, and `LocationType` +
+            `LocationPath` to be sent together, resolved via the separate
+            `GET /search-jobs/locations` autocomplete endpoint (see below).
           schema:
             type: string
-          example: "Canada"
+          example: "Hsinchu, Taiwan"
+
+        - name: Latitude
+          in: query
+          required: false
+          description: |
+            Latitude of the resolved location, from the `lat` field of a
+            `/search-jobs/locations` suggestion. Required (with `Longitude`,
+            `LocationType`, `LocationPath`) for location filtering to take effect.
+          schema:
+            type: number
+          example: 24.80361
+
+        - name: Longitude
+          in: query
+          required: false
+          description: Longitude of the resolved location, from the suggestion's `lon` field.
+          schema:
+            type: number
+          example: 120.96861
+
+        - name: LocationType
+          in: query
+          required: false
+          description: |
+            Location granularity, from the suggestion's `lt` field (e.g. `4` = city,
+            `2`/`8` = broader region — exact enum not fully mapped). Required for
+            location filtering; omitting it while still sending `Latitude`/`Longitude`
+            silently changes/breaks the result count.
+          schema:
+            type: integer
+          example: 4
+
+        - name: LocationPath
+          in: query
+          required: false
+          description: |
+            Internal hierarchy path for the resolved location, from the suggestion's
+            `lp` field (dash-separated ancestor IDs, e.g. country-region-city).
+            Required for location filtering — omitting it makes the server ignore
+            `Latitude`/`Longitude`/`Location` entirely and return unfiltered results.
+          schema:
+            type: string
+          example: "1668284-7280291-1675103-1675151"
 
         - name: CurrentPage
           in: query
@@ -408,6 +464,108 @@ paths:
                 hasContent: true
                 results: '<div class="search-results-count">We found 533 jobs…</div><ul class="search-results-list">…</ul>'
                 filters: '<section id="category-filters-section">…</section>'
+
+  /search-jobs/locations:
+    get:
+      operationId: getLocationSuggestions
+      summary: Location autocomplete (AJAX)
+      description: |
+        Called as the user types into the "Where?" field. Returns geocoded location
+        candidates. Selecting one is the ONLY way to make location filtering work on
+        `/search-jobs/results` — free-text `Location` alone is ignored by that
+        endpoint. The chosen candidate's `lat`/`lon`/`lt`/`lp` fields must be forwarded
+        as `Latitude`/`Longitude`/`LocationType`/`LocationPath` on the results call.
+      parameters:
+        - name: term
+          in: query
+          required: true
+          description: Partial location text typed by the user.
+          schema:
+            type: string
+          example: "Hsinchu"
+
+        - name: countryCodes
+          in: query
+          required: false
+          description: Optional ISO country code filter to narrow suggestions. Empty by default.
+          schema:
+            type: string
+          example: ""
+
+        - name: lat
+          in: query
+          required: false
+          description: |
+            Optional latitude to bias/narrow suggestions (e.g. to a radius around a
+            previously resolved point). Empty on a fresh search.
+          schema:
+            type: string
+          example: ""
+
+        - name: lon
+          in: query
+          required: false
+          description: Optional longitude counterpart to `lat`. Empty on a fresh search.
+          schema:
+            type: string
+          example: ""
+
+      responses:
+        "200":
+          description: JSON array of location candidates, most relevant first.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      description: Internal location ID.
+                    value:
+                      type: string
+                      description: Human-readable label — maps to the `Location` param.
+                    lat:
+                      type: number
+                      description: Maps to the `Latitude` param on `/search-jobs/results`.
+                    lon:
+                      type: number
+                      description: Maps to the `Longitude` param on `/search-jobs/results`.
+                    type:
+                      type: integer
+                      description: Location kind classifier (city, region, etc.); distinct from `lt`.
+                    city:
+                      type: string
+                    division1:
+                      type: string
+                      description: State/province/region name.
+                    country:
+                      type: string
+                      description: ISO country code.
+                    lp:
+                      type: string
+                      description: |
+                        Dash-separated ancestor ID path. Maps to the `LocationPath`
+                        param on `/search-jobs/results`.
+                    lt:
+                      type: integer
+                      description: Maps to the `LocationType` param on `/search-jobs/results`.
+                    pc:
+                      type: string
+                      description: Postal code, when applicable.
+              example:
+                - id: 1675151
+                  value: "Hsinchu, Taiwan"
+                  lat: 24.80361
+                  lon: 120.96861
+                  type: 5
+                  city: "Hsinchu"
+                  division1: "Taiwan"
+                  country: "TW"
+                  lp: "1668284-7280291-1675103-1675151"
+                  lt: 4
+                  pc: ""
 
   /job/{city}/{job-slug}/{company_id}/{job_id}:
     get:
