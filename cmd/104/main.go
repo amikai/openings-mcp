@@ -33,7 +33,7 @@ func main() {
 		remoteWork = fs.StringEnumLong("remote-work", usageWithChoices("Remote work", labels(job104.RemoteWorkIDs)), enumChoices(job104.RemoteWorkIDs)...)
 		s9         = fs.StringSetLong("s9", usageWithChoices("Shift type (repeatable)", labels(job104.S9IDs)))
 	)
-	if err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("JOB104")); err != nil {
+	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
 			os.Exit(0)

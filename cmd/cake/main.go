@@ -46,7 +46,7 @@ func main() {
 		sectors        = fs.StringSetLong("sector", "Company sector slug, e.g. tech_software (repeatable)")
 		techLabels     = fs.StringSetLong("tech-label", "Technology the company uses, e.g. go (repeatable)")
 	)
-	if err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("CAKE")); err != nil {
+	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
 			os.Exit(0)

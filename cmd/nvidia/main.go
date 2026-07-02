@@ -41,7 +41,7 @@ func main() {
 		country      = fs.StringEnumLong("country", usageWithChoices("Country", nvidia.CountryIDs), labels(nvidia.CountryIDs)...)
 		site         = fs.StringEnumLong("site", usageWithChoices("City-level site", nvidia.SiteIDs), labels(nvidia.SiteIDs)...)
 	)
-	if err := ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("NVIDIA")); err != nil {
+	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
 			os.Exit(0)
