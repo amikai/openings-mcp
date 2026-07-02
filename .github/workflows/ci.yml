@@ -7,8 +7,17 @@ on:
     branches: [main]
 
 jobs:
-  ci:
-    runs-on: ubuntu-latest
+  test:
+    strategy:
+      matrix:
+        # The runner label encodes os+arch, so tests run natively on all
+        # four supported platforms: linux/macos x amd64/arm64.
+        os:
+          - ubuntu-latest # linux amd64
+          - ubuntu-24.04-arm # linux arm64
+          - macos-latest # macos arm64
+          - macos-15-intel # macos amd64
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
 
@@ -18,6 +27,12 @@ jobs:
 
       - name: Unit tests
         run: make ut
+
+  validate-openapi:
+    # Separate job: the validator runs in docker, which macOS runners lack.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
       - name: Validate OpenAPI specs
         run: make validate-openapi
