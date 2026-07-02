@@ -8,7 +8,29 @@ permissions:
   contents: write
 
 jobs:
+  test:
+    strategy:
+      matrix:
+        # The runner label encodes os+arch, so tests run natively on all
+        # four supported platforms: linux/macos x amd64/arm64.
+        os:
+          - ubuntu-latest # linux amd64
+          - ubuntu-24.04-arm # linux arm64
+          - macos-latest # macos arm64
+          - macos-15-intel # macos amd64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - name: Unit tests
+        run: make ut
+
   release:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,9 +40,6 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version: stable
-
-      - name: Unit tests
-        run: make ut
 
       - uses: goreleaser/goreleaser-action@v6
         with:
