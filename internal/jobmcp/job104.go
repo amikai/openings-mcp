@@ -10,38 +10,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-type job104SearchInput struct {
-	Keyword string   `json:"keyword"` // required
-	Area    string   `json:"area"`    // required
-	JobType string   `json:"job_type,omitempty"`
-	Sort    string   `json:"sort,omitempty"`
-	Remote  string   `json:"remote,omitempty"`
-	Edu     []string `json:"edu,omitempty"`
-	Page    int      `json:"page,omitempty"`
-}
-
-type job104DetailInput struct {
-	JobCode string `json:"job_code" jsonschema:"104 job code (jobNo), required"`
-}
-
-// job104SearchInputSchema is hand-written JSON kept aligned with openapi.yaml's
-// searchJobs parameters: friendly property names, human labels instead of 104
-// codes (the ids.go maps translate labels back to codes — enum labels here
-// must match those map keys). Descriptions carry semantics only, never
-// id=label tables.
-var job104SearchInputSchema = mustSchema(job104SearchSchemaJSON)
-
-// mustSchema unmarshals a raw JSON schema, panicking on malformed JSON —
-// a programmer error, same failure mode as jsonschema.For before it.
-func mustSchema(raw string) *jsonschema.Schema {
-	var s jsonschema.Schema
-	if err := json.Unmarshal([]byte(raw), &s); err != nil {
-		panic(fmt.Sprintf("job104 search schema: %v", err))
-	}
-	return &s
-}
-
-const job104SearchSchemaJSON = `{
+var job104SearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -105,7 +74,38 @@ const job104SearchSchemaJSON = `{
 	},
 	"required": ["keyword", "area"],
 	"additionalProperties": false
-}`
+}`)
+
+type job104SearchInput struct {
+	Keyword string   `json:"keyword"` // required
+	Area    string   `json:"area"`    // required
+	JobType string   `json:"job_type,omitempty"`
+	Sort    string   `json:"sort,omitempty"`
+	Remote  string   `json:"remote,omitempty"`
+	Edu     []string `json:"edu,omitempty"`
+	Page    int      `json:"page,omitempty"`
+}
+
+type job104DetailInput struct {
+	JobCode string `json:"job_code" jsonschema:"104 job code (jobNo), required"`
+}
+
+// job104SearchInputSchema is hand-written JSON kept aligned with openapi.yaml's
+// searchJobs parameters: friendly property names, human labels instead of 104
+// codes (the ids.go maps translate labels back to codes — enum labels here
+// must match those map keys). Descriptions carry semantics only, never
+// id=label tables.
+var job104SearchInputSchema = mustSchema(job104SearchInputRawSchema)
+
+// mustSchema unmarshals a raw JSON schema, panicking on malformed JSON —
+// a programmer error, same failure mode as jsonschema.For before it.
+func mustSchema(rawSchema []byte) *jsonschema.Schema {
+	var s jsonschema.Schema
+	if err := json.Unmarshal(rawSchema, &s); err != nil {
+		panic(fmt.Sprintf("job104 search schema: %v", err))
+	}
+	return &s
+}
 
 // lookupCode translates one human label to its typed code, erroring with the
 // field name on unknown labels.
@@ -134,50 +134,58 @@ func lookupCodes[T any](field string, labels []string, m map[string]T) ([]T, err
 	return out, nil
 }
 
-func job104ToRequest(in job104SearchInput) (job104.SearchJobsParams, error) {
+func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, error) {
 	var params job104.SearchJobsParams
-	// The schema already marks keyword and area required; these guard direct
-	// callers and clients that skip schema validation.
+	// The schema already marks keyword and area required; this guards direct
+	// callers and clients that skip schema validation — a missing area fails
+	// its enum Validate below (empty label maps to the zero value).
 	if in.Keyword == "" {
-		return params, fmt.Errorf("keyword is required")
+		return nil, fmt.Errorf("keyword is required")
 	}
 	params.Keyword = job104.NewOptString(in.Keyword)
-	if in.Area == "" {
-		return params, fmt.Errorf("area is required")
+
+	area := job104.AreaIDs[in.Area]
+	if err := area.Validate(); err != nil {
+		return nil, fmt.Errorf("invalid area %q: %w", in.Area, err)
 	}
-	code, err := lookupCode("area", in.Area, job104.AreaIDs)
-	if err != nil {
-		return params, err
-	}
-	params.Area = job104.NewOptSearchJobsArea(code)
+	params.Area = job104.NewOptSearchJobsArea(area)
+
 	if in.JobType != "" {
-		code, err := lookupCode("job_type", in.JobType, job104.RoIDs)
-		if err != nil {
-			return params, err
+		jobType := job104.RoIDs[in.JobType]
+		if err := jobType.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid job_type %q: %w", in.JobType, err)
 		}
-		params.Ro = job104.NewOptSearchJobsRo(code)
+		params.Ro = job104.NewOptSearchJobsRo(jobType)
 	}
+
 	if in.Sort != "" {
-		code, err := lookupCode("sort", in.Sort, job104.OrderIDs)
-		if err != nil {
-			return params, err
+		sort := job104.OrderIDs[in.Sort]
+		if err := sort.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid sort %q: %w", in.Sort, err)
 		}
-		params.Order = job104.NewOptSearchJobsOrder(code)
+		params.Order = job104.NewOptSearchJobsOrder(sort)
 	}
+
 	if in.Remote != "" {
-		code, err := lookupCode("remote", in.Remote, job104.RemoteWorkIDs)
-		if err != nil {
-			return params, err
+		remote := job104.RemoteWorkIDs[in.Remote]
+		if err := remote.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid remote %q: %w", in.Remote, err)
 		}
-		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(code)
+		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(remote)
 	}
-	if params.Edu, err = lookupCodes("edu", in.Edu, job104.EduIDs); err != nil {
-		return params, err
+
+	for _, label := range in.Edu {
+		edu := job104.EduIDs[label]
+		if err := edu.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid edu %q: %w", label, err)
+		}
+		params.Edu = append(params.Edu, edu)
 	}
+
 	if in.Page > 0 {
 		params.Page = job104.NewOptInt(in.Page)
 	}
-	return params, nil
+	return &params, nil
 }
 
 // RegisterJob104 registers the 104 search and job-detail tools.
@@ -187,11 +195,11 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		Description: "Search jobs on 104 (Taiwan's largest job board) by keyword and area, with optional job-type/remote/education/sort filters.",
 		InputSchema: job104SearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in job104SearchInput) (*mcp.CallToolResult, any, error) {
-		params, err := job104ToRequest(in)
+		params, err := job104MCPToHTTPRequest(&in)
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		resp, err := c.SearchJobs(ctx, params)
+		resp, err := c.SearchJobs(ctx, *params)
 		if err != nil {
 			return errorResult(err), nil, nil
 		}

@@ -110,7 +110,7 @@ func TestJob104SearchJobsSchema(t *testing.T) {
 	assert.Equal(t, want, schema)
 }
 
-func TestJob104ToRequest(t *testing.T) {
+func TestJob104MCPToHTTPRequest(t *testing.T) {
 	in := job104SearchInput{
 		Keyword: "golang",
 		Area:    "Taipei",
@@ -120,7 +120,7 @@ func TestJob104ToRequest(t *testing.T) {
 		Edu:     []string{"University", "Master"},
 		Page:    2,
 	}
-	got, err := job104ToRequest(in)
+	got, err := job104MCPToHTTPRequest(&in)
 	require.NoError(t, err)
 
 	want := job104.SearchJobsParams{
@@ -132,10 +132,10 @@ func TestJob104ToRequest(t *testing.T) {
 		Page:       job104.NewOptInt(2),
 		Edu:        []job104.SearchJobsEduItem{job104.SearchJobsEduItem4, job104.SearchJobsEduItem5},
 	}
-	assert.Equal(t, want, got)
+	assert.Equal(t, want, *got)
 }
 
-func TestJob104ToRequestMissingRequired(t *testing.T) {
+func TestJob104MCPToHTTPRequestMissingRequired(t *testing.T) {
 	cases := []struct {
 		name string
 		in   job104SearchInput
@@ -143,28 +143,28 @@ func TestJob104ToRequestMissingRequired(t *testing.T) {
 	}{
 		{"all empty", job104SearchInput{}, "keyword is required"},
 		{"filters only", job104SearchInput{Area: "Taipei", Sort: "Newest", Page: 2}, "keyword is required"},
-		{"keyword only", job104SearchInput{Keyword: "golang"}, "area is required"},
+		{"keyword only", job104SearchInput{Keyword: "golang"}, `invalid area ""`},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := job104ToRequest(tc.in)
+			_, err := job104MCPToHTTPRequest(&tc.in)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.want)
 		})
 	}
 }
 
-func TestJob104ToRequestMinimal(t *testing.T) {
-	got, err := job104ToRequest(job104SearchInput{Keyword: "golang", Area: "Taipei"})
+func TestJob104MCPToHTTPRequestMinimal(t *testing.T) {
+	got, err := job104MCPToHTTPRequest(&job104SearchInput{Keyword: "golang", Area: "Taipei"})
 	require.NoError(t, err)
 	want := job104.SearchJobsParams{
 		Keyword: job104.NewOptString("golang"),
 		Area:    job104.NewOptSearchJobsArea(job104.AreaIDs["Taipei"]),
 	}
-	assert.Equal(t, want, got)
+	assert.Equal(t, want, *got)
 }
 
-func TestJob104ToRequestInvalidLabels(t *testing.T) {
+func TestJob104MCPToHTTPRequestInvalidLabels(t *testing.T) {
 	cases := []struct {
 		name string
 		in   job104SearchInput
@@ -178,7 +178,7 @@ func TestJob104ToRequestInvalidLabels(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := job104ToRequest(tc.in)
+			_, err := job104MCPToHTTPRequest(&tc.in)
 			require.Error(t, err)
 			assert.Contains(t, err.Error(), tc.want)
 		})
