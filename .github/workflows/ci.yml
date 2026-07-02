@@ -42,3 +42,25 @@ jobs:
 
       - name: Validate OpenAPI specs
         run: make validate-openapi
+
+  release-dry-run:
+    # Runs the release pipeline in snapshot mode: builds the binaries and
+    # the linux/amd64 + linux/arm64 docker images, but publishes nothing.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - uses: docker/setup-qemu-action@v3
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: goreleaser/goreleaser-action@v6
+        with:
+          version: '~> v2'
+          args: release --snapshot --clean
