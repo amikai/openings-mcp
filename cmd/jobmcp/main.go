@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/amikai/job-mcp/internal/jobmcp"
+	"github.com/amikai/job-mcp/internal/provider/cake"
 	"github.com/amikai/job-mcp/internal/provider/job104"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -28,7 +29,13 @@ func runWithTransport(transport mcp.Transport) error {
 	if err != nil {
 		return err
 	}
-	server := newServer(c104)
+
+	hcCake := &http.Client{Timeout: 30 * time.Second}
+	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(hcCake))
+	if err != nil {
+		return err
+	}
+	server := newServer(c104, cCake)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
@@ -36,8 +43,9 @@ func runWithTransport(transport mcp.Transport) error {
 	return nil
 }
 
-func newServer(c104 *job104.Client) *mcp.Server {
+func newServer(c104 *job104.Client, cCake *cake.Client) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "job-mcp"}, nil)
 	jobmcp.RegisterJob104(server, c104)
+	jobmcp.RegisterCake(server, cCake)
 	return server
 }

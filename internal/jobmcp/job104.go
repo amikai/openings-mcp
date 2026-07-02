@@ -102,7 +102,7 @@ var job104SearchInputSchema = mustSchema(job104SearchInputRawSchema)
 func mustSchema(rawSchema []byte) *jsonschema.Schema {
 	var s jsonschema.Schema
 	if err := json.Unmarshal(rawSchema, &s); err != nil {
-		panic(fmt.Sprintf("job104 search schema: %v", err))
+		panic(fmt.Sprintf("jobmcp tool schema: %v", err))
 	}
 	return &s
 }
