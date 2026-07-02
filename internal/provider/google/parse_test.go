@@ -33,8 +33,8 @@ var wantJobs = []Job{
 }
 
 var wantDetail = &JobDetailResponse{
-	ID:    "106863362666570438",
-	Title: "Software Engineer, GPU System Software",
+	ID:       "106863362666570438",
+	Title:    "Software Engineer, GPU System Software",
 	Company:  "Google",
 	Location: "Taipei, Taiwan",
 	About: `About the job

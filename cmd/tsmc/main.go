@@ -53,7 +53,6 @@ func main() {
 	writeReport(os.Stdout, keyword, search, jobs, details)
 }
 
-
 func writeReport(w io.Writer, keyword string, search *tsmc.JobsResponse, jobs []tsmc.Job, details map[string]*tsmc.JobDetailResponse) {
 	fmt.Fprintf(w, "TSMC Jobs Report\n")
 	fmt.Fprintf(w, "Keyword: %s\n", keyword)

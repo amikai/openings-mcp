@@ -46,7 +46,6 @@ func main() {
 	writeReport(os.Stdout, keyword, search, jobs, details)
 }
 
-
 func defaultSearchParams(keyword string) *google.JobsRequest {
 	return &google.JobsRequest{
 		Query:          keyword,

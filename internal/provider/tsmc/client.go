@@ -15,8 +15,8 @@ const defaultBaseURL = "https://careers.tsmc.com"
 
 const (
 	defaultPerPage = 10
-	pathSearchJobs = "/zh_TW/careers/SearchJobs/"
-	pathJobDetail  = "/zh_TW/careers/JobDetail"
+	jobsPath       = "/zh_TW/careers/SearchJobs/"
+	jobDetailPath  = "/zh_TW/careers/JobDetail"
 )
 
 // Query parameter field IDs
@@ -154,7 +154,7 @@ func (c *Client) jobsURL(p *JobsRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	u = u.JoinPath(pathSearchJobs)
+	u = u.JoinPath(jobsPath)
 	if p.Keyword != "" {
 		u = u.JoinPath(p.Keyword)
 	}
@@ -195,7 +195,7 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	if err != nil {
 		return nil, err
 	}
-	doc, err := c.getHTML(ctx, rawURL, c.baseURL+pathSearchJobs)
+	doc, err := c.getHTML(ctx, rawURL, c.baseURL+jobsPath)
 	if err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
@@ -204,8 +204,8 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 }
 
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
-	u := c.baseURL + pathJobDetail + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
-	doc, err := c.getHTML(ctx, u, c.baseURL+pathSearchJobs)
+	u := c.baseURL + jobDetailPath + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
+	doc, err := c.getHTML(ctx, u, c.baseURL+jobsPath)
 	if err != nil {
 		return nil, fmt.Errorf("job detail %s: %w", jobID, err)
 	}

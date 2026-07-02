@@ -112,9 +112,9 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 	}
 
 	var ld struct {
-		Title      string `json:"title"`
-		DatePosted string `json:"datePosted"`
-		Identifier string `json:"identifier"`
+		Title       string `json:"title"`
+		DatePosted  string `json:"datePosted"`
+		Identifier  string `json:"identifier"`
 		JobLocation []struct {
 			Address struct {
 				Locality string `json:"addressLocality"`

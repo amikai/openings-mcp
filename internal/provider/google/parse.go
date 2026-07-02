@@ -224,4 +224,3 @@ func spanChildText(n *html.Node) string {
 	}
 	return ""
 }
-
