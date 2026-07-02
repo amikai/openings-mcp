@@ -40,7 +40,7 @@ func runWithTransport(transport mcp.Transport) error {
 }
 
 func newServer(c104 *job104.Client, cTSMC *tsmc.Client) *mcp.Server {
-	server := mcp.NewServer(&mcp.Implementation{Name: "job-mcp", Version: "v0.1.0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: "job-mcp"}, nil)
 	jobmcp.RegisterJob104(server, c104)
 	jobmcp.RegisterTSMC(server, cTSMC)
 	return server
