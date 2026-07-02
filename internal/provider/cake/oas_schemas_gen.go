@@ -203,6 +203,950 @@ func (s *JobDetail) SetRequirements(val string) {
 
 func (*JobDetail) getJobDetailRes() {}
 
+// Search filters. Use `{}` for the minimal job-description workflow. All keys are optional. Filter
+// values are not validated server-side: unknown values are silently ignored or match nothing, so
+// clients must send the exact enumerated values below. Enumerations were captured on 2026-07-02 from
+// the website filter UI and the `available_facets` block the API returns with every search response.
+// Open vocabularies (`locations`, `professions`, `page.sectors`, `page.tech_labels`, `lang_names`) are
+// data-derived and unbounded, so they stay plain strings; read current values from `available_facets`
+// instead of guessing.
+// Ref: #/components/schemas/JobSearchFilters
+type JobSearchFilters struct {
+	// Location names as shown on the website, localized (both English and Chinese names are accepted, e.g.
+	// "Taiwan", "台灣", "Taipei City, Taiwan"). Valid values come from `available_facets.locations`.
+	Locations []string `json:"locations"`
+	// Profession slugs in `category_subcategory` form, e.g. "it_back-end-engineer",
+	// "it_software-engineer". Valid values come from `available_facets.professions` (399 observed
+	// globally).
+	Professions []string `json:"professions"`
+	// Employment types.
+	JobTypes []JobSearchFiltersJobTypesItem `json:"job_types"`
+	// Seniority of the role.
+	SeniorityLevels []JobSearchFiltersSeniorityLevelsItem `json:"seniority_levels"`
+	// Required years of work experience, as range buckets.
+	YearOfSeniority []JobSearchFiltersYearOfSeniorityItem `json:"year_of_seniority"`
+	// Number of people the role manages, as range buckets.
+	NumberOfManagement []JobSearchFiltersNumberOfManagementItem `json:"number_of_management"`
+	// Remote-work policy.
+	Remote []JobSearchFiltersRemoteItem `json:"remote"`
+	// Inclusive-hiring traits the employer highlights.
+	InclusivityTraits []JobSearchFiltersInclusivityTraitsItem `json:"inclusivity_traits"`
+	// Language of the job description, as an English language name. Data-derived; observed values include
+	// "English", "Chinese", "Japanese", "Korean", "Vietnamese", "Indonesian", "French", "Arabic", "Malay
+	// (macrolanguage)". Valid values come from `available_facets.lang_names`.
+	LangNames []string `json:"lang_names"`
+	// Salary range filter.
+	Salary OptJobSearchFiltersSalary `json:"salary"`
+	// Filters on the employer's company page.
+	Page OptJobSearchFiltersPage `json:"page"`
+}
+
+// GetLocations returns the value of Locations.
+func (s *JobSearchFilters) GetLocations() []string {
+	return s.Locations
+}
+
+// GetProfessions returns the value of Professions.
+func (s *JobSearchFilters) GetProfessions() []string {
+	return s.Professions
+}
+
+// GetJobTypes returns the value of JobTypes.
+func (s *JobSearchFilters) GetJobTypes() []JobSearchFiltersJobTypesItem {
+	return s.JobTypes
+}
+
+// GetSeniorityLevels returns the value of SeniorityLevels.
+func (s *JobSearchFilters) GetSeniorityLevels() []JobSearchFiltersSeniorityLevelsItem {
+	return s.SeniorityLevels
+}
+
+// GetYearOfSeniority returns the value of YearOfSeniority.
+func (s *JobSearchFilters) GetYearOfSeniority() []JobSearchFiltersYearOfSeniorityItem {
+	return s.YearOfSeniority
+}
+
+// GetNumberOfManagement returns the value of NumberOfManagement.
+func (s *JobSearchFilters) GetNumberOfManagement() []JobSearchFiltersNumberOfManagementItem {
+	return s.NumberOfManagement
+}
+
+// GetRemote returns the value of Remote.
+func (s *JobSearchFilters) GetRemote() []JobSearchFiltersRemoteItem {
+	return s.Remote
+}
+
+// GetInclusivityTraits returns the value of InclusivityTraits.
+func (s *JobSearchFilters) GetInclusivityTraits() []JobSearchFiltersInclusivityTraitsItem {
+	return s.InclusivityTraits
+}
+
+// GetLangNames returns the value of LangNames.
+func (s *JobSearchFilters) GetLangNames() []string {
+	return s.LangNames
+}
+
+// GetSalary returns the value of Salary.
+func (s *JobSearchFilters) GetSalary() OptJobSearchFiltersSalary {
+	return s.Salary
+}
+
+// GetPage returns the value of Page.
+func (s *JobSearchFilters) GetPage() OptJobSearchFiltersPage {
+	return s.Page
+}
+
+// SetLocations sets the value of Locations.
+func (s *JobSearchFilters) SetLocations(val []string) {
+	s.Locations = val
+}
+
+// SetProfessions sets the value of Professions.
+func (s *JobSearchFilters) SetProfessions(val []string) {
+	s.Professions = val
+}
+
+// SetJobTypes sets the value of JobTypes.
+func (s *JobSearchFilters) SetJobTypes(val []JobSearchFiltersJobTypesItem) {
+	s.JobTypes = val
+}
+
+// SetSeniorityLevels sets the value of SeniorityLevels.
+func (s *JobSearchFilters) SetSeniorityLevels(val []JobSearchFiltersSeniorityLevelsItem) {
+	s.SeniorityLevels = val
+}
+
+// SetYearOfSeniority sets the value of YearOfSeniority.
+func (s *JobSearchFilters) SetYearOfSeniority(val []JobSearchFiltersYearOfSeniorityItem) {
+	s.YearOfSeniority = val
+}
+
+// SetNumberOfManagement sets the value of NumberOfManagement.
+func (s *JobSearchFilters) SetNumberOfManagement(val []JobSearchFiltersNumberOfManagementItem) {
+	s.NumberOfManagement = val
+}
+
+// SetRemote sets the value of Remote.
+func (s *JobSearchFilters) SetRemote(val []JobSearchFiltersRemoteItem) {
+	s.Remote = val
+}
+
+// SetInclusivityTraits sets the value of InclusivityTraits.
+func (s *JobSearchFilters) SetInclusivityTraits(val []JobSearchFiltersInclusivityTraitsItem) {
+	s.InclusivityTraits = val
+}
+
+// SetLangNames sets the value of LangNames.
+func (s *JobSearchFilters) SetLangNames(val []string) {
+	s.LangNames = val
+}
+
+// SetSalary sets the value of Salary.
+func (s *JobSearchFilters) SetSalary(val OptJobSearchFiltersSalary) {
+	s.Salary = val
+}
+
+// SetPage sets the value of Page.
+func (s *JobSearchFilters) SetPage(val OptJobSearchFiltersPage) {
+	s.Page = val
+}
+
+type JobSearchFiltersInclusivityTraitsItem string
+
+const (
+	JobSearchFiltersInclusivityTraitsItemForeignTalents      JobSearchFiltersInclusivityTraitsItem = "foreign_talents"
+	JobSearchFiltersInclusivityTraitsItemGenderEquity        JobSearchFiltersInclusivityTraitsItem = "gender_equity"
+	JobSearchFiltersInclusivityTraitsItemLgbtq               JobSearchFiltersInclusivityTraitsItem = "lgbtq"
+	JobSearchFiltersInclusivityTraitsItemCareerChange        JobSearchFiltersInclusivityTraitsItem = "career_change"
+	JobSearchFiltersInclusivityTraitsItemBackToWork          JobSearchFiltersInclusivityTraitsItem = "back_to_work"
+	JobSearchFiltersInclusivityTraitsItemDisabilityConfident JobSearchFiltersInclusivityTraitsItem = "disability_confident"
+	JobSearchFiltersInclusivityTraitsItemSeniorCitizen       JobSearchFiltersInclusivityTraitsItem = "senior_citizen"
+)
+
+// AllValues returns all JobSearchFiltersInclusivityTraitsItem values.
+func (JobSearchFiltersInclusivityTraitsItem) AllValues() []JobSearchFiltersInclusivityTraitsItem {
+	return []JobSearchFiltersInclusivityTraitsItem{
+		JobSearchFiltersInclusivityTraitsItemForeignTalents,
+		JobSearchFiltersInclusivityTraitsItemGenderEquity,
+		JobSearchFiltersInclusivityTraitsItemLgbtq,
+		JobSearchFiltersInclusivityTraitsItemCareerChange,
+		JobSearchFiltersInclusivityTraitsItemBackToWork,
+		JobSearchFiltersInclusivityTraitsItemDisabilityConfident,
+		JobSearchFiltersInclusivityTraitsItemSeniorCitizen,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersInclusivityTraitsItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersInclusivityTraitsItemForeignTalents:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemGenderEquity:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemLgbtq:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemCareerChange:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemBackToWork:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemDisabilityConfident:
+		return []byte(s), nil
+	case JobSearchFiltersInclusivityTraitsItemSeniorCitizen:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersInclusivityTraitsItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersInclusivityTraitsItem(data) {
+	case JobSearchFiltersInclusivityTraitsItemForeignTalents:
+		*s = JobSearchFiltersInclusivityTraitsItemForeignTalents
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemGenderEquity:
+		*s = JobSearchFiltersInclusivityTraitsItemGenderEquity
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemLgbtq:
+		*s = JobSearchFiltersInclusivityTraitsItemLgbtq
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemCareerChange:
+		*s = JobSearchFiltersInclusivityTraitsItemCareerChange
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemBackToWork:
+		*s = JobSearchFiltersInclusivityTraitsItemBackToWork
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemDisabilityConfident:
+		*s = JobSearchFiltersInclusivityTraitsItemDisabilityConfident
+		return nil
+	case JobSearchFiltersInclusivityTraitsItemSeniorCitizen:
+		*s = JobSearchFiltersInclusivityTraitsItemSeniorCitizen
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type JobSearchFiltersJobTypesItem string
+
+const (
+	JobSearchFiltersJobTypesItemFullTime   JobSearchFiltersJobTypesItem = "full_time"
+	JobSearchFiltersJobTypesItemPartTime   JobSearchFiltersJobTypesItem = "part_time"
+	JobSearchFiltersJobTypesItemInternship JobSearchFiltersJobTypesItem = "internship"
+	JobSearchFiltersJobTypesItemContract   JobSearchFiltersJobTypesItem = "contract"
+	JobSearchFiltersJobTypesItemFreelance  JobSearchFiltersJobTypesItem = "freelance"
+	JobSearchFiltersJobTypesItemTemporary  JobSearchFiltersJobTypesItem = "temporary"
+	JobSearchFiltersJobTypesItemVolunteer  JobSearchFiltersJobTypesItem = "volunteer"
+)
+
+// AllValues returns all JobSearchFiltersJobTypesItem values.
+func (JobSearchFiltersJobTypesItem) AllValues() []JobSearchFiltersJobTypesItem {
+	return []JobSearchFiltersJobTypesItem{
+		JobSearchFiltersJobTypesItemFullTime,
+		JobSearchFiltersJobTypesItemPartTime,
+		JobSearchFiltersJobTypesItemInternship,
+		JobSearchFiltersJobTypesItemContract,
+		JobSearchFiltersJobTypesItemFreelance,
+		JobSearchFiltersJobTypesItemTemporary,
+		JobSearchFiltersJobTypesItemVolunteer,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersJobTypesItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersJobTypesItemFullTime:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemPartTime:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemInternship:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemContract:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemFreelance:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemTemporary:
+		return []byte(s), nil
+	case JobSearchFiltersJobTypesItemVolunteer:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersJobTypesItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersJobTypesItem(data) {
+	case JobSearchFiltersJobTypesItemFullTime:
+		*s = JobSearchFiltersJobTypesItemFullTime
+		return nil
+	case JobSearchFiltersJobTypesItemPartTime:
+		*s = JobSearchFiltersJobTypesItemPartTime
+		return nil
+	case JobSearchFiltersJobTypesItemInternship:
+		*s = JobSearchFiltersJobTypesItemInternship
+		return nil
+	case JobSearchFiltersJobTypesItemContract:
+		*s = JobSearchFiltersJobTypesItemContract
+		return nil
+	case JobSearchFiltersJobTypesItemFreelance:
+		*s = JobSearchFiltersJobTypesItemFreelance
+		return nil
+	case JobSearchFiltersJobTypesItemTemporary:
+		*s = JobSearchFiltersJobTypesItemTemporary
+		return nil
+	case JobSearchFiltersJobTypesItemVolunteer:
+		*s = JobSearchFiltersJobTypesItemVolunteer
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type JobSearchFiltersNumberOfManagementItem string
+
+const (
+	JobSearchFiltersNumberOfManagementItemNotSpecified JobSearchFiltersNumberOfManagementItem = "not_specified"
+	JobSearchFiltersNumberOfManagementItemNone         JobSearchFiltersNumberOfManagementItem = "none"
+	JobSearchFiltersNumberOfManagementItemOneFive      JobSearchFiltersNumberOfManagementItem = "one_five"
+	JobSearchFiltersNumberOfManagementItemFiveTen      JobSearchFiltersNumberOfManagementItem = "five_ten"
+	JobSearchFiltersNumberOfManagementItemTenFifteen   JobSearchFiltersNumberOfManagementItem = "ten_fifteen"
+	JobSearchFiltersNumberOfManagementItemFifteen      JobSearchFiltersNumberOfManagementItem = "fifteen_"
+)
+
+// AllValues returns all JobSearchFiltersNumberOfManagementItem values.
+func (JobSearchFiltersNumberOfManagementItem) AllValues() []JobSearchFiltersNumberOfManagementItem {
+	return []JobSearchFiltersNumberOfManagementItem{
+		JobSearchFiltersNumberOfManagementItemNotSpecified,
+		JobSearchFiltersNumberOfManagementItemNone,
+		JobSearchFiltersNumberOfManagementItemOneFive,
+		JobSearchFiltersNumberOfManagementItemFiveTen,
+		JobSearchFiltersNumberOfManagementItemTenFifteen,
+		JobSearchFiltersNumberOfManagementItemFifteen,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersNumberOfManagementItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersNumberOfManagementItemNotSpecified:
+		return []byte(s), nil
+	case JobSearchFiltersNumberOfManagementItemNone:
+		return []byte(s), nil
+	case JobSearchFiltersNumberOfManagementItemOneFive:
+		return []byte(s), nil
+	case JobSearchFiltersNumberOfManagementItemFiveTen:
+		return []byte(s), nil
+	case JobSearchFiltersNumberOfManagementItemTenFifteen:
+		return []byte(s), nil
+	case JobSearchFiltersNumberOfManagementItemFifteen:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersNumberOfManagementItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersNumberOfManagementItem(data) {
+	case JobSearchFiltersNumberOfManagementItemNotSpecified:
+		*s = JobSearchFiltersNumberOfManagementItemNotSpecified
+		return nil
+	case JobSearchFiltersNumberOfManagementItemNone:
+		*s = JobSearchFiltersNumberOfManagementItemNone
+		return nil
+	case JobSearchFiltersNumberOfManagementItemOneFive:
+		*s = JobSearchFiltersNumberOfManagementItemOneFive
+		return nil
+	case JobSearchFiltersNumberOfManagementItemFiveTen:
+		*s = JobSearchFiltersNumberOfManagementItemFiveTen
+		return nil
+	case JobSearchFiltersNumberOfManagementItemTenFifteen:
+		*s = JobSearchFiltersNumberOfManagementItemTenFifteen
+		return nil
+	case JobSearchFiltersNumberOfManagementItemFifteen:
+		*s = JobSearchFiltersNumberOfManagementItemFifteen
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Filters on the employer's company page.
+type JobSearchFiltersPage struct {
+	// Company size, as employee-count range buckets.
+	NumberOfEmployees []JobSearchFiltersPageNumberOfEmployeesItem `json:"number_of_employees"`
+	// Industry sector slugs, either a bare category ("tech") or `category_subcategory` ("tech_software").
+	// Valid values come from `available_facets.page.sectors` (150 observed globally).
+	Sectors []string `json:"sectors"`
+	// Technologies the company uses, e.g. "go", "kubernetes". Valid values come from
+	// `available_facets.page.tech_labels`.
+	TechLabels []string `json:"tech_labels"`
+}
+
+// GetNumberOfEmployees returns the value of NumberOfEmployees.
+func (s *JobSearchFiltersPage) GetNumberOfEmployees() []JobSearchFiltersPageNumberOfEmployeesItem {
+	return s.NumberOfEmployees
+}
+
+// GetSectors returns the value of Sectors.
+func (s *JobSearchFiltersPage) GetSectors() []string {
+	return s.Sectors
+}
+
+// GetTechLabels returns the value of TechLabels.
+func (s *JobSearchFiltersPage) GetTechLabels() []string {
+	return s.TechLabels
+}
+
+// SetNumberOfEmployees sets the value of NumberOfEmployees.
+func (s *JobSearchFiltersPage) SetNumberOfEmployees(val []JobSearchFiltersPageNumberOfEmployeesItem) {
+	s.NumberOfEmployees = val
+}
+
+// SetSectors sets the value of Sectors.
+func (s *JobSearchFiltersPage) SetSectors(val []string) {
+	s.Sectors = val
+}
+
+// SetTechLabels sets the value of TechLabels.
+func (s *JobSearchFiltersPage) SetTechLabels(val []string) {
+	s.TechLabels = val
+}
+
+type JobSearchFiltersPageNumberOfEmployeesItem string
+
+const (
+	JobSearchFiltersPageNumberOfEmployeesItem110      JobSearchFiltersPageNumberOfEmployeesItem = "1_10"
+	JobSearchFiltersPageNumberOfEmployeesItem1150     JobSearchFiltersPageNumberOfEmployeesItem = "11_50"
+	JobSearchFiltersPageNumberOfEmployeesItem51200    JobSearchFiltersPageNumberOfEmployeesItem = "51_200"
+	JobSearchFiltersPageNumberOfEmployeesItem201500   JobSearchFiltersPageNumberOfEmployeesItem = "201_500"
+	JobSearchFiltersPageNumberOfEmployeesItem5011000  JobSearchFiltersPageNumberOfEmployeesItem = "501_1000"
+	JobSearchFiltersPageNumberOfEmployeesItem10015000 JobSearchFiltersPageNumberOfEmployeesItem = "1001_5000"
+	JobSearchFiltersPageNumberOfEmployeesItem5001     JobSearchFiltersPageNumberOfEmployeesItem = "5001_"
+)
+
+// AllValues returns all JobSearchFiltersPageNumberOfEmployeesItem values.
+func (JobSearchFiltersPageNumberOfEmployeesItem) AllValues() []JobSearchFiltersPageNumberOfEmployeesItem {
+	return []JobSearchFiltersPageNumberOfEmployeesItem{
+		JobSearchFiltersPageNumberOfEmployeesItem110,
+		JobSearchFiltersPageNumberOfEmployeesItem1150,
+		JobSearchFiltersPageNumberOfEmployeesItem51200,
+		JobSearchFiltersPageNumberOfEmployeesItem201500,
+		JobSearchFiltersPageNumberOfEmployeesItem5011000,
+		JobSearchFiltersPageNumberOfEmployeesItem10015000,
+		JobSearchFiltersPageNumberOfEmployeesItem5001,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersPageNumberOfEmployeesItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersPageNumberOfEmployeesItem110:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem1150:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem51200:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem201500:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem5011000:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem10015000:
+		return []byte(s), nil
+	case JobSearchFiltersPageNumberOfEmployeesItem5001:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersPageNumberOfEmployeesItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersPageNumberOfEmployeesItem(data) {
+	case JobSearchFiltersPageNumberOfEmployeesItem110:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem110
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem1150:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem1150
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem51200:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem51200
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem201500:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem201500
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem5011000:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem5011000
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem10015000:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem10015000
+		return nil
+	case JobSearchFiltersPageNumberOfEmployeesItem5001:
+		*s = JobSearchFiltersPageNumberOfEmployeesItem5001
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type JobSearchFiltersRemoteItem string
+
+const (
+	JobSearchFiltersRemoteItemNoRemoteWork       JobSearchFiltersRemoteItem = "no_remote_work"
+	JobSearchFiltersRemoteItemPartialRemoteWork  JobSearchFiltersRemoteItem = "partial_remote_work"
+	JobSearchFiltersRemoteItemOptionalRemoteWork JobSearchFiltersRemoteItem = "optional_remote_work"
+	JobSearchFiltersRemoteItemFullRemoteWork     JobSearchFiltersRemoteItem = "full_remote_work"
+)
+
+// AllValues returns all JobSearchFiltersRemoteItem values.
+func (JobSearchFiltersRemoteItem) AllValues() []JobSearchFiltersRemoteItem {
+	return []JobSearchFiltersRemoteItem{
+		JobSearchFiltersRemoteItemNoRemoteWork,
+		JobSearchFiltersRemoteItemPartialRemoteWork,
+		JobSearchFiltersRemoteItemOptionalRemoteWork,
+		JobSearchFiltersRemoteItemFullRemoteWork,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersRemoteItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersRemoteItemNoRemoteWork:
+		return []byte(s), nil
+	case JobSearchFiltersRemoteItemPartialRemoteWork:
+		return []byte(s), nil
+	case JobSearchFiltersRemoteItemOptionalRemoteWork:
+		return []byte(s), nil
+	case JobSearchFiltersRemoteItemFullRemoteWork:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersRemoteItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersRemoteItem(data) {
+	case JobSearchFiltersRemoteItemNoRemoteWork:
+		*s = JobSearchFiltersRemoteItemNoRemoteWork
+		return nil
+	case JobSearchFiltersRemoteItemPartialRemoteWork:
+		*s = JobSearchFiltersRemoteItemPartialRemoteWork
+		return nil
+	case JobSearchFiltersRemoteItemOptionalRemoteWork:
+		*s = JobSearchFiltersRemoteItemOptionalRemoteWork
+		return nil
+	case JobSearchFiltersRemoteItemFullRemoteWork:
+		*s = JobSearchFiltersRemoteItemFullRemoteWork
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Salary range filter.
+type JobSearchFiltersSalary struct {
+	// Pay period. The website UI only offers per_month and per_year, but the API accepts all values listed
+	// in `available_facets.salary.type`.
+	Type OptJobSearchFiltersSalaryType `json:"type"`
+	// ISO 4217 currency code. Enumerated values were observed in `available_facets.salary.currency`.
+	Currency OptJobSearchFiltersSalaryCurrency `json:"currency"`
+	// Minimum salary in the selected currency and period.
+	Min OptInt `json:"min"`
+	// Maximum salary in the selected currency and period.
+	Max OptInt `json:"max"`
+}
+
+// GetType returns the value of Type.
+func (s *JobSearchFiltersSalary) GetType() OptJobSearchFiltersSalaryType {
+	return s.Type
+}
+
+// GetCurrency returns the value of Currency.
+func (s *JobSearchFiltersSalary) GetCurrency() OptJobSearchFiltersSalaryCurrency {
+	return s.Currency
+}
+
+// GetMin returns the value of Min.
+func (s *JobSearchFiltersSalary) GetMin() OptInt {
+	return s.Min
+}
+
+// GetMax returns the value of Max.
+func (s *JobSearchFiltersSalary) GetMax() OptInt {
+	return s.Max
+}
+
+// SetType sets the value of Type.
+func (s *JobSearchFiltersSalary) SetType(val OptJobSearchFiltersSalaryType) {
+	s.Type = val
+}
+
+// SetCurrency sets the value of Currency.
+func (s *JobSearchFiltersSalary) SetCurrency(val OptJobSearchFiltersSalaryCurrency) {
+	s.Currency = val
+}
+
+// SetMin sets the value of Min.
+func (s *JobSearchFiltersSalary) SetMin(val OptInt) {
+	s.Min = val
+}
+
+// SetMax sets the value of Max.
+func (s *JobSearchFiltersSalary) SetMax(val OptInt) {
+	s.Max = val
+}
+
+// ISO 4217 currency code. Enumerated values were observed in `available_facets.salary.currency`.
+type JobSearchFiltersSalaryCurrency string
+
+const (
+	JobSearchFiltersSalaryCurrencyTWD JobSearchFiltersSalaryCurrency = "TWD"
+	JobSearchFiltersSalaryCurrencyUSD JobSearchFiltersSalaryCurrency = "USD"
+	JobSearchFiltersSalaryCurrencyJPY JobSearchFiltersSalaryCurrency = "JPY"
+	JobSearchFiltersSalaryCurrencyEUR JobSearchFiltersSalaryCurrency = "EUR"
+	JobSearchFiltersSalaryCurrencyGBP JobSearchFiltersSalaryCurrency = "GBP"
+	JobSearchFiltersSalaryCurrencyCNY JobSearchFiltersSalaryCurrency = "CNY"
+	JobSearchFiltersSalaryCurrencyHKD JobSearchFiltersSalaryCurrency = "HKD"
+	JobSearchFiltersSalaryCurrencySGD JobSearchFiltersSalaryCurrency = "SGD"
+	JobSearchFiltersSalaryCurrencyCAD JobSearchFiltersSalaryCurrency = "CAD"
+	JobSearchFiltersSalaryCurrencyMYR JobSearchFiltersSalaryCurrency = "MYR"
+	JobSearchFiltersSalaryCurrencyIDR JobSearchFiltersSalaryCurrency = "IDR"
+	JobSearchFiltersSalaryCurrencyVND JobSearchFiltersSalaryCurrency = "VND"
+	JobSearchFiltersSalaryCurrencyTHB JobSearchFiltersSalaryCurrency = "THB"
+	JobSearchFiltersSalaryCurrencyPHP JobSearchFiltersSalaryCurrency = "PHP"
+	JobSearchFiltersSalaryCurrencyINR JobSearchFiltersSalaryCurrency = "INR"
+	JobSearchFiltersSalaryCurrencyAED JobSearchFiltersSalaryCurrency = "AED"
+	JobSearchFiltersSalaryCurrencyAFN JobSearchFiltersSalaryCurrency = "AFN"
+	JobSearchFiltersSalaryCurrencyUAH JobSearchFiltersSalaryCurrency = "UAH"
+)
+
+// AllValues returns all JobSearchFiltersSalaryCurrency values.
+func (JobSearchFiltersSalaryCurrency) AllValues() []JobSearchFiltersSalaryCurrency {
+	return []JobSearchFiltersSalaryCurrency{
+		JobSearchFiltersSalaryCurrencyTWD,
+		JobSearchFiltersSalaryCurrencyUSD,
+		JobSearchFiltersSalaryCurrencyJPY,
+		JobSearchFiltersSalaryCurrencyEUR,
+		JobSearchFiltersSalaryCurrencyGBP,
+		JobSearchFiltersSalaryCurrencyCNY,
+		JobSearchFiltersSalaryCurrencyHKD,
+		JobSearchFiltersSalaryCurrencySGD,
+		JobSearchFiltersSalaryCurrencyCAD,
+		JobSearchFiltersSalaryCurrencyMYR,
+		JobSearchFiltersSalaryCurrencyIDR,
+		JobSearchFiltersSalaryCurrencyVND,
+		JobSearchFiltersSalaryCurrencyTHB,
+		JobSearchFiltersSalaryCurrencyPHP,
+		JobSearchFiltersSalaryCurrencyINR,
+		JobSearchFiltersSalaryCurrencyAED,
+		JobSearchFiltersSalaryCurrencyAFN,
+		JobSearchFiltersSalaryCurrencyUAH,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersSalaryCurrency) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersSalaryCurrencyTWD:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyUSD:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyJPY:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyEUR:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyGBP:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyCNY:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyHKD:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencySGD:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyCAD:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyMYR:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyIDR:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyVND:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyTHB:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyPHP:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyINR:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyAED:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyAFN:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryCurrencyUAH:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersSalaryCurrency) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersSalaryCurrency(data) {
+	case JobSearchFiltersSalaryCurrencyTWD:
+		*s = JobSearchFiltersSalaryCurrencyTWD
+		return nil
+	case JobSearchFiltersSalaryCurrencyUSD:
+		*s = JobSearchFiltersSalaryCurrencyUSD
+		return nil
+	case JobSearchFiltersSalaryCurrencyJPY:
+		*s = JobSearchFiltersSalaryCurrencyJPY
+		return nil
+	case JobSearchFiltersSalaryCurrencyEUR:
+		*s = JobSearchFiltersSalaryCurrencyEUR
+		return nil
+	case JobSearchFiltersSalaryCurrencyGBP:
+		*s = JobSearchFiltersSalaryCurrencyGBP
+		return nil
+	case JobSearchFiltersSalaryCurrencyCNY:
+		*s = JobSearchFiltersSalaryCurrencyCNY
+		return nil
+	case JobSearchFiltersSalaryCurrencyHKD:
+		*s = JobSearchFiltersSalaryCurrencyHKD
+		return nil
+	case JobSearchFiltersSalaryCurrencySGD:
+		*s = JobSearchFiltersSalaryCurrencySGD
+		return nil
+	case JobSearchFiltersSalaryCurrencyCAD:
+		*s = JobSearchFiltersSalaryCurrencyCAD
+		return nil
+	case JobSearchFiltersSalaryCurrencyMYR:
+		*s = JobSearchFiltersSalaryCurrencyMYR
+		return nil
+	case JobSearchFiltersSalaryCurrencyIDR:
+		*s = JobSearchFiltersSalaryCurrencyIDR
+		return nil
+	case JobSearchFiltersSalaryCurrencyVND:
+		*s = JobSearchFiltersSalaryCurrencyVND
+		return nil
+	case JobSearchFiltersSalaryCurrencyTHB:
+		*s = JobSearchFiltersSalaryCurrencyTHB
+		return nil
+	case JobSearchFiltersSalaryCurrencyPHP:
+		*s = JobSearchFiltersSalaryCurrencyPHP
+		return nil
+	case JobSearchFiltersSalaryCurrencyINR:
+		*s = JobSearchFiltersSalaryCurrencyINR
+		return nil
+	case JobSearchFiltersSalaryCurrencyAED:
+		*s = JobSearchFiltersSalaryCurrencyAED
+		return nil
+	case JobSearchFiltersSalaryCurrencyAFN:
+		*s = JobSearchFiltersSalaryCurrencyAFN
+		return nil
+	case JobSearchFiltersSalaryCurrencyUAH:
+		*s = JobSearchFiltersSalaryCurrencyUAH
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Pay period. The website UI only offers per_month and per_year, but the API accepts all values listed
+// in `available_facets.salary.type`.
+type JobSearchFiltersSalaryType string
+
+const (
+	JobSearchFiltersSalaryTypePerMonth     JobSearchFiltersSalaryType = "per_month"
+	JobSearchFiltersSalaryTypePerYear      JobSearchFiltersSalaryType = "per_year"
+	JobSearchFiltersSalaryTypePerHour      JobSearchFiltersSalaryType = "per_hour"
+	JobSearchFiltersSalaryTypePerDay       JobSearchFiltersSalaryType = "per_day"
+	JobSearchFiltersSalaryTypePieceRatePay JobSearchFiltersSalaryType = "piece_rate_pay"
+)
+
+// AllValues returns all JobSearchFiltersSalaryType values.
+func (JobSearchFiltersSalaryType) AllValues() []JobSearchFiltersSalaryType {
+	return []JobSearchFiltersSalaryType{
+		JobSearchFiltersSalaryTypePerMonth,
+		JobSearchFiltersSalaryTypePerYear,
+		JobSearchFiltersSalaryTypePerHour,
+		JobSearchFiltersSalaryTypePerDay,
+		JobSearchFiltersSalaryTypePieceRatePay,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersSalaryType) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersSalaryTypePerMonth:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryTypePerYear:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryTypePerHour:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryTypePerDay:
+		return []byte(s), nil
+	case JobSearchFiltersSalaryTypePieceRatePay:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersSalaryType) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersSalaryType(data) {
+	case JobSearchFiltersSalaryTypePerMonth:
+		*s = JobSearchFiltersSalaryTypePerMonth
+		return nil
+	case JobSearchFiltersSalaryTypePerYear:
+		*s = JobSearchFiltersSalaryTypePerYear
+		return nil
+	case JobSearchFiltersSalaryTypePerHour:
+		*s = JobSearchFiltersSalaryTypePerHour
+		return nil
+	case JobSearchFiltersSalaryTypePerDay:
+		*s = JobSearchFiltersSalaryTypePerDay
+		return nil
+	case JobSearchFiltersSalaryTypePieceRatePay:
+		*s = JobSearchFiltersSalaryTypePieceRatePay
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type JobSearchFiltersSeniorityLevelsItem string
+
+const (
+	JobSearchFiltersSeniorityLevelsItemInternshipLevel JobSearchFiltersSeniorityLevelsItem = "internship_level"
+	JobSearchFiltersSeniorityLevelsItemEntryLevel      JobSearchFiltersSeniorityLevelsItem = "entry_level"
+	JobSearchFiltersSeniorityLevelsItemAssociate       JobSearchFiltersSeniorityLevelsItem = "associate"
+	JobSearchFiltersSeniorityLevelsItemMidSeniorLevel  JobSearchFiltersSeniorityLevelsItem = "mid_senior_level"
+	JobSearchFiltersSeniorityLevelsItemDirector        JobSearchFiltersSeniorityLevelsItem = "director"
+	JobSearchFiltersSeniorityLevelsItemExecutive       JobSearchFiltersSeniorityLevelsItem = "executive"
+)
+
+// AllValues returns all JobSearchFiltersSeniorityLevelsItem values.
+func (JobSearchFiltersSeniorityLevelsItem) AllValues() []JobSearchFiltersSeniorityLevelsItem {
+	return []JobSearchFiltersSeniorityLevelsItem{
+		JobSearchFiltersSeniorityLevelsItemInternshipLevel,
+		JobSearchFiltersSeniorityLevelsItemEntryLevel,
+		JobSearchFiltersSeniorityLevelsItemAssociate,
+		JobSearchFiltersSeniorityLevelsItemMidSeniorLevel,
+		JobSearchFiltersSeniorityLevelsItemDirector,
+		JobSearchFiltersSeniorityLevelsItemExecutive,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersSeniorityLevelsItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersSeniorityLevelsItemInternshipLevel:
+		return []byte(s), nil
+	case JobSearchFiltersSeniorityLevelsItemEntryLevel:
+		return []byte(s), nil
+	case JobSearchFiltersSeniorityLevelsItemAssociate:
+		return []byte(s), nil
+	case JobSearchFiltersSeniorityLevelsItemMidSeniorLevel:
+		return []byte(s), nil
+	case JobSearchFiltersSeniorityLevelsItemDirector:
+		return []byte(s), nil
+	case JobSearchFiltersSeniorityLevelsItemExecutive:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersSeniorityLevelsItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersSeniorityLevelsItem(data) {
+	case JobSearchFiltersSeniorityLevelsItemInternshipLevel:
+		*s = JobSearchFiltersSeniorityLevelsItemInternshipLevel
+		return nil
+	case JobSearchFiltersSeniorityLevelsItemEntryLevel:
+		*s = JobSearchFiltersSeniorityLevelsItemEntryLevel
+		return nil
+	case JobSearchFiltersSeniorityLevelsItemAssociate:
+		*s = JobSearchFiltersSeniorityLevelsItemAssociate
+		return nil
+	case JobSearchFiltersSeniorityLevelsItemMidSeniorLevel:
+		*s = JobSearchFiltersSeniorityLevelsItemMidSeniorLevel
+		return nil
+	case JobSearchFiltersSeniorityLevelsItemDirector:
+		*s = JobSearchFiltersSeniorityLevelsItemDirector
+		return nil
+	case JobSearchFiltersSeniorityLevelsItemExecutive:
+		*s = JobSearchFiltersSeniorityLevelsItemExecutive
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type JobSearchFiltersYearOfSeniorityItem string
+
+const (
+	JobSearchFiltersYearOfSeniorityItem01  JobSearchFiltersYearOfSeniorityItem = "0_1"
+	JobSearchFiltersYearOfSeniorityItem13  JobSearchFiltersYearOfSeniorityItem = "1_3"
+	JobSearchFiltersYearOfSeniorityItem35  JobSearchFiltersYearOfSeniorityItem = "3_5"
+	JobSearchFiltersYearOfSeniorityItem510 JobSearchFiltersYearOfSeniorityItem = "5_10"
+	JobSearchFiltersYearOfSeniorityItem10  JobSearchFiltersYearOfSeniorityItem = "10_"
+)
+
+// AllValues returns all JobSearchFiltersYearOfSeniorityItem values.
+func (JobSearchFiltersYearOfSeniorityItem) AllValues() []JobSearchFiltersYearOfSeniorityItem {
+	return []JobSearchFiltersYearOfSeniorityItem{
+		JobSearchFiltersYearOfSeniorityItem01,
+		JobSearchFiltersYearOfSeniorityItem13,
+		JobSearchFiltersYearOfSeniorityItem35,
+		JobSearchFiltersYearOfSeniorityItem510,
+		JobSearchFiltersYearOfSeniorityItem10,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobSearchFiltersYearOfSeniorityItem) MarshalText() ([]byte, error) {
+	switch s {
+	case JobSearchFiltersYearOfSeniorityItem01:
+		return []byte(s), nil
+	case JobSearchFiltersYearOfSeniorityItem13:
+		return []byte(s), nil
+	case JobSearchFiltersYearOfSeniorityItem35:
+		return []byte(s), nil
+	case JobSearchFiltersYearOfSeniorityItem510:
+		return []byte(s), nil
+	case JobSearchFiltersYearOfSeniorityItem10:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobSearchFiltersYearOfSeniorityItem) UnmarshalText(data []byte) error {
+	switch JobSearchFiltersYearOfSeniorityItem(data) {
+	case JobSearchFiltersYearOfSeniorityItem01:
+		*s = JobSearchFiltersYearOfSeniorityItem01
+		return nil
+	case JobSearchFiltersYearOfSeniorityItem13:
+		*s = JobSearchFiltersYearOfSeniorityItem13
+		return nil
+	case JobSearchFiltersYearOfSeniorityItem35:
+		*s = JobSearchFiltersYearOfSeniorityItem35
+		return nil
+	case JobSearchFiltersYearOfSeniorityItem510:
+		*s = JobSearchFiltersYearOfSeniorityItem510
+		return nil
+	case JobSearchFiltersYearOfSeniorityItem10:
+		*s = JobSearchFiltersYearOfSeniorityItem10
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
 // Minimal job search item. `description` is useful for previews, but the detail endpoint returns a
 // fuller HTML description and requirements.
 // Ref: #/components/schemas/JobSearchItem
@@ -248,14 +1192,15 @@ func (s *JobSearchItem) SetDescription(val string) {
 type JobSearchRequest struct {
 	// Search keyword. Use an empty string to browse jobs without a keyword.
 	Query string `json:"query"`
-	// 1-based page number. Observed as optional; omitting it returns page 1. The API currently returns 20
-	// jobs per page.
+	// 1-based page number. Observed as optional; omitting it returns page 1.
 	Page OptInt `json:"page"`
-	// Sort order for the search results.
-	SortBy JobSearchRequestSortBy `json:"sort_by"`
-	// Filter object. Use `{}` for the minimal job-description workflow. Normal filter values should come
-	// from Cake.me's own facet UI/API rather than being guessed by clients.
-	Filters JobSearchRequestFilters `json:"filters"`
+	// Number of jobs per page. Observed as optional; omitting it returns 20 jobs per page. The website UI
+	// sends 10.
+	PerPage OptInt `json:"per_page"`
+	// Sort order for the search results. This is the only request field with server-side validation: any
+	// other value returns 422.
+	SortBy  JobSearchRequestSortBy `json:"sort_by"`
+	Filters JobSearchFilters       `json:"filters"`
 }
 
 // GetQuery returns the value of Query.
@@ -268,13 +1213,18 @@ func (s *JobSearchRequest) GetPage() OptInt {
 	return s.Page
 }
 
+// GetPerPage returns the value of PerPage.
+func (s *JobSearchRequest) GetPerPage() OptInt {
+	return s.PerPage
+}
+
 // GetSortBy returns the value of SortBy.
 func (s *JobSearchRequest) GetSortBy() JobSearchRequestSortBy {
 	return s.SortBy
 }
 
 // GetFilters returns the value of Filters.
-func (s *JobSearchRequest) GetFilters() JobSearchRequestFilters {
+func (s *JobSearchRequest) GetFilters() JobSearchFilters {
 	return s.Filters
 }
 
@@ -288,30 +1238,23 @@ func (s *JobSearchRequest) SetPage(val OptInt) {
 	s.Page = val
 }
 
+// SetPerPage sets the value of PerPage.
+func (s *JobSearchRequest) SetPerPage(val OptInt) {
+	s.PerPage = val
+}
+
 // SetSortBy sets the value of SortBy.
 func (s *JobSearchRequest) SetSortBy(val JobSearchRequestSortBy) {
 	s.SortBy = val
 }
 
 // SetFilters sets the value of Filters.
-func (s *JobSearchRequest) SetFilters(val JobSearchRequestFilters) {
+func (s *JobSearchRequest) SetFilters(val JobSearchFilters) {
 	s.Filters = val
 }
 
-// Filter object. Use `{}` for the minimal job-description workflow. Normal filter values should come
-// from Cake.me's own facet UI/API rather than being guessed by clients.
-type JobSearchRequestFilters map[string]jx.Raw
-
-func (s *JobSearchRequestFilters) init() JobSearchRequestFilters {
-	m := *s
-	if m == nil {
-		m = map[string]jx.Raw{}
-		*s = m
-	}
-	return m
-}
-
-// Sort order for the search results.
+// Sort order for the search results. This is the only request field with server-side validation: any
+// other value returns 422.
 type JobSearchRequestSortBy string
 
 const (
@@ -359,7 +1302,7 @@ func (s *JobSearchRequestSortBy) UnmarshalText(data []byte) error {
 type JobSearchResponse struct {
 	TotalEntries int `json:"total_entries"`
 	TotalPages   int `json:"total_pages"`
-	// Observed page size. Currently 20.
+	// Page size. Echoes the request `per_page`; defaults to 20.
 	PerPage     int             `json:"per_page"`
 	CurrentPage int             `json:"current_page"`
 	Data        []JobSearchItem `json:"data"`
@@ -457,6 +1400,190 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobSearchFiltersPage returns new OptJobSearchFiltersPage with value set to v.
+func NewOptJobSearchFiltersPage(v JobSearchFiltersPage) OptJobSearchFiltersPage {
+	return OptJobSearchFiltersPage{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobSearchFiltersPage is optional JobSearchFiltersPage.
+type OptJobSearchFiltersPage struct {
+	Value JobSearchFiltersPage
+	Set   bool
+}
+
+// IsSet returns true if OptJobSearchFiltersPage was set.
+func (o OptJobSearchFiltersPage) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobSearchFiltersPage) Reset() {
+	var v JobSearchFiltersPage
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobSearchFiltersPage) SetTo(v JobSearchFiltersPage) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobSearchFiltersPage) Get() (v JobSearchFiltersPage, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobSearchFiltersPage) Or(d JobSearchFiltersPage) JobSearchFiltersPage {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobSearchFiltersSalary returns new OptJobSearchFiltersSalary with value set to v.
+func NewOptJobSearchFiltersSalary(v JobSearchFiltersSalary) OptJobSearchFiltersSalary {
+	return OptJobSearchFiltersSalary{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobSearchFiltersSalary is optional JobSearchFiltersSalary.
+type OptJobSearchFiltersSalary struct {
+	Value JobSearchFiltersSalary
+	Set   bool
+}
+
+// IsSet returns true if OptJobSearchFiltersSalary was set.
+func (o OptJobSearchFiltersSalary) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobSearchFiltersSalary) Reset() {
+	var v JobSearchFiltersSalary
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobSearchFiltersSalary) SetTo(v JobSearchFiltersSalary) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobSearchFiltersSalary) Get() (v JobSearchFiltersSalary, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobSearchFiltersSalary) Or(d JobSearchFiltersSalary) JobSearchFiltersSalary {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobSearchFiltersSalaryCurrency returns new OptJobSearchFiltersSalaryCurrency with value set to v.
+func NewOptJobSearchFiltersSalaryCurrency(v JobSearchFiltersSalaryCurrency) OptJobSearchFiltersSalaryCurrency {
+	return OptJobSearchFiltersSalaryCurrency{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobSearchFiltersSalaryCurrency is optional JobSearchFiltersSalaryCurrency.
+type OptJobSearchFiltersSalaryCurrency struct {
+	Value JobSearchFiltersSalaryCurrency
+	Set   bool
+}
+
+// IsSet returns true if OptJobSearchFiltersSalaryCurrency was set.
+func (o OptJobSearchFiltersSalaryCurrency) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobSearchFiltersSalaryCurrency) Reset() {
+	var v JobSearchFiltersSalaryCurrency
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobSearchFiltersSalaryCurrency) SetTo(v JobSearchFiltersSalaryCurrency) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobSearchFiltersSalaryCurrency) Get() (v JobSearchFiltersSalaryCurrency, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobSearchFiltersSalaryCurrency) Or(d JobSearchFiltersSalaryCurrency) JobSearchFiltersSalaryCurrency {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobSearchFiltersSalaryType returns new OptJobSearchFiltersSalaryType with value set to v.
+func NewOptJobSearchFiltersSalaryType(v JobSearchFiltersSalaryType) OptJobSearchFiltersSalaryType {
+	return OptJobSearchFiltersSalaryType{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobSearchFiltersSalaryType is optional JobSearchFiltersSalaryType.
+type OptJobSearchFiltersSalaryType struct {
+	Value JobSearchFiltersSalaryType
+	Set   bool
+}
+
+// IsSet returns true if OptJobSearchFiltersSalaryType was set.
+func (o OptJobSearchFiltersSalaryType) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobSearchFiltersSalaryType) Reset() {
+	var v JobSearchFiltersSalaryType
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobSearchFiltersSalaryType) SetTo(v JobSearchFiltersSalaryType) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobSearchFiltersSalaryType) Get() (v JobSearchFiltersSalaryType, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobSearchFiltersSalaryType) Or(d JobSearchFiltersSalaryType) JobSearchFiltersSalaryType {
 	if v, ok := o.Get(); ok {
 		return v
 	}
