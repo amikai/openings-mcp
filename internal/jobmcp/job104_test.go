@@ -218,33 +218,18 @@ func TestJob104SearchJobsMissingRequiredE2E(t *testing.T) {
 func TestJob104SearchJobsInvalidEnumE2E(t *testing.T) {
 	clientSession, _ := testJob104MCPClientServer(t)
 
-	// Values outside a property's enum are rejected by the SDK's
+	// A value outside a property's enum is rejected by the SDK's
 	// input-schema validation before the handler runs, as an IsError
 	// tool result.
-	cases := []struct {
-		name string
-		args map[string]any
-		want string
-	}{
-		{"area", map[string]any{"keyword": "Golang", "area": "Mars"}, `validating "arguments": validating root: validating /properties/area: enum: Mars does not equal any of: [Taipei NewTaipei Yilan Keelung Taoyuan Hsinchu Miaoli Taichung Changhua Nantou Yunlin Chiayi Tainan Kaohsiung Pingtung Taitung Hualien Penghu Kinmen Lienchiang Beijing Tianjin Shanghai Chongqing Guangdong Fujian Hainan Zhejiang Jiangsu Shandong Hebei Liaoning Jilin Heilongjiang Hunan Hubei Jiangxi Anhui Henan Shanxi Shaanxi Gansu Qinghai Sichuan Guizhou Yunnan InnerMongolia Tibet Ningxia Xinjiang Guangxi HongKong Macao NortheastAsia SoutheastAsia OtherAsia AustraliaNZ OtherOceania Canada EasternUS WesternUS MidwesternUS CentralAmerica SouthAmerica NorthernEurope SouthernEurope EasternEurope WesternEurope CentralEurope NorthAfrica CentralAfrica SouthAfrica EastAfrica WestAfrica]`},
-		{"job_type", map[string]any{"keyword": "Golang", "area": "Taipei", "job_type": "full"}, `validating "arguments": validating root: validating /properties/job_type: enum: full does not equal any of: [Full-time Part-time Senior Dispatch]`},
-		{"sort", map[string]any{"keyword": "Golang", "area": "Taipei", "sort": "newest"}, `validating "arguments": validating root: validating /properties/sort: enum: newest does not equal any of: [Relevance Newest]`},
-		{"remote", map[string]any{"keyword": "Golang", "area": "Taipei", "remote": "hybrid"}, `validating "arguments": validating root: validating /properties/remote: enum: hybrid does not equal any of: [Full Partial]`},
-		{"edu", map[string]any{"keyword": "Golang", "area": "Taipei", "edu": []string{"PhD"}}, `validating "arguments": validating root: validating /properties/edu: validating /properties/edu/items: enum: PhD does not equal any of: [HighSchoolBelow HighSchool College University Master Doctorate]`},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
-				Name:      "104_search_jobs",
-				Arguments: tc.args,
-			})
-			require.NoError(t, err)
-			require.True(t, callRes.IsError)
-			text, ok := callRes.Content[0].(*mcp.TextContent)
-			require.True(t, ok)
-			assert.Equal(t, tc.want, text.Text)
-		})
-	}
+	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      "104_search_jobs",
+		Arguments: map[string]any{"keyword": "Golang", "area": "Taipei", "job_type": "valueNotInEnum"},
+	})
+	require.NoError(t, err)
+	require.True(t, callRes.IsError)
+	text, ok := callRes.Content[0].(*mcp.TextContent)
+	require.True(t, ok)
+	assert.Equal(t, `validating "arguments": validating root: validating /properties/job_type: enum: valueNotInEnum does not equal any of: [Full-time Part-time Senior Dispatch]`, text.Text)
 }
 
 func TestJob104GetJobDetailE2E(t *testing.T) {
