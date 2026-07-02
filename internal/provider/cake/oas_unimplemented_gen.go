@@ -27,8 +27,9 @@ func (UnimplementedHandler) GetJobDetail(ctx context.Context, params GetJobDetai
 //
 // Searches jobs by keyword and returns paginated results. For the minimal job-description workflow,
 // callers only need each result's `path` to request the full detail from `/api/client/v1/jobs/{path}`.
-// Observed minimal request requirements: `query`, `sort_by`, and `filters` are required. `page` is
-// optional and defaults to page 1. Use `filters: {}` when no filters are needed.
+// Observed minimal request requirements: `query`, `sort_by`, and `filters` are required (missing any
+// of them returns 422). `page` and `per_page` are optional and default to page 1 with 20 jobs per
+// page. Use `filters: {}` when no filters are needed.
 //
 // POST /api/client/v1/jobs/search
 func (UnimplementedHandler) SearchJobs(ctx context.Context, req *JobSearchRequest) (r SearchJobsRes, _ error) {

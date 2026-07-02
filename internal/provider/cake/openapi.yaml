@@ -32,8 +32,9 @@ paths:
         request the full detail from `/api/client/v1/jobs/{path}`.
 
         Observed minimal request requirements:
-        `query`, `sort_by`, and `filters` are required. `page` is optional and
-        defaults to page 1. Use `filters: {}` when no filters are needed.
+        `query`, `sort_by`, and `filters` are required (missing any of them
+        returns 422). `page` and `per_page` are optional and default to page 1
+        with 20 jobs per page. Use `filters: {}` when no filters are needed.
       operationId: searchJobs
       requestBody:
         required: true
@@ -63,6 +64,12 @@ paths:
                   sort_by: "popularity"
                   filters:
                     locations: ["Taiwan"]
+                    job_types: ["full_time"]
+                    remote: ["partial_remote_work"]
+                    salary:
+                      type: "per_month"
+                      currency: "TWD"
+                      min: 60000
       responses:
         "200":
           description: Search succeeded.
@@ -136,21 +143,232 @@ components:
           minimum: 1
           description: >
             1-based page number. Observed as optional; omitting it returns page 1.
-            The API currently returns 20 jobs per page.
           example: 1
+        per_page:
+          type: integer
+          minimum: 1
+          description: >
+            Number of jobs per page. Observed as optional; omitting it returns
+            20 jobs per page. The website UI sends 10.
+          example: 20
         sort_by:
           type: string
           enum: [popularity, latest]
-          description: Sort order for the search results.
+          description: >
+            Sort order for the search results. This is the only request field
+            with server-side validation: any other value returns 422.
           example: "popularity"
         filters:
-          type: object
+          $ref: "#/components/schemas/JobSearchFilters"
+
+    JobSearchFilters:
+      type: object
+      description: >
+        Search filters. Use `{}` for the minimal job-description workflow.
+        All keys are optional. Filter values are not validated server-side:
+        unknown values are silently ignored or match nothing, so clients must
+        send the exact enumerated values below. Enumerations were captured on
+        2026-07-02 from the website filter UI and the `available_facets` block
+        the API returns with every search response. Open vocabularies
+        (`locations`, `professions`, `page.sectors`, `page.tech_labels`,
+        `lang_names`) are data-derived and unbounded, so they stay plain
+        strings; read current values from `available_facets` instead of
+        guessing.
+      properties:
+        locations:
+          type: array
           description: >
-            Filter object. Use `{}` for the minimal job-description workflow.
-            Normal filter values should come from Cake.me's own facet UI/API
-            rather than being guessed by clients.
-          additionalProperties: true
-          example: {}
+            Location names as shown on the website, localized (both English and
+            Chinese names are accepted, e.g. "Taiwan", "台灣",
+            "Taipei City, Taiwan"). Valid values come from
+            `available_facets.locations`.
+          items:
+            type: string
+          example: ["台灣"]
+        professions:
+          type: array
+          description: >
+            Profession slugs in `category_subcategory` form, e.g.
+            "it_back-end-engineer", "it_software-engineer". Valid values come
+            from `available_facets.professions` (399 observed globally).
+          items:
+            type: string
+          example: ["it_back-end-engineer"]
+        job_types:
+          type: array
+          description: Employment types.
+          items:
+            type: string
+            enum:
+              - full_time
+              - part_time
+              - internship
+              - contract
+              - freelance
+              - temporary
+              - volunteer
+          example: ["full_time"]
+        seniority_levels:
+          type: array
+          description: Seniority of the role.
+          items:
+            type: string
+            enum:
+              - internship_level
+              - entry_level
+              - associate
+              - mid_senior_level
+              - director
+              - executive
+          example: ["mid_senior_level"]
+        year_of_seniority:
+          type: array
+          description: Required years of work experience, as range buckets.
+          items:
+            type: string
+            enum:
+              - "0_1"
+              - "1_3"
+              - "3_5"
+              - "5_10"
+              - "10_"
+          example: ["5_10"]
+        number_of_management:
+          type: array
+          description: Number of people the role manages, as range buckets.
+          items:
+            type: string
+            enum:
+              - not_specified
+              - none
+              - one_five
+              - five_ten
+              - ten_fifteen
+              - fifteen_
+          example: ["none"]
+        remote:
+          type: array
+          description: Remote-work policy.
+          items:
+            type: string
+            enum:
+              - no_remote_work
+              - partial_remote_work
+              - optional_remote_work
+              - full_remote_work
+          example: ["partial_remote_work"]
+        inclusivity_traits:
+          type: array
+          description: Inclusive-hiring traits the employer highlights.
+          items:
+            type: string
+            enum:
+              - foreign_talents
+              - gender_equity
+              - lgbtq
+              - career_change
+              - back_to_work
+              - disability_confident
+              - senior_citizen
+          example: ["lgbtq"]
+        lang_names:
+          type: array
+          description: >
+            Language of the job description, as an English language name.
+            Data-derived; observed values include "English", "Chinese",
+            "Japanese", "Korean", "Vietnamese", "Indonesian", "French",
+            "Arabic", "Malay (macrolanguage)". Valid values come from
+            `available_facets.lang_names`.
+          items:
+            type: string
+          example: ["Chinese"]
+        salary:
+          type: object
+          description: Salary range filter.
+          properties:
+            type:
+              type: string
+              description: >
+                Pay period. The website UI only offers per_month and per_year,
+                but the API accepts all values listed in
+                `available_facets.salary.type`.
+              enum:
+                - per_month
+                - per_year
+                - per_hour
+                - per_day
+                - piece_rate_pay
+              example: "per_month"
+            currency:
+              type: string
+              description: >
+                ISO 4217 currency code. Enumerated values were observed in
+                `available_facets.salary.currency`.
+              enum:
+                - TWD
+                - USD
+                - JPY
+                - EUR
+                - GBP
+                - CNY
+                - HKD
+                - SGD
+                - CAD
+                - MYR
+                - IDR
+                - VND
+                - THB
+                - PHP
+                - INR
+                - AED
+                - AFN
+                - UAH
+              example: "TWD"
+            min:
+              type: integer
+              minimum: 0
+              description: Minimum salary in the selected currency and period.
+              example: 60000
+            max:
+              type: integer
+              minimum: 0
+              description: Maximum salary in the selected currency and period.
+              example: 150000
+        page:
+          type: object
+          description: Filters on the employer's company page.
+          properties:
+            number_of_employees:
+              type: array
+              description: Company size, as employee-count range buckets.
+              items:
+                type: string
+                enum:
+                  - "1_10"
+                  - "11_50"
+                  - "51_200"
+                  - "201_500"
+                  - "501_1000"
+                  - "1001_5000"
+                  - "5001_"
+              example: ["51_200"]
+            sectors:
+              type: array
+              description: >
+                Industry sector slugs, either a bare category ("tech") or
+                `category_subcategory` ("tech_software"). Valid values come
+                from `available_facets.page.sectors` (150 observed globally).
+              items:
+                type: string
+              example: ["tech_software"]
+            tech_labels:
+              type: array
+              description: >
+                Technologies the company uses, e.g. "go", "kubernetes". Valid
+                values come from `available_facets.page.tech_labels`.
+              items:
+                type: string
+              example: ["go"]
 
     JobSearchResponse:
       type: object
@@ -168,7 +386,7 @@ components:
           example: 18
         per_page:
           type: integer
-          description: Observed page size. Currently 20.
+          description: Page size. Echoes the request `per_page`; defaults to 20.
           example: 20
         current_page:
           type: integer

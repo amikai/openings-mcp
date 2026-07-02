@@ -192,8 +192,9 @@ func (s *Server) handleGetJobDetailRequest(args [1]string, argsEscaped bool, w h
 //
 // Searches jobs by keyword and returns paginated results. For the minimal job-description workflow,
 // callers only need each result's `path` to request the full detail from `/api/client/v1/jobs/{path}`.
-// Observed minimal request requirements: `query`, `sort_by`, and `filters` are required. `page` is
-// optional and defaults to page 1. Use `filters: {}` when no filters are needed.
+// Observed minimal request requirements: `query`, `sort_by`, and `filters` are required (missing any
+// of them returns 422). `page` and `per_page` are optional and default to page 1 with 20 jobs per
+// page. Use `filters: {}` when no filters are needed.
 //
 // POST /api/client/v1/jobs/search
 func (s *Server) handleSearchJobsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
