@@ -21,9 +21,9 @@ jobs:
           - windows-11-arm # windows arm64
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: stable
 
@@ -38,7 +38,7 @@ jobs:
     # Separate job: the validator runs in docker, which macOS runners lack.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Validate OpenAPI specs
         run: make validate-openapi
@@ -48,11 +48,11 @@ jobs:
     # the linux/amd64 + linux/arm64 docker images, but publishes nothing.
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-go@v5
+      - uses: actions/setup-go@v6
         with:
           go-version: stable
 
