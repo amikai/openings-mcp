@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/amikai/job-mcp/internal/jobmcp"
 	"github.com/amikai/job-mcp/internal/provider/cake"
 	"github.com/amikai/job-mcp/internal/provider/google"
 	"github.com/amikai/job-mcp/internal/provider/job104"
@@ -38,7 +37,7 @@ func TestServerListsJobTools(t *testing.T) {
 	}
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
-	server := jobmcp.NewServer(c104, cCake, cNvidia, cTsmc, cGoogle)
+	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle)
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)
