@@ -13,6 +13,12 @@ from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 
 ## Install
 
+With Homebrew:
+
+```
+brew install --cask amikai/tap/openings-mcp
+```
+
 With Go:
 
 ```
