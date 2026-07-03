@@ -15,6 +15,12 @@ from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 multiple postings or fetches full job details, so use `Gemini Flash` or
 `Claude Haiku`, and keep `effort` low.
 
+> **Disclaimer:** This is an unofficial, personal-use tool. It is not affiliated
+> with, endorsed by, or sponsored by 104 Corporation, TSMC, or any other job
+> board or company whose listings it searches. It calls each site's public web
+> endpoints; please respect their terms of service and use it at a reasonable,
+> low frequency. No scraped job data is distributed with this project.
+
 ## Install
 
 With Homebrew:
@@ -80,9 +86,14 @@ any time without notice. Job listing data belongs to the respective sites and
 is fetched on your behalf when you invoke a tool — nothing is stored or
 redistributed by this project.
 
-Use this tool for personal job searching at a human pace. You are responsible
-for complying with the terms of service of each site you query; do not use it
-for bulk scraping or data harvesting.
+Use this tool for personal job searching at a human pace. Every request goes
+out from your own machine, and a site may throttle or temporarily block your
+IP if too many arrive too quickly. The server does not rate-limit requests,
+so a client that pages through many results or fetches lots of job details in
+one go can trip these limits. No login is involved, so your accounts on these
+sites are not at risk. You are responsible for complying with the terms of
+service of each site you query; do not use it for bulk scraping or data
+harvesting.
 
 ## Credits
 
