@@ -2,9 +2,6 @@ package jobmcp
 
 import (
 	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/amikai/job-mcp/internal/provider/nvidia"
@@ -13,45 +10,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func newMockNvidiaServer(t *testing.T) *httptest.Server {
-	t.Helper()
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/jobs", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-
-		var req nvidia.JobsRequest
-		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
-
-		serveTestdata(t, "../provider/nvidia/testdata/jobs_rsp.json")(w, r)
-	})
-
-	mux.HandleFunc("/job/Israel-Yokneam/Senior-Software-Golang-Kubernetes-Engineer_JR2015916", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		serveTestdata(t, "../provider/nvidia/testdata/job_detail_rsp.json")(w, r)
-	})
-
-	return httptest.NewServer(mux)
-}
-
-func serveTestdata(t *testing.T, path string) http.HandlerFunc {
-	t.Helper()
-	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
-	}
-}
-
 func testNvidiaMCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
-	srv := newMockNvidiaServer(t)
+	srv := nvidia.NewMockServer()
 	t.Cleanup(srv.Close)
 	client, err := nvidia.NewClient(srv.URL, nvidia.WithClient(srv.Client()))
 	require.NoError(t, err)
