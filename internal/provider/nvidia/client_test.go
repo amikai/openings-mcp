@@ -24,9 +24,13 @@ func newMockServer(t *testing.T) *httptest.Server {
 		err := json.NewDecoder(r.Body).Decode(&req)
 		require.NoError(t, err)
 
-		assert.Equal(t, 20, req.Limit)
-		assert.Equal(t, 0, req.Offset)
-		assert.Equal(t, "golang", req.SearchText)
+		wantReq := JobsRequest{
+			AppliedFacets: AppliedFacets{},
+			Limit:         20,
+			Offset:        0,
+			SearchText:    "golang",
+		}
+		assert.Equal(t, wantReq, req)
 
 		serveTestdata("testdata/jobs_rsp.json")(w, r)
 	})
