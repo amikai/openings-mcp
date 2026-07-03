@@ -4,13 +4,6 @@
   <strong>Search job listings from any MCP client — job boards and company career sites, one server.</strong>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Go-1.26+-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go 1.26+">
-  <img src="https://img.shields.io/badge/MCP-stdio-7c6cff?style=flat-square" alt="MCP stdio">
-  <img src="https://img.shields.io/badge/Docker-amd64%20%7C%20arm64-2496ED?style=flat-square&logo=docker&logoColor=white" alt="Docker multi-arch">
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License">
-</p>
-
 **job-mcp** searches job listings across job boards and company career sites —
 currently **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**, and
 **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)** —
