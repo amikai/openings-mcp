@@ -3,13 +3,16 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
+	"fmt"
 	"io"
 	"log"
 	"log/slog"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/peterbourgon/ff/v4"
+	"github.com/peterbourgon/ff/v4/ffhelp"
 
 	"github.com/amikai/job-mcp/internal/jobmcp"
 	"github.com/amikai/job-mcp/internal/logging"
@@ -22,9 +25,19 @@ import (
 )
 
 func main() {
-	logFile := flag.String("log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
-	enableCommandLogging := flag.Bool("enable-command-logging", false, "log raw JSON-RPC traffic to the log output")
-	flag.Parse()
+	fs := ff.NewFlagSet("jobmcp")
+	var (
+		logFile              = fs.StringLong("log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
+		enableCommandLogging = fs.BoolLong("enable-command-logging", "log raw JSON-RPC traffic to the log output")
+	)
+	if err := ff.Parse(fs, os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
+		if errors.Is(err, ff.ErrHelp) {
+			os.Exit(0)
+		}
+		fmt.Fprintln(os.Stderr, "err:", err)
+		os.Exit(1)
+	}
 
 	logOutput := io.Writer(os.Stderr)
 	if *logFile != "" {
