@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/amikai/job-mcp/internal/provider/job104"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -92,25 +94,43 @@ type job104SearchInput struct {
 	Page    int      `json:"page,omitempty"`
 }
 
-// job104SearchOutput mirrors job104.JobsResponse for the LLM: identical
-// fields and JSON names, except the coded jobRo/remoteWorkType become the
-// job_type/remote labels used by the search input params. Unknown codes
-// leave the label empty and omitempty drops the field.
+// job104SearchOutput reshapes job104.JobsResponse for the LLM, making it
+// easy to read.
 type job104SearchOutput struct {
 	Data     []job104JobSummary   `json:"data"`
 	Metadata job104SearchMetadata `json:"metadata"`
 }
 
 type job104DetailInput struct {
-	JobCode string `json:"job_code" jsonschema:"104 job code (jobNo)"`
+	JobCode string `json:"job_code" jsonschema:"104 job code, from a search result's jobCode field (not jobNo)."`
 }
 
-// job104DetailOutput mirrors job104.JobDetailResponse for the LLM: Opt
-// fields flatten to plain values with omitempty, and the coded
-// jobType/remoteWork become the job_type/remote labels used by the search
-// input params. Unknown codes and null remoteWork drop the label.
+// job104DetailOutput reshapes job104.JobDetailResponse for the LLM, making
+// it easy to read.
 type job104DetailOutput struct {
-	Data job104JobDetail `json:"data"`
+	JobName        string   `json:"jobName"`                                                                                               // header.jobName
+	CompanyName    string   `json:"companyName"`                                                                                           // header.custName
+	URL            string   `json:"url" jsonschema:"Public job posting URL."`                                                              // built from the job_code input; the 104 response has no posting URL
+	CompanyURL     string   `json:"companyUrl" jsonschema:"Company profile page URL."`                                                     // header.custUrl
+	AppearDate     string   `json:"appearDate"`                                                                                            // header.appearDate
+	JobDescription string   `json:"jobDescription,omitempty"`                                                                              // jobDetail.jobDescription
+	JobCategory    []string `json:"jobCategory,omitempty"`                                                                                 // jobDetail.jobCategory[].description
+	Salary         string   `json:"salary,omitempty"`                                                                                      // jobDetail.salary
+	SalaryMin      int      `json:"salaryMin,omitempty"`                                                                                   // jobDetail.salaryMin
+	SalaryMax      int      `json:"salaryMax,omitempty"`                                                                                   // jobDetail.salaryMax
+	JobType        string   `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`            // jobDetail.jobType code → label; unknown code drops the field
+	Remote         string   `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."` // jobDetail.remoteWork.type code → label; null/unknown drops the field
+	AddressRegion  string   `json:"addressRegion,omitempty"`                                                                               // jobDetail.addressRegion
+	AddressDetail  string   `json:"addressDetail,omitempty"`                                                                               // jobDetail.addressDetail
+	WorkExp        string   `json:"workExp,omitempty"`                                                                                     // condition.workExp
+	Edu            string   `json:"edu,omitempty"`                                                                                         // condition.edu
+	Major          []string `json:"major,omitempty"`                                                                                       // condition.major
+	Specialty      []string `json:"specialty,omitempty"`                                                                                   // condition.specialty[].description
+	ManageResp     string   `json:"manageResp,omitempty"`                                                                                  // jobDetail.manageResp
+	NeedEmp        string   `json:"needEmp,omitempty"`                                                                                     // jobDetail.needEmp
+	Welfare        string   `json:"welfare,omitempty"`                                                                                     // welfare.welfare
+	Industry       string   `json:"industry,omitempty"`
+	Employees      string   `json:"employees,omitempty"`
 }
 
 func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, error) {
@@ -168,23 +188,32 @@ func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, er
 }
 
 type job104JobSummary struct {
-	JobNo         string               `json:"jobNo"`
-	JobName       string               `json:"jobName"`
-	CustName      string               `json:"custName"`
-	CustNo        string               `json:"custNo"`
-	Link          job104JobSummaryLink `json:"link"`
-	SalaryHigh    int                  `json:"salaryHigh"`
-	SalaryLow     int                  `json:"salaryLow"`
-	JobAddrNoDesc string               `json:"jobAddrNoDesc"`
-	AppearDate    string               `json:"appearDate" jsonschema:"Posting date, YYYYMMDD."`
-	ApplyCnt      int                  `json:"applyCnt"`
-	Remote        string               `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."`
-	JobType       string               `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`
+	JobCode       string `json:"jobCode" jsonschema:"104 job code — pass this to 104_get_job_detail's job_code param."` // link.job's trailing path segment
+	JobName       string `json:"jobName"`
+	CompanyName   string `json:"companyName"`                                       // custName
+	URL           string `json:"url" jsonschema:"Public job posting URL."`          // link.job
+	CompanyURL    string `json:"companyUrl" jsonschema:"Company profile page URL."` // link.cust
+	SalaryHigh    int    `json:"salaryHigh"`
+	SalaryLow     int    `json:"salaryLow"`
+	JobAddrNoDesc string `json:"jobAddrNoDesc"`
+	AppearDate    string `json:"appearDate" jsonschema:"Posting date, YYYYMMDD."`
+	ApplyCnt      int    `json:"applyCnt"`
+	Remote        string `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."` // remoteWorkType code → label; unknown code drops the field
+	JobType       string `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`            // jobRo code → label; unknown code drops the field
 }
 
-type job104JobSummaryLink struct {
-	Job  string `json:"job" jsonschema:"Public job posting URL; the trailing path segment is the job code for 104_get_job_detail."`
-	Cust string `json:"cust"`
+// job104JobCodeFromURL extracts the job code from a 104 job posting URL's
+// trailing path segment (e.g. https://www.104.com.tw/job/8zsac -> 8zsac).
+// The response's jobNo, by contrast, is 104's internal listing id and 404s
+// if passed to GetJobDetail.
+func job104JobCodeFromURL(raw string) string {
+	path := raw
+	if u, err := url.Parse(raw); err == nil {
+		path = u.Path
+	}
+	path = strings.TrimRight(path, "/")
+	parts := strings.Split(path, "/")
+	return parts[len(parts)-1]
 }
 
 type job104SearchMetadata struct {
@@ -228,11 +257,11 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 	}
 	for _, j := range resp.Data {
 		out.Data = append(out.Data, job104JobSummary{
-			JobNo:         j.JobNo,
+			JobCode:       job104JobCodeFromURL(j.Link.Job),
 			JobName:       j.JobName,
-			CustName:      j.CustName,
-			CustNo:        j.CustNo,
-			Link:          job104JobSummaryLink{Job: j.Link.Job, Cust: j.Link.Cust},
+			CompanyName:   j.CustName,
+			URL:           j.Link.Job,
+			CompanyURL:    j.Link.Cust,
 			SalaryHigh:    j.SalaryHigh,
 			SalaryLow:     j.SalaryLow,
 			JobAddrNoDesc: j.JobAddrNoDesc,
@@ -245,116 +274,45 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 	return out
 }
 
-type job104JobDetail struct {
-	Header    job104DetailHeader    `json:"header"`
-	Contact   job104DetailContact   `json:"contact"`
-	Condition job104DetailCondition `json:"condition"`
-	Welfare   job104DetailWelfare   `json:"welfare"`
-	JobDetail job104DetailJobDetail `json:"jobDetail"`
-	Industry  string                `json:"industry"`
-	Employees string                `json:"employees"`
-	CustNo    string                `json:"custNo"`
-}
-
-type job104DetailHeader struct {
-	JobName    string `json:"jobName"`
-	CustName   string `json:"custName"`
-	CustUrl    string `json:"custUrl"`
-	AppearDate string `json:"appearDate"`
-	IsSaved    bool   `json:"isSaved"`
-	IsApplied  bool   `json:"isApplied"`
-}
-
-type job104DetailContact struct {
-	HrName string `json:"hrName,omitempty"`
-	Email  string `json:"email,omitempty"`
-	Reply  string `json:"reply,omitempty"`
-}
-
-type job104DetailCondition struct {
-	WorkExp   string                  `json:"workExp,omitempty"`
-	Edu       string                  `json:"edu,omitempty"`
-	Major     []string                `json:"major,omitempty"`
-	Specialty []job104CodeDescription `json:"specialty,omitempty"`
-}
-
-type job104DetailWelfare struct {
-	Welfare string `json:"welfare,omitempty"`
-}
-
-type job104DetailJobDetail struct {
-	JobDescription string                  `json:"jobDescription,omitempty"`
-	JobCategory    []job104CodeDescription `json:"jobCategory,omitempty"`
-	Salary         string                  `json:"salary,omitempty"`
-	SalaryMin      int                     `json:"salaryMin,omitempty"`
-	SalaryMax      int                     `json:"salaryMax,omitempty"`
-	JobType        string                  `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`
-	AddressRegion  string                  `json:"addressRegion,omitempty"`
-	AddressDetail  string                  `json:"addressDetail,omitempty"`
-	ManageResp     string                  `json:"manageResp,omitempty"`
-	NeedEmp        string                  `json:"needEmp,omitempty"`
-	Remote         string                  `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."`
-}
-
-type job104CodeDescription struct {
-	Code        string `json:"code,omitempty"`
-	Description string `json:"description,omitempty"`
-}
-
-func job104HTTPToMCPDetail(resp *job104.JobDetailResponse) *job104DetailOutput {
+func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job104DetailOutput {
 	d := resp.Data
 	out := &job104DetailOutput{
-		Data: job104JobDetail{
-			Header: job104DetailHeader{
-				JobName:    d.Header.JobName,
-				CustName:   d.Header.CustName,
-				CustUrl:    d.Header.CustUrl,
-				AppearDate: d.Header.AppearDate,
-				IsSaved:    d.Header.IsSaved,
-				IsApplied:  d.Header.IsApplied,
-			},
-			Contact: job104DetailContact{
-				HrName: d.Contact.HrName.Or(""),
-				Email:  d.Contact.Email.Or(""),
-				Reply:  d.Contact.Reply.Or(""),
-			},
-			Condition: job104DetailCondition{
-				WorkExp:   d.Condition.WorkExp.Or(""),
-				Edu:       d.Condition.Edu.Or(""),
-				Major:     d.Condition.Major,
-				Specialty: job104CodeDescriptions(d.Condition.Specialty),
-			},
-			Welfare: job104DetailWelfare{Welfare: d.Welfare.Welfare.Or("")},
-			JobDetail: job104DetailJobDetail{
-				JobDescription: d.JobDetail.JobDescription.Or(""),
-				JobCategory:    job104CodeDescriptions(d.JobDetail.JobCategory),
-				Salary:         d.JobDetail.Salary.Or(""),
-				SalaryMin:      d.JobDetail.SalaryMin.Or(0),
-				SalaryMax:      d.JobDetail.SalaryMax.Or(0),
-				JobType:        job104RoLabels[job104.SearchJobsRo(d.JobDetail.JobType.Or(0))],
-				AddressRegion:  d.JobDetail.AddressRegion.Or(""),
-				AddressDetail:  d.JobDetail.AddressDetail.Or(""),
-				ManageResp:     d.JobDetail.ManageResp.Or(""),
-				NeedEmp:        d.JobDetail.NeedEmp.Or(""),
-			},
-			Industry:  d.Industry,
-			Employees: d.Employees,
-			CustNo:    d.CustNo,
-		},
+		JobName:        d.Header.JobName,
+		CompanyName:    d.Header.CustName,
+		URL:            "https://www.104.com.tw/job/" + jobCode,
+		CompanyURL:     d.Header.CustUrl,
+		AppearDate:     d.Header.AppearDate,
+		JobDescription: d.JobDetail.JobDescription.Or(""),
+		JobCategory:    job104Descriptions(d.JobDetail.JobCategory),
+		Salary:         d.JobDetail.Salary.Or(""),
+		SalaryMin:      d.JobDetail.SalaryMin.Or(0),
+		SalaryMax:      d.JobDetail.SalaryMax.Or(0),
+		JobType:        job104RoLabels[job104.SearchJobsRo(d.JobDetail.JobType.Or(0))],
+		AddressRegion:  d.JobDetail.AddressRegion.Or(""),
+		AddressDetail:  d.JobDetail.AddressDetail.Or(""),
+		WorkExp:        d.Condition.WorkExp.Or(""),
+		Edu:            d.Condition.Edu.Or(""),
+		Major:          d.Condition.Major,
+		Specialty:      job104Descriptions(d.Condition.Specialty),
+		ManageResp:     d.JobDetail.ManageResp.Or(""),
+		NeedEmp:        d.JobDetail.NeedEmp.Or(""),
+		Welfare:        d.Welfare.Welfare.Or(""),
+		Industry:       d.Industry,
+		Employees:      d.Employees,
 	}
 	if rw, ok := d.JobDetail.RemoteWork.Get(); ok {
-		out.Data.JobDetail.Remote = job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
+		out.Remote = job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
 	}
 	return out
 }
 
-func job104CodeDescriptions(in []job104.CodeDescription) []job104CodeDescription {
+func job104Descriptions(in []job104.CodeDescription) []string {
 	if len(in) == 0 {
 		return nil
 	}
-	out := make([]job104CodeDescription, 0, len(in))
+	out := make([]string, 0, len(in))
 	for _, cd := range in {
-		out = append(out, job104CodeDescription{Code: cd.Code.Or(""), Description: cd.Description.Or("")})
+		out = append(out, cd.Description.Or(""))
 	}
 	return out
 }
@@ -382,7 +340,7 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "104_get_job_detail",
-		Description: "Get the full job description for a 104 job code (jobNo from search results).",
+		Description: "Get the full job description for a 104 job code (jobCode from 104_search_jobs results, not jobNo).",
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104DetailInput) (*mcp.CallToolResult, *job104DetailOutput, error) {
 		resp, err := c.GetJobDetail(ctx, job104.GetJobDetailParams{JobCode: in.JobCode})
 		if err != nil {
@@ -391,6 +349,6 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 			}
 			return errorResult(err), nil, nil
 		}
-		return nil, job104HTTPToMCPDetail(resp), nil
+		return nil, job104HTTPToMCPDetail(resp, in.JobCode), nil
 	})
 }

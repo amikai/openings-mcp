@@ -148,36 +148,36 @@ func TestJob104SearchJobE2E(t *testing.T) {
 
 	wantResp := &job104SearchOutput{
 		Data: []job104JobSummary{
-			{JobNo: "10177057", JobName: "GoLang Developer", CustName: "曜驊智能股份有限公司", CustNo: "130000000042972", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/624o1", Cust: "https://www.104.com.tw/company/1a2x6biwgs"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260515", ApplyCnt: 3, JobType: "Full-time"},
-			{JobNo: "15015281", JobName: "Golang 後端工程師", CustName: "富一代資訊有限公司", CustNo: "130000000264142", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8xtv5", Cust: "https://www.104.com.tw/company/1a2x6bnn4e"}, SalaryHigh: 120000, SalaryLow: 60000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260609", ApplyCnt: 8, JobType: "Full-time"},
-			{JobNo: "11282518", JobName: "Golang 工程師", CustName: "百阜科技股份有限公司", CustNo: "130000000112061", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/6ptna", Cust: "https://www.104.com.tw/company/1a2x6bkdrx"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260526", ApplyCnt: 4, JobType: "Full-time"},
-			{JobNo: "12689685", JobName: "Senior Cloud Backend Engineer (Golang)", CustName: "華玉科技股份有限公司", CustNo: "130000000180812", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/7jzf9", Cust: "https://www.104.com.tw/company/1a2x6bluto"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 6, JobType: "Full-time"},
-			{JobNo: "14271913", JobName: "軟體工程師 Golang", CustName: "線上探索科技股份有限公司", CustNo: "130000000147477", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8hwa1", Cust: "https://www.104.com.tw/company/1a2x6bl53p"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大同區", AppearDate: "20260304", ApplyCnt: 6, JobType: "Full-time"},
-			{JobNo: "15160106", JobName: "Software Engineer (Golang, Flutter), Virtual insurance", CustName: "香港商六度科技有限公司", CustNo: "130000000161268", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/90xm2", Cust: "https://www.104.com.tw/company/1a2x6blfqs"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260618", ApplyCnt: 5, Remote: "Partial", JobType: "Full-time"},
-			{JobNo: "13305625", JobName: "Golang開發工程師", CustName: "太禾科技有限公司", CustNo: "130000000177509", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/7x6op", Cust: "https://www.104.com.tw/company/1a2x6bls9x"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260618", ApplyCnt: 5, JobType: "Full-time"},
-			{JobNo: "14954565", JobName: "Golang 後端工程師 / Golang Backend Engineer", CustName: "炫石有限公司", CustNo: "130000000241271", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8wj0l", Cust: "https://www.104.com.tw/company/1a2x6bn5h3"}, SalaryHigh: 9999999, SalaryLow: 60000, JobAddrNoDesc: "台北市信義區", AppearDate: "20260511", ApplyCnt: 8, JobType: "Full-time"},
-			{JobNo: "14893390", JobName: "Golang開發工程師", CustName: "四天科技有限公司", CustNo: "130000000231318", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8v7ta", Cust: "https://www.104.com.tw/company/1a2x6bmxsm"}, SalaryHigh: 150000, SalaryLow: 80000, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 8, JobType: "Full-time"},
-			{JobNo: "14953361", JobName: "【擴編】資深Golang後端工程師 / Senior Golang Developer", CustName: "瑞典商英鉑科股份有限公司台灣分公司", CustNo: "130000000217988", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8wi35", Cust: "https://www.104.com.tw/company/1a2x6bmnic"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 4, JobType: "Full-time"},
-			{JobNo: "15115498", JobName: "軟體工程師 (Software Engineer - Golang)", CustName: "立視科技股份有限公司", CustNo: "130000000266972", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8zz6y", Cust: "https://www.104.com.tw/company/1a2x6bnpb0"}, SalaryHigh: 88000, SalaryLow: 55000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260625", ApplyCnt: 4, JobType: "Full-time"},
-			{JobNo: "14439753", JobName: "GOLANG 開發工程師", CustName: "益晨資訊科技有限公司", CustNo: "130000000221207", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8lhs9", Cust: "https://www.104.com.tw/company/1a2x6bmpzr"}, SalaryHigh: 90000, SalaryLow: 72000, JobAddrNoDesc: "台北市中正區", AppearDate: "20260625", ApplyCnt: 7, JobType: "Full-time"},
-			{JobNo: "13761398", JobName: "Senior Backend Engineer ( Golang )（每月有遠端日）", CustName: "幣託科技股份有限公司", CustNo: "130000000223436", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/86yd2", Cust: "https://www.104.com.tw/company/1a2x6bmrpo"}, SalaryHigh: 150000, SalaryLow: 85000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260622", ApplyCnt: 10, Remote: "Partial", JobType: "Full-time"},
-			{JobNo: "15097562", JobName: "後端工程師（Golang）", CustName: "米奈娛樂有限公司", CustNo: "130000000251337", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8zlcq", Cust: "https://www.104.com.tw/company/1a2x6bnd8p"}, SalaryHigh: 80000, SalaryLow: 70000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260620", ApplyCnt: 7, JobType: "Full-time"},
-			{JobNo: "14335204", JobName: "Golang後端與DevOps工程師", CustName: "時刻無限股份有限公司", CustNo: "130000000242671", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8j944", Cust: "https://www.104.com.tw/company/1a2x6bn6jz"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260622", ApplyCnt: 8, JobType: "Full-time"},
-			{JobNo: "14660408", JobName: "Golang 遊戲開發工程師(大安)", CustName: "天晴資訊有限公司", CustNo: "130000000167545", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8q81k", Cust: "https://www.104.com.tw/company/1a2x6blkl5"}, SalaryHigh: 95000, SalaryLow: 50000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 7, JobType: "Full-time"},
-			{JobNo: "15245367", JobName: "Golang Engineer", CustName: "瞬聯科技股份有限公司", CustNo: "130000000159109", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/92ref", Cust: "https://www.104.com.tw/company/1a2x6ble2t"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 20, JobType: "Full-time"},
-			{JobNo: "13766806", JobName: "【純遠端】國際遊戲公司 誠徵  Go/Golang 工程師", CustName: "台灣英特艾倫人力資源有限公司", CustNo: "130000000048447", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/872ja", Cust: "https://www.104.com.tw/company/1a2x6bj0ov"}, SalaryHigh: 180000, SalaryLow: 150000, JobAddrNoDesc: "台北市中山區", AppearDate: "20260623", ApplyCnt: 12, Remote: "Full", JobType: "Full-time"},
-			{JobNo: "14645682", JobName: "Golang 後端工程師(大安)", CustName: "天晴資訊有限公司", CustNo: "130000000167545", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8pwoi", Cust: "https://www.104.com.tw/company/1a2x6blkl5"}, SalaryHigh: 9999999, SalaryLow: 50000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 5, JobType: "Full-time"},
-			{JobNo: "15043542", JobName: "【TENG0502】Software Engineer (Backend) - Golang / RoR", CustName: "喬富科技股份有限公司", CustNo: "130000000264905", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8yfo6", Cust: "https://www.104.com.tw/company/1a2x6bnnpl"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市松山區", AppearDate: "20260623", ApplyCnt: 10, JobType: "Full-time"},
-			{JobNo: "14525012", JobName: "Golang工程師-Junior", CustName: "彼雅特科技股份有限公司", CustNo: "130000000220505", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8nbkk", Cust: "https://www.104.com.tw/company/1a2x6bmpg9"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260529", ApplyCnt: 6, JobType: "Full-time"},
-			{JobNo: "14797877", JobName: "[資訊部]Golang工程師", CustName: "虹耀建設股份有限公司", CustNo: "130000000145239", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8t645", Cust: "https://www.104.com.tw/company/1a2x6bl3dj"}, SalaryHigh: 9999999, SalaryLow: 75000, JobAddrNoDesc: "台北市中正區", AppearDate: "20260622", ApplyCnt: 6, JobType: "Full-time"},
-			{JobNo: "14965947", JobName: "資深後端工程師（Golang / Java） / Senior Backend Engineer（Golang / Java）", CustName: "炫石有限公司", CustNo: "130000000241271", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8wrsr", Cust: "https://www.104.com.tw/company/1a2x6bn5h3"}, SalaryHigh: 9999999, SalaryLow: 60000, JobAddrNoDesc: "台北市信義區", AppearDate: "20260511", ApplyCnt: 2, JobType: "Full-time"},
-			{JobNo: "14935253", JobName: "【擴編】Golang後端工程師/ Golang Developer", CustName: "瑞典商英鉑科股份有限公司台灣分公司", CustNo: "130000000217988", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8w445", Cust: "https://www.104.com.tw/company/1a2x6bmnic"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 9, JobType: "Full-time"},
-			{JobNo: "14408054", JobName: "後端工程師-Golang-台北", CustName: "立特有限公司", CustNo: "130000000211187", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8ktbq", Cust: "https://www.104.com.tw/company/1a2x6bmi9f"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 10, JobType: "Full-time"},
-			{JobNo: "15106548", JobName: "Senior Backend Engineer (Golang), Virtual insurance", CustName: "香港商六度科技有限公司", CustNo: "130000000161268", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8zsac", Cust: "https://www.104.com.tw/company/1a2x6blfqs"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260622", ApplyCnt: 12, Remote: "Partial", JobType: "Full-time"},
-			{JobNo: "15139656", JobName: "Golang 後端工程師", CustName: "昕展資訊有限公司", CustNo: "130000000261162", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/90hu0", Cust: "https://www.104.com.tw/company/1a2x6bnktm"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260623", ApplyCnt: 10, JobType: "Full-time"},
-			{JobNo: "14946666", JobName: "後端工程師 (Backend Engineer - Golang)", CustName: "開端智能股份有限公司", CustNo: "130000000255283", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8wcx6", Cust: "https://www.104.com.tw/company/1a2x6bngab"}, SalaryHigh: 80000, SalaryLow: 50000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260626", ApplyCnt: 17, JobType: "Full-time"},
-			{JobNo: "13903564", JobName: "Backend Engineer(Java or Golang)", CustName: "重高科技股份有限公司", CustNo: "130000000227435", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8a024", Cust: "https://www.104.com.tw/company/1a2x6bmusr"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260622", ApplyCnt: 17, JobType: "Full-time"},
-			{JobNo: "14115841", JobName: "Golang 網站開發工程師(Backend)_零售解決方案課", CustName: "日本NEC集團_統智科技股份有限公司", CustNo: "12876266000", Link: job104JobSummaryLink{Job: "https://www.104.com.tw/job/8ejup", Cust: "https://www.104.com.tw/company/5wy72fk"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260612", ApplyCnt: 19, JobType: "Full-time"},
+			{JobCode: "624o1", JobName: "GoLang Developer", CompanyName: "曜驊智能股份有限公司", URL: "https://www.104.com.tw/job/624o1", CompanyURL: "https://www.104.com.tw/company/1a2x6biwgs", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260515", ApplyCnt: 3, JobType: "Full-time"},
+			{JobCode: "8xtv5", JobName: "Golang 後端工程師", CompanyName: "富一代資訊有限公司", URL: "https://www.104.com.tw/job/8xtv5", CompanyURL: "https://www.104.com.tw/company/1a2x6bnn4e", SalaryHigh: 120000, SalaryLow: 60000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260609", ApplyCnt: 8, JobType: "Full-time"},
+			{JobCode: "6ptna", JobName: "Golang 工程師", CompanyName: "百阜科技股份有限公司", URL: "https://www.104.com.tw/job/6ptna", CompanyURL: "https://www.104.com.tw/company/1a2x6bkdrx", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260526", ApplyCnt: 4, JobType: "Full-time"},
+			{JobCode: "7jzf9", JobName: "Senior Cloud Backend Engineer (Golang)", CompanyName: "華玉科技股份有限公司", URL: "https://www.104.com.tw/job/7jzf9", CompanyURL: "https://www.104.com.tw/company/1a2x6bluto", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 6, JobType: "Full-time"},
+			{JobCode: "8hwa1", JobName: "軟體工程師 Golang", CompanyName: "線上探索科技股份有限公司", URL: "https://www.104.com.tw/job/8hwa1", CompanyURL: "https://www.104.com.tw/company/1a2x6bl53p", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大同區", AppearDate: "20260304", ApplyCnt: 6, JobType: "Full-time"},
+			{JobCode: "90xm2", JobName: "Software Engineer (Golang, Flutter), Virtual insurance", CompanyName: "香港商六度科技有限公司", URL: "https://www.104.com.tw/job/90xm2", CompanyURL: "https://www.104.com.tw/company/1a2x6blfqs", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260618", ApplyCnt: 5, Remote: "Partial", JobType: "Full-time"},
+			{JobCode: "7x6op", JobName: "Golang開發工程師", CompanyName: "太禾科技有限公司", URL: "https://www.104.com.tw/job/7x6op", CompanyURL: "https://www.104.com.tw/company/1a2x6bls9x", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260618", ApplyCnt: 5, JobType: "Full-time"},
+			{JobCode: "8wj0l", JobName: "Golang 後端工程師 / Golang Backend Engineer", CompanyName: "炫石有限公司", URL: "https://www.104.com.tw/job/8wj0l", CompanyURL: "https://www.104.com.tw/company/1a2x6bn5h3", SalaryHigh: 9999999, SalaryLow: 60000, JobAddrNoDesc: "台北市信義區", AppearDate: "20260511", ApplyCnt: 8, JobType: "Full-time"},
+			{JobCode: "8v7ta", JobName: "Golang開發工程師", CompanyName: "四天科技有限公司", URL: "https://www.104.com.tw/job/8v7ta", CompanyURL: "https://www.104.com.tw/company/1a2x6bmxsm", SalaryHigh: 150000, SalaryLow: 80000, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 8, JobType: "Full-time"},
+			{JobCode: "8wi35", JobName: "【擴編】資深Golang後端工程師 / Senior Golang Developer", CompanyName: "瑞典商英鉑科股份有限公司台灣分公司", URL: "https://www.104.com.tw/job/8wi35", CompanyURL: "https://www.104.com.tw/company/1a2x6bmnic", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 4, JobType: "Full-time"},
+			{JobCode: "8zz6y", JobName: "軟體工程師 (Software Engineer - Golang)", CompanyName: "立視科技股份有限公司", URL: "https://www.104.com.tw/job/8zz6y", CompanyURL: "https://www.104.com.tw/company/1a2x6bnpb0", SalaryHigh: 88000, SalaryLow: 55000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260625", ApplyCnt: 4, JobType: "Full-time"},
+			{JobCode: "8lhs9", JobName: "GOLANG 開發工程師", CompanyName: "益晨資訊科技有限公司", URL: "https://www.104.com.tw/job/8lhs9", CompanyURL: "https://www.104.com.tw/company/1a2x6bmpzr", SalaryHigh: 90000, SalaryLow: 72000, JobAddrNoDesc: "台北市中正區", AppearDate: "20260625", ApplyCnt: 7, JobType: "Full-time"},
+			{JobCode: "86yd2", JobName: "Senior Backend Engineer ( Golang )（每月有遠端日）", CompanyName: "幣託科技股份有限公司", URL: "https://www.104.com.tw/job/86yd2", CompanyURL: "https://www.104.com.tw/company/1a2x6bmrpo", SalaryHigh: 150000, SalaryLow: 85000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260622", ApplyCnt: 10, Remote: "Partial", JobType: "Full-time"},
+			{JobCode: "8zlcq", JobName: "後端工程師（Golang）", CompanyName: "米奈娛樂有限公司", URL: "https://www.104.com.tw/job/8zlcq", CompanyURL: "https://www.104.com.tw/company/1a2x6bnd8p", SalaryHigh: 80000, SalaryLow: 70000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260620", ApplyCnt: 7, JobType: "Full-time"},
+			{JobCode: "8j944", JobName: "Golang後端與DevOps工程師", CompanyName: "時刻無限股份有限公司", URL: "https://www.104.com.tw/job/8j944", CompanyURL: "https://www.104.com.tw/company/1a2x6bn6jz", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260622", ApplyCnt: 8, JobType: "Full-time"},
+			{JobCode: "8q81k", JobName: "Golang 遊戲開發工程師(大安)", CompanyName: "天晴資訊有限公司", URL: "https://www.104.com.tw/job/8q81k", CompanyURL: "https://www.104.com.tw/company/1a2x6blkl5", SalaryHigh: 95000, SalaryLow: 50000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 7, JobType: "Full-time"},
+			{JobCode: "92ref", JobName: "Golang Engineer", CompanyName: "瞬聯科技股份有限公司", URL: "https://www.104.com.tw/job/92ref", CompanyURL: "https://www.104.com.tw/company/1a2x6ble2t", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 20, JobType: "Full-time"},
+			{JobCode: "872ja", JobName: "【純遠端】國際遊戲公司 誠徵  Go/Golang 工程師", CompanyName: "台灣英特艾倫人力資源有限公司", URL: "https://www.104.com.tw/job/872ja", CompanyURL: "https://www.104.com.tw/company/1a2x6bj0ov", SalaryHigh: 180000, SalaryLow: 150000, JobAddrNoDesc: "台北市中山區", AppearDate: "20260623", ApplyCnt: 12, Remote: "Full", JobType: "Full-time"},
+			{JobCode: "8pwoi", JobName: "Golang 後端工程師(大安)", CompanyName: "天晴資訊有限公司", URL: "https://www.104.com.tw/job/8pwoi", CompanyURL: "https://www.104.com.tw/company/1a2x6blkl5", SalaryHigh: 9999999, SalaryLow: 50000, JobAddrNoDesc: "台北市大安區", AppearDate: "20260623", ApplyCnt: 5, JobType: "Full-time"},
+			{JobCode: "8yfo6", JobName: "【TENG0502】Software Engineer (Backend) - Golang / RoR", CompanyName: "喬富科技股份有限公司", URL: "https://www.104.com.tw/job/8yfo6", CompanyURL: "https://www.104.com.tw/company/1a2x6bnnpl", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市松山區", AppearDate: "20260623", ApplyCnt: 10, JobType: "Full-time"},
+			{JobCode: "8nbkk", JobName: "Golang工程師-Junior", CompanyName: "彼雅特科技股份有限公司", URL: "https://www.104.com.tw/job/8nbkk", CompanyURL: "https://www.104.com.tw/company/1a2x6bmpg9", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260529", ApplyCnt: 6, JobType: "Full-time"},
+			{JobCode: "8t645", JobName: "[資訊部]Golang工程師", CompanyName: "虹耀建設股份有限公司", URL: "https://www.104.com.tw/job/8t645", CompanyURL: "https://www.104.com.tw/company/1a2x6bl3dj", SalaryHigh: 9999999, SalaryLow: 75000, JobAddrNoDesc: "台北市中正區", AppearDate: "20260622", ApplyCnt: 6, JobType: "Full-time"},
+			{JobCode: "8wrsr", JobName: "資深後端工程師（Golang / Java） / Senior Backend Engineer（Golang / Java）", CompanyName: "炫石有限公司", URL: "https://www.104.com.tw/job/8wrsr", CompanyURL: "https://www.104.com.tw/company/1a2x6bn5h3", SalaryHigh: 9999999, SalaryLow: 60000, JobAddrNoDesc: "台北市信義區", AppearDate: "20260511", ApplyCnt: 2, JobType: "Full-time"},
+			{JobCode: "8w445", JobName: "【擴編】Golang後端工程師/ Golang Developer", CompanyName: "瑞典商英鉑科股份有限公司台灣分公司", URL: "https://www.104.com.tw/job/8w445", CompanyURL: "https://www.104.com.tw/company/1a2x6bmnic", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 9, JobType: "Full-time"},
+			{JobCode: "8ktbq", JobName: "後端工程師-Golang-台北", CompanyName: "立特有限公司", URL: "https://www.104.com.tw/job/8ktbq", CompanyURL: "https://www.104.com.tw/company/1a2x6bmi9f", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260622", ApplyCnt: 10, JobType: "Full-time"},
+			{JobCode: "8zsac", JobName: "Senior Backend Engineer (Golang), Virtual insurance", CompanyName: "香港商六度科技有限公司", URL: "https://www.104.com.tw/job/8zsac", CompanyURL: "https://www.104.com.tw/company/1a2x6blfqs", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市信義區", AppearDate: "20260622", ApplyCnt: 12, Remote: "Partial", JobType: "Full-time"},
+			{JobCode: "90hu0", JobName: "Golang 後端工程師", CompanyName: "昕展資訊有限公司", URL: "https://www.104.com.tw/job/90hu0", CompanyURL: "https://www.104.com.tw/company/1a2x6bnktm", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市中山區", AppearDate: "20260623", ApplyCnt: 10, JobType: "Full-time"},
+			{JobCode: "8wcx6", JobName: "後端工程師 (Backend Engineer - Golang)", CompanyName: "開端智能股份有限公司", URL: "https://www.104.com.tw/job/8wcx6", CompanyURL: "https://www.104.com.tw/company/1a2x6bngab", SalaryHigh: 80000, SalaryLow: 50000, JobAddrNoDesc: "台北市松山區", AppearDate: "20260626", ApplyCnt: 17, JobType: "Full-time"},
+			{JobCode: "8a024", JobName: "Backend Engineer(Java or Golang)", CompanyName: "重高科技股份有限公司", URL: "https://www.104.com.tw/job/8a024", CompanyURL: "https://www.104.com.tw/company/1a2x6bmusr", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市大安區", AppearDate: "20260622", ApplyCnt: 17, JobType: "Full-time"},
+			{JobCode: "8ejup", JobName: "Golang 網站開發工程師(Backend)_零售解決方案課", CompanyName: "日本NEC集團_統智科技股份有限公司", URL: "https://www.104.com.tw/job/8ejup", CompanyURL: "https://www.104.com.tw/company/5wy72fk", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "台北市內湖區", AppearDate: "20260612", ApplyCnt: 19, JobType: "Full-time"},
 		},
 		Metadata: job104SearchMetadata{
 			Pagination: job104Pagination{CurrentPage: 1, LastPage: 7, Total: 189},
@@ -248,52 +248,26 @@ func TestJob104GetJobDetailE2E(t *testing.T) {
 	require.NoError(t, json.Unmarshal(data, &got))
 
 	want := &job104DetailOutput{
-		Data: job104JobDetail{
-			Header: job104DetailHeader{
-				JobName:    "軟體工程師 (數位工程發展部)",
-				CustName:   "亞新工程顧問股份有限公司",
-				CustUrl:    "https://www.104.com.tw/company/264c9zc",
-				AppearDate: "2026/06/22",
-				IsSaved:    false,
-				IsApplied:  false,
-			},
-			Contact: job104DetailContact{
-				HrName: "Rachel Chiu 邱小姐",
-				Email:  "personnel@maaconsultants.com,cj.yu@maaconsultants.com,eugene.shen@maaconsultants.com,fred.chou@maaconsultants.com",
-			},
-			Condition: job104DetailCondition{
-				WorkExp: "不拘",
-				Edu:     "大學以上",
-				Major:   []string{"資訊工程相關"},
-				Specialty: []job104CodeDescription{
-					{Code: "12001003009", Description: "C#"},
-					{Code: "12001003006", Description: "ASP.NET"},
-					{Code: "12001004031", Description: "MS SQL"},
-					{Code: "12001003045", Description: "Python"},
-					{Code: "12003001003", Description: "GIS"},
-					{Code: "12001003094", Description: "IoT"},
-					{Code: "12002003010", Description: "Revit"},
-				},
-			},
-			Welfare: job104DetailWelfare{
-				Welfare: "在亞新，我們重視同仁的職涯成長與友善職場，透過全方位的福利與支持，推動以人為本、永續發展的職場環境，實現工作與生活的和諧平衡。\n\n【薪酬與獎金】\n  •  具市場競爭力的薪資水準\n  •  年節獎金與專案獎金，共享成果回饋\n\n【健康與保障】\n  •  勞健保及完整團體保險(意外、醫療、重大疾病、職災保障)\n  •  定期健康檢查、健康講座與員工關懷方案\n\n【休假與彈性】\n  •  彈性上下班、育兒友善措施，兼顧生活平衡\n\n【教育訓練與發展】\n  •  完善新人培訓與師徒制\n  •  E-learning 線上學習資源\n  •  專業證照補助（如 PMP、專業技師等）\n  •  外部訓練與國際研討會，拓展國際視野\n  •  參與國家級重大工程，累積獨特專業經驗\n\n【生活與休閒】\n  •  福委會關懷：生日禮金、節慶禮品或禮券、婚喪喜慶、傷病住院慰問與生育補助\n  •  部門聚餐、咖啡分享日、社團活動、Happy Hour，促進交流與凝聚力\n  •  舒適職場環境：明亮開放空間、零食吧、茶包與自助研磨咖啡機\n\n【招募流程】\n  1. 投遞履歷\n  2. HR初審履歷 → 部門主管面試\n  3. Final面談（含專案介紹與Q&A）\n  4. 錄取通知\n （流程清楚透明，讓你安心應徵!)",
-			},
-			JobDetail: job104DetailJobDetail{
-				JobDescription: "無相關經驗可，大學以上資訊工程、資訊管理等相關科系畢業\n\n【工作內容】\n- 參與智慧工程數位平台的設計、開發與維運\n- 開發與維護 GIS、BIM 系統，並支援無人機地形數據應用\n- 參與 AI 工具與文件管理系統之開發 \n- 與跨領域團隊合作（工程、IoT、BIM、AI），推動數位轉型與自動化流程\n\n【希望條件】\n- 熟悉現代軟體系統研發流程與版本控制\n- 熟悉至少一種指令式程式設計語言（C#、JavaScript、Python、PHP 尤佳）\n- 具 ASP.NET、SQL、Vue.js、Laravel、Unity、GIS、IoT、Revit等開發經驗\n- 具軟體設計、開發、運營、開發、機器學習、AI 模型訓練 (Finetuning)、 AI 應用設計（OCR、RAG、LLM、Agentic 等）開發、導入經驗\n- 具 Azure DevOps、Docker、Kubernetes 經驗者優先\n\n＊我們期待具備高度邏輯思維、善於溝通系統需求與設計選擇，並能獨立完成軟體開發的夥伴加入，一起參與系統規劃與優化。",
-				JobCategory: []job104CodeDescription{
-					{Code: "2007001004", Description: "軟體工程師"},
-				},
-				Salary:        "待遇面議",
-				JobType:       "Full-time",
-				AddressRegion: "新北市汐止區",
-				AddressDetail: "新台五路一段112號22樓",
-				ManageResp:    "不需負擔管理責任",
-				NeedEmp:       "2~3人",
-			},
-			Industry:  "建築及工程技術服務業",
-			Employees: "1200人",
-			CustNo:    "264c9zc",
-		},
+		JobName:        "軟體工程師 (數位工程發展部)",
+		CompanyName:    "亞新工程顧問股份有限公司",
+		URL:            "https://www.104.com.tw/job/624o1",
+		CompanyURL:     "https://www.104.com.tw/company/264c9zc",
+		AppearDate:     "2026/06/22",
+		JobDescription: "無相關經驗可，大學以上資訊工程、資訊管理等相關科系畢業\n\n【工作內容】\n- 參與智慧工程數位平台的設計、開發與維運\n- 開發與維護 GIS、BIM 系統，並支援無人機地形數據應用\n- 參與 AI 工具與文件管理系統之開發 \n- 與跨領域團隊合作（工程、IoT、BIM、AI），推動數位轉型與自動化流程\n\n【希望條件】\n- 熟悉現代軟體系統研發流程與版本控制\n- 熟悉至少一種指令式程式設計語言（C#、JavaScript、Python、PHP 尤佳）\n- 具 ASP.NET、SQL、Vue.js、Laravel、Unity、GIS、IoT、Revit等開發經驗\n- 具軟體設計、開發、運營、開發、機器學習、AI 模型訓練 (Finetuning)、 AI 應用設計（OCR、RAG、LLM、Agentic 等）開發、導入經驗\n- 具 Azure DevOps、Docker、Kubernetes 經驗者優先\n\n＊我們期待具備高度邏輯思維、善於溝通系統需求與設計選擇，並能獨立完成軟體開發的夥伴加入，一起參與系統規劃與優化。",
+		JobCategory:    []string{"軟體工程師"},
+		Salary:         "待遇面議",
+		JobType:        "Full-time",
+		AddressRegion:  "新北市汐止區",
+		AddressDetail:  "新台五路一段112號22樓",
+		WorkExp:        "不拘",
+		Edu:            "大學以上",
+		Major:          []string{"資訊工程相關"},
+		Specialty:      []string{"C#", "ASP.NET", "MS SQL", "Python", "GIS", "IoT", "Revit"},
+		ManageResp:     "不需負擔管理責任",
+		NeedEmp:        "2~3人",
+		Welfare:        "在亞新，我們重視同仁的職涯成長與友善職場，透過全方位的福利與支持，推動以人為本、永續發展的職場環境，實現工作與生活的和諧平衡。\n\n【薪酬與獎金】\n  •  具市場競爭力的薪資水準\n  •  年節獎金與專案獎金，共享成果回饋\n\n【健康與保障】\n  •  勞健保及完整團體保險(意外、醫療、重大疾病、職災保障)\n  •  定期健康檢查、健康講座與員工關懷方案\n\n【休假與彈性】\n  •  彈性上下班、育兒友善措施，兼顧生活平衡\n\n【教育訓練與發展】\n  •  完善新人培訓與師徒制\n  •  E-learning 線上學習資源\n  •  專業證照補助（如 PMP、專業技師等）\n  •  外部訓練與國際研討會，拓展國際視野\n  •  參與國家級重大工程，累積獨特專業經驗\n\n【生活與休閒】\n  •  福委會關懷：生日禮金、節慶禮品或禮券、婚喪喜慶、傷病住院慰問與生育補助\n  •  部門聚餐、咖啡分享日、社團活動、Happy Hour，促進交流與凝聚力\n  •  舒適職場環境：明亮開放空間、零食吧、茶包與自助研磨咖啡機\n\n【招募流程】\n  1. 投遞履歷\n  2. HR初審履歷 → 部門主管面試\n  3. Final面談（含專案介紹與Q&A）\n  4. 錄取通知\n （流程清楚透明，讓你安心應徵!)",
+		Industry:       "建築及工程技術服務業",
+		Employees:      "1200人",
 	}
 	assert.Equal(t, want, &got)
 }
@@ -343,10 +317,10 @@ func TestJob104HTTPToMCPResponse(t *testing.T) {
 	// Unknown codes (jobRo 9, remoteWorkType 9) map to no label at all.
 	want := &job104SearchOutput{
 		Data: []job104JobSummary{
-			{JobNo: "1", JobName: "onsite", CustName: "c1", CustNo: "n1", Link: job104JobSummaryLink{Job: "j1", Cust: "u1"}, SalaryHigh: 2, SalaryLow: 1, JobAddrNoDesc: "a1", AppearDate: "20260101", ApplyCnt: 3, JobType: "Full-time"},
-			{JobNo: "2", JobName: "full-remote", CustName: "c2", CustNo: "n2", Link: job104JobSummaryLink{Job: "j2", Cust: "u2"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "a2", AppearDate: "20260102", ApplyCnt: 4, Remote: "Full", JobType: "Part-time"},
-			{JobNo: "3", JobName: "hybrid", CustName: "c3", CustNo: "n3", Link: job104JobSummaryLink{Job: "j3", Cust: "u3"}, SalaryHigh: 9, SalaryLow: 5, JobAddrNoDesc: "a3", AppearDate: "20260103", ApplyCnt: 5, Remote: "Partial", JobType: "Dispatch"},
-			{JobNo: "4", JobName: "unknown-codes", CustName: "c4", CustNo: "n4", Link: job104JobSummaryLink{Job: "j4", Cust: "u4"}, SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "a4", AppearDate: "20260104", ApplyCnt: 6},
+			{JobCode: "j1", JobName: "onsite", CompanyName: "c1", URL: "j1", CompanyURL: "u1", SalaryHigh: 2, SalaryLow: 1, JobAddrNoDesc: "a1", AppearDate: "20260101", ApplyCnt: 3, JobType: "Full-time"},
+			{JobCode: "j2", JobName: "full-remote", CompanyName: "c2", URL: "j2", CompanyURL: "u2", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "a2", AppearDate: "20260102", ApplyCnt: 4, Remote: "Full", JobType: "Part-time"},
+			{JobCode: "j3", JobName: "hybrid", CompanyName: "c3", URL: "j3", CompanyURL: "u3", SalaryHigh: 9, SalaryLow: 5, JobAddrNoDesc: "a3", AppearDate: "20260103", ApplyCnt: 5, Remote: "Partial", JobType: "Dispatch"},
+			{JobCode: "j4", JobName: "unknown-codes", CompanyName: "c4", URL: "j4", CompanyURL: "u4", SalaryHigh: 0, SalaryLow: 0, JobAddrNoDesc: "a4", AppearDate: "20260104", ApplyCnt: 6},
 		},
 		Metadata: job104SearchMetadata{
 			Pagination: job104Pagination{CurrentPage: 1, LastPage: 2, Total: 34},
@@ -396,36 +370,34 @@ func TestJob104HTTPToMCPDetail(t *testing.T) {
 			CustNo:    "cn",
 		},
 	}
-	got := job104HTTPToMCPDetail(&in)
+	got := job104HTTPToMCPDetail(&in, "jc1")
 
+	// isSaved/isApplied/custNo/contact are dropped, specialty/jobCategory
+	// keep only descriptions, and everything else flattens to one level.
 	want := &job104DetailOutput{
-		Data: job104JobDetail{
-			Header:  job104DetailHeader{JobName: "j", CustName: "c", CustUrl: "u", AppearDate: "2026/01/01", IsSaved: true, IsApplied: false},
-			Contact: job104DetailContact{HrName: "hr", Email: "e@x", Reply: ""},
-			Condition: job104DetailCondition{
-				WorkExp:   "exp",
-				Edu:       "edu",
-				Major:     []string{"m1"},
-				Specialty: []job104CodeDescription{{Code: "s1", Description: "d1"}},
-			},
-			Welfare: job104DetailWelfare{Welfare: "w"},
-			JobDetail: job104DetailJobDetail{
-				JobDescription: "desc",
-				JobCategory:    []job104CodeDescription{{Code: "k1", Description: "kd1"}},
-				Salary:         "sal",
-				SalaryMin:      10,
-				SalaryMax:      20,
-				JobType:        "Full-time",
-				AddressRegion:  "region",
-				AddressDetail:  "detail",
-				ManageResp:     "mr",
-				NeedEmp:        "ne",
-				Remote:         "Full",
-			},
-			Industry:  "ind",
-			Employees: "9人",
-			CustNo:    "cn",
-		},
+		JobName:        "j",
+		CompanyName:    "c",
+		URL:            "https://www.104.com.tw/job/jc1",
+		CompanyURL:     "u",
+		AppearDate:     "2026/01/01",
+		JobDescription: "desc",
+		JobCategory:    []string{"kd1"},
+		Salary:         "sal",
+		SalaryMin:      10,
+		SalaryMax:      20,
+		JobType:        "Full-time",
+		Remote:         "Full",
+		AddressRegion:  "region",
+		AddressDetail:  "detail",
+		WorkExp:        "exp",
+		Edu:            "edu",
+		Major:          []string{"m1"},
+		Specialty:      []string{"d1"},
+		ManageResp:     "mr",
+		NeedEmp:        "ne",
+		Welfare:        "w",
+		Industry:       "ind",
+		Employees:      "9人",
 	}
 	assert.Equal(t, want, got)
 }
@@ -443,16 +415,17 @@ func TestJob104HTTPToMCPDetailNullRemoteUnknownJobType(t *testing.T) {
 			CustNo:    "cn",
 		},
 	}
-	got := job104HTTPToMCPDetail(&in)
+	got := job104HTTPToMCPDetail(&in, "jc1")
 
 	// Null remoteWork and unknown jobType code both drop their labels.
 	want := &job104DetailOutput{
-		Data: job104JobDetail{
-			Header:    job104DetailHeader{JobName: "j", CustName: "c", CustUrl: "u", AppearDate: "2026/01/01"},
-			Industry:  "ind",
-			Employees: "9人",
-			CustNo:    "cn",
-		},
+		JobName:     "j",
+		CompanyName: "c",
+		URL:         "https://www.104.com.tw/job/jc1",
+		CompanyURL:  "u",
+		AppearDate:  "2026/01/01",
+		Industry:    "ind",
+		Employees:   "9人",
 	}
 	assert.Equal(t, want, got)
 }
