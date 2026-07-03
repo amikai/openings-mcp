@@ -1,32 +1,64 @@
 package main
 
 import (
-	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/peterbourgon/ff/v4"
+	"github.com/peterbourgon/ff/v4/ffhelp"
+
 	google "github.com/amikai/job-mcp/internal/provider/google"
 )
 
+// Enum values mirror openapi.yaml's searchJobs parameters. The site silently
+// ignores unrecognized values, so the flags reject them up front.
+var (
+	targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
+	degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
+	employmentTypes = []string{"FULL_TIME", "PART_TIME", "TEMPORARY", "INTERN"}
+	companies       = []string{"DeepMind", "GFiber", "Google", "Verily Life Sciences", "Waymo", "Wing", "YouTube"}
+	sortOrders      = []string{"relevance", "date"}
+)
+
+// main issues a single JobsRequest built entirely from flags, then fetches
+// JobDetail for the first ten jobs the search returned.
 func main() {
-	scanner := bufio.NewScanner(os.Stdin)
-	scanner.Scan()
-	keyword := strings.TrimSpace(scanner.Text())
-	if keyword == "" {
-		fmt.Fprintln(os.Stderr, "keyword is required")
+	fs := ff.NewFlagSet("google")
+	var (
+		baseURL        = fs.StringLong("base-url", "https://www.google.com/about/careers/applications", "Google Careers site base URL")
+		timeout        = fs.DurationLong("timeout", 60*time.Second, "request timeout")
+		query          = fs.StringLong("query", "", "free-text search query")
+		location       = fs.StringLong("location", "", "location filter (city, region, or country)")
+		hasRemote      = fs.BoolLong("has-remote", "only jobs marked Remote eligible")
+		targetLevel    = fs.StringEnumLong("target-level", usageWithChoices("Experience level", targetLevels), withUnset(targetLevels)...)
+		skills         = fs.StringLong("skills", "", "free-text skills and qualifications filter")
+		degree         = fs.StringEnumLong("degree", usageWithChoices("Minimum education level", degrees), withUnset(degrees)...)
+		employmentType = fs.StringEnumLong("employment-type", usageWithChoices("Job type", employmentTypes), withUnset(employmentTypes)...)
+		company        = fs.StringEnumLong("company", usageWithChoices("Organization", companies), withUnset(companies)...)
+		sortBy         = fs.StringEnumLong("sort-by", usageWithChoices("Sort order", sortOrders), withUnset(sortOrders)...)
+		page           = fs.IntLong("page", 1, "1-based page number; 20 results per page")
+	)
+	if err := ff.Parse(fs, os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
+		if errors.Is(err, ff.ErrHelp) {
+			os.Exit(0)
+		}
+		fmt.Fprintln(os.Stderr, "err:", err)
 		os.Exit(1)
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+	req := buildJobsRequest(*query, *location, *hasRemote, *targetLevel, *skills, *degree, *employmentType, *company, *sortBy, *page)
+
+	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
 
-	client := google.NewClient(http.DefaultClient)
-	search, err := client.Jobs(ctx, defaultSearchParams(keyword))
+	client := google.NewClient(*baseURL, nil)
+	search, err := client.Jobs(ctx, req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -43,16 +75,48 @@ func main() {
 		details[job.ID] = detail
 	}
 
-	writeReport(os.Stdout, keyword, search, jobs, details)
+	writeReport(os.Stdout, *query, *baseURL, search, jobs, details)
 }
 
-func defaultSearchParams(keyword string) *google.JobsRequest {
-	return &google.JobsRequest{
-		Query:          keyword,
-		EmploymentType: []string{"FULL_TIME"},
-		SortBy:         "date",
-		Page:           1,
+func buildJobsRequest(query, location string, hasRemote bool, targetLevel, skills, degree, employmentType, company, sortBy string, page int) *google.JobsRequest {
+	req := &google.JobsRequest{
+		Query:     query,
+		HasRemote: hasRemote,
+		Skills:    skills,
+		SortBy:    sortBy,
+		Page:      page,
 	}
+	if location != "" {
+		req.Locations = []string{location}
+	}
+	if targetLevel != "" {
+		req.TargetLevels = []string{targetLevel}
+	}
+	if degree != "" {
+		req.Degrees = []string{degree}
+	}
+	if employmentType != "" {
+		req.EmploymentType = []string{employmentType}
+	}
+	if company != "" {
+		req.Companies = []string{company}
+	}
+	return req
+}
+
+// withUnset prefixes choices with "" so an ff.StringEnumLong flag can default
+// to unset (no filter) instead of silently falling back to the first real
+// value — ffval.Enum's zero Default only survives initialize() if it's itself
+// in the Valid list.
+func withUnset(choices []string) []string {
+	return append([]string{""}, choices...)
+}
+
+// usageWithChoices appends a "one of: ..." list to base. ffhelp never
+// introspects an ff.StringEnumLong's valid values on its own, so small
+// enough choice sets are spelled out here to make -h self-documenting.
+func usageWithChoices(base string, choices []string) string {
+	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))
 }
 
 func jobsForDetail(jobs []google.Job) []google.Job {
@@ -62,15 +126,14 @@ func jobsForDetail(jobs []google.Job) []google.Job {
 	return jobs
 }
 
-func writeReport(w io.Writer, keyword string, search *google.JobsResponse, jobs []google.Job, details map[string]*google.JobDetailResponse) {
+func writeReport(w io.Writer, query, baseURL string, search *google.JobsResponse, jobs []google.Job, details map[string]*google.JobDetailResponse) {
 	fmt.Fprintf(w, "Google Jobs Report\n")
-	fmt.Fprintf(w, "Keyword: %s\n", keyword)
-	fmt.Fprintf(w, "Filters: full-time, newest first\n")
+	fmt.Fprintf(w, "Query: %s\n", query)
 	fmt.Fprintf(w, "Found %d jobs; showing %d\n\n", len(search.Jobs), len(jobs))
 
 	for i, job := range jobs {
 		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.ID, job.Title)
-		fmt.Fprintf(w, "URL: https://www.google.com/about/careers/applications/jobs/results/%s\n", job.ID)
+		fmt.Fprintf(w, "URL: %s/jobs/results/%s\n", baseURL, job.ID)
 		if job.Company != "" {
 			fmt.Fprintf(w, "Company: %s\n", job.Company)
 		}

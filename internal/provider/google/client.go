@@ -13,9 +13,8 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://www.google.com/about/careers/applications"
-	jobsPath       = "/jobs/results"
-	jobDetailPath  = "/jobs/results/%s" // id
+	jobsPath      = "/jobs/results"
+	jobDetailPath = "/jobs/results/%s" // id
 )
 
 type Client struct {
@@ -57,10 +56,10 @@ type JobDetailResponse struct {
 	Responsibilities string
 }
 
-func NewClient(c *http.Client) *Client {
+func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
-		httpClient: cmp.Or(c, http.DefaultClient),
-		baseURL:    defaultBaseURL,
+		httpClient: cmp.Or(httpClient, http.DefaultClient),
+		baseURL:    baseURL,
 	}
 }
 

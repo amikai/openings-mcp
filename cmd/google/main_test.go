@@ -22,15 +22,15 @@ func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	writeReport(&buf, "software engineer", search, jobsForDetail(search.Jobs), details)
+	writeReport(&buf, "software engineer", "https://www.google.com/about/careers/applications", search, jobsForDetail(search.Jobs), details)
 	got := buf.String()
 
 	for _, want := range []string{
 		"Google Jobs Report",
-		"Keyword: software engineer",
-		"Filters: full-time, newest first",
+		"Query: software engineer",
 		"Found 2 jobs; showing 2",
 		"[104030745835512518] Model UX Designer",
+		"URL: https://www.google.com/about/careers/applications/jobs/results/104030745835512518",
 		"Company: Google",
 		"Location: Mountain View, CA, USA",
 		"About: Design AI product UX.",
@@ -53,13 +53,30 @@ func TestJobsForDetailLimitsGoogleJobsToTen(t *testing.T) {
 	}
 }
 
-func TestDefaultSearchParamsUsesFullTimeNewest(t *testing.T) {
-	got := defaultSearchParams("software engineer")
+func TestBuildJobsRequest(t *testing.T) {
+	got := buildJobsRequest("software engineer", "Taiwan", true, "MID", "Python", "MASTERS", "FULL_TIME", "Google", "date", 2)
+
 	want := &google.JobsRequest{
 		Query:          "software engineer",
-		SortBy:         "date",
+		Locations:      []string{"Taiwan"},
+		HasRemote:      true,
+		TargetLevels:   []string{"MID"},
+		Skills:         "Python",
+		Degrees:        []string{"MASTERS"},
 		EmploymentType: []string{"FULL_TIME"},
-		Page:           1,
+		Companies:      []string{"Google"},
+		SortBy:         "date",
+		Page:           2,
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestBuildJobsRequestLeavesUnsetFiltersOut(t *testing.T) {
+	got := buildJobsRequest("software engineer", "", false, "", "", "", "", "", "", 1)
+
+	want := &google.JobsRequest{
+		Query: "software engineer",
+		Page:  1,
 	}
 	assert.Equal(t, want, got)
 }
