@@ -132,7 +132,7 @@ type nvidiaSearchOutput struct {
 type nvidiaJobSummary struct {
 	Title         string `json:"title"`
 	ExternalPath  string `json:"external_path"`
-	LocationsText string `json:"locations_text,omitempty"`
+	LocationsText string `json:"locations_text,omitempty" jsonschema:"Human-readable location(s); may be an aggregate count like '3 Locations' instead of a specific site when the job posts to multiple locations."`
 	PostedOn      string `json:"posted_on,omitempty"`
 }
 

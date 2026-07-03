@@ -545,3 +545,24 @@ func TestGoogleMCPToHTTPRequestMissingRequired(t *testing.T) {
 		})
 	}
 }
+
+func TestGoogleMCPToHTTPRequestInvalidLabels(t *testing.T) {
+	cases := []struct {
+		name string
+		in   googleSearchInput
+		want string
+	}{
+		{"target_level", googleSearchInput{Keyword: "x", Location: "Taiwan", TargetLevel: "JUNIOR"}, `invalid target_level "JUNIOR"`},
+		{"degree", googleSearchInput{Keyword: "x", Location: "Taiwan", Degree: "HIGH_SCHOOL"}, `invalid degree "HIGH_SCHOOL"`},
+		{"employment_type", googleSearchInput{Keyword: "x", Location: "Taiwan", EmploymentType: "CONTRACT"}, `invalid employment_type "CONTRACT"`},
+		{"company", googleSearchInput{Keyword: "x", Location: "Taiwan", Company: "Alphabet"}, `invalid company "Alphabet"`},
+		{"sort_by", googleSearchInput{Keyword: "x", Location: "Taiwan", SortBy: "newest"}, `invalid sort_by "newest"`},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			_, err := googleMCPToHTTPRequest(&tc.in)
+			require.Error(t, err)
+			assert.Contains(t, err.Error(), tc.want)
+		})
+	}
+}
