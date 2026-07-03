@@ -25,6 +25,13 @@ Without Go: download the archive for your platform from
 [Releases](https://github.com/amikai/openings-mcp/releases) and put
 `openings-mcp` on your PATH.
 
+With Homebrew:
+
+```
+brew tap amikai/tap
+brew install --cask openings-mcp
+```
+
 With Docker (multi-arch: linux/amd64, linux/arm64):
 
 ```

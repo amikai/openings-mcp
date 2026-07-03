@@ -3,7 +3,8 @@ version: 2
 project_name: openings-mcp
 
 builds:
-  - main: ./cmd/openings-mcp
+  - id: openings-mcp
+    main: ./cmd/openings-mcp
     binary: openings-mcp
     env:
       - CGO_ENABLED=0
@@ -18,11 +19,28 @@ builds:
       - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
 
 archives:
-  - formats: [tar.gz]
+  - id: openings-mcp
+    formats: [tar.gz]
     name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}'
     format_overrides:
       - goos: windows
         formats: [zip]
+
+homebrew_casks:
+  - name: openings-mcp
+    ids:
+      - openings-mcp
+    binaries:
+      - openings-mcp
+    homepage: 'https://github.com/amikai/openings-mcp'
+    description: 'MCP server for searching job listings across job boards and company career sites'
+    directory: Casks
+    commit_msg_template: 'chore: update Homebrew cask for {{ .ProjectName }} {{ .Tag }}'
+    repository:
+      owner: amikai
+      name: homebrew-tap
+      branch: main
+      token: '{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}'
 
 dockers_v2:
   - images:

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "openings-mcp": {
+      "command": "openings-mcp",
+      "args": []
+    }
+  }
+}
