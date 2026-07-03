@@ -111,9 +111,33 @@ type googleDetailOutput struct {
 	Responsibilities string `json:"responsibilities,omitempty" jsonschema:"Job responsibilities as plain text."`
 }
 
-// googleMCPToHTTPRequest maps tool input onto the provider request. Enum
-// values pass through verbatim; the input schema already constrains them, and
-// the site silently ignores unrecognized values.
+// googleTargetLevels, googleDegrees, googleEmploymentTypes, googleCompanies,
+// and googleSortBys mirror the enum values in googleSearchInputRawSchema.
+// The google provider's client is hand-written (no ogen-generated types), so
+// unlike job104/nvidia/cake there's no generated Validate() to call; the site
+// itself silently ignores unrecognized values instead of erroring, so
+// jobmcp validates against these sets to fail fast like the other providers.
+var googleTargetLevels = map[string]bool{
+	"EARLY": true, "MID": true, "ADVANCED": true,
+	"INTERN_AND_APPRENTICE": true, "DIRECTOR_PLUS": true,
+}
+
+var googleDegrees = map[string]bool{
+	"PURSUING_DEGREE": true, "ASSOCIATE": true, "BACHELORS": true,
+	"MASTERS": true, "PHD": true,
+}
+
+var googleEmploymentTypes = map[string]bool{
+	"FULL_TIME": true, "PART_TIME": true, "TEMPORARY": true, "INTERN": true,
+}
+
+var googleCompanies = map[string]bool{
+	"DeepMind": true, "GFiber": true, "Google": true,
+	"Verily Life Sciences": true, "Waymo": true, "Wing": true, "YouTube": true,
+}
+
+var googleSortBys = map[string]bool{"relevance": true, "date": true}
+
 func googleMCPToHTTPRequest(in *googleSearchInput) (*google.JobsRequest, error) {
 	var req google.JobsRequest
 	// The schema already marks keyword and location required; this guards
@@ -130,19 +154,36 @@ func googleMCPToHTTPRequest(in *googleSearchInput) (*google.JobsRequest, error) 
 
 	req.HasRemote = in.HasRemote
 	if in.TargetLevel != "" {
+		if !googleTargetLevels[in.TargetLevel] {
+			return nil, fmt.Errorf("invalid target_level %q", in.TargetLevel)
+		}
 		req.TargetLevels = []string{in.TargetLevel}
 	}
 	req.Skills = in.Skills
 	if in.Degree != "" {
+		if !googleDegrees[in.Degree] {
+			return nil, fmt.Errorf("invalid degree %q", in.Degree)
+		}
 		req.Degrees = []string{in.Degree}
 	}
 	if in.EmploymentType != "" {
+		if !googleEmploymentTypes[in.EmploymentType] {
+			return nil, fmt.Errorf("invalid employment_type %q", in.EmploymentType)
+		}
 		req.EmploymentType = []string{in.EmploymentType}
 	}
 	if in.Company != "" {
+		if !googleCompanies[in.Company] {
+			return nil, fmt.Errorf("invalid company %q", in.Company)
+		}
 		req.Companies = []string{in.Company}
 	}
-	req.SortBy = in.SortBy
+	if in.SortBy != "" {
+		if !googleSortBys[in.SortBy] {
+			return nil, fmt.Errorf("invalid sort_by %q", in.SortBy)
+		}
+		req.SortBy = in.SortBy
+	}
 	req.Page = in.Page
 	return &req, nil
 }
