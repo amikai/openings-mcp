@@ -11,6 +11,7 @@ import (
 	"github.com/amikai/job-mcp/internal/jobmcp"
 	"github.com/amikai/job-mcp/internal/provider/cake"
 	"github.com/amikai/job-mcp/internal/provider/job104"
+	"github.com/amikai/job-mcp/internal/provider/nvidia"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -35,7 +36,14 @@ func runWithTransport(transport mcp.Transport) error {
 	if err != nil {
 		return err
 	}
-	server := newServer(c104, cCake)
+
+	hcNvidia := &http.Client{Timeout: 30 * time.Second}
+	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(hcNvidia))
+	if err != nil {
+		return err
+	}
+
+	server := newServer(c104, cCake, cNvidia)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
@@ -43,9 +51,10 @@ func runWithTransport(transport mcp.Transport) error {
 	return nil
 }
 
-func newServer(c104 *job104.Client, cCake *cake.Client) *mcp.Server {
+func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "job-mcp"}, nil)
 	jobmcp.RegisterJob104(server, c104)
 	jobmcp.RegisterCake(server, cCake)
+	jobmcp.RegisterNvidia(server, cNvidia)
 	return server
 }
