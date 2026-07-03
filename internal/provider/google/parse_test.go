@@ -10,26 +10,186 @@ import (
 )
 
 var wantJobs = []Job{
-	{ID: "106863362666570438", Title: "Software Engineer, GPU System Software", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "82975510480462534", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan"},
-	{ID: "81991011634422470", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "143985660506579654", Title: "Senior Signal and Power Integrity Engineer, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "78019461818262214", Title: "Software Engineering Manager, Release Engineering, Google Cloud Platforms", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "112498222319968966", Title: "Firmware Engineer, Pixel Systems Power", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "123677700068909766", Title: "Supplier Quality Engineer, Memory", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "77507329917887174", Title: "Software Engineering Manager, Pixel Camera", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "126487124076569286", Title: "Developer Relations Engineer, Android, Play, Games", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "110315781933146822", Title: "Software Engineer, Android Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "120702421604147910", Title: "Firmware Engineer, Wi-Fi, Pixel Connectivity", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "84295530024182470", Title: "Senior Product Design Engineer, Trackers and Home", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "76806086312501958", Title: "Software Engineer, Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "92642283567882950", Title: "Test Engineer, User Experience Quality", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "74113863372415686", Title: "Staff Hardware System Engineer, Home and Health", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "103770758580183750", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "87506232826307270", Title: "Software Engineer Manager II, Silicon Tools", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan"},
-	{ID: "109039274703102662", Title: "Product Quality Engineer, Global Hardware Quality and Reliability", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "107666671874777798", Title: "Test Development Engineer, Global Manufacturing Engineering", Company: "Google", Location: "Taipei, Taiwan"},
-	{ID: "141781579927036614", Title: "Senior Software Engineer, Emerging On-prem AI Infrastructure", Company: "Google", Location: "Taipei, Taiwan"},
+	{
+		ID: "106863362666570438", Title: "Software Engineer, GPU System Software", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Electrical Engineering, Computer Science, a related technical field, or equivalent practical experience.",
+			"2 years of experience in software, firmware and driver development in languages such as C/C++.",
+		},
+	},
+	{
+		ID: "82975510480462534", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
+			"8 years of experience with industry-standard tools, languages and methodologies relevant to the production Silicon SoC’s or ASIC’s, including product engineering or test engineering.",
+		},
+	},
+	{
+		ID: "81991011634422470", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Electrical Engineering, a similar field, or equivalent practical experience.",
+			"4 years of experience in scripting languages such as Perl, TCL, Shell, or Python.",
+		},
+	},
+	{
+		ID: "143985660506579654", Title: "Senior Signal and Power Integrity Engineer, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor’s degree in Electrical Engineering, Computer Engineering, or related field or equivalent practical experience.",
+			"4 years of work experience in Consumer Electronics/embedded system design or electrical systems development.",
+			"4 years of experience with signal and power integrity simulation of system boards, including SoC/chipset, Memory technology, and other communication interfaces.",
+		},
+	},
+	{
+		ID: "78019461818262214", Title: "Software Engineering Manager, Release Engineering, Google Cloud Platforms", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Advanced",
+		MinimumQualifications: []string{
+			"Bachelor’s degree, or equivalent practical experience.",
+			"8 years of experience in software development in C++, GO, or Python.",
+			"3 years of experience across testing, maintaining, or launching software products.",
+			"3 years of experience in a technical leadership role.",
+			"2 years of experience in a people management or team leadership role.",
+		},
+	},
+	{
+		ID: "112498222319968966", Title: "Firmware Engineer, Pixel Systems Power", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Computer Science, Electrical Engineering, Computer Engineering, a related technical field, or equivalent practical experience.",
+			"5 years of experience in embedded development.",
+			"Experience in programming in C or C++.",
+		},
+	},
+	{
+		ID: "123677700068909766", Title: "Supplier Quality Engineer, Memory", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Engineering (e.g., Quality, Electrical) or equivalent practical experience.",
+			"5 years of experience in quality, reliability, product, or test engineering, specifically focused on DRAM technologies (e.g., DDR and LPDDR components, and DIMM modules).",
+			"Ability to travel up to 20% of the time as needed.",
+		},
+	},
+	{
+		ID: "77507329917887174", Title: "Software Engineering Manager, Pixel Camera", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Advanced",
+		MinimumQualifications: []string{
+			"Bachelor’s degree, or equivalent practical experience.",
+			"8 years of experience in software development.",
+			"3 years of experience in a technical leadership role.",
+			"2 years of experience in a people management or team leadership role.",
+			"Experience with Andriod or mobile app development.",
+			"Experience using Java or Kotlin programming language.",
+		},
+	},
+	{
+		ID: "126487124076569286", Title: "Developer Relations Engineer, Android, Play, Games", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Computer Science, a similar technical field, or equivalent practical experience.",
+			"3 years of work experience in a technical role (e.g., software engineering, solutions consultant, etc.) or equivalent technical experience.",
+		},
+	},
+	{
+		ID: "110315781933146822", Title: "Software Engineer, Android Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor’s degree or equivalent practical experience.",
+			"2 years of experience with Android software development in Kotlin or Java.",
+		},
+	},
+	{
+		ID: "120702421604147910", Title: "Firmware Engineer, Wi-Fi, Pixel Connectivity", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Computer Science, Electrical Engineering, Computer Engineering, or a related technical field, or equivalent practical experience.",
+			"5 years of experience in coding with a general purpose programming language (e.g., C/C++).",
+			"Experience with Wi-Fi drivers, firmware or framework development.",
+		},
+	},
+	{
+		ID: "84295530024182470", Title: "Senior Product Design Engineer, Trackers and Home", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Mechanical Engineering, Product Design, or a related field, or equivalent practical experience.",
+			"5 years of experience designing mechanical components such as plastic or metal parts, mechanical assemblies, printed circuit boards, or flexes.",
+			"5 years of experience using computer-aided design (CAD) tools such as 3D MCAD, NX, Creo, or Solidworks.",
+		},
+	},
+	{
+		ID: "76806086312501958", Title: "Software Engineer, Apps, Pixel", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Early",
+		MinimumQualifications: []string{
+			"Bachelor’s degree or equivalent practical experience.",
+			"1 year of experience with software development in one or more programming languages (e.g., Java, Kotlin, C++, Python).",
+			"1 year of experience with data structures or algorithms.",
+		},
+	},
+	{
+		ID: "92642283567882950", Title: "Test Engineer, User Experience Quality", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in computer science, electrical engineering, or equivalent practical experience.",
+			"3 years of experience in coding (e.g., Python or Java), developing test methodologies, writing test plans, creating test cases, and debugging.",
+			"2 years of experience with developing infrastructure, or experience with compute technologies, mobile application development.",
+		},
+	},
+	{
+		ID: "74113863372415686", Title: "Staff Hardware System Engineer, Home and Health", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Advanced",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Electrical Engineering, Computer Engineering, Physics, a related field, or equivalent practical experience.",
+			"6 years of experience working in consumer electronics system design.",
+			"Experience in one of the following domains, such as architecture, power/battery/Soc, interfaces, or analog/camera/display engineering.",
+		},
+	},
+	{
+		ID: "103770758580183750", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor’s degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
+			"4 years of experience in high-performance CPU or AI accelerator logic design, RTL design or integration, including microarchitecture definition and PPA optimizations.",
+			"Experience in CPU, and cache subsystem integration with SOCs.",
+		},
+	},
+	{
+		ID: "87506232826307270", Title: "Software Engineer Manager II, Silicon Tools", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ExperienceLevel: "Advanced",
+		MinimumQualifications: []string{
+			"Bachelor's degree or equivalent practical experience.",
+			"8 years of experience in software development, with experience in building and scaling internal/external tools within a engineering organization.",
+			"2 years of experience in a people management or team leadership role.",
+		},
+	},
+	{
+		ID: "109039274703102662", Title: "Product Quality Engineer, Global Hardware Quality and Reliability", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor's degree in Mechanical Engineering, Industrial Engineering, Materials Engineering, a related engineering discipline, or equivalent practical experience.",
+			"5 years of experience in Quality/Reliability/Production operation, with direct experience in New Product development and qualification.",
+		},
+	},
+	{
+		ID: "107666671874777798", Title: "Test Development Engineer, Global Manufacturing Engineering", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor’s degree in Electrical Engineering, Computer Science, or a related technical field, or equivalent practical experience.",
+			"5 years of experience in software development.",
+			"Experience developing and validating Python scripts to automate manufacturing test processes.",
+		},
+	},
+	{
+		ID: "141781579927036614", Title: "Senior Software Engineer, Emerging On-prem AI Infrastructure", Company: "Google", Location: "Taipei, Taiwan",
+		ExperienceLevel: "Mid",
+		MinimumQualifications: []string{
+			"Bachelor’s degree or equivalent practical experience.",
+			"5 years of experience in software engineering, and with building tools focused on infrastructure operations, reliability, and architectural integrity.",
+			"2 years of experience in software design and architecture, within a large-scale cloud infrastructure provider.",
+			"Experience in testing, maintaining, and launching software products or infrastructure systems, and in debugging, troubleshooting, and diagnosing issues within distributed systems.",
+		},
+	},
 }
 
 var wantDetail = &JobDetailResponse{

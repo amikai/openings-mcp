@@ -85,11 +85,13 @@ type googleSearchOutput struct {
 }
 
 type googleJobSummary struct {
-	ID       string `json:"id" jsonschema:"Job ID; pass to google_get_job_detail."`
-	URL      string `json:"url,omitempty" jsonschema:"Public Google Careers job posting URL."`
-	Title    string `json:"title"`
-	Company  string `json:"company,omitempty"`
-	Location string `json:"location,omitempty"`
+	ID                    string   `json:"id" jsonschema:"Job ID; pass to google_get_job_detail."`
+	URL                   string   `json:"url,omitempty" jsonschema:"Public Google Careers job posting URL."`
+	Title                 string   `json:"title"`
+	Company               string   `json:"company,omitempty"`
+	Location              string   `json:"location,omitempty"`
+	ExperienceLevel       string   `json:"experience_level,omitempty" jsonschema:"Experience level badge (e.g. Early, Mid, Advanced)."`
+	MinimumQualifications []string `json:"minimum_qualifications,omitempty" jsonschema:"Minimum qualifications summary from the search results card."`
 }
 
 type googleDetailInput struct {
@@ -149,11 +151,13 @@ func googleHTTPToMCPResponse(resp *google.JobsResponse) *googleSearchOutput {
 	}
 	for _, j := range resp.Jobs {
 		out.Data = append(out.Data, googleJobSummary{
-			ID:       j.ID,
-			URL:      googleJobURL(j.ID),
-			Title:    j.Title,
-			Company:  j.Company,
-			Location: j.Location,
+			ID:                    j.ID,
+			URL:                   googleJobURL(j.ID),
+			Title:                 j.Title,
+			Company:               j.Company,
+			Location:              j.Location,
+			ExperienceLevel:       j.ExperienceLevel,
+			MinimumQualifications: j.MinimumQualifications,
 		})
 	}
 	return out

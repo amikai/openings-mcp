@@ -40,10 +40,12 @@ type JobsResponse struct {
 }
 
 type Job struct {
-	ID       string
-	Title    string
-	Company  string
-	Location string
+	ID                    string
+	Title                 string
+	Company               string
+	Location              string
+	ExperienceLevel       string
+	MinimumQualifications []string
 }
 
 type JobDetailResponse struct {
