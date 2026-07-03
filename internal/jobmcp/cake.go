@@ -2,6 +2,7 @@ package jobmcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/amikai/job-mcp/internal/provider/cake"
@@ -221,13 +222,21 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 		}
 		res, err := c.SearchJobs(ctx, req)
 		if err != nil {
+			if ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
-		resp, ok := res.(*cake.JobSearchResponse)
-		if !ok {
+		switch r := res.(type) {
+		case *cake.JobSearchResponse:
+			return nil, cakeHTTPToMCPResponse(r), nil
+		case *cake.ErrorResponse:
+			// 422 is the only non-200 status the spec declares, so it arrives
+			// as a value rather than an error.
+			return errorResult(fmt.Errorf("upstream error: 422")), nil, nil
+		default:
 			return errorResult(fmt.Errorf("job search returned %T", res)), nil, nil
 		}
-		return nil, cakeHTTPToMCPResponse(resp), nil
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
@@ -236,12 +245,20 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeDetailInput) (*mcp.CallToolResult, *cakeDetailOutput, error) {
 		res, err := c.GetJobDetail(ctx, cake.GetJobDetailParams{Path: in.Path})
 		if err != nil {
+			if ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
-		detail, ok := res.(*cake.JobDetail)
-		if !ok {
+		switch r := res.(type) {
+		case *cake.JobDetail:
+			return nil, cakeHTTPToMCPDetail(r), nil
+		case *cake.ErrorResponse:
+			// 404 is the only non-200 status the spec declares, so it arrives
+			// as a value rather than an error.
+			return errorResult(fmt.Errorf("upstream error: 404")), nil, nil
+		default:
 			return errorResult(fmt.Errorf("job detail %s returned %T", in.Path, res)), nil, nil
 		}
-		return nil, cakeHTTPToMCPDetail(detail), nil
 	})
 }
