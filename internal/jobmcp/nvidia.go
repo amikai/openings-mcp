@@ -2,6 +2,7 @@ package jobmcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -262,13 +263,21 @@ func RegisterNvidia(s *mcp.Server, c *nvidia.Client) {
 		}
 		res, err := c.SearchJobs(ctx, req)
 		if err != nil {
+			if ue, ok := errors.AsType[*nvidia.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
-		resp, ok := res.(*nvidia.JobsResponse)
-		if !ok {
+		switch r := res.(type) {
+		case *nvidia.JobsResponse:
+			return nil, nvidiaHTTPToMCPResponse(r), nil
+		case *nvidia.ErrorResponse:
+			// 400 is the only non-200 status the spec declares, so it arrives
+			// as a value rather than an error.
+			return errorResult(fmt.Errorf("upstream error: 400")), nil, nil
+		default:
 			return errorResult(fmt.Errorf("job search returned %T", res)), nil, nil
 		}
-		return nil, nvidiaHTTPToMCPResponse(resp), nil
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
@@ -284,12 +293,20 @@ func RegisterNvidia(s *mcp.Server, c *nvidia.Client) {
 			TitleSlug: titleSlug,
 		})
 		if err != nil {
+			if ue, ok := errors.AsType[*nvidia.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
-		detail, ok := res.(*nvidia.JobDetailResponse)
-		if !ok {
-			return errorResult(fmt.Errorf("job detail returned %T", res)), nil, nil
+		switch r := res.(type) {
+		case *nvidia.JobDetailResponse:
+			return nil, nvidiaHTTPToMCPDetail(r), nil
+		case *nvidia.ErrorResponse:
+			// 404 is the only non-200 status the spec declares, so it arrives
+			// as a value rather than an error.
+			return errorResult(fmt.Errorf("upstream error: 404")), nil, nil
+		default:
+			return errorResult(fmt.Errorf("job detail %s returned %T", in.ExternalPath, res)), nil, nil
 		}
-		return nil, nvidiaHTTPToMCPDetail(detail), nil
 	})
 }

@@ -2,6 +2,7 @@ package jobmcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/amikai/job-mcp/internal/provider/job104"
@@ -371,6 +372,9 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		}
 		resp, err := c.SearchJobs(ctx, *params)
 		if err != nil {
+			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
 		return nil, job104HTTPToMCPResponse(resp), nil
@@ -382,12 +386,20 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104DetailInput) (*mcp.CallToolResult, *job104DetailOutput, error) {
 		resp, err := c.GetJobDetail(ctx, job104.GetJobDetailParams{JobCode: in.JobCode})
 		if err != nil {
+			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
 			return errorResult(err), nil, nil
 		}
-		detail, ok := resp.(*job104.JobDetailResponse)
-		if !ok {
+		switch r := resp.(type) {
+		case *job104.JobDetailResponse:
+			return nil, job104HTTPToMCPDetail(r), nil
+		case *job104.ErrorResponse:
+			// 404 is the only non-200 status the spec declares, so it arrives
+			// as a value rather than an error.
+			return errorResult(fmt.Errorf("upstream error: 404")), nil, nil
+		default:
 			return errorResult(fmt.Errorf("job detail %s returned %T", in.JobCode, resp)), nil, nil
 		}
-		return nil, job104HTTPToMCPDetail(detail), nil
 	})
 }
