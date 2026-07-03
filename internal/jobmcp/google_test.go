@@ -443,7 +443,7 @@ Develop test suites that enable unit, integration and system level testing of ou
 func TestGoogleHTTPToMCPResponse(t *testing.T) {
 	in := google.JobsResponse{
 		Jobs: []google.Job{
-			{ID: "1", Title: "t1", Company: "Google", Location: "Taipei, Taiwan", ExperienceLevel: "Mid", MinimumQualifications: []string{"q1", "q2"}},
+			{ID: "1", Title: "t1", Company: "Google", Location: "Taipei, Taiwan", Remote: true, ExperienceLevel: "Mid", MinimumQualifications: []string{"q1", "q2"}},
 			{Title: "t2"},
 		},
 	}
@@ -451,7 +451,7 @@ func TestGoogleHTTPToMCPResponse(t *testing.T) {
 
 	want := &googleSearchOutput{
 		Data: []googleJobSummary{
-			{ID: "1", URL: "https://www.google.com/about/careers/applications/jobs/results/1", Title: "t1", Company: "Google", Location: "Taipei, Taiwan", ExperienceLevel: "Mid", MinimumQualifications: []string{"q1", "q2"}},
+			{ID: "1", URL: "https://www.google.com/about/careers/applications/jobs/results/1", Title: "t1", Company: "Google", Location: "Taipei, Taiwan", Remote: true, ExperienceLevel: "Mid", MinimumQualifications: []string{"q1", "q2"}},
 			{Title: "t2"},
 		},
 	}
@@ -464,6 +464,7 @@ func TestGoogleHTTPToMCPDetail(t *testing.T) {
 		Title:            "t",
 		Company:          "Google",
 		Location:         "Taipei, Taiwan",
+		Remote:           true,
 		About:            "a",
 		Qualifications:   "q",
 		Responsibilities: "r",
@@ -476,6 +477,7 @@ func TestGoogleHTTPToMCPDetail(t *testing.T) {
 		Title:            "t",
 		Company:          "Google",
 		Location:         "Taipei, Taiwan",
+		Remote:           true,
 		About:            "a",
 		Qualifications:   "q",
 		Responsibilities: "r",

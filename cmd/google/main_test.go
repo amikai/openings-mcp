@@ -13,7 +13,7 @@ func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 	search := &google.JobsResponse{
 		Jobs: []google.Job{
 			{ID: "104030745835512518", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA"},
-			{ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA"},
+			{ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA", Remote: true},
 		},
 	}
 	details := map[string]*google.JobDetailResponse{
@@ -37,6 +37,7 @@ func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 		"Qualifications: Bachelor's degree.",
 		"Responsibilities: Create model UX flows.",
 		"[126340255522398918] Senior Engineer, GDC",
+		"Remote eligible",
 		"Build backend services.",
 	} {
 		if !strings.Contains(got, want) {

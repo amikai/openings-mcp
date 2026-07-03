@@ -44,6 +44,7 @@ type Job struct {
 	Title                 string
 	Company               string
 	Location              string
+	Remote                bool
 	ExperienceLevel       string
 	MinimumQualifications []string
 }
@@ -53,6 +54,7 @@ type JobDetailResponse struct {
 	Title            string
 	Company          string
 	Location         string
+	Remote           bool
 	About            string
 	Qualifications   string
 	Responsibilities string

@@ -2,6 +2,7 @@ package google
 
 import (
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -248,6 +249,55 @@ func TestParseSearchHTML(t *testing.T) {
 
 	got := parseJobsHTML(doc)
 	assert.Equal(t, wantJobs, got)
+}
+
+// Minimal card/detail markup mirroring the live structure of a remote-
+// eligible job: the fixtures carry no remote jobs, and on the live site the
+// "Remote eligible" badge shares span.RP7SMd with the company badge.
+
+func TestParseSearchHTMLRemoteEligible(t *testing.T) {
+	const cardHTML = `<html><body><ul>
+<li class="lLd3Je" ssk="18:123">
+<h3 class="QJPWVe">Forward Deployed Engineer</h3>
+<span class="RP7SMd"><i class="google-material-icons">corporate_fare</i><span>Google</span></span>
+<span class="RP7SMd"><i class="google-material-icons">laptop_windows</i><span>Remote eligible</span></span>
+<span class="r0wTof">San Francisco, CA, USA</span>
+</li></ul></body></html>`
+	doc, err := html.Parse(strings.NewReader(cardHTML))
+	require.NoError(t, err)
+
+	got := parseJobsHTML(doc)
+
+	want := []Job{{
+		ID:       "123",
+		Title:    "Forward Deployed Engineer",
+		Company:  "Google",
+		Location: "San Francisco, CA, USA",
+		Remote:   true,
+	}}
+	assert.Equal(t, want, got)
+}
+
+func TestParseDetailHTMLRemoteEligible(t *testing.T) {
+	const detailHTML = `<html><head><title>Forward Deployed Engineer — Google Careers</title></head><body><main>
+<span class="RP7SMd"><i class="google-material-icons">corporate_fare</i><span>Google</span></span>
+<span class="RP7SMd"><i class="google-material-icons">laptop_windows</i><span>Remote eligible</span></span>
+<span class="r0wTof">San Francisco, CA, USA</span>
+</main></body></html>`
+	doc, err := html.Parse(strings.NewReader(detailHTML))
+	require.NoError(t, err)
+
+	got, ok := parseJobDetailHTML(doc, "123")
+	require.True(t, ok)
+
+	want := &JobDetailResponse{
+		ID:       "123",
+		Title:    "Forward Deployed Engineer",
+		Company:  "Google",
+		Location: "San Francisco, CA, USA",
+		Remote:   true,
+	}
+	assert.Equal(t, want, got)
 }
 
 func TestParseDetailHTML(t *testing.T) {

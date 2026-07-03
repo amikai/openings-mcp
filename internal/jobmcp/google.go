@@ -90,6 +90,7 @@ type googleJobSummary struct {
 	Title                 string   `json:"title"`
 	Company               string   `json:"company,omitempty"`
 	Location              string   `json:"location,omitempty"`
+	Remote                bool     `json:"remote,omitempty" jsonschema:"True when the job is marked Remote eligible."`
 	ExperienceLevel       string   `json:"experience_level,omitempty" jsonschema:"Experience level badge (e.g. Early, Mid, Advanced)."`
 	MinimumQualifications []string `json:"minimum_qualifications,omitempty" jsonschema:"Minimum qualifications summary from the search results card."`
 }
@@ -104,6 +105,7 @@ type googleDetailOutput struct {
 	Title            string `json:"title"`
 	Company          string `json:"company,omitempty"`
 	Location         string `json:"location,omitempty"`
+	Remote           bool   `json:"remote,omitempty" jsonschema:"True when the job is marked Remote eligible."`
 	About            string `json:"about,omitempty" jsonschema:"About-the-job section as plain text."`
 	Qualifications   string `json:"qualifications,omitempty" jsonschema:"Minimum and preferred qualifications as plain text."`
 	Responsibilities string `json:"responsibilities,omitempty" jsonschema:"Job responsibilities as plain text."`
@@ -156,6 +158,7 @@ func googleHTTPToMCPResponse(resp *google.JobsResponse) *googleSearchOutput {
 			Title:                 j.Title,
 			Company:               j.Company,
 			Location:              j.Location,
+			Remote:                j.Remote,
 			ExperienceLevel:       j.ExperienceLevel,
 			MinimumQualifications: j.MinimumQualifications,
 		})
@@ -170,6 +173,7 @@ func googleHTTPToMCPDetail(detail *google.JobDetailResponse) *googleDetailOutput
 		Title:            detail.Title,
 		Company:          detail.Company,
 		Location:         detail.Location,
+		Remote:           detail.Remote,
 		About:            detail.About,
 		Qualifications:   detail.Qualifications,
 		Responsibilities: detail.Responsibilities,

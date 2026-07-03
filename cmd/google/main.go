@@ -140,6 +140,9 @@ func writeReport(w io.Writer, query, baseURL string, search *google.JobsResponse
 		if job.Location != "" {
 			fmt.Fprintf(w, "Location: %s\n", job.Location)
 		}
+		if job.Remote {
+			fmt.Fprintln(w, "Remote eligible")
+		}
 		if detail := details[job.ID]; detail != nil {
 			writeDetail(w, detail)
 		}

@@ -39,6 +39,7 @@ func parseJobCard(li *html.Node) (Job, bool) {
 	}
 
 	var title, company, location, experienceLevel string
+	var remote bool
 	var minimumQualifications []string
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
@@ -49,8 +50,14 @@ func parseJobCard(li *html.Node) (Job, bool) {
 				title = strings.TrimSpace(textContent(n))
 				return
 			case n.Data == "span" && hasClass(n, "RP7SMd"):
-				// xq -q "li.lLd3Je span.RP7SMd span" --html
-				company = spanChildText(n)
+				// xq -q "li.lLd3Je span.RP7SMd span" --html; the company badge
+				// comes first, remote jobs add a second "Remote eligible" badge
+				// with the same class.
+				if t := spanChildText(n); t == "Remote eligible" {
+					remote = true
+				} else if company == "" {
+					company = t
+				}
 				return
 			case n.Data == "span" && hasClass(n, "r0wTof") && location == "":
 				// xq -q "li.lLd3Je span.r0wTof" --html (first match = primary location)
@@ -77,6 +84,7 @@ func parseJobCard(li *html.Node) (Job, bool) {
 		Title:                 title,
 		Company:               company,
 		Location:              location,
+		Remote:                remote,
 		ExperienceLevel:       experienceLevel,
 		MinimumQualifications: minimumQualifications,
 	}, title != ""
@@ -126,8 +134,14 @@ func parseJobDetailHTML(doc *html.Node, id string) (*JobDetailResponse, bool) {
 				inMain = false
 				return
 			case inMain && n.Data == "span" && hasClass(n, "RP7SMd"):
-				// xq -q "main span.RP7SMd span" --html
-				detail.Company = spanChildText(n)
+				// xq -q "main span.RP7SMd span" --html; the company badge
+				// comes first, remote jobs add a second "Remote eligible"
+				// badge with the same class.
+				if t := spanChildText(n); t == "Remote eligible" {
+					detail.Remote = true
+				} else if detail.Company == "" {
+					detail.Company = t
+				}
 				return
 			case inMain && n.Data == "span" && hasClass(n, "r0wTof") && detail.Location == "":
 				// xq -q "main span.r0wTof" --html
