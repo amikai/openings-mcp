@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func assertTools(t *testing.T, server *mcp.Server, names ...string) {
@@ -14,27 +16,19 @@ func assertTools(t *testing.T, server *mcp.Server, names ...string) {
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer serverSession.Close()
 	clientSession, err := client.Connect(ctx, clientTransport, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer clientSession.Close()
 
 	res, err := clientSession.ListTools(ctx, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	got := make(map[string]bool, len(res.Tools))
 	for _, tool := range res.Tools {
 		got[tool.Name] = true
 	}
 	for _, name := range names {
-		if !got[name] {
-			t.Fatalf("missing tool %q in %v", name, got)
-		}
+		assert.Contains(t, got, name)
 	}
 }

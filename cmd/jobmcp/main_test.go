@@ -14,6 +14,8 @@ import (
 	"github.com/amikai/job-mcp/internal/provider/nvidia"
 	"github.com/amikai/job-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type writeCloser struct {
@@ -25,37 +27,25 @@ func (writeCloser) Close() error { return nil }
 func TestServerListsJobTools(t *testing.T) {
 	ctx := context.Background()
 	c104, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(http.DefaultClient))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(http.DefaultClient))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(http.DefaultClient))
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer serverSession.Close()
 	clientSession, err := client.Connect(ctx, clientTransport, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	defer clientSession.Close()
 
 	res, err := clientSession.ListTools(ctx, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	got := make(map[string]bool, len(res.Tools))
 	for _, tool := range res.Tools {
 		got[tool.Name] = true
@@ -72,9 +62,7 @@ func TestServerListsJobTools(t *testing.T) {
 		"google_search_jobs",
 		"google_get_job_detail",
 	} {
-		if !got[name] {
-			t.Fatalf("missing tool %q in %v", name, got)
-		}
+		assert.Contains(t, got, name)
 	}
 }
 
@@ -83,7 +71,6 @@ func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 		Reader: io.NopCloser(strings.NewReader("")),
 		Writer: writeCloser{Writer: io.Discard},
 	}
-	if err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil))); err != nil {
-		t.Fatalf("runWithTransport() error = %v, want nil", err)
-	}
+	err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	require.NoError(t, err)
 }

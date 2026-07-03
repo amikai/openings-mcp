@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 
 	cake "github.com/amikai/job-mcp/internal/provider/cake"
@@ -125,8 +124,6 @@ func TestWriteReportIncludesEveryJobDetail(t *testing.T) {
 		"[backend-engineer] Backend Engineer",
 		"Build APIs",
 	} {
-		if !strings.Contains(got, want) {
-			t.Fatalf("report missing %q:\n%s", want, got)
-		}
+		assert.Contains(t, got, want)
 	}
 }

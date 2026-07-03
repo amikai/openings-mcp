@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 
 	google "github.com/amikai/job-mcp/internal/provider/google"
@@ -40,18 +39,14 @@ func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 		"Remote eligible",
 		"Build backend services.",
 	} {
-		if !strings.Contains(got, want) {
-			t.Fatalf("report missing %q:\n%s", want, got)
-		}
+		assert.Contains(t, got, want)
 	}
 }
 
 func TestJobsForDetailLimitsGoogleJobsToTen(t *testing.T) {
 	jobs := make([]google.Job, 12)
 	got := jobsForDetail(jobs)
-	if len(got) != 10 {
-		t.Fatalf("jobsForDetail returned %d jobs, want 10", len(got))
-	}
+	assert.Len(t, got, 10)
 }
 
 func TestBuildJobsRequest(t *testing.T) {

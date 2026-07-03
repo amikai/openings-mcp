@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"strings"
 	"testing"
 
 	"github.com/amikai/job-mcp/internal/provider/job104"
@@ -65,9 +64,7 @@ func TestWriteDetail(t *testing.T) {
 		"Experience: 3 years | Education: Bachelor",
 		"Build Go services",
 	} {
-		if !strings.Contains(got, want) {
-			t.Fatalf("writeDetail missing %q:\n%s", want, got)
-		}
+		assert.Contains(t, got, want)
 	}
 }
 
