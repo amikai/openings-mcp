@@ -4,6 +4,7 @@ OPENAPI_SPECS := \
 	internal/provider/cake/openapi.yaml \
 	internal/provider/google/openapi.yaml \
 	internal/provider/job104/openapi.yaml \
+	internal/provider/linkedin/openapi.yaml \
 	internal/provider/nvidia/openapi.yaml \
 	internal/provider/synopsys/openapi.yaml \
 	internal/provider/tsmc/openapi.yaml
