@@ -10,11 +10,11 @@ import (
 // parseJobsHTML parses job cards from search results HTML.
 func parseJobsHTML(doc *goquery.Document) []Job {
 	var jobs []Job
-	doc.Find("li.lLd3Je").Each(func(_ int, li *goquery.Selection) {
+	for _, li := range doc.Find("li.lLd3Je").EachIter() {
 		if job, ok := parseJobCard(li); ok {
 			jobs = append(jobs, job)
 		}
-	})
+	}
 	return jobs
 }
 
@@ -34,13 +34,13 @@ func parseJobCard(li *goquery.Selection) (Job, bool) {
 	var remote bool
 	// the company badge comes first, remote jobs add a second "Remote
 	// eligible" badge with the same class.
-	li.Find("span.RP7SMd").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range li.Find("span.RP7SMd").EachIter() {
 		if t := spanChildText(s); t == "Remote eligible" {
 			remote = true
 		} else if company == "" {
 			company = t
 		}
-	})
+	}
 
 	location := strings.TrimSpace(li.Find("span.r0wTof").First().Text())
 	experienceLevel := strings.TrimSpace(li.Find("span.wVSTAb").First().Text())
@@ -60,9 +60,9 @@ func parseJobCard(li *goquery.Selection) (Job, bool) {
 // bulletTexts collects the whitespace-normalized text of every <li> under sel.
 func bulletTexts(sel *goquery.Selection) []string {
 	var bullets []string
-	sel.Find("li").Each(func(_ int, li *goquery.Selection) {
+	for _, li := range sel.Find("li").EachIter() {
 		bullets = append(bullets, strings.Join(strings.Fields(li.Text()), " "))
-	})
+	}
 	return bullets
 }
 
@@ -78,13 +78,13 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 
 	// the company badge comes first, remote jobs add a second "Remote
 	// eligible" badge with the same class.
-	main.Find("span.RP7SMd").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range main.Find("span.RP7SMd").EachIter() {
 		if t := spanChildText(s); t == "Remote eligible" {
 			detail.Remote = true
 		} else if detail.Company == "" {
 			detail.Company = t
 		}
-	})
+	}
 
 	detail.Location = strings.TrimSpace(main.Find("span.r0wTof").First().Text())
 
@@ -104,14 +104,14 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 		detail.Responsibilities = strings.TrimSpace(strings.ReplaceAll(sb.String(), "\r", ""))
 	}
 
-	main.Find("h3").EachWithBreak(func(_ int, h3 *goquery.Selection) bool {
+	for _, h3 := range main.Find("h3").EachIter() {
 		t := strings.TrimSpace(h3.Text())
 		if !strings.HasPrefix(t, "Minimum qualifications") {
-			return true
+			continue
 		}
 		detail.Qualifications = parseQualifications(h3.Nodes[0])
-		return false
-	})
+		break
+	}
 
 	return &detail, detail.Title != ""
 }

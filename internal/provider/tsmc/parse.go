@@ -19,11 +19,11 @@ func parseSearchHTML(doc *goquery.Document) ([]Job, int) {
 	}
 
 	var jobs []Job
-	doc.Find("article.article--result").Each(func(_ int, article *goquery.Selection) {
+	for _, article := range doc.Find("article.article--result").EachIter() {
 		if job, ok := parseJobCard(article); ok {
 			jobs = append(jobs, job)
 		}
-	})
+	}
 	if total == 0 {
 		total = len(jobs)
 	}
@@ -94,9 +94,9 @@ func parseDetailHTML(doc *goquery.Document) (JobDetailResponse, bool) {
 	detail.Title = strings.TrimSpace(doc.Find("h2.banner__text__title").First().Text())
 	// each field group (label + value) lives in its own sibling
 	// article.article--details element.
-	doc.Find("article.article--details").Each(func(_ int, article *goquery.Selection) {
+	for _, article := range doc.Find("article.article--details").EachIter() {
 		parseDetailArticle(article, &detail)
-	})
+	}
 
 	return detail, detail.Title != ""
 }
@@ -104,7 +104,7 @@ func parseDetailHTML(doc *goquery.Document) (JobDetailResponse, bool) {
 func parseDetailArticle(article *goquery.Selection, detail *JobDetailResponse) {
 	// Collect label-value pairs from field divs, in document order.
 	var label string
-	article.Find("div.article__content__view__field__label, div.article__content__view__field__value").Each(func(_ int, n *goquery.Selection) {
+	for _, n := range article.Find("div.article__content__view__field__label, div.article__content__view__field__value").EachIter() {
 		switch {
 		case n.HasClass("article__content__view__field__label"):
 			label = strings.TrimSpace(n.Text())
@@ -130,18 +130,18 @@ func parseDetailArticle(article *goquery.Selection, detail *JobDetailResponse) {
 			}
 			label = ""
 		}
-	})
+	}
 }
 
 // divChildrenText collects text from <div> children joined by newlines,
 // falling back to full text content if no <div> children exist.
 func divChildrenText(sel *goquery.Selection) string {
 	var parts []string
-	sel.ChildrenFiltered("div").Each(func(_ int, c *goquery.Selection) {
+	for _, c := range sel.ChildrenFiltered("div").EachIter() {
 		if t := strings.TrimSpace(c.Text()); t != "" {
 			parts = append(parts, t)
 		}
-	})
+	}
 	if len(parts) > 0 {
 		return strings.Join(parts, "\n")
 	}

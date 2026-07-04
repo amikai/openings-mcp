@@ -27,11 +27,11 @@ func parseSearchResults(resultsHTML string) (*JobsResponse, error) {
 		result.CurrentPage, _ = strconv.Atoi(section.AttrOr("data-current-page", ""))
 	}
 
-	doc.Find("li.search-results-list__list-item").Each(func(_ int, li *goquery.Selection) {
+	for _, li := range doc.Find("li.search-results-list__list-item").EachIter() {
 		if job, ok := parseJobCard(li); ok {
 			result.Jobs = append(result.Jobs, job)
 		}
-	})
+	}
 
 	return &result, nil
 }
@@ -127,15 +127,15 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 	//   3. rest = job description
 	firstH3Seen := false
 	var descSB strings.Builder
-	atsDesc.Contents().Each(func(_ int, c *goquery.Selection) {
+	for _, c := range atsDesc.Contents().EachIter() {
 		n := c.Nodes[0]
 		if n.Type == html.ElementNode && n.Data == "span" &&
 			strings.Contains(c.AttrOr("class", ""), "job-info") {
-			return
+			continue
 		}
 		if n.Type == html.ElementNode && n.Data == "h3" && !firstH3Seen {
 			firstH3Seen = true
-			c.Find("span").Each(func(_ int, s *goquery.Selection) {
+			for _, s := range c.Find("span").EachIter() {
 				class := s.AttrOr("class", "")
 				text := strings.TrimSpace(s.Text())
 				switch {
@@ -149,11 +149,11 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 					// xq -q "span.job-remote.job-info" --html
 					remoteEligible = strings.TrimSpace(strings.TrimPrefix(text, "Remote Eligible"))
 				}
-			})
-			return
+			}
+			continue
 		}
 		appendNodeText(&descSB, n)
-	})
+	}
 	description = strings.TrimSpace(strings.ReplaceAll(descSB.String(), "\r", ""))
 	return
 }
