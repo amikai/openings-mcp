@@ -4,6 +4,10 @@
   <strong>Search job listings from any MCP client — job boards and company career sites, one server.</strong>
 </p>
 
+<p align="center">
+  <img src="assets/openings_demo.gif" alt="Demo of openings-mcp searching job listings from Claude Code" width="800">
+</p>
+
 **openings-mcp** searches job listings across job boards and company career sites —
 currently **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**,
 **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
