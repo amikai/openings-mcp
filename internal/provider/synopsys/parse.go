@@ -9,91 +9,52 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
 
 func parseSearchResults(resultsHTML string) (*JobsResponse, error) {
-	doc, err := html.Parse(strings.NewReader(resultsHTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(resultsHTML))
 	if err != nil {
 		return nil, err
 	}
 
 	var result JobsResponse
 
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode {
-			switch {
-			case n.Data == "section" && attrVal(n, "id") == "search-results":
-				// xq -q "section#search-results" -a "data-total-results" --html
-				// xq -q "section#search-results" -a "data-total-pages" --html
-				// xq -q "section#search-results" -a "data-current-page" --html
-				result.TotalResults, _ = strconv.Atoi(attrVal(n, "data-total-results"))
-				result.TotalPages, _ = strconv.Atoi(attrVal(n, "data-total-pages"))
-				result.CurrentPage, _ = strconv.Atoi(attrVal(n, "data-current-page"))
+	if section := doc.Find("section#search-results").First(); section.Length() > 0 {
+		result.TotalResults, _ = strconv.Atoi(section.AttrOr("data-total-results", ""))
+		result.TotalPages, _ = strconv.Atoi(section.AttrOr("data-total-pages", ""))
+		result.CurrentPage, _ = strconv.Atoi(section.AttrOr("data-current-page", ""))
+	}
 
-			case n.Data == "li" && strings.Contains(attrVal(n, "class"), "search-results-list__list-item"):
-				// xq -q "li.search-results-list__list-item" --html
-				if job, ok := parseJobCard(n); ok {
-					result.Jobs = append(result.Jobs, job)
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
+	for _, li := range doc.Find("li.search-results-list__list-item").EachIter() {
+		if job, ok := parseJobCard(li); ok {
+			result.Jobs = append(result.Jobs, job)
 		}
 	}
-	walk(doc)
 
 	return &result, nil
 }
 
-func parseJobCard(li *html.Node) (Job, bool) {
+func parseJobCard(li *goquery.Selection) (Job, bool) {
 	var job Job
 
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode {
-			switch n.Data {
-			case "a":
-				if strings.Contains(attrVal(n, "class"), "sr-job-link") {
-					// xq -q "li.search-results-list__list-item a.sr-job-link" -a "href" --html
-					href := attrVal(n, "href")
-					// href = /job/{city}/{slug}/44408/{jobID}
-					parts := strings.Split(strings.TrimPrefix(href, "/job/"), "/")
-					if len(parts) >= 4 {
-						job.City = parts[0]
-						job.Slug = parts[1]
-						job.JobID = parts[3]
-					}
-				}
-			case "h2":
-				// xq -q "li.search-results-list__list-item h2" --html
-				job.Title = strings.TrimSpace(textContent(n))
-			case "span":
-				class := attrVal(n, "class")
-				text := strings.TrimSpace(textContent(n))
-				switch {
-				case class == "job-location":
-					// xq -q "li.search-results-list__list-item span.job-location" --html
-					job.Location = text
-				case class == "category":
-					// xq -q "li.search-results-list__list-item span.category" --html
-					job.Category = strings.TrimSpace(strings.TrimPrefix(text, "Category:"))
-				case class == "job-date-posted":
-					// xq -q "li.search-results-list__list-item span.job-date-posted" --html
-					job.Posted = strings.TrimSpace(strings.TrimPrefix(text, "Posted:"))
-				case class == "jobId":
-					// xq -q "li.search-results-list__list-item span.jobId" --html
-					job.DisplayID = strings.TrimSpace(strings.TrimPrefix(text, "Job ID:"))
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
+	if a := li.Find("a.sr-job-link").First(); a.Length() > 0 {
+		href, _ := a.Attr("href")
+		// href = /job/{city}/{slug}/44408/{jobID}
+		parts := strings.Split(strings.TrimPrefix(href, "/job/"), "/")
+		if len(parts) >= 4 {
+			job.City = parts[0]
+			job.Slug = parts[1]
+			job.JobID = parts[3]
 		}
 	}
-	walk(li)
+
+	job.Title = strings.TrimSpace(li.Find("h2").First().Text())
+	job.Location = strings.TrimSpace(li.Find("span.job-location").First().Text())
+	job.Category = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(li.Find("span.category").First().Text()), "Category:"))
+	job.Posted = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(li.Find("span.job-date-posted").First().Text()), "Posted:"))
+	job.DisplayID = strings.TrimSpace(strings.TrimPrefix(strings.TrimSpace(li.Find("span.jobId").First().Text()), "Job ID:"))
 
 	return job, job.JobID != ""
 }
@@ -149,29 +110,14 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 }
 
 func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description string) {
-	doc, err := html.Parse(bytes.NewReader(body))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
 		return
 	}
 
 	// xq -q "div.ats-description" --html
-	var atsDesc *html.Node
-	var findAts func(*html.Node)
-	findAts = func(n *html.Node) {
-		if atsDesc != nil {
-			return
-		}
-		if n.Type == html.ElementNode && n.Data == "div" &&
-			strings.Contains(attrVal(n, "class"), "ats-description") {
-			atsDesc = n
-			return
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			findAts(c)
-		}
-	}
-	findAts(doc)
-	if atsDesc == nil {
+	atsDesc := doc.Find("div.ats-description").First()
+	if atsDesc.Length() == 0 {
 		return
 	}
 
@@ -181,38 +127,32 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 	//   3. rest = job description
 	firstH3Seen := false
 	var descSB strings.Builder
-	for c := atsDesc.FirstChild; c != nil; c = c.NextSibling {
-		if c.Type == html.ElementNode && c.Data == "span" &&
-			strings.Contains(attrVal(c, "class"), "job-info") {
+	for _, c := range atsDesc.Contents().EachIter() {
+		n := c.Nodes[0]
+		if n.Type == html.ElementNode && n.Data == "span" &&
+			strings.Contains(c.AttrOr("class", ""), "job-info") {
 			continue
 		}
-		if c.Type == html.ElementNode && c.Data == "h3" && !firstH3Seen {
+		if n.Type == html.ElementNode && n.Data == "h3" && !firstH3Seen {
 			firstH3Seen = true
-			var walkH3 func(*html.Node)
-			walkH3 = func(n *html.Node) {
-				if n.Type == html.ElementNode && n.Data == "span" {
-					class := attrVal(n, "class")
-					text := strings.TrimSpace(textContent(n))
-					switch {
-					case strings.Contains(class, "job-category"):
-						// xq -q "span.job-category.job-info" --html
-						category = strings.TrimSpace(strings.TrimPrefix(text, "Category"))
-					case strings.Contains(class, "job-type"):
-						// xq -q "span.job-type.job-info" --html
-						hireType = strings.TrimSpace(strings.TrimPrefix(text, "Hire Type"))
-					case strings.Contains(class, "job-remote"):
-						// xq -q "span.job-remote.job-info" --html
-						remoteEligible = strings.TrimSpace(strings.TrimPrefix(text, "Remote Eligible"))
-					}
-				}
-				for cc := n.FirstChild; cc != nil; cc = cc.NextSibling {
-					walkH3(cc)
+			for _, s := range c.Find("span").EachIter() {
+				class := s.AttrOr("class", "")
+				text := strings.TrimSpace(s.Text())
+				switch {
+				case strings.Contains(class, "job-category"):
+					// xq -q "span.job-category.job-info" --html
+					category = strings.TrimSpace(strings.TrimPrefix(text, "Category"))
+				case strings.Contains(class, "job-type"):
+					// xq -q "span.job-type.job-info" --html
+					hireType = strings.TrimSpace(strings.TrimPrefix(text, "Hire Type"))
+				case strings.Contains(class, "job-remote"):
+					// xq -q "span.job-remote.job-info" --html
+					remoteEligible = strings.TrimSpace(strings.TrimPrefix(text, "Remote Eligible"))
 				}
 			}
-			walkH3(c)
 			continue
 		}
-		appendNodeText(&descSB, c)
+		appendNodeText(&descSB, n)
 	}
 	description = strings.TrimSpace(strings.ReplaceAll(descSB.String(), "\r", ""))
 	return
@@ -243,28 +183,4 @@ func appendNodeText(sb *strings.Builder, n *html.Node) {
 	case "h1", "h2", "h3", "h4", "h5", "p":
 		sb.WriteByte('\n')
 	}
-}
-
-func attrVal(n *html.Node, key string) string {
-	for _, a := range n.Attr {
-		if a.Key == key {
-			return a.Val
-		}
-	}
-	return ""
-}
-
-func textContent(n *html.Node) string {
-	var sb strings.Builder
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.TextNode {
-			sb.WriteString(n.Data)
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
-		}
-	}
-	walk(n)
-	return sb.String()
 }

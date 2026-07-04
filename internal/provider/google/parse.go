@@ -3,81 +3,48 @@ package google
 import (
 	"strings"
 
+	"github.com/PuerkitoBio/goquery"
 	"golang.org/x/net/html"
 )
 
 // parseJobsHTML parses job cards from search results HTML.
-// xq -q "li.lLd3Je" -a "ssk" --html → "18:{jobID}"
-// xq -q "li.lLd3Je h3.QJPWVe" --html → title
-// xq -q "li.lLd3Je span.RP7SMd span" --html → company (inner span, skips icon)
-// xq -q "li.lLd3Je span.r0wTof" --html → primary location (first match)
-// xq -q "li.lLd3Je span.wVSTAb" --html → experience level badge
-// xq -q "li.lLd3Je div.Xsxa1e ul li" --html → minimum qualifications bullets
-func parseJobsHTML(doc *html.Node) []Job {
+func parseJobsHTML(doc *goquery.Document) []Job {
 	var jobs []Job
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "li" && hasClass(n, "lLd3Je") {
-			if job, ok := parseJobCard(n); ok {
-				jobs = append(jobs, job)
-			}
-			return
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
+	for _, li := range doc.Find("li.lLd3Je").EachIter() {
+		if job, ok := parseJobCard(li); ok {
+			jobs = append(jobs, job)
 		}
 	}
-	walk(doc)
 	return jobs
 }
 
-func parseJobCard(li *html.Node) (Job, bool) {
-	ssk := attrVal(li, "ssk")
+func parseJobCard(li *goquery.Selection) (Job, bool) {
+	ssk, _ := li.Attr("ssk")
 	_, id, _ := strings.Cut(ssk, ":")
 	if id == "" {
 		return Job{}, false
 	}
 
-	var title, company, location, experienceLevel string
+	title := strings.TrimSpace(li.Find("h3.QJPWVe").First().Text())
+	if title == "" {
+		return Job{}, false
+	}
+
+	var company string
 	var remote bool
-	var minimumQualifications []string
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode {
-			switch {
-			case n.Data == "h3" && hasClass(n, "QJPWVe"):
-				// xq -q "li.lLd3Je h3.QJPWVe" --html
-				title = strings.TrimSpace(textContent(n))
-				return
-			case n.Data == "span" && hasClass(n, "RP7SMd"):
-				// xq -q "li.lLd3Je span.RP7SMd span" --html; the company badge
-				// comes first, remote jobs add a second "Remote eligible" badge
-				// with the same class.
-				if t := spanChildText(n); t == "Remote eligible" {
-					remote = true
-				} else if company == "" {
-					company = t
-				}
-				return
-			case n.Data == "span" && hasClass(n, "r0wTof") && location == "":
-				// xq -q "li.lLd3Je span.r0wTof" --html (first match = primary location)
-				location = strings.TrimSpace(textContent(n))
-				return
-			case n.Data == "span" && hasClass(n, "wVSTAb"):
-				// xq -q "li.lLd3Je span.wVSTAb" --html
-				experienceLevel = strings.TrimSpace(textContent(n))
-				return
-			case n.Data == "div" && hasClass(n, "Xsxa1e"):
-				// xq -q "li.lLd3Je div.Xsxa1e ul li" --html
-				minimumQualifications = bulletTexts(n)
-				return
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
+	// the company badge comes first, remote jobs add a second "Remote
+	// eligible" badge with the same class.
+	for _, s := range li.Find("span.RP7SMd").EachIter() {
+		if t := spanChildText(s); t == "Remote eligible" {
+			remote = true
+		} else if company == "" {
+			company = t
 		}
 	}
-	walk(li)
+
+	location := strings.TrimSpace(li.Find("span.r0wTof").First().Text())
+	experienceLevel := strings.TrimSpace(li.Find("span.wVSTAb").First().Text())
+	minimumQualifications := bulletTexts(li.Find("div.Xsxa1e").First())
 
 	return Job{
 		ID:                    id,
@@ -87,118 +54,94 @@ func parseJobCard(li *html.Node) (Job, bool) {
 		Remote:                remote,
 		ExperienceLevel:       experienceLevel,
 		MinimumQualifications: minimumQualifications,
-	}, title != ""
+	}, true
 }
 
-// bulletTexts collects the whitespace-normalized text of every <li> under n.
-func bulletTexts(n *html.Node) []string {
+// bulletTexts collects the whitespace-normalized text of every <li> under sel.
+func bulletTexts(sel *goquery.Selection) []string {
 	var bullets []string
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "li" {
-			bullets = append(bullets, strings.Join(strings.Fields(textContent(n)), " "))
-			return
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
-		}
+	for _, li := range sel.Find("li").EachIter() {
+		bullets = append(bullets, strings.Join(strings.Fields(li.Text()), " "))
 	}
-	walk(n)
 	return bullets
 }
 
 // parseJobDetailHTML parses a single job detail page.
-// xq -q "title" --html → title (strip " — Google Careers" suffix)
-// xq -q "main span.RP7SMd span" --html → company (inner span, skips icon)
-// xq -q "main span.r0wTof" --html → location (scoped to <main> to exclude sidebar)
-// xq -q "main div.aG5W3" --html → About the job section
-// xq -q "main div.BDNOWe" --html → Responsibilities section
-// xq -q "h3" --html (matched by text prefix "Minimum/Preferred qualifications") → Qualifications
-func parseJobDetailHTML(doc *html.Node, id string) (*JobDetailResponse, bool) {
+func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, bool) {
 	detail := JobDetailResponse{ID: id}
-	var inMain bool
 
-	var walk func(*html.Node)
-	walk = func(n *html.Node) {
-		if n.Type == html.ElementNode {
-			switch {
-			case n.Data == "title":
-				t := strings.TrimSpace(textContent(n))
-				detail.Title = strings.TrimSuffix(t, " — Google Careers")
-				return
-			case n.Data == "main":
-				inMain = true
-				for c := n.FirstChild; c != nil; c = c.NextSibling {
-					walk(c)
-				}
-				inMain = false
-				return
-			case inMain && n.Data == "span" && hasClass(n, "RP7SMd"):
-				// xq -q "main span.RP7SMd span" --html; the company badge
-				// comes first, remote jobs add a second "Remote eligible"
-				// badge with the same class.
-				if t := spanChildText(n); t == "Remote eligible" {
-					detail.Remote = true
-				} else if detail.Company == "" {
-					detail.Company = t
-				}
-				return
-			case inMain && n.Data == "span" && hasClass(n, "r0wTof") && detail.Location == "":
-				// xq -q "main span.r0wTof" --html
-				detail.Location = strings.TrimSpace(textContent(n))
-				return
-			case inMain && n.Data == "div" && hasClass(n, "aG5W3"):
-				// xq -q "main div.aG5W3" --html
-				var sb strings.Builder
-				for c := n.FirstChild; c != nil; c = c.NextSibling {
-					appendNodeText(&sb, c)
-				}
-				detail.About = strings.TrimSpace(strings.ReplaceAll(sb.String(), "\r", ""))
-				return
-			case inMain && n.Data == "div" && hasClass(n, "BDNOWe"):
-				// xq -q "main div.BDNOWe" --html
-				var sb strings.Builder
-				for c := n.FirstChild; c != nil; c = c.NextSibling {
-					appendNodeText(&sb, c)
-				}
-				detail.Responsibilities = strings.TrimSpace(strings.ReplaceAll(sb.String(), "\r", ""))
-				return
-			case inMain && n.Data == "h3" && detail.Qualifications == "":
-				t := strings.TrimSpace(textContent(n))
-				if strings.HasPrefix(t, "Minimum qualifications") {
-					var sb strings.Builder
-					appendNodeText(&sb, n)
-					for sib := n.NextSibling; sib != nil; sib = sib.NextSibling {
-						if sib.Type == html.ElementNode {
-							if sib.Data == "h3" {
-								qt := strings.TrimSpace(textContent(sib))
-								if strings.HasPrefix(qt, "Preferred qualifications") {
-									appendNodeText(&sb, sib)
-									continue
-								}
-								break
-							}
-							if sib.Data == "div" {
-								break
-							}
-							if sib.Data == "br" {
-								continue
-							}
-						}
-						appendNodeText(&sb, sib)
-					}
-					detail.Qualifications = strings.TrimSpace(sb.String())
-					return
-				}
-			}
-		}
-		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			walk(c)
+	title := strings.TrimSpace(doc.Find("title").First().Text())
+	detail.Title = strings.TrimSuffix(title, " — Google Careers")
+
+	// scoped to <main> to exclude sidebar content.
+	main := doc.Find("main").First()
+
+	// the company badge comes first, remote jobs add a second "Remote
+	// eligible" badge with the same class.
+	for _, s := range main.Find("span.RP7SMd").EachIter() {
+		if t := spanChildText(s); t == "Remote eligible" {
+			detail.Remote = true
+		} else if detail.Company == "" {
+			detail.Company = t
 		}
 	}
-	walk(doc)
+
+	detail.Location = strings.TrimSpace(main.Find("span.r0wTof").First().Text())
+
+	if about := main.Find("div.aG5W3").First(); about.Length() > 0 {
+		var sb strings.Builder
+		for c := about.Nodes[0].FirstChild; c != nil; c = c.NextSibling {
+			appendNodeText(&sb, c)
+		}
+		detail.About = strings.TrimSpace(strings.ReplaceAll(sb.String(), "\r", ""))
+	}
+
+	if resp := main.Find("div.BDNOWe").First(); resp.Length() > 0 {
+		var sb strings.Builder
+		for c := resp.Nodes[0].FirstChild; c != nil; c = c.NextSibling {
+			appendNodeText(&sb, c)
+		}
+		detail.Responsibilities = strings.TrimSpace(strings.ReplaceAll(sb.String(), "\r", ""))
+	}
+
+	for _, h3 := range main.Find("h3").EachIter() {
+		t := strings.TrimSpace(h3.Text())
+		if !strings.HasPrefix(t, "Minimum qualifications") {
+			continue
+		}
+		detail.Qualifications = parseQualifications(h3.Nodes[0])
+		break
+	}
 
 	return &detail, detail.Title != ""
+}
+
+// parseQualifications collects the "Minimum qualifications" heading and, if
+// immediately followed by a "Preferred qualifications" heading, that too —
+// this sibling-order logic isn't expressible as a CSS selector.
+func parseQualifications(h3 *html.Node) string {
+	var sb strings.Builder
+	appendNodeText(&sb, h3)
+	for sib := h3.NextSibling; sib != nil; sib = sib.NextSibling {
+		if sib.Type == html.ElementNode {
+			if sib.Data == "h3" {
+				qt := strings.TrimSpace(textContent(sib))
+				if strings.HasPrefix(qt, "Preferred qualifications") {
+					appendNodeText(&sb, sib)
+					continue
+				}
+				break
+			}
+			if sib.Data == "div" {
+				break
+			}
+			if sib.Data == "br" {
+				continue
+			}
+		}
+		appendNodeText(&sb, sib)
+	}
+	return strings.TrimSpace(sb.String())
 }
 
 func appendNodeText(sb *strings.Builder, n *html.Node) {
@@ -228,28 +171,6 @@ func appendNodeText(sb *strings.Builder, n *html.Node) {
 	}
 }
 
-func hasClass(n *html.Node, cls string) bool {
-	for _, a := range n.Attr {
-		if a.Key == "class" {
-			for _, c := range strings.Fields(a.Val) {
-				if c == cls {
-					return true
-				}
-			}
-		}
-	}
-	return false
-}
-
-func attrVal(n *html.Node, key string) string {
-	for _, a := range n.Attr {
-		if a.Key == key {
-			return a.Val
-		}
-	}
-	return ""
-}
-
 func textContent(n *html.Node) string {
 	var sb strings.Builder
 	var walk func(*html.Node)
@@ -265,11 +186,7 @@ func textContent(n *html.Node) string {
 	return sb.String()
 }
 
-func spanChildText(n *html.Node) string {
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if c.Type == html.ElementNode && c.Data == "span" {
-			return strings.TrimSpace(textContent(c))
-		}
-	}
-	return ""
+// spanChildText returns the text of the first direct <span> child of sel.
+func spanChildText(sel *goquery.Selection) string {
+	return strings.TrimSpace(sel.ChildrenFiltered("span").First().Text())
 }

@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strconv"
 
-	"golang.org/x/net/html"
+	"github.com/PuerkitoBio/goquery"
 )
 
 const (
@@ -207,7 +207,7 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	return &detail, nil
 }
 
-func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Node, error) {
+func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*goquery.Document, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, err
@@ -226,7 +226,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Nod
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	doc, err := html.Parse(resp.Body)
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("parse html: %w", err)
 	}

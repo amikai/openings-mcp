@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
 )
 
 var wantJobs = []Job{
@@ -244,7 +244,7 @@ func TestParseSearchHTML(t *testing.T) {
 	require.NoError(t, err)
 	defer f.Close()
 
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	got := parseJobsHTML(doc)
@@ -263,7 +263,7 @@ func TestParseSearchHTMLRemoteEligible(t *testing.T) {
 <span class="RP7SMd"><i class="google-material-icons">laptop_windows</i><span>Remote eligible</span></span>
 <span class="r0wTof">San Francisco, CA, USA</span>
 </li></ul></body></html>`
-	doc, err := html.Parse(strings.NewReader(cardHTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(cardHTML))
 	require.NoError(t, err)
 
 	got := parseJobsHTML(doc)
@@ -284,7 +284,7 @@ func TestParseDetailHTMLRemoteEligible(t *testing.T) {
 <span class="RP7SMd"><i class="google-material-icons">laptop_windows</i><span>Remote eligible</span></span>
 <span class="r0wTof">San Francisco, CA, USA</span>
 </main></body></html>`
-	doc, err := html.Parse(strings.NewReader(detailHTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(detailHTML))
 	require.NoError(t, err)
 
 	got, ok := parseJobDetailHTML(doc, "123")
@@ -305,7 +305,7 @@ func TestParseDetailHTML(t *testing.T) {
 	require.NoError(t, err)
 	defer f.Close()
 
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	id := "106863362666570438"

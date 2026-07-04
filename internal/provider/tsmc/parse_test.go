@@ -4,9 +4,9 @@ import (
 	"os"
 	"testing"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
 )
 
 var wantJobs = []Job{
@@ -46,7 +46,7 @@ func TestParseSearchHTML(t *testing.T) {
 	f, err := os.Open("testdata/jobs_rsp.html")
 	require.NoError(t, err)
 	defer f.Close()
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	gotJobs, gotTotal := parseSearchHTML(doc)
@@ -58,7 +58,7 @@ func TestParseDetailHTML(t *testing.T) {
 	f, err := os.Open("testdata/job_detail_rsp.html")
 	require.NoError(t, err)
 	defer f.Close()
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	got, ok := parseDetailHTML(doc)

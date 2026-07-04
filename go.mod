@@ -5,6 +5,7 @@ go 1.26.4
 tool github.com/ogen-go/ogen/cmd/ogen
 
 require (
+	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.2.0
 	github.com/google/jsonschema-go v0.4.3
@@ -20,6 +21,7 @@ require (
 )
 
 require (
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/clipperhouse/displaywidth v0.10.0 // indirect
 	github.com/clipperhouse/uax29/v2 v2.6.0 // indirect
