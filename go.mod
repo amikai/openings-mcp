@@ -8,6 +8,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.12.0
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.2.0
+	github.com/goccy/go-yaml v1.19.2
 	github.com/google/jsonschema-go v0.4.3
 	github.com/jaytaylor/html2text v0.0.0-20260303211410-1a4bdc82ecec
 	github.com/modelcontextprotocol/go-sdk v1.6.1
