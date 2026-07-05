@@ -12,9 +12,16 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
+	"golang.org/x/sync/errgroup"
 
 	workday "github.com/amikai/openings-mcp/internal/provider/workday"
 )
+
+// maxConcurrentDetailFetches caps how many job-detail requests runSearch
+// fires at once — fetchJobResult never returns an error, so the only reason
+// to bound it is being a considerate caller of someone else's career site
+// rather than firing --limit-many requests in a single burst.
+const maxConcurrentDetailFetches = 5
 
 func main() {
 	rootFlags := ff.NewFlagSet("workday")
@@ -261,10 +268,16 @@ func runSearch(ctx context.Context, tenant string, timeout time.Duration, search
 		return err
 	}
 
-	results := make([]jobResultJSON, 0, len(search.JobPostings))
-	for _, job := range search.JobPostings {
-		results = append(results, fetchJobResult(ctx, client, baseURL, job))
+	results := make([]jobResultJSON, len(search.JobPostings))
+	g, gCtx := errgroup.WithContext(ctx)
+	g.SetLimit(maxConcurrentDetailFetches)
+	for i, job := range search.JobPostings {
+		g.Go(func() error {
+			results[i] = fetchJobResult(gCtx, client, baseURL, job)
+			return nil
+		})
 	}
+	_ = g.Wait() // fetchJobResult never returns an error; failures land in each result's Error field instead.
 
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
