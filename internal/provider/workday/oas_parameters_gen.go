@@ -16,9 +16,9 @@ import (
 
 // GetJobDetailParams is parameters of getJobDetail operation.
 type GetJobDetailParams struct {
-	// Location slug segment, e.g. `US-CA-Remote`.
+	// Location slug segment.
 	Location string
-	// Title-and-requisition-id segment, e.g. `Software-Engineer_R12345`.
+	// Title-and-requisition-id segment.
 	TitleSlug string
 }
 

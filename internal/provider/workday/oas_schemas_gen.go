@@ -12,13 +12,12 @@ func (s *ErrorResponseStatusCode) Error() string {
 	return fmt.Sprintf("code %d: %+v", s.StatusCode, s.Response)
 }
 
-// One property per facet parameter name, each an array of selected value ids (OR'd within a facet,
-// AND'd across facets). Both the set of facet parameter names and their value ids are tenant-specific
-// and opaque — discover them from a live `JobsResponse.facets` tree rather than assuming any fixed
-// set. Common names observed on NVIDIA's tenant: `jobFamilyGroup`, `workerSubType`, `timeType`,
-// `locationHierarchy1`, `locationHierarchy2`, `locations` — but a different tenant's Workday
-// configuration may name or structure these differently. Omit a property (or leave its array empty) to
-// leave that dimension unfiltered.
+// One property per facet parameter name, each an array of selected value ids. Ids are OR'd within a
+// facet and AND'd across facets. Names and ids are tenant-specific and opaque; discover them from a
+// live `JobsResponse.facets` tree rather than assuming any fixed set (names commonly observed, but not
+// guaranteed: `jobFamilyGroup`, `workerSubType`, `timeType`, `locationHierarchy1`,
+// `locationHierarchy2`, `locations`). Omit a property, or leave its array empty, to leave that
+// dimension unfiltered.
 // Ref: #/components/schemas/AppliedFacets
 type AppliedFacets map[string][]string
 
@@ -31,6 +30,7 @@ func (s *AppliedFacets) init() AppliedFacets {
 	return m
 }
 
+// Best-effort error body; exact fields vary per tenant, so unknown properties are allowed.
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
 	ErrorCode       OptString `json:"errorCode"`
@@ -116,18 +116,17 @@ func (s *ErrorResponseStatusCode) SetResponse(val ErrorResponse) {
 	s.Response = val
 }
 
-// Recursive: a node is either a facet group (has `facetParameter`, optionally `descriptor`, and nested
-// `values`) or a leaf value (has `descriptor`, `id`, and `count`, and no `values`). Top-level entries
-// in `JobsResponse.facets` are groups; `values` may nest further groups (e.g. a `locationMainGroup`
-// wrapping `locationHierarchy2` / `locationHierarchy1` / `locations` sub-groups) before bottoming out
-// at leaves. No fixed depth — walk until a node has no `values`.
+// Recursive. A group has `facetParameter` (and usually `descriptor`) plus nested `values`; a leaf
+// value has `descriptor`, `id`, and `count`, and no `values`. Top-level entries in
+// `JobsResponse.facets` are groups, and groups may nest further groups (e.g. `locationMainGroup`
+// wrapping `locationHierarchy2`, `locationHierarchy1`, and `locations`) before bottoming out at
+// leaves. There is no fixed depth; walk until a node has no `values`.
 // Ref: #/components/schemas/FacetNode
 type FacetNode struct {
-	// Facet parameter name, present on groups; absent on leaf values.
+	// Facet parameter name; present on groups, absent on leaf values.
 	FacetParameter OptString `json:"facetParameter"`
-	// Human-readable label. On a leaf, the selectable value's display name (e.g. "Engineering"); on a
-	// group, its UI section title (e.g. "Locations"). Some top-level groups omit it entirely (observed on
-	// NVIDIA's `locationMainGroup`).
+	// Human-readable label: a value's display name on a leaf, a UI section title on a group. Some
+	// top-level groups omit it entirely (observed on a tenant's `locationMainGroup`).
 	Descriptor OptString `json:"descriptor"`
 	// Opaque tenant-specific GUID; present on leaf values, used in `appliedFacets`.
 	ID OptString `json:"id"`
@@ -295,10 +294,9 @@ func (s *JobPostingInfo) SetExternalUrl(val OptString) {
 	s.ExternalUrl = val
 }
 
-// Observed job listing entries occasionally omit `title`/ `externalPath` entirely, leaving only
-// `bulletFields` — an incomplete/transient posting on Workday's side. Neither field is required;
-// callers should skip entries with an empty `externalPath` rather than assume every entry is
-// fetchable.
+// Entries occasionally arrive incomplete, carrying only `bulletFields` with no `title` or
+// `externalPath` (a transient posting on Workday's side). Neither field is required; skip entries with
+// an empty `externalPath` rather than assuming every entry is fetchable.
 // Ref: #/components/schemas/JobSummary
 type JobSummary struct {
 	Title OptString `json:"title"`
@@ -309,7 +307,7 @@ type JobSummary struct {
 	// Human-readable relative posting date.
 	PostedOn OptString `json:"postedOn"`
 	// Short supplementary strings shown under the title in search results; in practice usually just the
-	// requisition id (e.g. `["JR2003389"]"), but treat as freeform.
+	// requisition id (e.g. `["JR2003389"]`), but treat as freeform.
 	BulletFields []string `json:"bulletFields"`
 }
 
@@ -366,8 +364,8 @@ func (s *JobSummary) SetBulletFields(val []string) {
 // Ref: #/components/schemas/JobsRequest
 type JobsRequest struct {
 	AppliedFacets AppliedFacets `json:"appliedFacets"`
-	// Page size. NVIDIA's tenant caps this at 20 (HTTP 400 above it); treat the cap as tenant-specific
-	// rather than a platform constant.
+	// Page size. At least one tenant caps this at 20 (HTTP 400 above it); treat the cap as
+	// tenant-specific.
 	Limit int `json:"limit"`
 	// Zero-based result offset for pagination.
 	Offset int `json:"offset"`
@@ -417,15 +415,16 @@ func (s *JobsRequest) SetSearchText(val string) {
 
 // Ref: #/components/schemas/JobsResponse
 type JobsResponse struct {
-	// Total matching job count. Observed capped at 2000 on NVIDIA's tenant when unfiltered; exact once a
-	// filter narrows the set — verify the cap per tenant.
+	// Total matching job count. Observed capped at 2000 on at least one tenant when unfiltered and exact
+	// once a filter narrows the set; verify the cap per tenant.
 	Total       int          `json:"total"`
 	JobPostings []JobSummary `json:"jobPostings"`
-	// The tenant's complete, current facet tree with live counts. Present on every response, including an
-	// unfiltered search — this is the primary way to discover a tenant's filter vocabulary without
-	// hardcoding it. Confirmed present on NVIDIA's tenant, but deliberately not marked `required` and
-	// nullable so a tenant that omits it (or sends `facets: null`) still decodes rather than failing the
-	// whole search.
+	// The facet tree for the current query, with live counts. It narrows along with `jobPostings`:
+	// `searchText` narrows it as much as an `appliedFacets` filter does, so it is only the tenant's
+	// complete facet tree when both `appliedFacets` and `searchText` are empty. Present on every observed
+	// response, and the primary way to discover the filter vocabulary when read from such an unfiltered
+	// search. It is deliberately optional and nullable so a tenant that omits it (or sends `facets: null`)
+	// still decodes rather than failing the whole search.
 	Facets OptNilFacetNodeArray `json:"facets"`
 }
 

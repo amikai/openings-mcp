@@ -1,75 +1,73 @@
 openapi: 3.1.0
 
 info:
-  title: Workday CXS (Candidate Experience) Career Site API — Generic Reference
+  title: Workday CXS (Candidate Experience) Career Site API
   version: "1.0.0"
   description: >
-    Tenant-agnostic description of the Workday CXS job-search API that powers
-    "myworkdayjobs.com" career sites. This is not one company's provider —
-    it documents the contract shared across Workday tenants, derived from
-    reverse-engineering NVIDIA's career site (see ../nvidia/openapi.yaml) and
-    confirmed live against `nvidia.wd5.myworkdayjobs.com` (empty-search POST
-    to `/jobs`, 2026-07-05).
+    Workday is a multi-tenant platform used by many companies to power
+    their career sites. Each company has its own tenant, Workday instance,
+    and site identifier, so the client can construct the target company's
+    base URL at runtime and query job data through the same shared API
+    contract, documented here. 
+
+    OpenAPI requires a default value for each variable in the server URL
+    template, so the defaults are set to Workday's own careers site, which is
+    stable and always on.
 
     ## Multi-tenant URL shape
 
-    Every Workday CXS site follows:
-    `https://{tenant}.{wdInstance}.myworkdayjobs.com/wday/cxs/{tenant}/{site}`
+    A company's public careers site and its CXS API share one host and one
+    trailing `{site}` segment: the public site is
+    `https://{tenant}.{wdInstance}.myworkdayjobs.com/{site}` and the API
+    base is
+    `https://{tenant}.{wdInstance}.myworkdayjobs.com/wday/cxs/{tenant}/{site}`.
+    Read all three variables off the public careers URL; `{wdInstance}`
+    (the Workday pod, e.g. `wd1` or `wd5`) varies per company and is not
+    derivable from the tenant name.
 
-    - `tenant` — the company's Workday tenant slug (e.g. `nvidia`).
-    - `wdInstance` — a per-tenant Workday pod, e.g. `wd5` (varies by company;
-      not derivable from the tenant name, read it off the company's public
-      careers URL).
-    - `site` — the external career site name configured by that tenant
-      (e.g. `NVIDIAExternalCareerSite`); one Workday tenant can expose
-      multiple sites.
+    ## Facets are tenant-specific, and narrow with the query
 
-    Because the base URL is entirely tenant-specific, a generated client
-    from this spec must take `serverURL` as a runtime parameter (ogen's
-    `NewClient(serverURL string, ...)` already does this) — do not hardcode
-    a `servers:` entry's host for any tenant other than the illustrative
-    example below.
+    `appliedFacets` maps each facet parameter name to an array of opaque
+    Workday GUIDs. Both the parameter names and the GUIDs behind each
+    value are configured per tenant, so none of it is portable across
+    companies. Every `POST /jobs` response carries a `facets` field with
+    live counts for the current query.
 
-    ## Facets are tenant-specific and self-describing
+    That tree is scoped to the current query, not a static per-tenant
+    list: `searchText` narrows it just as much as `appliedFacets` does.
+    To discover a tenant's full facet vocabulary, both fields have to be empty
+    at once: `{appliedFacets: {}, searchText: "", limit: 1, offset: 0}`.
 
-    `appliedFacets` filters by facet-parameter-name → array of opaque
-    Workday GUIDs. Both the set of facet parameter names (`jobFamilyGroup`,
-    `workerSubType`, `timeType`, `locationHierarchy1`, `locationHierarchy2`,
-    `locations`, ...) and the GUIDs behind each value are configured per
-    tenant — nothing here is portable across companies, and nothing needs
-    to be: **every `POST /jobs` response includes a `facets` field with the
-    complete, current facet tree, including on a fully empty/unfiltered
-    search.** A single unfiltered request (`{appliedFacets: {}, searchText:
-    "", limit: 1, offset: 0}`) is therefore enough to discover a tenant's
-    entire filter vocabulary (all categories, all countries, all city-level
-    sites, with live counts) — no pagination or per-branch drill-down
-    requests are needed. Confirmed live on NVIDIA: one empty-search POST
-    returned 4 top-level facet groups, including a `locationMainGroup` that
-    nested 2 location types, 34 countries, and 121 city-level sites, each
-    with a resolvable `id` and a live `count`.
-
-    Facet nodes are recursive (see `FacetNode` below): a node is either a
-    *value* (`descriptor` + `id` + `count`, selectable and used in
-    `appliedFacets`) or a *group* (`facetParameter` + optional `descriptor`
-    + nested `values`, itself containing more nodes). Don't assume a fixed
-    depth — `jobFamilyGroup`/`workerSubType`/`timeType` are flat (values are
-    leaves directly), while `locationMainGroup` wraps three nested facets.
+    Facet nodes are recursive (see `FacetNode`): a node is either a leaf
+    value (`descriptor` + `id` + `count`, usable in `appliedFacets`) or a
+    group (`facetParameter` + nested `values`). Depth varies per facet:
+    `jobFamilyGroup`, `workerSubType`, and `timeType` have been observed
+    flat, while `locationMainGroup` nested location types, countries, and
+    city-level sites. Walk until a node has no `values`.
 
     ## Pagination and errors
 
-    `limit`/`offset` paginate `jobPostings`; `total` reports the match
-    count, capped at 2000 by at least the NVIDIA tenant when unfiltered
-    (exact once a filter narrows the set — verify the cap per tenant, it
-    may not be a platform-wide constant). The API is reverse-engineered per
-    tenant, so exact error codes aren't guaranteed portable; 400 has been
-    observed for both a too-high `limit` and an unknown facet id.
+    `limit`/`offset` paginate `jobPostings`. `total` reports the match
+    count; it was observed capped at 2000 on at least one tenant when
+    unfiltered and exact once a filter narrows the set, so treat the cap
+    as tenant-specific rather than a platform constant. Error shapes and
+    codes are likewise not guaranteed portable; 400 has been observed both
+    for a too-high `limit` and for an unknown facet id.
 
 servers:
-  - url: https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite
-    description: >
-      Illustrative example only (NVIDIA's tenant) — every other tenant has a
-      different host and path. Always construct `serverURL` per company at
-      runtime rather than relying on this default.
+  - url: https://{tenant}.{wdInstance}.myworkdayjobs.com/wday/cxs/{tenant}/{site}
+    variables:
+      tenant: { default: workday, description: Company's Workday tenant slug }
+      wdInstance:
+        {
+          default: wd5,
+          description: Workday pod. Varies per company and is not derivable from the tenant name; read it off the company's careers URL.,
+        }
+      site:
+        {
+          default: Workday,
+          description: "Career site name, e.g. `ExternalCareerSite`",
+        }
 
 tags:
   - name: Jobs
@@ -82,14 +80,13 @@ paths:
       summary: Search / filter / paginate jobs
       description: >
         Searches jobs by keyword and/or facet filters, paginated via
-        `limit`/`offset`. All four body fields are required by the API even
-        when unused — send `{}` for `appliedFacets` and `""` for
-        `searchText`. The response's `facets` field is present on every
-        call, filtered search or not, and is the authoritative source for a
-        tenant's current facet parameter names, value ids, and labels —
-        prefer reading it live over hardcoding values (see NVIDIA's
-        `facets.go` for what hardcoded seed values look like, and why they
-        need periodic revalidation).
+        `limit`/`offset`. All four body fields are required even when
+        unused.
+
+        The response's `facets` tree is scoped to the current query:
+        `searchText` narrows it as much as `appliedFacets` does. To
+        discover a tenant's full facet vocabulary, send both empty
+        (`{}` for `appliedFacets`, `""` for `searchText`) with `limit: 1`.
       operationId: searchJobs
       requestBody:
         required: true
@@ -99,7 +96,7 @@ paths:
               $ref: "#/components/schemas/JobsRequest"
             examples:
               discoverFacets:
-                summary: Unfiltered search — discover the tenant's full facet tree
+                summary: Unfiltered search that discovers the tenant's full facet tree
                 value:
                   appliedFacets: {}
                   limit: 1
@@ -129,10 +126,9 @@ paths:
                 $ref: "#/components/schemas/JobsResponse"
         default:
           description: >
-            Any non-200 status. Error shape and codes are reverse-engineered
-            and not guaranteed identical across tenants; 400 has been
-            observed for a `limit` above the tenant's cap or an unknown
-            facet parameter/value id.
+            Any non-200 status. Error shape and codes are not guaranteed
+            identical across tenants; 400 has been observed for a `limit`
+            above the tenant's cap or an unknown facet parameter/value id.
           content:
             application/json:
               schema:
@@ -143,29 +139,27 @@ paths:
       tags: [Jobs]
       summary: Get job detail
       description: >
-        Fetches a single job posting. `externalPath` returned from the
-        search endpoint has the form `/job/{location}/{titleSlug}` (exactly
-        two segments after `/job/`); split on the first `/` to get these two
-        path parameters — a single combined path parameter fails because
-        standard URI encoders percent-encode the `/` inside it, producing a
-        URL the server rejects. This is a platform routing detail, not
-        NVIDIA-specific; directly confirmed against NVIDIA's and Trend
-        Micro's tenants (including Trend Micro's "XMLNAME-" titleSlugs,
-        Workday's naming for titles that start with a non-letter — see
-        testdata/trendmicro_*.sh).
+        Fetches a single job posting. `externalPath` from the search
+        response has the form `/job/{location}/{titleSlug}`, with exactly
+        two segments after `/job/`. Split it on the first `/` and pass the
+        parts as separate path parameters: a single combined parameter
+        fails because standard URI encoders percent-encode its embedded
+        `/`, producing a URL the server rejects. This routing detail holds
+        across tenants, including `XMLNAME-` titleSlugs, Workday's naming
+        for titles that start with a non-letter.
       operationId: getJobDetail
       parameters:
         - name: location
           in: path
           required: true
-          description: Location slug segment, e.g. `US-CA-Remote`.
+          description: Location slug segment.
           schema:
             type: string
           example: "US-CA-Remote"
         - name: titleSlug
           in: path
           required: true
-          description: Title-and-requisition-id segment, e.g. `Software-Engineer_R12345`.
+          description: Title-and-requisition-id segment
           schema:
             type: string
           example: "Software-Engineer_R12345"
@@ -195,8 +189,8 @@ components:
           type: integer
           minimum: 1
           description: >
-            Page size. NVIDIA's tenant caps this at 20 (HTTP 400 above it);
-            treat the cap as tenant-specific rather than a platform constant.
+            Page size. At least one tenant caps this at 20 (HTTP 400
+            above it); treat the cap as tenant-specific.
           example: 20
         offset:
           type: integer
@@ -212,15 +206,13 @@ components:
       type: object
       description: >
         One property per facet parameter name, each an array of selected
-        value ids (OR'd within a facet, AND'd across facets). Both the set
-        of facet parameter names and their value ids are tenant-specific and
-        opaque — discover them from a live `JobsResponse.facets` tree rather
-        than assuming any fixed set. Common names observed on NVIDIA's
-        tenant: `jobFamilyGroup`, `workerSubType`, `timeType`,
-        `locationHierarchy1`, `locationHierarchy2`, `locations` — but a
-        different tenant's Workday configuration may name or structure these
-        differently. Omit a property (or leave its array empty) to leave
-        that dimension unfiltered.
+        value ids. Ids are OR'd within a facet and AND'd across facets.
+        Names and ids are tenant-specific and opaque; discover them from a
+        live `JobsResponse.facets` tree rather than assuming any fixed set
+        (names commonly observed, but not guaranteed: `jobFamilyGroup`,
+        `workerSubType`, `timeType`, `locationHierarchy1`,
+        `locationHierarchy2`, `locations`). Omit a property, or leave its
+        array empty, to leave that dimension unfiltered.
       additionalProperties:
         type: array
         items:
@@ -233,50 +225,55 @@ components:
         total:
           type: integer
           description: >
-            Total matching job count. Observed capped at 2000 on NVIDIA's
-            tenant when unfiltered; exact once a filter narrows the set —
-            verify the cap per tenant.
+            Total matching job count. Observed capped at 2000 on at least
+            one tenant when unfiltered and exact once a filter narrows the
+            set; verify the cap per tenant.
           example: 508
         jobPostings:
           type: array
           items:
             $ref: "#/components/schemas/JobSummary"
         facets:
+          # `nullable` is the OAS 3.0 keyword, kept because ogen (v1.22)
+          # rejects the 3.1-style `type: [array, "null"]` union.
           type: array
           nullable: true
           description: >
-            The tenant's complete, current facet tree with live counts.
-            Present on every response, including an unfiltered search —
-            this is the primary way to discover a tenant's filter
-            vocabulary without hardcoding it. Confirmed present on NVIDIA's
-            tenant, but deliberately not marked `required` and nullable so
-            a tenant that omits it (or sends `facets: null`) still decodes
-            rather than failing the whole search.
+            The facet tree for the current query, with live counts. It
+            narrows along with `jobPostings`: `searchText` narrows it as
+            much as an `appliedFacets` filter does, so it is only the
+            tenant's complete facet tree when both `appliedFacets` and
+            `searchText` are empty. Present on every observed response,
+            and the primary way to discover the filter vocabulary when
+            read from such an unfiltered search. It is deliberately
+            optional and nullable so a tenant that omits it (or sends
+            `facets: null`) still decodes rather than failing the whole
+            search.
           items:
             $ref: "#/components/schemas/FacetNode"
 
     FacetNode:
       type: object
       description: >
-        Recursive: a node is either a *facet group* (has `facetParameter`,
-        optionally `descriptor`, and nested `values`) or a *leaf value* (has
-        `descriptor`, `id`, and `count`, and no `values`). Top-level entries
-        in `JobsResponse.facets` are groups; `values` may nest further
-        groups (e.g. a `locationMainGroup` wrapping `locationHierarchy2` /
-        `locationHierarchy1` / `locations` sub-groups) before bottoming out
-        at leaves. No fixed depth — walk until a node has no `values`.
+        Recursive. A group has `facetParameter` (and usually `descriptor`)
+        plus nested `values`; a leaf value has `descriptor`, `id`, and
+        `count`, and no `values`. Top-level entries in
+        `JobsResponse.facets` are groups, and groups may nest further
+        groups (e.g. `locationMainGroup` wrapping `locationHierarchy2`,
+        `locationHierarchy1`, and `locations`) before bottoming out at
+        leaves. There is no fixed depth; walk until a node has no
+        `values`.
       properties:
         facetParameter:
           type: string
-          description: Facet parameter name, present on groups; absent on leaf values.
+          description: Facet parameter name; present on groups, absent on leaf values.
           example: "jobFamilyGroup"
         descriptor:
           type: string
           description: >
-            Human-readable label. On a leaf, the selectable value's display
-            name (e.g. "Engineering"); on a group, its UI section title
-            (e.g. "Locations"). Some top-level groups omit it entirely
-            (observed on NVIDIA's `locationMainGroup`).
+            Human-readable label: a value's display name on a leaf, a UI
+            section title on a group. Some top-level groups omit it
+            entirely (observed on a tenant's `locationMainGroup`).
           example: "Engineering"
         id:
           type: string
@@ -295,11 +292,11 @@ components:
     JobSummary:
       type: object
       description: >
-        Observed job listing entries occasionally omit `title`/
-        `externalPath` entirely, leaving only `bulletFields` — an
-        incomplete/transient posting on Workday's side. Neither field is
-        required; callers should skip entries with an empty `externalPath`
-        rather than assume every entry is fetchable.
+        Entries occasionally arrive incomplete, carrying only
+        `bulletFields` with no `title` or `externalPath` (a transient
+        posting on Workday's side). Neither field is required; skip
+        entries with an empty `externalPath` rather than assuming every
+        entry is fetchable.
       properties:
         title:
           type: string
@@ -321,7 +318,7 @@ components:
           description: >
             Short supplementary strings shown under the title in search
             results; in practice usually just the requisition id (e.g.
-            `["JR2003389"]"), but treat as freeform.
+            `["JR2003389"]`), but treat as freeform.
           items:
             type: string
 
@@ -363,6 +360,9 @@ components:
 
     ErrorResponse:
       type: object
+      description: >
+        Best-effort error body; exact fields vary per tenant, so unknown
+        properties are allowed.
       properties:
         errorCode:
           type: string

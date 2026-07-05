@@ -11,11 +11,11 @@ import (
 // segments GetJobDetail expects. The API rejects a single combined path
 // parameter because standard URI encoders escape the "/" between them.
 //
-// Only the exact "/job/{location}/{titleSlug}" shape is accepted; anything
-// else — missing "/job/" prefix, an empty segment, or extra path segments
-// (whose "/" a URI encoder would percent-encode into a shape the server
-// rejects) — returns ok=false so callers can take their fallback path
-// instead of issuing a request that is guaranteed to fail.
+// It only accepts the exact "/job/{location}/{titleSlug}" shape, and
+// returns ok=false for anything else: a missing "/job/" prefix, an empty
+// segment, or extra path segments, whose "/" a URI encoder would
+// percent-encode into a shape the server rejects. Callers can then fall
+// back instead of sending a request that's guaranteed to fail.
 func SplitExternalPath(externalPath string) (location, titleSlug string, ok bool) {
 	rest, found := strings.CutPrefix(externalPath, "/job/")
 	if !found {
@@ -29,14 +29,12 @@ func SplitExternalPath(externalPath string) (location, titleSlug string, ok bool
 }
 
 // PublicSiteURL derives a Workday tenant's public-facing (non-API) career
-// site origin from its CXS base URL, by taking the base URL's last path
-// segment — the "{site}" segment shared by both URL shapes (see
+// site origin from its CXS base URL. It takes the base URL's last path
+// segment, the "{site}" segment shared by both URL shapes (see
 // openapi.yaml's "Multi-tenant URL shape" note). For example:
 //
 //	https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite
 //	  -> https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
-//
-// Confirmed against NVIDIA's and Trend Micro's tenants.
 func PublicSiteURL(baseURL string) (string, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {

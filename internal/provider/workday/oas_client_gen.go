@@ -30,24 +30,21 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// GetJobDetail invokes getJobDetail operation.
 	//
-	// Fetches a single job posting. `externalPath` returned from the search endpoint has the form
-	// `/job/{location}/{titleSlug}` (exactly two segments after `/job/`); split on the first `/` to get
-	// these two path parameters — a single combined path parameter fails because standard URI encoders
-	// percent-encode the `/` inside it, producing a URL the server rejects. This is a platform routing
-	// detail, not NVIDIA-specific; directly confirmed against NVIDIA's and Trend Micro's tenants
-	// (including Trend Micro's "XMLNAME-" titleSlugs, Workday's naming for titles that start with a
-	// non-letter — see testdata/trendmicro_*.sh).
+	// Fetches a single job posting. `externalPath` from the search response has the form
+	// `/job/{location}/{titleSlug}`, with exactly two segments after `/job/`. Split it on the first `/`
+	// and pass the parts as separate path parameters: a single combined parameter fails because standard
+	// URI encoders percent-encode its embedded `/`, producing a URL the server rejects. This routing
+	// detail holds across tenants, including `XMLNAME-` titleSlugs, Workday's naming for titles that start
+	// with a non-letter.
 	//
 	// GET /job/{location}/{titleSlug}
 	GetJobDetail(ctx context.Context, params GetJobDetailParams) (*JobDetailResponse, error)
 	// SearchJobs invokes searchJobs operation.
 	//
 	// Searches jobs by keyword and/or facet filters, paginated via `limit`/`offset`. All four body fields
-	// are required by the API even when unused — send `{}` for `appliedFacets` and `""` for
-	// `searchText`. The response's `facets` field is present on every call, filtered search or not, and is
-	// the authoritative source for a tenant's current facet parameter names, value ids, and labels —
-	// prefer reading it live over hardcoding values (see NVIDIA's `facets.go` for what hardcoded seed
-	// values look like, and why they need periodic revalidation).
+	// are required even when unused. The response's `facets` tree is scoped to the current query:
+	// `searchText` narrows it as much as `appliedFacets` does. To discover a tenant's full facet
+	// vocabulary, send both empty (`{}` for `appliedFacets`, `""` for `searchText`) with `limit: 1`.
 	//
 	// POST /jobs
 	SearchJobs(ctx context.Context, request *JobsRequest) (*JobsResponse, error)
@@ -94,13 +91,12 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // GetJobDetail invokes getJobDetail operation.
 //
-// Fetches a single job posting. `externalPath` returned from the search endpoint has the form
-// `/job/{location}/{titleSlug}` (exactly two segments after `/job/`); split on the first `/` to get
-// these two path parameters — a single combined path parameter fails because standard URI encoders
-// percent-encode the `/` inside it, producing a URL the server rejects. This is a platform routing
-// detail, not NVIDIA-specific; directly confirmed against NVIDIA's and Trend Micro's tenants
-// (including Trend Micro's "XMLNAME-" titleSlugs, Workday's naming for titles that start with a
-// non-letter — see testdata/trendmicro_*.sh).
+// Fetches a single job posting. `externalPath` from the search response has the form
+// `/job/{location}/{titleSlug}`, with exactly two segments after `/job/`. Split it on the first `/`
+// and pass the parts as separate path parameters: a single combined parameter fails because standard
+// URI encoders percent-encode its embedded `/`, producing a URL the server rejects. This routing
+// detail holds across tenants, including `XMLNAME-` titleSlugs, Workday's naming for titles that start
+// with a non-letter.
 //
 // GET /job/{location}/{titleSlug}
 func (c *Client) GetJobDetail(ctx context.Context, params GetJobDetailParams) (*JobDetailResponse, error) {
@@ -218,11 +214,9 @@ func (c *Client) sendGetJobDetail(ctx context.Context, params GetJobDetailParams
 // SearchJobs invokes searchJobs operation.
 //
 // Searches jobs by keyword and/or facet filters, paginated via `limit`/`offset`. All four body fields
-// are required by the API even when unused — send `{}` for `appliedFacets` and `""` for
-// `searchText`. The response's `facets` field is present on every call, filtered search or not, and is
-// the authoritative source for a tenant's current facet parameter names, value ids, and labels —
-// prefer reading it live over hardcoding values (see NVIDIA's `facets.go` for what hardcoded seed
-// values look like, and why they need periodic revalidation).
+// are required even when unused. The response's `facets` tree is scoped to the current query:
+// `searchText` narrows it as much as `appliedFacets` does. To discover a tenant's full facet
+// vocabulary, send both empty (`{}` for `appliedFacets`, `""` for `searchText`) with `limit: 1`.
 //
 // POST /jobs
 func (c *Client) SearchJobs(ctx context.Context, request *JobsRequest) (*JobsResponse, error) {
