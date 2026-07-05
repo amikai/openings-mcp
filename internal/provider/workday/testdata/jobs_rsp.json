@@ -1,0 +1,37 @@
+{
+  "total": 2,
+  "jobPostings": [
+    {
+      "title": "Backend Engineer",
+      "externalPath": "/job/US-CA-Remote/Backend-Engineer_REQ001",
+      "locationsText": "Remote",
+      "postedOn": "Posted Today",
+      "bulletFields": ["REQ001"]
+    },
+    {
+      "bulletFields": ["REQ002"]
+    }
+  ],
+  "facets": [
+    {
+      "facetParameter": "jobFamilyGroup",
+      "descriptor": "Job Category",
+      "values": [
+        { "descriptor": "Engineering", "id": "cat-eng-id", "count": 1 },
+        { "descriptor": "Sales", "id": "cat-sales-id", "count": 1 }
+      ]
+    },
+    {
+      "facetParameter": "locationMainGroup",
+      "values": [
+        {
+          "facetParameter": "locationHierarchy1",
+          "descriptor": "Locations",
+          "values": [
+            { "descriptor": "United States", "id": "country-us-id", "count": 2 }
+          ]
+        }
+      ]
+    }
+  ]
+}
