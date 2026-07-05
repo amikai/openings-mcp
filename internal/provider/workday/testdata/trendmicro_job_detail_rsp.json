@@ -1,0 +1,36 @@
+{
+  "jobPostingInfo": {
+    "id": "1cb59210e27310013b6191733dac0000",
+    "title": "(Sr.) Backend Engineer",
+    "jobDescription": "<p style=\"text-align:left\"><b>Join Trend ‧ Join New Generation</b></p><p style=\"text-align:inherit\"></p><p style=\"text-align:left\"><b>趨勢科技 - 全球雲端資安領航者 / 全亞洲最大軟體公司 / 企業版圖橫跨五大洲 / 趨勢全球研發基地在台灣 </b><br /><span><span><span><span><span class=\"WL01\">&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span></span></span></p><p>Trend Micro Vision One is a purpose-built threat defense platform that provides added value and new benefits beyond XDR (Extended Detection and Response) solutions, allowing customer to see more and respond faster. Vision One providing deep and broad extended detection and response capabilities that collect and automatically correlate data across multiple security layers—email, endpoints, servers, cloud workloads, and networks—Trend Micro Vision One prevents the majority of attacks with automated protection.</p><p>The objective of TW Engineering Group is to provide the best endpoint security solution to help customers, from small &amp; medium businesses to vary large enterprises, conquer cybersecurity challenges effectively and efficiently. Every partner within Group 1 will have opportunity to join diverse squad team and demonstrate his/her expertise and enthusiasm to make customer success in their business without cyber threat. Along this journey, we are looking for partners with not only exceptional engineering expertise, but also great curiosity and customer empathy, so we can learn from customer behavior and create business impact together.<br /><br /> </p><p><b>Responsibilities &#xff1a;</b></p><ul><li>Co-work with other teams to design, develop, &amp; operate scalable backend services to support endpoint security and peripheral use cases on public clouds (AWS, Azure, …etc.)</li><li>Design &amp; implement ways to measure and validate the quality of customer experience we deliver</li><li>Analyze &amp; resolve customer problems by listening to data and customer feedbacks</li><li>Identify and report defects, working closely with development teams to resolve issues promptly</li><li>Perform tasks and projects as assigned.</li><li>Document solutions for knowledge sharing within the team.</li></ul><p><b>BASIC QUALIFICATIONS</b></p><ul><li>Bachelor degree or higher in computer science or related fields</li><li>Strong programming skill with any of: Java or Go</li><li>Cloud Application development and debugging experience on AWS or Azure</li><li>Proactive, self-motivated and good teamwork</li><li>Good English communication skill</li></ul><p><b>BIG PLUS</b></p><ul><li>Cloud Application development on container technologies, such as Docker and Kubernetes.</li><li>Have experience with any of: PostgreSQL, MySQL, Redis, MongoDB, Elastic Search, Kibana, or Terraform</li></ul><p><b>Would be a plus</b></p><ul><li>Knowledge in enterprise design/integration pattern</li><li>Experience in the cybersecurity fields</li></ul><p></p><p>#LI-YJ1</p><p><span><span><span>&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span><br /><i>連結智慧 守護世界 --- Connected Intelligence for Securing a Connected World</i></p>",
+    "location": "Taipei",
+    "postedOn": "Posted 30+ Days Ago",
+    "startDate": "2024-05-29",
+    "timeType": "Full time",
+    "jobReqId": "R0006260",
+    "jobPostingId": "XMLNAME--Sr--Backend-Engineer_R0006260-1",
+    "jobPostingSiteId": "External",
+    "country": {
+      "descriptor": "Taiwan",
+      "id": "a4e08b475d6a4176853c9d1cb9854e02"
+    },
+    "canApply": true,
+    "posted": true,
+    "includeResumeParsing": true,
+    "jobRequisitionLocation": {
+      "descriptor": "Taipei",
+      "country": {
+        "descriptor": "Taiwan",
+        "id": "a4e08b475d6a4176853c9d1cb9854e02",
+        "alpha2Code": "TW"
+      }
+    },
+    "externalUrl": "https://trendmicro.wd3.myworkdayjobs.com/External/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1"
+  },
+  "hiringOrganization": {
+    "name": "TWT Trend Micro Incorporated",
+    "url": ""
+  },
+  "similarJobs": [],
+  "userAuthenticated": false
+}

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -156,4 +157,62 @@ func TestGetJobDetail(t *testing.T) {
 	}
 
 	assert.Equal(t, want, detail)
+}
+
+// TestSecondTenantFixtures decodes real captures from a second tenant
+// (Trend Micro: wd3 pod, site "External" — see testdata/trendmicro_*.sh)
+// to guard the contract's tenant-agnostic claim beyond NVIDIA. The detail
+// fixture deliberately uses one of Workday's "XMLNAME-" titleSlugs
+// (generated when a job title starts with a non-letter, here
+// "(Sr.) Backend Engineer"), pinning that platform quirk end to end:
+// the search result's externalPath splits into the exact segments the
+// detail endpoint then serves.
+func TestSecondTenantFixtures(t *testing.T) {
+	jobsRsp, err := os.ReadFile("testdata/trendmicro_jobs_rsp.json")
+	require.NoError(t, err)
+	detailRsp, err := os.ReadFile("testdata/trendmicro_job_detail_rsp.json")
+	require.NoError(t, err)
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/jobs", serveMockJSON(jobsRsp))
+	mux.HandleFunc("/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1", serveMockJSON(detailRsp))
+	srv := httptest.NewServer(mux)
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+
+	search, err := client.SearchJobs(context.Background(), &JobsRequest{
+		AppliedFacets: AppliedFacets{},
+		Limit:         5,
+		Offset:        0,
+		SearchText:    "backend engineer",
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 42, search.Total)
+	require.Len(t, search.JobPostings, 5)
+
+	externalPath := search.JobPostings[0].ExternalPath.Value
+	assert.Equal(t, "/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1", externalPath)
+	facets, ok := search.Facets.Get()
+	assert.True(t, ok)
+	assert.NotEmpty(t, facets)
+
+	location, titleSlug, ok := SplitExternalPath(externalPath)
+	require.True(t, ok)
+	assert.Equal(t, "Taipei", location)
+	assert.Equal(t, "XMLNAME--Sr--Backend-Engineer_R0006260-1", titleSlug)
+
+	detail, err := client.GetJobDetail(context.Background(), GetJobDetailParams{
+		Location:  location,
+		TitleSlug: titleSlug,
+	})
+	require.NoError(t, err)
+	info := detail.JobPostingInfo
+	assert.Equal(t, "(Sr.) Backend Engineer", info.Title)
+	assert.Equal(t, NewOptString("R0006260"), info.JobReqId)
+	assert.Equal(t,
+		NewOptString("https://trendmicro.wd3.myworkdayjobs.com/External/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1"),
+		info.ExternalUrl)
+	assert.NotEmpty(t, info.JobDescription)
 }

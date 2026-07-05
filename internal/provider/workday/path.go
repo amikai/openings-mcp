@@ -36,7 +36,7 @@ func SplitExternalPath(externalPath string) (location, titleSlug string, ok bool
 //	https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite
 //	  -> https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite
 //
-// Confirmed against NVIDIA's tenant; not verified against any other.
+// Confirmed against NVIDIA's and Trend Micro's tenants.
 func PublicSiteURL(baseURL string) (string, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {

@@ -1,0 +1,127 @@
+{
+  "total": 42,
+  "jobPostings": [
+    {
+      "title": "(Sr.) Backend Engineer",
+      "externalPath": "/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1",
+      "locationsText": "Taipei",
+      "postedOn": "Posted 30+ Days Ago",
+      "bulletFields": [
+        "R0006260"
+      ]
+    },
+    {
+      "title": "(Sr.) Backend Engineer",
+      "externalPath": "/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0009324",
+      "locationsText": "Taipei",
+      "postedOn": "Posted 30+ Days Ago",
+      "bulletFields": [
+        "R0009324"
+      ]
+    },
+    {
+      "title": "Sr. Backend Engineer (IIA)",
+      "externalPath": "/job/Taipei/Sr-Backend-Engineer--IIA-_R0009294",
+      "locationsText": "Taipei",
+      "postedOn": "Posted 30+ Days Ago",
+      "bulletFields": [
+        "R0009294"
+      ]
+    },
+    {
+      "title": "(Sr.) Applied AI Backend Engineer",
+      "externalPath": "/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0007813",
+      "locationsText": "Taipei",
+      "postedOn": "Posted 30+ Days Ago",
+      "bulletFields": [
+        "R0007813"
+      ]
+    },
+    {
+      "title": "(Sr.) Applied AI Backend Engineer",
+      "externalPath": "/job/Taipei/Sr-Engineer-Backend_R0007867",
+      "locationsText": "Taipei",
+      "postedOn": "Posted 30+ Days Ago",
+      "bulletFields": [
+        "R0007867"
+      ]
+    }
+  ],
+  "facets": [
+    {
+      "facetParameter": "jobFamilyGroup",
+      "descriptor": "Job Category",
+      "values": [
+        {
+          "descriptor": "Product Development",
+          "id": "904e04688bb0016982d07b383e1dab0c",
+          "count": 40
+        },
+        {
+          "descriptor": "Threat",
+          "id": "904e04688bb001c112547b383e1da90c",
+          "count": 1
+        },
+        {
+          "descriptor": "DataIQ",
+          "id": "904e04688bb0010d914c7a383e1da50c",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "facetParameter": "workerSubType",
+      "descriptor": "Job Type",
+      "values": [
+        {
+          "descriptor": "Regular",
+          "id": "904e04688bb00110d3d92e873c1dfc04",
+          "count": 42
+        }
+      ]
+    },
+    {
+      "facetParameter": "timeType",
+      "descriptor": "Time Type",
+      "values": [
+        {
+          "descriptor": "Full time",
+          "id": "f6887f8ffb6901a0ae6afd8c1a1d8900",
+          "count": 42
+        }
+      ]
+    },
+    {
+      "facetParameter": "locationMainGroup",
+      "values": [
+        {
+          "facetParameter": "locationCountry",
+          "descriptor": "Location Country",
+          "values": [
+            {
+              "descriptor": "Canada",
+              "id": "a30a87ed25634629aa6c3958aa2b91ea",
+              "count": 6
+            },
+            {
+              "descriptor": "Philippines",
+              "id": "e56f1daf83e04bacae794ba5c5593560",
+              "count": 1
+            },
+            {
+              "descriptor": "Taiwan",
+              "id": "a4e08b475d6a4176853c9d1cb9854e02",
+              "count": 27
+            },
+            {
+              "descriptor": "United States of America",
+              "id": "bc33aa3152ec42d4995f4791a106ed09",
+              "count": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "userAuthenticated": false
+}

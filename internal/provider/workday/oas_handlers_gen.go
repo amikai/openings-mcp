@@ -39,8 +39,9 @@ func (c *codeRecorder) Unwrap() http.ResponseWriter {
 // `/job/{location}/{titleSlug}` (exactly two segments after `/job/`); split on the first `/` to get
 // these two path parameters — a single combined path parameter fails because standard URI encoders
 // percent-encode the `/` inside it, producing a URL the server rejects. This is a platform routing
-// detail, not NVIDIA-specific, but has only been directly confirmed against NVIDIA's tenant — verify
-// before relying on it for a new tenant.
+// detail, not NVIDIA-specific; directly confirmed against NVIDIA's and Trend Micro's tenants
+// (including Trend Micro's "XMLNAME-" titleSlugs, Workday's naming for titles that start with a
+// non-letter — see testdata/trendmicro_*.sh).
 //
 // GET /job/{location}/{titleSlug}
 func (s *Server) handleGetJobDetailRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
