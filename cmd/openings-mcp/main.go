@@ -15,8 +15,9 @@ import (
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 
-	"github.com/amikai/openings-mcp/internal/openingsmcp"
+	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/amikai/openings-mcp/internal/logging"
+	"github.com/amikai/openings-mcp/internal/openingsmcp"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
@@ -35,9 +36,10 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools for six job boards: 104 and Cake.me (both Taiwan-centric) and LinkedIn (global), plus the official careers sites of Google, NVIDIA, and TSMC.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104 and Cake.me (Taiwan-centric) and LinkedIn (global), plus the careers sites of Google, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering hundreds of companies' official careers sites behind one company parameter.
 
 Tool selection:
+- When the user names a specific company, try search_jobs_by_company first; it covers hundreds of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, 104, ...) when the company isn't covered.
 - When the user names a site or company, use that provider's tools.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, and LinkedIn) rather than a single company's careers site.
 
@@ -126,7 +128,21 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 	jarLinkedin, _ := cookiejar.New(nil)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", &http.Client{Timeout: 30 * time.Second, Jar: jarLinkedin})
 
-	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, logger)
+	adapterWorkday := ats.NewWorkdayAdapter(hc)
+	adapterLever, err := ats.NewLeverAdapter("https://api.lever.co", hc)
+	if err != nil {
+		return err
+	}
+	adapterAshby, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
+	if err != nil {
+		return err
+	}
+	registry, err := ats.NewRegistry(adapterWorkday, adapterLever, adapterAshby)
+	if err != nil {
+		return err
+	}
+
+	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, registry, logger)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
@@ -134,7 +150,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 	return nil
 }
 
-func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, cTsmc *tsmc.Client, cGoogle *google.Client, cLinkedin *linkedin.Client, logger *slog.Logger) *mcp.Server {
+func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, cTsmc *tsmc.Client, cGoogle *google.Client, cLinkedin *linkedin.Client, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "openings-mcp", Version: version}, &mcp.ServerOptions{Instructions: serverInstructions, Logger: logger})
 	server.AddReceivingMiddleware(logging.ErrorLoggingMiddleware(logger))
 	openingsmcp.RegisterJob104(server, c104)
@@ -143,5 +159,6 @@ func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, 
 	openingsmcp.RegisterTsmc(server, cTsmc)
 	openingsmcp.RegisterGoogle(server, cGoogle)
 	openingsmcp.RegisterLinkedin(server, cLinkedin)
+	openingsmcp.RegisterCompany(server, registry)
 	return server
 }
