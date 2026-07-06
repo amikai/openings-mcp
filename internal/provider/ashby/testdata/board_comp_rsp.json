@@ -1,0 +1,378 @@
+{
+  "jobs": [
+    {
+      "id": "7724fbe3-6a27-4418-9705-2dcc40751a16",
+      "title": "Software Engineer (Agent Platform)",
+      "department": "Engineering",
+      "team": "Engineering",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "shouldDisplayCompensationOnJobPostings": true,
+      "secondaryLocations": [
+        {
+          "location": "New York",
+          "address": {
+            "postalAddress": {
+              "addressRegion": "New York",
+              "streetAddress": "Remote",
+              "addressCountry": "United States",
+              "addressLocality": "New York"
+            }
+          }
+        }
+      ],
+      "publishedAt": "2025-08-25T20:13:34.942+00:00",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "address": {
+        "postalAddress": {
+          "postalCode": "94104",
+          "addressRegion": "CA",
+          "streetAddress": "1 Post Street, Floor 15",
+          "addressCountry": "United States",
+          "addressLocality": "San Francisco"
+        }
+      },
+      "jobUrl": "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16",
+      "applyUrl": "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16/application",
+      "descriptionHtml": "<h2>About the Role</h2><p style=\"min-height:1.5em\">Agent Platform is Browserbase’s framework for automating browsers with code. The Agent Platform team creates developer tools at the intersection of AI and open source, making browser automation smarter, simpler, and more powerful.</p><p style=\"min-height:1.5em\"></p><h2>What you'll do</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Build, operate, and grow the Agent Platform framework — developer-first APIs with ~2M monthly downloads and ~17k stars. Design and implement tools that make automating the web simple and powerful.</p></li><li><p style=\"min-height:1.5em\">Work with frontier AI labs (OpenAI, Google, and others) to improve models, benchmark capabilities, and make them more accessible to developers.</p></li><li><p style=\"min-height:1.5em\">Deploy production-ready AI solutions that impact millions of customers, shaping the future of the web.</p></li><li><p style=\"min-height:1.5em\">Help define, scope, and prioritize projects that shape the future of developer tooling.</p></li><li><p style=\"min-height:1.5em\">Document as you go and share your knowledge with the team.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>Technical skills:</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Strong coding skills: preferably TypeScript; also valuable: Python/Go.</p></li><li><p style=\"min-height:1.5em\">Experience building developer tools, frameworks, or libraries that others depend on.</p></li><li><p style=\"min-height:1.5em\">Experience building AI agents/LLMs, distributed systems, or applying reinforcement learning.</p></li><li><p style=\"min-height:1.5em\">Familiarity with web automation frameworks (Puppeteer, Playwright, Selenium) or web scraping; huge bonus: Chrome DevTools Protocol (CDP) experience.</p></li><li><p style=\"min-height:1.5em\">Track record of open source contributions or public developer projects.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>You're a good fit if you:</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.</p></li><li><p style=\"min-height:1.5em\">Have a strong sense of ownership and bias toward action.</p></li><li><p style=\"min-height:1.5em\">Can drive projects independently, with high accountability without much outside input.</p></li><li><p style=\"min-height:1.5em\">Communicate clearly in writing and in person, and choose the right medium for the message.</p></li><li><p style=\"min-height:1.5em\">Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.</p></li><li><p style=\"min-height:1.5em\">Enjoy collaborating with a small, ambitious team in a fast-paced environment.</p></li><li><p style=\"min-height:1.5em\">Are excited to work <strong>5 days a week in our San Francisco</strong> HQ (or open to relocating here).</p><p style=\"min-height:1.5em\"></p></li></ul><h2><strong>Why join us</strong>:</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Shape the future of browser automation with AI-driven developer tools.</p></li><li><p style=\"min-height:1.5em\">Work in the open: collaborate with and contribute to the broader open source community.</p></li><li><p style=\"min-height:1.5em\">Collaborate with a small, high-bar team of engineers who care deeply about quality.</p></li><li><p style=\"min-height:1.5em\">Join an ambitious startup where your impact will be felt immediately.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>More about Browserbase</h2><p style=\"min-height:1.5em\">Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.</p><p style=\"min-height:1.5em\">We are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://memos.hawkhill.ventures/p/an-internet-browser-for-ai\">founding vision</a> to power the world's best AI tools and help everyone automate the web.</p>",
+      "descriptionPlain": "ABOUT THE ROLE\n\nAgent Platform is Browserbase’s framework for automating browsers with code. The Agent Platform team creates developer tools at the intersection of AI and open source, making browser automation smarter, simpler, and more powerful.\n\n\n\n\nWHAT YOU'LL DO\n\n - Build, operate, and grow the Agent Platform framework — developer-first APIs with ~2M monthly downloads and ~17k stars. Design and implement tools that make automating the web simple and powerful.\n\n - Work with frontier AI labs (OpenAI, Google, and others) to improve models, benchmark capabilities, and make them more accessible to developers.\n\n - Deploy production-ready AI solutions that impact millions of customers, shaping the future of the web.\n\n - Help define, scope, and prioritize projects that shape the future of developer tooling.\n\n - Document as you go and share your knowledge with the team.\n   \n   \n\n\nTECHNICAL SKILLS:\n\n - Strong coding skills: preferably TypeScript; also valuable: Python/Go.\n\n - Experience building developer tools, frameworks, or libraries that others depend on.\n\n - Experience building AI agents/LLMs, distributed systems, or applying reinforcement learning.\n\n - Familiarity with web automation frameworks (Puppeteer, Playwright, Selenium) or web scraping; huge bonus: Chrome DevTools Protocol (CDP) experience.\n\n - Track record of open source contributions or public developer projects.\n   \n   \n\n\nYOU'RE A GOOD FIT IF YOU:\n\n - Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.\n\n - Have a strong sense of ownership and bias toward action.\n\n - Can drive projects independently, with high accountability without much outside input.\n\n - Communicate clearly in writing and in person, and choose the right medium for the message.\n\n - Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.\n\n - Enjoy collaborating with a small, ambitious team in a fast-paced environment.\n\n - Are excited to work 5 days a week in our San Francisco HQ (or open to relocating here).\n   \n   \n\n\nWHY JOIN US:\n\n - Shape the future of browser automation with AI-driven developer tools.\n\n - Work in the open: collaborate with and contribute to the broader open source community.\n\n - Collaborate with a small, high-bar team of engineers who care deeply about quality.\n\n - Join an ambitious startup where your impact will be felt immediately.\n   \n   \n\n\nMORE ABOUT BROWSERBASE\n\nBrowserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.\n\nWe are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision https://memos.hawkhill.ventures/p/an-internet-browser-for-ai to power the world's best AI tools and help everyone automate the web.",
+      "compensation": {
+        "compensationTierSummary": "$132K – $330K • Offers Equity",
+        "scrapeableCompensationSalarySummary": "$132K - $330K",
+        "compensationTiers": [
+          {
+            "id": "367c7f23-c418-4655-a422-37e03fa9be9d",
+            "tierSummary": "Estimated base salary $132K – $330K • Offers Equity",
+            "title": null,
+            "additionalInformation": null,
+            "components": [
+              {
+                "id": "9ecdc79f-c9b0-4fe9-9c6a-d3a480e1c2d6",
+                "summary": "Estimated base salary $132K – $330K",
+                "compensationType": "Salary",
+                "interval": "1 YEAR",
+                "currencyCode": "USD",
+                "minValue": 132000,
+                "maxValue": 330000
+              },
+              {
+                "id": "5d5d6f60-efd3-4d6c-a387-9589322d7b52",
+                "summary": "Offers Equity",
+                "compensationType": "EquityPercentage",
+                "interval": "NONE",
+                "currencyCode": null,
+                "minValue": null,
+                "maxValue": null
+              }
+            ]
+          }
+        ],
+        "summaryComponents": [
+          {
+            "compensationType": "Salary",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": 132000,
+            "maxValue": 330000
+          },
+          {
+            "compensationType": "EquityPercentage",
+            "interval": "NONE",
+            "currencyCode": null,
+            "minValue": null,
+            "maxValue": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "b0e0b29c-d37b-4efd-8f6b-5c12bc4dac36",
+      "title": "Business Development Representative",
+      "department": "GTM",
+      "team": "GTM",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "shouldDisplayCompensationOnJobPostings": true,
+      "secondaryLocations": [],
+      "publishedAt": "2026-04-30T16:50:31.980+00:00",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "address": {
+        "postalAddress": {
+          "postalCode": "94104",
+          "addressRegion": "CA",
+          "streetAddress": "1 Post Street, Floor 15",
+          "addressCountry": "United States",
+          "addressLocality": "San Francisco"
+        }
+      },
+      "jobUrl": "https://jobs.ashbyhq.com/browserbase/b0e0b29c-d37b-4efd-8f6b-5c12bc4dac36",
+      "applyUrl": "https://jobs.ashbyhq.com/browserbase/b0e0b29c-d37b-4efd-8f6b-5c12bc4dac36/application",
+      "descriptionHtml": "<h2>About the Role</h2><p style=\"min-height:1.5em\">You will be part of our very first outbound prospecting and pipeline generation motion across developer-led and enterprise segments. You will help to develop our outreach strategy, and work closely with leaders across Sales, Marketing, Product, and Developer Relations to drive pipeline that converts.</p><p style=\"min-height:1.5em\">You'll have the opportunity to build and refine Browserbase's business development motion from the ground up.</p><p style=\"min-height:1.5em\"></p><h2>What You'll Do</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Set and maintain a high-performing culture for sales outreach</p></li><li><p style=\"min-height:1.5em\">Build outbound strategy based on Browserbase's product, developer personas, competitive landscape, and tooling through methods like role-plays, call reviews, and technical onboarding</p></li><li><p style=\"min-height:1.5em\">Strategize with sales and GTM on pipeline and prospecting initiatives to meet company objectives</p></li><li><p style=\"min-height:1.5em\">Improve team output and efficiency over time by optimizing systems, sequences, and processes</p></li><li><p style=\"min-height:1.5em\">Help establish our first playbook of resources for business development</p><p style=\"min-height:1.5em\"></p></li></ul><h2>What You'll Need</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Minimum 2 years of quota-carrying sales experience as an individual contributor, with a proven, consistent track record exceeding goals</p></li><li><p style=\"min-height:1.5em\">Prior success in fast-paced, results-oriented GTM environments, ideally at developer tools or infrastructure SaaS companies, with a history of consistently performing above quota in an outbound environment</p></li><li><p style=\"min-height:1.5em\">Ability to articulate technical and business value to our customers</p></li><li><p style=\"min-height:1.5em\">Proficiency in CRM and sales intelligence tools (e.g., HubSpot, Common Room, Looker, Excel) and familiarity with email and call automation platforms</p></li><li><p style=\"min-height:1.5em\">Ability to leverage data to drive decisions, create systems, and identify process improvements</p></li><li><p style=\"min-height:1.5em\">Strong collaboration and influencing skills, demonstrated through excellent communication and presentation skills</p></li></ul><p style=\"min-height:1.5em\"></p><h2>Nice to Haves</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Experience selling developer tools, infrastructure, or API products</p></li><li><p style=\"min-height:1.5em\">Familiarity with the AI/ML ecosystem, browser automation, or agentic AI space — bonus points if you've seen how tools like Claude are being used to build autonomous agents!</p></li><li><p style=\"min-height:1.5em\">Experience in a product-led growth (PLG) environment where BDRs work alongside self-serve funnels</p></li><li><p style=\"min-height:1.5em\">Experience at a high-growth startup</p></li><li><p style=\"min-height:1.5em\">Familiarity with signal-based prospecting tools like Common Room or similar community/product-led sales platforms</p></li><li><p style=\"min-height:1.5em\">Technical curiosity: you may not be writing code, but you're comfortable talking about APIs, SDKs, and developer workflows</p></li></ul><p style=\"min-height:1.5em\"></p><h2>Why you should join us</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Be at the center of the AI wave: every AI agent that touches the web needs browser infrastructure. You'll be selling into the fastest-growing segment in tech.</p></li><li><p style=\"min-height:1.5em\">Work at a category-defining company: we're building the standard for headless browser infrastructure. Wing VC ET30 honoree two years running (2025 &amp; 2026), backed by Notable Capital, CRV, and Kleiner Perkins.</p></li><li><p style=\"min-height:1.5em\">Work on a technical product with a massive TAM: our customers range from solo developers to Fortune 500 enterprises. Our outbound motion spans the full spectrum.</p></li><li><p style=\"min-height:1.5em\">Collaborate with a rockstar team: join a team of ~60 and counting that punches way above its weight</p></li><li><p style=\"min-height:1.5em\">Generous benefits: we’ll make sure you’re fully covered with health insurance, tech setup, flexible time off, and office snacks. We offer competitive salary and equity packages, and take careful consideration of each hire on our small team</p></li></ul><p style=\"min-height:1.5em\"></p><h2>More about Browserbase</h2><p style=\"min-height:1.5em\">Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.</p><p style=\"min-height:1.5em\">We are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. We've been named to the Wing VC Enterprise Tech 30 two years running (2025 and 2026). Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision to power the world's best AI tools and help everyone automate the web.</p>",
+      "descriptionPlain": "ABOUT THE ROLE\n\nYou will be part of our very first outbound prospecting and pipeline generation motion across developer-led and enterprise segments. You will help to develop our outreach strategy, and work closely with leaders across Sales, Marketing, Product, and Developer Relations to drive pipeline that converts.\n\nYou'll have the opportunity to build and refine Browserbase's business development motion from the ground up.\n\n\n\n\nWHAT YOU'LL DO\n\n - Set and maintain a high-performing culture for sales outreach\n\n - Build outbound strategy based on Browserbase's product, developer personas, competitive landscape, and tooling through methods like role-plays, call reviews, and technical onboarding\n\n - Strategize with sales and GTM on pipeline and prospecting initiatives to meet company objectives\n\n - Improve team output and efficiency over time by optimizing systems, sequences, and processes\n\n - Help establish our first playbook of resources for business development\n   \n   \n\n\nWHAT YOU'LL NEED\n\n - Minimum 2 years of quota-carrying sales experience as an individual contributor, with a proven, consistent track record exceeding goals\n\n - Prior success in fast-paced, results-oriented GTM environments, ideally at developer tools or infrastructure SaaS companies, with a history of consistently performing above quota in an outbound environment\n\n - Ability to articulate technical and business value to our customers\n\n - Proficiency in CRM and sales intelligence tools (e.g., HubSpot, Common Room, Looker, Excel) and familiarity with email and call automation platforms\n\n - Ability to leverage data to drive decisions, create systems, and identify process improvements\n\n - Strong collaboration and influencing skills, demonstrated through excellent communication and presentation skills\n\n\n\n\nNICE TO HAVES\n\n - Experience selling developer tools, infrastructure, or API products\n\n - Familiarity with the AI/ML ecosystem, browser automation, or agentic AI space — bonus points if you've seen how tools like Claude are being used to build autonomous agents!\n\n - Experience in a product-led growth (PLG) environment where BDRs work alongside self-serve funnels\n\n - Experience at a high-growth startup\n\n - Familiarity with signal-based prospecting tools like Common Room or similar community/product-led sales platforms\n\n - Technical curiosity: you may not be writing code, but you're comfortable talking about APIs, SDKs, and developer workflows\n\n\n\n\nWHY YOU SHOULD JOIN US\n\n - Be at the center of the AI wave: every AI agent that touches the web needs browser infrastructure. You'll be selling into the fastest-growing segment in tech.\n\n - Work at a category-defining company: we're building the standard for headless browser infrastructure. Wing VC ET30 honoree two years running (2025 & 2026), backed by Notable Capital, CRV, and Kleiner Perkins.\n\n - Work on a technical product with a massive TAM: our customers range from solo developers to Fortune 500 enterprises. Our outbound motion spans the full spectrum.\n\n - Collaborate with a rockstar team: join a team of ~60 and counting that punches way above its weight\n\n - Generous benefits: we’ll make sure you’re fully covered with health insurance, tech setup, flexible time off, and office snacks. We offer competitive salary and equity packages, and take careful consideration of each hire on our small team\n\n\n\n\nMORE ABOUT BROWSERBASE\n\nBrowserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.\n\nWe are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. We've been named to the Wing VC Enterprise Tech 30 two years running (2025 and 2026). Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision to power the world's best AI tools and help everyone automate the web.",
+      "compensation": {
+        "compensationTierSummary": "$150K – $175K • Offers Equity • Offers Commission",
+        "scrapeableCompensationSalarySummary": "$150K - $175K",
+        "compensationTiers": [
+          {
+            "id": "73c2dbc5-2e13-4145-86d4-bb8c928a9d9d",
+            "tierSummary": "OTE Total $150K – $175K • Offers Equity • Offers Commission",
+            "title": null,
+            "additionalInformation": null,
+            "components": [
+              {
+                "id": "6d1270c9-5f38-45b7-9e48-47ddb10b9c15",
+                "summary": "Offers Commission",
+                "compensationType": "Commission",
+                "interval": "1 YEAR",
+                "currencyCode": "USD",
+                "minValue": null,
+                "maxValue": null
+              },
+              {
+                "id": "33788229-482b-45de-ab2e-69f24298f7fa",
+                "summary": "Offers Equity",
+                "compensationType": "EquityPercentage",
+                "interval": "NONE",
+                "currencyCode": null,
+                "minValue": null,
+                "maxValue": null
+              },
+              {
+                "id": "660d8d84-23da-479a-83f7-ebc679a499ba",
+                "summary": "OTE Total $150K – $175K",
+                "compensationType": "Salary",
+                "interval": "1 YEAR",
+                "currencyCode": "USD",
+                "minValue": 150000,
+                "maxValue": 175000
+              }
+            ]
+          }
+        ],
+        "summaryComponents": [
+          {
+            "compensationType": "Commission",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": null,
+            "maxValue": null
+          },
+          {
+            "compensationType": "EquityPercentage",
+            "interval": "NONE",
+            "currencyCode": null,
+            "minValue": null,
+            "maxValue": null
+          },
+          {
+            "compensationType": "Salary",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": 150000,
+            "maxValue": 175000
+          }
+        ]
+      }
+    },
+    {
+      "id": "bcbf0fb9-2405-497b-bbc9-e09d8f7a4963",
+      "title": "Software Engineer (Core Infrastructure)",
+      "department": "Engineering",
+      "team": "Engineering",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "shouldDisplayCompensationOnJobPostings": true,
+      "secondaryLocations": [],
+      "publishedAt": "2025-03-25T08:06:38.373+00:00",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "address": {
+        "postalAddress": {
+          "postalCode": "94104",
+          "addressRegion": "CA",
+          "streetAddress": "1 Post Street, Floor 15",
+          "addressCountry": "United States",
+          "addressLocality": "San Francisco"
+        }
+      },
+      "jobUrl": "https://jobs.ashbyhq.com/browserbase/bcbf0fb9-2405-497b-bbc9-e09d8f7a4963",
+      "applyUrl": "https://jobs.ashbyhq.com/browserbase/bcbf0fb9-2405-497b-bbc9-e09d8f7a4963/application",
+      "descriptionHtml": "<h2>About the Role</h2><p style=\"min-height:1.5em\">Core (aka Browserbase Core Infrastructure) is the backbone of everything we do. This team keeps our browsers running at scale, solving massive distributed systems challenges and making sure our platform is fast, reliable, and scalable.</p><p style=\"min-height:1.5em\"></p><h2>What you’ll do</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Build, operate, and grow the Browserbase Core platform — designing and developing robust, scalable distributed backends with developer-friendly APIs.</p></li><li><p style=\"min-height:1.5em\">Work closely with the rest of Engineering, gathering input and providing great support so every team can build on Core with confidence.</p></li><li><p style=\"min-height:1.5em\">Help define, scope, and review key projects; set priorities on the roadmap; and sequence deliverables that push the platform forward.</p></li><li><p style=\"min-height:1.5em\">Establish and reinforce best practices around development, operations, and reliability.</p></li><li><p style=\"min-height:1.5em\">Continuously enhance the platform to meet rapidly expanding customer adoption and demand.</p></li><li><p style=\"min-height:1.5em\">Investigate, troubleshoot, and resolve operational issues that arise in production.</p></li><li><p style=\"min-height:1.5em\">Document as you go and share your knowledge with the team.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>Technical skills</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Deep experience building and scaling distributed systems, with scale on the order of hundreds or thousands of instances.</p></li><li><p style=\"min-height:1.5em\">Strong expertise coding in Go or Typescript; bonus if you’ve touched Firecracker or similar VMMs.</p></li><li><p style=\"min-height:1.5em\">Familiarity with CI/CD pipelines, Kubernetes and Docker, message queues, relational databases, automated testing, performance optimization, and zero-downtime multi-region deployments.</p></li><li><p style=\"min-height:1.5em\">A systems-thinking mindset you understand how infrastructure choices ripple all the way up to customer experience.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>You’re a good fit if you…</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.</p></li><li><p style=\"min-height:1.5em\">Have a strong sense of ownership and bias toward action.</p></li><li><p style=\"min-height:1.5em\">Can drive projects independently, with high accountability without much outside input.</p></li><li><p style=\"min-height:1.5em\">Communicate clearly in writing and in person, and choose the right medium for the message.</p></li><li><p style=\"min-height:1.5em\">Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.</p></li><li><p style=\"min-height:1.5em\">Enjoy collaborating with a small, ambitious team in a fast-paced environment.</p></li><li><p style=\"min-height:1.5em\">Are excited to work <strong>5 days a week in our San Francisco</strong> HQ (or open to relocating here).</p><p style=\"min-height:1.5em\"></p></li></ul><h2>Why join us</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Work on some of the hardest problems in modern infrastructure.</p></li><li><p style=\"min-height:1.5em\">Collaborate with a small, high-bar team of engineers who care deeply about quality.</p></li><li><p style=\"min-height:1.5em\">Build core technology that every Browserbase product depends on.</p></li><li><p style=\"min-height:1.5em\">Join an ambitious startup where your impact will be felt immediately.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>More about Browserbase</h2><p style=\"min-height:1.5em\">Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.</p><p style=\"min-height:1.5em\">We are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://memos.hawkhill.ventures/p/an-internet-browser-for-ai\">founding vision</a> to power the world's best AI tools and help everyone automate the web.</p>",
+      "descriptionPlain": "ABOUT THE ROLE\n\nCore (aka Browserbase Core Infrastructure) is the backbone of everything we do. This team keeps our browsers running at scale, solving massive distributed systems challenges and making sure our platform is fast, reliable, and scalable.\n\n\n\n\nWHAT YOU’LL DO\n\n - Build, operate, and grow the Browserbase Core platform — designing and developing robust, scalable distributed backends with developer-friendly APIs.\n\n - Work closely with the rest of Engineering, gathering input and providing great support so every team can build on Core with confidence.\n\n - Help define, scope, and review key projects; set priorities on the roadmap; and sequence deliverables that push the platform forward.\n\n - Establish and reinforce best practices around development, operations, and reliability.\n\n - Continuously enhance the platform to meet rapidly expanding customer adoption and demand.\n\n - Investigate, troubleshoot, and resolve operational issues that arise in production.\n\n - Document as you go and share your knowledge with the team.\n   \n   \n\n\nTECHNICAL SKILLS\n\n - Deep experience building and scaling distributed systems, with scale on the order of hundreds or thousands of instances.\n\n - Strong expertise coding in Go or Typescript; bonus if you’ve touched Firecracker or similar VMMs.\n\n - Familiarity with CI/CD pipelines, Kubernetes and Docker, message queues, relational databases, automated testing, performance optimization, and zero-downtime multi-region deployments.\n\n - A systems-thinking mindset you understand how infrastructure choices ripple all the way up to customer experience.\n   \n   \n\n\nYOU’RE A GOOD FIT IF YOU…\n\n - Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.\n\n - Have a strong sense of ownership and bias toward action.\n\n - Can drive projects independently, with high accountability without much outside input.\n\n - Communicate clearly in writing and in person, and choose the right medium for the message.\n\n - Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.\n\n - Enjoy collaborating with a small, ambitious team in a fast-paced environment.\n\n - Are excited to work 5 days a week in our San Francisco HQ (or open to relocating here).\n   \n   \n\n\nWHY JOIN US\n\n - Work on some of the hardest problems in modern infrastructure.\n\n - Collaborate with a small, high-bar team of engineers who care deeply about quality.\n\n - Build core technology that every Browserbase product depends on.\n\n - Join an ambitious startup where your impact will be felt immediately.\n   \n   \n\n\nMORE ABOUT BROWSERBASE\n\nBrowserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.\n\nWe are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision https://memos.hawkhill.ventures/p/an-internet-browser-for-ai to power the world's best AI tools and help everyone automate the web.",
+      "compensation": {
+        "compensationTierSummary": "$132K – $358K • Offers Equity",
+        "scrapeableCompensationSalarySummary": "$132K - $358K",
+        "compensationTiers": [
+          {
+            "id": "b1c095fd-d8a7-4603-a499-62903b45333a",
+            "tierSummary": "Estimated base salary $132K – $358K • Offers Equity",
+            "title": null,
+            "additionalInformation": null,
+            "components": [
+              {
+                "id": "4937e464-8a5b-4f7c-99e6-cbe779d56a29",
+                "summary": "Estimated base salary $132K – $358K",
+                "compensationType": "Salary",
+                "interval": "1 YEAR",
+                "currencyCode": "USD",
+                "minValue": 132000,
+                "maxValue": 358000
+              },
+              {
+                "id": "de1f5195-2543-46d5-b938-a286e2efc296",
+                "summary": "Offers Equity",
+                "compensationType": "EquityPercentage",
+                "interval": "NONE",
+                "currencyCode": null,
+                "minValue": null,
+                "maxValue": null
+              }
+            ]
+          }
+        ],
+        "summaryComponents": [
+          {
+            "compensationType": "Salary",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": 132000,
+            "maxValue": 358000
+          },
+          {
+            "compensationType": "EquityPercentage",
+            "interval": "NONE",
+            "currencyCode": null,
+            "minValue": null,
+            "maxValue": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "be6c011e-9bb1-4be0-93c2-ed615ef070d8",
+      "title": "Software Engineer (Dashboard)",
+      "department": "Engineering",
+      "team": "Engineering",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "shouldDisplayCompensationOnJobPostings": false,
+      "secondaryLocations": [
+        {
+          "location": "New York",
+          "address": {
+            "postalAddress": {
+              "addressRegion": "New York",
+              "streetAddress": "Remote",
+              "addressCountry": "United States",
+              "addressLocality": "New York"
+            }
+          }
+        }
+      ],
+      "publishedAt": "2026-07-02T20:29:11.379+00:00",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "address": {
+        "postalAddress": {
+          "postalCode": "94104",
+          "addressRegion": "CA",
+          "streetAddress": "1 Post Street, Floor 15",
+          "addressCountry": "United States",
+          "addressLocality": "San Francisco"
+        }
+      },
+      "jobUrl": "https://jobs.ashbyhq.com/browserbase/be6c011e-9bb1-4be0-93c2-ed615ef070d8",
+      "applyUrl": "https://jobs.ashbyhq.com/browserbase/be6c011e-9bb1-4be0-93c2-ed615ef070d8/application",
+      "descriptionHtml": "<h1>Software Engineer (Dashboard)</h1><p style=\"min-height:1.5em\">Dashboard is the front door to Browserbase. This team owns our dashboard and web experience - everything from authentication and billing to data-rich observability and complex UI. It’s true full stack engineering: building interfaces users love while solving tough problems under the hood.</p><p style=\"min-height:1.5em\"></p><h2>What you’ll do</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Build and scale Browserbase’s dashboard and web presence.</p></li><li><p style=\"min-height:1.5em\">Design and implement complex UI and data visualizations that make large-scale data intuitive.</p></li><li><p style=\"min-height:1.5em\">Collaborate across teams to ensure the dashboard surfaces the power of Browserbase clearly and effectively.</p></li><li><p style=\"min-height:1.5em\">Help define, scope, and prioritize roadmap objectives that improve user experience.</p></li><li><p style=\"min-height:1.5em\">Establish and reinforce best practices around frontend performance, accessibility, and maintainability.</p></li><li><p style=\"min-height:1.5em\">Document as you go and share your knowledge with the team.</p><p style=\"min-height:1.5em\"></p></li></ul><h2>Technical skills</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Strong experience with modern frontend frameworks (React, Next.js).</p></li><li><p style=\"min-height:1.5em\">Proficiency in TypeScript.</p></li><li><p style=\"min-height:1.5em\">Background in full stack development (Node.js, APIs, Postgres).</p></li><li><p style=\"min-height:1.5em\">Experience with data-heavy applications (observability, analytics, dashboards).</p></li><li><p style=\"min-height:1.5em\">Familiarity with UI/UX best practices and implementing complex interfaces.</p></li></ul><p style=\"min-height:1.5em\"></p><h2>You’re a good fit if you…</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.</p></li><li><p style=\"min-height:1.5em\">Have a strong sense of ownership and bias toward action.</p></li><li><p style=\"min-height:1.5em\">Can drive projects independently, with high accountability without much outside input.</p></li><li><p style=\"min-height:1.5em\">Communicate clearly in writing and in person, and choose the right medium for the message.</p></li><li><p style=\"min-height:1.5em\">Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.</p></li><li><p style=\"min-height:1.5em\">Enjoy collaborating with a small, ambitious team in a fast-paced environment.</p></li><li><p style=\"min-height:1.5em\">Are excited to work <strong>5 days a week in our San Francisco HQ</strong> (or open to relocating here) or <strong>remote in New York</strong>.</p></li></ul><p style=\"min-height:1.5em\"></p><h2>Why join us</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Shape the user-facing side of Browserbase — the dashboard that every customer touches.</p></li><li><p style=\"min-height:1.5em\">Build complex, data-rich applications that bring our infrastructure to life.</p></li><li><p style=\"min-height:1.5em\">Collaborate with a small, high-bar team of engineers who care deeply about quality.</p></li><li><p style=\"min-height:1.5em\">Join an ambitious startup where your impact will be felt immediately.</p></li></ul><p style=\"min-height:1.5em\"></p><h2>More about Browserbase</h2><p style=\"min-height:1.5em\">Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.</p><p style=\"min-height:1.5em\">We are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://memos.hawkhill.ventures/p/an-internet-browser-for-ai\">founding vision</a> to power the world's best AI tools and help everyone automate the web.</p>",
+      "descriptionPlain": "SOFTWARE ENGINEER (DASHBOARD)\n\nDashboard is the front door to Browserbase. This team owns our dashboard and web experience - everything from authentication and billing to data-rich observability and complex UI. It’s true full stack engineering: building interfaces users love while solving tough problems under the hood.\n\n\n\n\nWHAT YOU’LL DO\n\n - Build and scale Browserbase’s dashboard and web presence.\n\n - Design and implement complex UI and data visualizations that make large-scale data intuitive.\n\n - Collaborate across teams to ensure the dashboard surfaces the power of Browserbase clearly and effectively.\n\n - Help define, scope, and prioritize roadmap objectives that improve user experience.\n\n - Establish and reinforce best practices around frontend performance, accessibility, and maintainability.\n\n - Document as you go and share your knowledge with the team.\n   \n   \n\n\nTECHNICAL SKILLS\n\n - Strong experience with modern frontend frameworks (React, Next.js).\n\n - Proficiency in TypeScript.\n\n - Background in full stack development (Node.js, APIs, Postgres).\n\n - Experience with data-heavy applications (observability, analytics, dashboards).\n\n - Familiarity with UI/UX best practices and implementing complex interfaces.\n\n\n\n\nYOU’RE A GOOD FIT IF YOU…\n\n - Have high agency: you can set direction, make judgment calls, and drive projects forward without waiting for perfect clarity.\n\n - Have a strong sense of ownership and bias toward action.\n\n - Can drive projects independently, with high accountability without much outside input.\n\n - Communicate clearly in writing and in person, and choose the right medium for the message.\n\n - Are adaptable and able to dive into unfamiliar systems, learn quickly, and make sound technical decisions.\n\n - Enjoy collaborating with a small, ambitious team in a fast-paced environment.\n\n - Are excited to work 5 days a week in our San Francisco HQ (or open to relocating here) or remote in New York.\n\n\n\n\nWHY JOIN US\n\n - Shape the user-facing side of Browserbase — the dashboard that every customer touches.\n\n - Build complex, data-rich applications that bring our infrastructure to life.\n\n - Collaborate with a small, high-bar team of engineers who care deeply about quality.\n\n - Join an ambitious startup where your impact will be felt immediately.\n\n\n\n\nMORE ABOUT BROWSERBASE\n\nBrowserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.\n\nWe are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision https://memos.hawkhill.ventures/p/an-internet-browser-for-ai to power the world's best AI tools and help everyone automate the web.",
+      "compensation": {
+        "compensationTierSummary": null,
+        "scrapeableCompensationSalarySummary": null,
+        "compensationTiers": [],
+        "summaryComponents": []
+      }
+    },
+    {
+      "id": "fb279b47-670a-4087-b2c5-34af16e7e39f",
+      "title": "Customer Engineering Manager",
+      "department": "Engineering",
+      "team": "Engineering",
+      "employmentType": "FullTime",
+      "location": "San Francisco",
+      "shouldDisplayCompensationOnJobPostings": true,
+      "secondaryLocations": [],
+      "publishedAt": "2026-07-02T20:49:13.354+00:00",
+      "isListed": true,
+      "isRemote": false,
+      "workplaceType": "OnSite",
+      "address": {
+        "postalAddress": {
+          "postalCode": "94104",
+          "addressRegion": "CA",
+          "streetAddress": "1 Post Street, Floor 15",
+          "addressCountry": "United States",
+          "addressLocality": "San Francisco"
+        }
+      },
+      "jobUrl": "https://jobs.ashbyhq.com/browserbase/fb279b47-670a-4087-b2c5-34af16e7e39f",
+      "applyUrl": "https://jobs.ashbyhq.com/browserbase/fb279b47-670a-4087-b2c5-34af16e7e39f/application",
+      "descriptionHtml": "<h2><strong>About the role:</strong></h2><p style=\"min-height:1.5em\">As our Customer Engineering Manager, you will serve as a “player-coach,” directly leading and scaling our Customer Engineering team while owning its processes, technology stack, and operational performance. As Browserbase grows, the complexity and volume of our customers’ AI and automation deployments have grown exponentially. You will formalize the operational frameworks, support playbooks, and project management methodologies that enable the team to support our customers’ successful integration of our technology, both reactively and proactively.</p><p style=\"min-height:1.5em\">Sitting at the intersection of Post-Sales, Product, and Core Engineering, you will help define what technical excellence looks like for the organization. You will mentor the existing team while serving as the definitive escalation point for highly complex AI and web automation integrations, fostering a hard-working, collaborative culture within our San Francisco headquarters.</p><p style=\"min-height:1.5em\"></p><h2><strong>What you'll do</strong></h2><p style=\"min-height:1.5em\">The core responsibilities for this role require balancing direct technical intervention with strategic organizational design.</p><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\"><strong>Team Leadership &amp; Mentorship:</strong> Direct, evaluate, and scale a high-performing team of Customer Engineers. Establish a smooth operating rhythm, uphold technical standards, facilitate team quarterly planning, and foster a culture of continuous growth and operational excellence.</p></li><li><p style=\"min-height:1.5em\"><strong>Process Engineering &amp; Scalability:</strong> Design and operationalize team-level delivery frameworks. Transform one-off integrations or semi-documented processes into standardized playbooks, runbooks, and internal tooling (leveraging LLMs and automation) that accelerates time-to-value for the broader CE team or the company as a whole.</p></li><li><p style=\"min-height:1.5em\"><strong>Technical Escalation &amp; Troubleshooting:</strong> Serve as the ultimate escalation point for the most complex integration challenges. Dive deep into logs, system behaviors, and client codebases to root-cause issues involving web automation, AI frameworks, and cloud st.</p></li><li><p style=\"min-height:1.5em\"><strong>Operational Rigor:</strong> Establish and enforce Service Level Agreements (SLAs), queue health metrics, and turnaround times. Build internal dashboards and workflows to track team velocity, customer health signals, and integration quality.</p></li><li><p style=\"min-height:1.5em\"><strong>Strategic Product Feedback:</strong> Synthesize trends from escalated technical issues and enterprise deployment blockers into highly structured, actionable feedback for the Product and Core Engineering teams, directly influencing the product roadmap.</p></li></ul><p style=\"min-height:1.5em\"></p><h2><strong>You're a good fit if you</strong></h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\"><strong>Are experienced:</strong> 6+ years in technical, customer-facing roles (such as Forward Deployed Engineering, Solutions Engineering, Technical Consulting, or Support Leadership) with at least 2+ years of direct people management experience.</p></li></ul><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\"><strong>Are a leader:</strong> Proven ability to lead, mentor, and scale technical teams while personally remaining a stable, senior contributor. You set technical standards and operating rhythms without stepping away from hands-on work.</p></li><li><p style=\"min-height:1.5em\"><strong>Have technical depth:</strong> Proficiency in modern web technologies, headless browser automation (Playwright, Puppeteer, Selenium), and API architectures. Strong ability to read, write, and debug code, preferably in TypeScript and/or Python.</p></li><li><p style=\"min-height:1.5em\"><strong>Are familiar with the AI Ecosystem:</strong> Practical experience deploying or integrating with modern AI orchestration frameworks (such as LangChain, crewAI, and Vercel AI SDK) and LLM-powered applications.</p></li><li><p style=\"min-height:1.5em\"><strong>Project Manage:</strong> Demonstrated track record of leading complex, multi-stakeholder technical projects from discovery to production rollout using structured delivery frameworks.</p></li><li><p style=\"min-height:1.5em\"><strong>Handle Ambiguity:</strong> Comfortable operating in a fast-moving environment, defining process where none exists and bringing structure to undefined problems with a high-agency, collaborative mindset.</p></li><li><p style=\"min-height:1.5em\"><strong>Ability to work onsite in SF:</strong> We are onsite 5 days a week in our sunny office in downtown SF.</p></li></ul><p style=\"min-height:1.5em\"></p><h2><strong>Why join us</strong>:</h2><ul style=\"min-height:1.5em\"><li><p style=\"min-height:1.5em\">Shape the future of browser automation with AI-driven developer tools.</p></li><li><p style=\"min-height:1.5em\">Work in the open: collaborate with and contribute to the broader open source community.</p></li><li><p style=\"min-height:1.5em\">Collaborate with a small, high-bar team of engineers who care deeply about quality.</p></li><li><p style=\"min-height:1.5em\">Join an ambitious startup where your impact will be felt immediately.</p></li></ul><p style=\"min-height:1.5em\"></p><h2>More about Browserbase</h2><p style=\"min-height:1.5em\">Browserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.</p><p style=\"min-height:1.5em\">We are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's <a target=\"_blank\" rel=\"noopener noreferrer nofollow\" href=\"https://memos.hawkhill.ventures/p/an-internet-browser-for-ai\">founding vision</a> to power the world's best AI tools and help everyone automate the web.</p><p style=\"min-height:1.5em\"></p><p style=\"min-height:1.5em\"></p>",
+      "descriptionPlain": "ABOUT THE ROLE:\n\nAs our Customer Engineering Manager, you will serve as a “player-coach,” directly leading and scaling our Customer Engineering team while owning its processes, technology stack, and operational performance. As Browserbase grows, the complexity and volume of our customers’ AI and automation deployments have grown exponentially. You will formalize the operational frameworks, support playbooks, and project management methodologies that enable the team to support our customers’ successful integration of our technology, both reactively and proactively.\n\nSitting at the intersection of Post-Sales, Product, and Core Engineering, you will help define what technical excellence looks like for the organization. You will mentor the existing team while serving as the definitive escalation point for highly complex AI and web automation integrations, fostering a hard-working, collaborative culture within our San Francisco headquarters.\n\n\n\n\nWHAT YOU'LL DO\n\nThe core responsibilities for this role require balancing direct technical intervention with strategic organizational design.\n\n - Team Leadership & Mentorship: Direct, evaluate, and scale a high-performing team of Customer Engineers. Establish a smooth operating rhythm, uphold technical standards, facilitate team quarterly planning, and foster a culture of continuous growth and operational excellence.\n\n - Process Engineering & Scalability: Design and operationalize team-level delivery frameworks. Transform one-off integrations or semi-documented processes into standardized playbooks, runbooks, and internal tooling (leveraging LLMs and automation) that accelerates time-to-value for the broader CE team or the company as a whole.\n\n - Technical Escalation & Troubleshooting: Serve as the ultimate escalation point for the most complex integration challenges. Dive deep into logs, system behaviors, and client codebases to root-cause issues involving web automation, AI frameworks, and cloud st.\n\n - Operational Rigor: Establish and enforce Service Level Agreements (SLAs), queue health metrics, and turnaround times. Build internal dashboards and workflows to track team velocity, customer health signals, and integration quality.\n\n - Strategic Product Feedback: Synthesize trends from escalated technical issues and enterprise deployment blockers into highly structured, actionable feedback for the Product and Core Engineering teams, directly influencing the product roadmap.\n\n\n\n\nYOU'RE A GOOD FIT IF YOU\n\n - Are experienced: 6+ years in technical, customer-facing roles (such as Forward Deployed Engineering, Solutions Engineering, Technical Consulting, or Support Leadership) with at least 2+ years of direct people management experience.\n\n - Are a leader: Proven ability to lead, mentor, and scale technical teams while personally remaining a stable, senior contributor. You set technical standards and operating rhythms without stepping away from hands-on work.\n\n - Have technical depth: Proficiency in modern web technologies, headless browser automation (Playwright, Puppeteer, Selenium), and API architectures. Strong ability to read, write, and debug code, preferably in TypeScript and/or Python.\n\n - Are familiar with the AI Ecosystem: Practical experience deploying or integrating with modern AI orchestration frameworks (such as LangChain, crewAI, and Vercel AI SDK) and LLM-powered applications.\n\n - Project Manage: Demonstrated track record of leading complex, multi-stakeholder technical projects from discovery to production rollout using structured delivery frameworks.\n\n - Handle Ambiguity: Comfortable operating in a fast-moving environment, defining process where none exists and bringing structure to undefined problems with a high-agency, collaborative mindset.\n\n - Ability to work onsite in SF: We are onsite 5 days a week in our sunny office in downtown SF.\n\n\n\n\nWHY JOIN US:\n\n - Shape the future of browser automation with AI-driven developer tools.\n\n - Work in the open: collaborate with and contribute to the broader open source community.\n\n - Collaborate with a small, high-bar team of engineers who care deeply about quality.\n\n - Join an ambitious startup where your impact will be felt immediately.\n\n\n\n\nMORE ABOUT BROWSERBASE\n\nBrowserbase is the complete platform to build and deploy agents that browse and interact with the web like humans. We provide one API key for agents to search and fetch information, fill out forms, and replicate user actions.\n\nWe are a Series B startup that grew our revenue 5x in 2025 and are continuing to grow, fast. Backed by Kleiner Perkins, CRV, and Notable Capital, our team is building on our CEO's founding vision https://memos.hawkhill.ventures/p/an-internet-browser-for-ai to power the world's best AI tools and help everyone automate the web.\n\n\n\n",
+      "compensation": {
+        "compensationTierSummary": "$260K – $310K • Offers Equity",
+        "scrapeableCompensationSalarySummary": "$260K - $310K",
+        "compensationTiers": [
+          {
+            "id": "5aa8edd3-6b78-4c32-85b6-44be8ef94696",
+            "tierSummary": "$260K – $310K • Offers Equity",
+            "title": null,
+            "additionalInformation": null,
+            "components": [
+              {
+                "id": "9221cebf-f33b-4a6d-b73c-568e6773a0e7",
+                "summary": "$260K – $310K",
+                "compensationType": "Salary",
+                "interval": "1 YEAR",
+                "currencyCode": "USD",
+                "minValue": 260000,
+                "maxValue": 310000
+              },
+              {
+                "id": "c90e36ba-017d-4254-ad6a-66c99eeb9c81",
+                "summary": "Offers Equity",
+                "compensationType": "EquityPercentage",
+                "interval": "NONE",
+                "currencyCode": null,
+                "minValue": null,
+                "maxValue": null
+              }
+            ]
+          }
+        ],
+        "summaryComponents": [
+          {
+            "compensationType": "Salary",
+            "interval": "1 YEAR",
+            "currencyCode": "USD",
+            "minValue": 260000,
+            "maxValue": 310000
+          },
+          {
+            "compensationType": "EquityPercentage",
+            "interval": "NONE",
+            "currencyCode": null,
+            "minValue": null,
+            "maxValue": null
+          }
+        ]
+      }
+    }
+  ],
+  "apiVersion": "1"
+}
