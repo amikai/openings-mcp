@@ -110,8 +110,10 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		if string(j.EmploymentType) != "" {
 			fields["employmentType"] = string(j.EmploymentType)
 		}
-		if string(j.WorkplaceType) != "" {
-			fields["workplaceType"] = string(j.WorkplaceType)
+		// Real boards send null for workplaceType/isRemote (see provider
+		// fixture board_nulls_rsp.json); treat null as unspecified.
+		if wt, ok := j.WorkplaceType.Get(); ok && string(wt) != "" {
+			fields["workplaceType"] = string(wt)
 		}
 		jobs = append(jobs, dumpJob{
 			summary: JobSummary{
@@ -127,7 +129,7 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 			description: j.DescriptionPlain.Value,
 			locations:   ashbyLocations(j),
 			fields:      fields,
-			isRemote:    j.IsRemote,
+			isRemote:    j.IsRemote.Or(false),
 		})
 	}
 	return jobs, nil
