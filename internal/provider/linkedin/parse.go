@@ -10,6 +10,9 @@ import (
 
 var remoteKeywords = []string{"remote", "work from home", "wfh"}
 
+// looksRemote is a heuristic, not a field LinkedIn provides: it's a plain
+// substring scan over whatever text we hand it. No match defaults to false.
+// A posting silent on remote work is assumed on-site, not unknown.
 func looksRemote(parts ...string) bool {
 	joined := strings.ToLower(strings.Join(parts, " "))
 	for _, kw := range remoteKeywords {
