@@ -3,10 +3,14 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/peterbourgon/ff/v4"
+	"github.com/peterbourgon/ff/v4/ffhelp"
 
 	lever "github.com/amikai/openings-mcp/internal/provider/lever"
 )
@@ -16,7 +20,88 @@ import (
 // EU server (https://api.eu.lever.co).
 const leverAPIBaseURL = "https://api.lever.co"
 
-func main() {}
+func main() {
+	rootFlags := ff.NewFlagSet("lever")
+	var (
+		site    = rootFlags.StringLong("site", "", "curated Lever site slug, e.g. leverdemo, palantir (see 'lever companies' for the full list)")
+		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
+		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
+	)
+	rootCmd := &ff.Command{
+		Name:  "lever",
+		Usage: "lever --site SITE [FLAGS] <companies|search|get> [FLAGS]",
+		Flags: rootFlags,
+	}
+
+	companiesFlags := ff.NewFlagSet("companies").SetParent(rootFlags)
+	companiesCmd := &ff.Command{
+		Name:      "companies",
+		Usage:     "lever companies [--format text|json]",
+		ShortHelp: "list curated Lever sites (company name and site slug)",
+		Flags:     companiesFlags,
+		Exec: func(ctx context.Context, args []string) error {
+			return runCompanies(*format)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
+
+	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
+	var (
+		locations   = searchFlags.StringListLong("location", "filter by location, repeatable (values OR'ed, case-sensitive)")
+		commitments = searchFlags.StringListLong("commitment", "filter by commitment, repeatable (values OR'ed, case-sensitive)")
+		teams       = searchFlags.StringListLong("team", "filter by team, repeatable (values OR'ed, case-sensitive)")
+		departments = searchFlags.StringListLong("department", "filter by department, repeatable (values OR'ed, case-sensitive)")
+		level       = searchFlags.StringLong("level", "", "filter by level")
+		limit       = searchFlags.IntLong("limit", 20, "page size")
+		skip        = searchFlags.IntLong("skip", 0, "number of postings to skip")
+	)
+	searchCmd := &ff.Command{
+		Name:      "search",
+		Usage:     "lever --site SITE search [--location L ...] [--commitment C ...] [--team T ...] [--department D ...] [--level LVL] [--limit N] [--skip N] [--format text|json]",
+		ShortHelp: "list postings for a site, with optional filters",
+		Flags:     searchFlags,
+		Exec: func(ctx context.Context, args []string) error {
+			return runSearch(ctx, *site, *timeout, *locations, *commitments, *teams, *departments, *level, *limit, *skip, *format)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
+
+	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
+	getCmd := &ff.Command{
+		Name:      "get",
+		Usage:     "lever --site SITE get POSTING-ID [--format text|json]",
+		ShortHelp: "fetch one posting by id",
+		Flags:     getFlags,
+		Exec: func(ctx context.Context, args []string) error {
+			var id string
+			if len(args) > 0 {
+				id = args[0]
+			}
+			return runGet(ctx, *site, *timeout, id, *format)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
+
+	if err := rootCmd.Parse(os.Args[1:]); err != nil {
+		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
+		if errors.Is(err, ff.ErrHelp) {
+			os.Exit(0)
+		}
+		fmt.Fprintln(os.Stderr, "err:", err)
+		os.Exit(1)
+	}
+
+	if rootCmd.GetSelected() == rootCmd {
+		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
+		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or get) is required")
+		os.Exit(1)
+	}
+
+	if err := rootCmd.Run(context.Background()); err != nil {
+		fmt.Fprintln(os.Stderr, "err:", err)
+		os.Exit(1)
+	}
+}
 
 // normalizeSite lowercases the --site value and requires it to be a
 // curated site — same policy as cmd/workday's --tenant, even though
