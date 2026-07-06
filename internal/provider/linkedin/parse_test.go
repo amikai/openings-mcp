@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/net/html"
 )
 
 var wantJobs = []Job{
@@ -28,7 +28,7 @@ func TestParseSearchHTML(t *testing.T) {
 	require.NoError(t, err)
 	defer f.Close()
 
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	got := parseJobsHTML(doc)
@@ -51,7 +51,7 @@ func TestParseSearchHTMLRemote(t *testing.T) {
   </div>
 </div>
 </li></ul></body></html>`
-	doc, err := html.Parse(strings.NewReader(cardHTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(cardHTML))
 	require.NoError(t, err)
 
 	got := parseJobsHTML(doc)
@@ -91,7 +91,7 @@ func TestParseDetailHTML(t *testing.T) {
 	require.NoError(t, err)
 	defer f.Close()
 
-	doc, err := html.Parse(f)
+	doc, err := goquery.NewDocumentFromReader(f)
 	require.NoError(t, err)
 
 	got, ok := parseJobDetailHTML(doc, "4422697744")
@@ -116,7 +116,7 @@ func TestParseDetailHTMLApplyURL(t *testing.T) {
 <h1 class="topcard__title">Widget Engineer</h1>
 <code id="applyUrl"><!--"https://distro.example.com/redirect?url=https%3A%2F%2Fjobs.example.com%2Fapply%2F123"--></code>
 </body></html>`
-	doc, err := html.Parse(strings.NewReader(detailHTML))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(detailHTML))
 	require.NoError(t, err)
 
 	got, ok := parseJobDetailHTML(doc, "123")
