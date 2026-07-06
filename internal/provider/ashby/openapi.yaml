@@ -213,6 +213,12 @@ components:
         postalCode:
           type: string
           description: Postal code.
+        streetAddress:
+          type: string
+          description: >
+            Street address. Not listed in the official field reference;
+            observed on boards that publish full office addresses.
+          example: 1 Post Street, Floor 15
 
     Compensation:
       type: object
@@ -220,11 +226,18 @@ components:
       properties:
         compensationTierSummary:
           type: string
-          description: Human-readable summary across all tiers.
+          nullable: true
+          description: >
+            Human-readable summary across all tiers. Observed as null when
+            the job publishes no compensation ranges (compensationTiers and
+            summaryComponents are then empty).
           example: "€76K – €185K • Offers Equity • Offers Bonus"
         scrapeableCompensationSalarySummary:
           type: string
-          description: Salary-only summary intended for scrapers.
+          nullable: true
+          description: >
+            Salary-only summary intended for scrapers. Observed as null when
+            the job publishes no compensation ranges.
           example: "€76K - €185K"
         compensationTiers:
           type: array

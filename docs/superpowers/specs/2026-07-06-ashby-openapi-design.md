@@ -80,8 +80,9 @@ Enum policy:
 Compensation (full structure, present only with `includeCompensation=true`):
 
 - `Compensation`: `compensationTierSummary`,
-  `scrapeableCompensationSalarySummary`, `compensationTiers[]`,
-  `summaryComponents[]`.
+  `scrapeableCompensationSalarySummary` (both nullable — observed null on
+  jobs that publish no compensation ranges, with empty tier/component
+  arrays), `compensationTiers[]`, `summaryComponents[]`.
 - `CompensationTier`: `id`, `title` (nullable — observed null on unnamed
   tiers), `tierSummary`, `additionalInformation` (nullable), `components[]`.
 - `CompensationComponent` (shared by `components[]` and
