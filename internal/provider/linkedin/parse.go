@@ -41,14 +41,18 @@ func parseJobsHTML(doc *html.Node) []Job {
 }
 
 func parseJobCard(card *html.Node) (Job, bool) {
-	var title, id, company, companyURL, location, postedDate string
+	var title, company, companyURL, location, postedDate string
+
+	// The card div carries the canonical job ID in its urn; the link href is a
+	// slugged fallback for cards that ever omit the attribute.
+	id := jobIDFromURN(attrVal(card, "data-entity-urn"))
 
 	var walk func(*html.Node)
 	walk = func(n *html.Node) {
 		if n.Type == html.ElementNode {
 			switch {
 			case n.Data == "a" && hasClass(n, "base-card__full-link"):
-				if href := attrVal(n, "href"); href != "" {
+				if href := attrVal(n, "href"); href != "" && id == "" {
 					id = jobIDFromHref(href)
 				}
 				if t := textContent(n); title == "" {
@@ -93,6 +97,21 @@ func parseJobCard(card *html.Node) (Job, bool) {
 		PostedDate: postedDate,
 		Remote:     looksRemote(title, location),
 	}, id != "" && title != ""
+}
+
+// jobIDFromURN extracts the numeric job ID from a job card's
+// data-entity-urn ("urn:li:jobPosting:4422697744" -> "4422697744"). Returns
+// "" when the attribute is absent or malformed so the caller can fall back to
+// the href.
+func jobIDFromURN(urn string) string {
+	if urn == "" {
+		return ""
+	}
+	idx := strings.LastIndex(urn, ":")
+	if idx == -1 {
+		return ""
+	}
+	return urn[idx+1:]
 }
 
 // jobIDFromHref extracts the numeric job ID: the last hyphen-separated
@@ -168,7 +187,10 @@ func parseJobDetailHTML(doc *html.Node, id string) (*JobDetailResponse, bool) {
 	detail.EmploymentType = criteria["Employment type"]
 	detail.JobFunction = criteria["Job function"]
 	detail.Industries = criteria["Industries"]
-	detail.Remote = looksRemote(detail.Title, detail.Location, detail.Description)
+	// Scan only title+location, not the description: a full-text scan flips
+	// Remote on any incidental mention (e.g. "not a remote position") and would
+	// disagree with the search card, which sees title+location alone.
+	detail.Remote = looksRemote(detail.Title, detail.Location)
 
 	return &detail, detail.Title != ""
 }
@@ -181,7 +203,7 @@ func parseCriteria(list *html.Node, out map[string]string) {
 		if li.Type != html.ElementNode || li.Data != "li" {
 			continue
 		}
-		var label, value string
+		var label, classedValue, anyValue string
 		var walk func(*html.Node)
 		walk = func(n *html.Node) {
 			if n.Type == html.ElementNode {
@@ -189,8 +211,18 @@ func parseCriteria(list *html.Node, out map[string]string) {
 				case n.Data == "h3" && label == "":
 					label = strings.TrimSpace(textContent(n))
 					return
-				case n.Data == "span" && value == "":
-					value = strings.TrimSpace(textContent(n))
+				case n.Data == "span":
+					text := strings.TrimSpace(textContent(n))
+					// Prefer the value span LinkedIn documents (and openapi.yaml
+					// pins); fall back to the first bare span so a markup tweak
+					// doesn't silently blank the field.
+					if hasClass(n, "description__job-criteria-text") {
+						if classedValue == "" {
+							classedValue = text
+						}
+					} else if anyValue == "" {
+						anyValue = text
+					}
 					return
 				}
 			}
@@ -199,6 +231,10 @@ func parseCriteria(list *html.Node, out map[string]string) {
 			}
 		}
 		walk(li)
+		value := classedValue
+		if value == "" {
+			value = anyValue
+		}
 		if label != "" {
 			out[label] = value
 		}

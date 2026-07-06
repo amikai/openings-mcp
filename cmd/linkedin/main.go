@@ -87,7 +87,11 @@ func buildJobsRequest(keywords, location string, distance int, workplaceType, jo
 		req.JobType = linkedin.JobTypeIDs[jobType]
 	}
 	if companyIDs != "" {
-		req.CompanyIDs = strings.Split(companyIDs, ",")
+		for _, id := range strings.Split(companyIDs, ",") {
+			if id = strings.TrimSpace(id); id != "" {
+				req.CompanyIDs = append(req.CompanyIDs, id)
+			}
+		}
 	}
 	if postedWithin > 0 {
 		req.PostedWithinSeconds = int(postedWithin.Seconds())

@@ -153,6 +153,7 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	if jobID == "" {
 		return nil, errors.New("empty job id")
 	}
+	c.warmSession(ctx)
 	u, err := url.JoinPath(c.baseURL, jobDetailPath, jobID)
 	if err != nil {
 		return nil, fmt.Errorf("build job detail url: %w", err)
@@ -168,6 +169,28 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	return detail, nil
 }
 
+// warmSession primes the cookie jar before a cold jobs/view request, which
+// LinkedIn otherwise 999-authwalls (see NewClient). It's a best-effort no-op
+// when the client carries no jar (a caller-supplied client) or the jar already
+// holds cookies for the host — e.g. from a prior Jobs call on the same client.
+func (c *Client) warmSession(ctx context.Context) {
+	jar := c.httpClient.Jar
+	if jar == nil {
+		return
+	}
+	u, err := url.Parse(c.baseURL)
+	if err != nil {
+		return
+	}
+	if len(jar.Cookies(u)) > 0 {
+		return
+	}
+	// The Set-Cookie values land in the jar during the request regardless of
+	// whether the response parses, so any error here is ignored: the real
+	// jobs/view request follows and surfaces its own error if still blocked.
+	c.getHTML(ctx, c.baseURL+"/jobs/search", "") //nolint:errcheck
+}
+
 func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Node, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
@@ -177,7 +200,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*html.Nod
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 	req.Header.Set("Cache-Control", "max-age=0")
 	req.Header.Set("Upgrade-Insecure-Requests", "1")
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36")
 	if referer != "" {
 		req.Header.Set("Referer", referer)
 	}
