@@ -1,10 +1,12 @@
 package openingsmcp
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 var linkedinSearchInputRawSchema = []byte(`{
@@ -198,4 +200,36 @@ func linkedinHTTPToMCPDetail(detail *linkedin.JobDetailResponse) *linkedinDetail
 		ApplyURL:       detail.ApplyURL,
 		LooksRemote:    detail.Remote,
 	}
+}
+
+// RegisterLinkedin registers the LinkedIn search and job-detail tools.
+func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "linkedin_search_jobs",
+		Description: "Search jobs on LinkedIn's public guest job-search surface by keyword/location, with optional workplace-type/job-type/easy-apply/company/posted-within filters. Caution: LinkedIn rate-limits aggressively -- a single session is typically cut off around the 10th consecutive search request with a plain HTTP 429 carrying no Retry-After hint. Page conservatively (start in steps of 10) and back off on your own schedule rather than retrying immediately after a 429.",
+		Annotations: &mcp.ToolAnnotations{Title: "Search LinkedIn jobs", ReadOnlyHint: true},
+		InputSchema: linkedinSearchInputSchema,
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
+		req, err := linkedinMCPToHTTPRequest(in)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		res, err := c.Jobs(ctx, req)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		return nil, linkedinHTTPToMCPResponse(res), nil
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        "linkedin_get_job_detail",
+		Description: "Get the full job description and criteria for a LinkedIn job by numeric ID (id from linkedin_search_jobs results). Caution: this is the most block-prone endpoint -- a cold request can return HTTP 999 (bot-suspected authwall) -- and it shares the same session-wide rate-limit budget as search, so avoid fetching details for many jobs in one session.",
+		Annotations: &mcp.ToolAnnotations{Title: "Get LinkedIn job details", ReadOnlyHint: true},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinDetailInput) (*mcp.CallToolResult, *linkedinDetailOutput, error) {
+		res, err := c.JobDetail(ctx, in.JobID)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		return nil, linkedinHTTPToMCPDetail(res), nil
+	})
 }
