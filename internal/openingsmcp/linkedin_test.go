@@ -14,11 +14,9 @@ func TestLinkedinMCPToHTTPRequest(t *testing.T) {
 	in := linkedinSearchInput{
 		Keyword:       "software engineer",
 		Location:      "Taiwan",
-		Distance:      25,
 		WorkplaceType: "Remote",
 		JobType:       "Full-time",
-		EasyApply:     true,
-		CompanyIDs:    "1441, 162479",
+		CompanyIDs:    []string{"1441", "162479"},
 		PostedWithin:  "Past week",
 		Start:         10,
 	}
@@ -28,10 +26,8 @@ func TestLinkedinMCPToHTTPRequest(t *testing.T) {
 	want := &linkedin.JobsRequest{
 		Keywords:            "software engineer",
 		Location:            "Taiwan",
-		Distance:            25,
 		WorkplaceType:       linkedin.WorkplaceRemote,
 		JobType:             linkedin.JobTypeFullTime,
-		EasyApply:           true,
 		CompanyIDs:          []string{"1441", "162479"},
 		PostedWithinSeconds: 604800,
 		Start:               10,
@@ -167,17 +163,10 @@ func TestLinkedinSearchJobsE2E(t *testing.T) {
 		"type": "object",
 		"properties": map[string]any{
 			"keyword": map[string]any{
-				"type":        "string",
-				"description": "Free-text search query matched against job title, company, and description.",
+				"type": "string",
 			},
 			"location": map[string]any{
-				"type":        "string",
-				"description": "Free-text location filter. LinkedIn searches globally; there is no separate country-code parameter.",
-			},
-			"distance": map[string]any{
-				"type":        "integer",
-				"description": "Search radius in miles around location.",
-				"minimum":     float64(0),
+				"type": "string",
 			},
 			"workplace_type": map[string]any{
 				"type":        "string",
@@ -189,13 +178,12 @@ func TestLinkedinSearchJobsE2E(t *testing.T) {
 				"description": "Job type filter.",
 				"enum":        []any{"Full-time", "Part-time", "Contract", "Temporary", "Internship"},
 			},
-			"easy_apply": map[string]any{
-				"type":        "boolean",
-				"description": "Only jobs with LinkedIn Easy Apply.",
-			},
 			"company_ids": map[string]any{
-				"type":        "string",
-				"description": "Comma-separated LinkedIn numeric company IDs. IDs are opaque and must be resolved from a company's public page or a prior search response, not guessed.",
+				"type":        "array",
+				"description": "LinkedIn numeric company IDs. IDs are opaque and must be resolved from a company's public page or a prior search response, not guessed.",
+				"items": map[string]any{
+					"type": "string",
+				},
 			},
 			"posted_within": map[string]any{
 				"type":        "string",
@@ -204,7 +192,7 @@ func TestLinkedinSearchJobsE2E(t *testing.T) {
 			},
 			"start": map[string]any{
 				"type":        "integer",
-				"description": "Zero-based result offset; default 0. The endpoint always returns exactly 10 cards per call regardless of this value, so paging through results must increment start by exactly 10 each call (0, 10, 20, ...) to avoid gaps. Do not mimic a real browser's 25-per-step scroll traffic, which skips 10 of every 25 positions this endpoint can return.",
+				"description": "Zero-based result offset. Each call returns exactly 10 results; increment by 10 each page (0, 10, 20, ...).",
 				"minimum":     float64(0),
 			},
 		},

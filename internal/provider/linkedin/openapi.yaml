@@ -106,7 +106,17 @@ paths:
         - name: distance
           in: query
           required: false
-          description: Search radius in miles around `location`.
+          description: |
+            Search radius in miles around `location`, per LinkedIn's own UI.
+            Not implemented by this client: unlike every other parameter in
+            this spec, its exact behavior was never confirmed against the
+            live site — no fixture or captured traffic exercises it, so
+            there's no evidence for what a given value actually does to
+            results (a quick manual check found a negative value silently
+            replaces the results with an unrelated, location-ignoring set
+            instead of erroring, which is reason enough not to guess at the
+            rest of its range). JobsRequest has no field for it; send it
+            yourself if you need it.
           schema:
             type: integer
           example: 50

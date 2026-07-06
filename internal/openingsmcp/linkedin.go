@@ -3,7 +3,6 @@ package openingsmcp
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -13,17 +12,10 @@ var linkedinSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
-			"type": "string",
-			"description": "Free-text search query matched against job title, company, and description."
+			"type": "string"
 		},
 		"location": {
-			"type": "string",
-			"description": "Free-text location filter. LinkedIn searches globally; there is no separate country-code parameter."
-		},
-		"distance": {
-			"type": "integer",
-			"description": "Search radius in miles around location.",
-			"minimum": 0
+			"type": "string"
 		},
 		"workplace_type": {
 			"type": "string",
@@ -35,13 +27,12 @@ var linkedinSearchInputRawSchema = []byte(`{
 			"description": "Job type filter.",
 			"enum": ["Full-time", "Part-time", "Contract", "Temporary", "Internship"]
 		},
-		"easy_apply": {
-			"type": "boolean",
-			"description": "Only jobs with LinkedIn Easy Apply."
-		},
 		"company_ids": {
-			"type": "string",
-			"description": "Comma-separated LinkedIn numeric company IDs. IDs are opaque and must be resolved from a company's public page or a prior search response, not guessed."
+			"type": "array",
+			"description": "LinkedIn numeric company IDs. IDs are opaque and must be resolved from a company's public page or a prior search response, not guessed.",
+			"items": {
+				"type": "string"
+			}
 		},
 		"posted_within": {
 			"type": "string",
@@ -50,7 +41,7 @@ var linkedinSearchInputRawSchema = []byte(`{
 		},
 		"start": {
 			"type": "integer",
-			"description": "Zero-based result offset; default 0. The endpoint always returns exactly 10 cards per call regardless of this value, so paging through results must increment start by exactly 10 each call (0, 10, 20, ...) to avoid gaps. Do not mimic a real browser's 25-per-step scroll traffic, which skips 10 of every 25 positions this endpoint can return.",
+			"description": "Zero-based result offset. Each call returns exactly 10 results; increment by 10 each page (0, 10, 20, ...).",
 			"minimum": 0
 		}
 	},
@@ -64,15 +55,13 @@ var linkedinSearchInputRawSchema = []byte(`{
 var linkedinSearchInputSchema = mustSchema(linkedinSearchInputRawSchema)
 
 type linkedinSearchInput struct {
-	Keyword       string `json:"keyword,omitempty"`
-	Location      string `json:"location,omitempty"`
-	Distance      int    `json:"distance,omitempty"`
-	WorkplaceType string `json:"workplace_type,omitempty"`
-	JobType       string `json:"job_type,omitempty"`
-	EasyApply     bool   `json:"easy_apply,omitempty"`
-	CompanyIDs    string `json:"company_ids,omitempty"`
-	PostedWithin  string `json:"posted_within,omitempty"`
-	Start         int    `json:"start,omitempty"`
+	Keyword       string   `json:"keyword,omitempty"`
+	Location      string   `json:"location,omitempty"`
+	WorkplaceType string   `json:"workplace_type,omitempty"`
+	JobType       string   `json:"job_type,omitempty"`
+	CompanyIDs    []string `json:"company_ids,omitempty"`
+	PostedWithin  string   `json:"posted_within,omitempty"`
+	Start         int      `json:"start,omitempty"`
 }
 
 // linkedinPostedWithinSeconds maps a human label to the seconds value
@@ -85,11 +74,10 @@ var linkedinPostedWithinSeconds = map[string]int{
 
 func linkedinMCPToHTTPRequest(in *linkedinSearchInput) (*linkedin.JobsRequest, error) {
 	req := &linkedin.JobsRequest{
-		Keywords:  in.Keyword,
-		Location:  in.Location,
-		Distance:  in.Distance,
-		EasyApply: in.EasyApply,
-		Start:     in.Start,
+		Keywords:   in.Keyword,
+		Location:   in.Location,
+		CompanyIDs: in.CompanyIDs,
+		Start:      in.Start,
 	}
 
 	if in.WorkplaceType != "" {
@@ -106,14 +94,6 @@ func linkedinMCPToHTTPRequest(in *linkedinSearchInput) (*linkedin.JobsRequest, e
 			return nil, fmt.Errorf("invalid job_type %q", in.JobType)
 		}
 		req.JobType = id
-	}
-
-	if in.CompanyIDs != "" {
-		for _, id := range strings.Split(in.CompanyIDs, ",") {
-			if id = strings.TrimSpace(id); id != "" {
-				req.CompanyIDs = append(req.CompanyIDs, id)
-			}
-		}
 	}
 
 	if in.PostedWithin != "" {
@@ -206,7 +186,7 @@ func linkedinHTTPToMCPDetail(detail *linkedin.JobDetailResponse) *linkedinDetail
 func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "linkedin_search_jobs",
-		Description: "Search jobs on LinkedIn's public guest job-search surface by keyword/location, with optional workplace-type/job-type/easy-apply/company/posted-within filters. Caution: LinkedIn rate-limits aggressively -- a single session is typically cut off around the 10th consecutive search request with a plain HTTP 429 carrying no Retry-After hint. Page conservatively (start in steps of 10) and back off on your own schedule rather than retrying immediately after a 429.",
+		Description: "Search jobs on LinkedIn's public guest job-search surface, with optional workplace-type/job-type/company/posted-within filters. LinkedIn rate-limits aggressively; page start in steps of 10, and back off instead of retrying immediately after a 429.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search LinkedIn jobs", ReadOnlyHint: true},
 		InputSchema: linkedinSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
@@ -223,7 +203,7 @@ func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "linkedin_get_job_detail",
-		Description: "Get the full job description and criteria for a LinkedIn job by numeric ID (id from linkedin_search_jobs results). Caution: this is the most block-prone endpoint -- a cold request can return HTTP 999 (bot-suspected authwall) -- and it shares the same session-wide rate-limit budget as search, so avoid fetching details for many jobs in one session.",
+		Description: "Get the full job description by LinkedIn ID (id from linkedin_search_jobs results). May be flagged as a bot and blocked (HTTP 999).",
 		Annotations: &mcp.ToolAnnotations{Title: "Get LinkedIn job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinDetailInput) (*mcp.CallToolResult, *linkedinDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.JobID)

@@ -51,7 +51,6 @@ const DefaultStart = 25
 type JobsRequest struct {
 	Keywords            string
 	Location            string
-	Distance            int
 	WorkplaceType       string // f_WT: one of Workplace* above
 	JobType             string // f_JT: one of JobType* above
 	EasyApply           bool   // f_AL
@@ -119,9 +118,6 @@ func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	}
 	if r.Location != "" {
 		q.Set("location", r.Location)
-	}
-	if r.Distance > 0 {
-		q.Set("distance", strconv.Itoa(r.Distance))
 	}
 	if r.WorkplaceType != "" {
 		q.Set("f_WT", r.WorkplaceType)
