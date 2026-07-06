@@ -100,6 +100,7 @@ func TestLinkedinHTTPToMCPDetail(t *testing.T) {
 	// dropped, so it must not appear anywhere in want.
 	want := &linkedinDetailOutput{
 		ID:             "7",
+		URL:            "https://www.linkedin.com/jobs/view/7",
 		Title:          "t",
 		Company:        "c",
 		Location:       "l",
@@ -276,6 +277,7 @@ func TestLinkedinGetJobDetailE2E(t *testing.T) {
 
 	want := linkedinDetailOutput{
 		ID:             "4422697744",
+		URL:            "https://www.linkedin.com/jobs/view/4422697744",
 		Title:          "Software Engineer",
 		Company:        "BoostDraft",
 		Location:       "Taiwan",

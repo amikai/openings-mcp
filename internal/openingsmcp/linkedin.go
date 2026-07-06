@@ -118,7 +118,7 @@ type linkedinJobSummary struct {
 	CompanyURL string `json:"company_url,omitempty"`
 	Location   string `json:"location,omitempty"`
 	PostedDate string `json:"posted_date,omitempty"`
-	Remote     bool   `json:"remote,omitempty" jsonschema:"Keyword heuristic (title/location substring match for 'remote'/'work from home'/'wfh'), not a field LinkedIn provides. False does not mean confirmed on-site."`
+	Remote     bool   `json:"remote,omitempty"`
 	URL        string `json:"url,omitempty" jsonschema:"Public job posting URL."`
 }
 
@@ -152,6 +152,7 @@ type linkedinDetailInput struct {
 
 type linkedinDetailOutput struct {
 	ID             string `json:"id"`
+	URL            string `json:"url,omitempty" jsonschema:"Public job posting URL."`
 	Title          string `json:"title"`
 	Company        string `json:"company,omitempty"`
 	Location       string `json:"location,omitempty"`
@@ -168,6 +169,7 @@ type linkedinDetailOutput struct {
 func linkedinHTTPToMCPDetail(detail *linkedin.JobDetailResponse) *linkedinDetailOutput {
 	return &linkedinDetailOutput{
 		ID:             detail.ID,
+		URL:            linkedinJobURL(detail.ID),
 		Title:          detail.Title,
 		Company:        detail.Company,
 		Location:       detail.Location,
@@ -186,7 +188,7 @@ func linkedinHTTPToMCPDetail(detail *linkedin.JobDetailResponse) *linkedinDetail
 func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "linkedin_search_jobs",
-		Description: "Search jobs on LinkedIn's public guest job-search surface, with optional workplace-type/job-type/company/posted-within filters. LinkedIn rate-limits aggressively; page start in steps of 10, and back off instead of retrying immediately after a 429.",
+		Description: "Search jobs on LinkedIn's public guest job-search surface. LinkedIn's rate limiting is aggressive; back off instead of retrying on a 429. Page start in steps of 10.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search LinkedIn jobs", ReadOnlyHint: true},
 		InputSchema: linkedinSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
