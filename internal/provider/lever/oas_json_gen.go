@@ -278,39 +278,6 @@ func (s *OptPostingCategories) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes PostingWorkplaceType as json.
-func (o OptPostingWorkplaceType) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes PostingWorkplaceType from json.
-func (o *OptPostingWorkplaceType) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptPostingWorkplaceType to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptPostingWorkplaceType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptPostingWorkplaceType) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes SalaryRange as json.
 func (o OptSalaryRange) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1064,50 +1031,6 @@ func (s *PostingListEntry) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *PostingListEntry) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes PostingWorkplaceType as json.
-func (s PostingWorkplaceType) Encode(e *jx.Encoder) {
-	e.Str(string(s))
-}
-
-// Decode decodes PostingWorkplaceType from json.
-func (s *PostingWorkplaceType) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PostingWorkplaceType to nil")
-	}
-	v, err := d.StrBytes()
-	if err != nil {
-		return err
-	}
-	// Try to use constant string.
-	switch PostingWorkplaceType(v) {
-	case PostingWorkplaceTypeUnspecified:
-		*s = PostingWorkplaceTypeUnspecified
-	case PostingWorkplaceTypeOnSite:
-		*s = PostingWorkplaceTypeOnSite
-	case PostingWorkplaceTypeRemote:
-		*s = PostingWorkplaceTypeRemote
-	case PostingWorkplaceTypeHybrid:
-		*s = PostingWorkplaceTypeHybrid
-	default:
-		*s = PostingWorkplaceType(v)
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s PostingWorkplaceType) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PostingWorkplaceType) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

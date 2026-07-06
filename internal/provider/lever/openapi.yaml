@@ -207,8 +207,13 @@ components:
             API; missing from the official field table.
         workplaceType:
           type: string
-          enum: [unspecified, on-site, remote, hybrid]
-          description: Primary workplace environment. Not filterable.
+          description: >
+            Primary workplace environment. Not filterable. The official
+            docs list `unspecified`, `on-site`, `remote`, and `hybrid`,
+            but live tenants have been observed returning `onsite` (no
+            hyphen) too, so this is deliberately not a closed enum — one
+            unexpected value would otherwise fail decoding for the whole
+            page.
         opening:
           type: string
           description: Description opening (styled HTML).

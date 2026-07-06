@@ -25,24 +25,6 @@ func (s *Posting) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.WorkplaceType.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
-		}
-		return nil
-	}(); err != nil {
-		failures = append(failures, validate.FieldError{
-			Name:  "workplaceType",
-			Error: err,
-		})
-	}
-	if err := func() error {
 		if value, ok := s.SalaryRange.Get(); ok {
 			if err := func() error {
 				if err := value.Validate(); err != nil {
@@ -64,21 +46,6 @@ func (s *Posting) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
-}
-
-func (s PostingWorkplaceType) Validate() error {
-	switch s {
-	case "unspecified":
-		return nil
-	case "on-site":
-		return nil
-	case "remote":
-		return nil
-	case "hybrid":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
 }
 
 func (s Postings) Validate() error {

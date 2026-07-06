@@ -353,52 +353,6 @@ func (o OptPostingCategories) Or(d PostingCategories) PostingCategories {
 	return d
 }
 
-// NewOptPostingWorkplaceType returns new OptPostingWorkplaceType with value set to v.
-func NewOptPostingWorkplaceType(v PostingWorkplaceType) OptPostingWorkplaceType {
-	return OptPostingWorkplaceType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptPostingWorkplaceType is optional PostingWorkplaceType.
-type OptPostingWorkplaceType struct {
-	Value PostingWorkplaceType
-	Set   bool
-}
-
-// IsSet returns true if OptPostingWorkplaceType was set.
-func (o OptPostingWorkplaceType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptPostingWorkplaceType) Reset() {
-	var v PostingWorkplaceType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptPostingWorkplaceType) SetTo(v PostingWorkplaceType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptPostingWorkplaceType) Get() (v PostingWorkplaceType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptPostingWorkplaceType) Or(d PostingWorkplaceType) PostingWorkplaceType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptSalaryRange returns new OptSalaryRange with value set to v.
 func NewOptSalaryRange(v SalaryRange) OptSalaryRange {
 	return OptSalaryRange{
@@ -503,8 +457,11 @@ type Posting struct {
 	// Creation timestamp in epoch milliseconds. Returned by the live API; missing from the official field
 	// table.
 	CreatedAt OptInt64 `json:"createdAt"`
-	// Primary workplace environment. Not filterable.
-	WorkplaceType OptPostingWorkplaceType `json:"workplaceType"`
+	// Primary workplace environment. Not filterable. The official docs list `unspecified`, `on-site`,
+	// `remote`, and `hybrid`, but live tenants have been observed returning `onsite` (no hyphen) too, so
+	// this is deliberately not a closed enum — one unexpected value would otherwise fail decoding for
+	// the whole page.
+	WorkplaceType OptString `json:"workplaceType"`
 	// Description opening (styled HTML).
 	Opening OptString `json:"opening"`
 	// Description opening (plaintext).
@@ -560,7 +517,7 @@ func (s *Posting) GetCreatedAt() OptInt64 {
 }
 
 // GetWorkplaceType returns the value of WorkplaceType.
-func (s *Posting) GetWorkplaceType() OptPostingWorkplaceType {
+func (s *Posting) GetWorkplaceType() OptString {
 	return s.WorkplaceType
 }
 
@@ -660,7 +617,7 @@ func (s *Posting) SetCreatedAt(val OptInt64) {
 }
 
 // SetWorkplaceType sets the value of WorkplaceType.
-func (s *Posting) SetWorkplaceType(val OptPostingWorkplaceType) {
+func (s *Posting) SetWorkplaceType(val OptString) {
 	s.WorkplaceType = val
 }
 
@@ -820,62 +777,6 @@ func (s *PostingListEntry) SetText(val string) {
 // SetContent sets the value of Content.
 func (s *PostingListEntry) SetContent(val string) {
 	s.Content = val
-}
-
-// Primary workplace environment. Not filterable.
-type PostingWorkplaceType string
-
-const (
-	PostingWorkplaceTypeUnspecified PostingWorkplaceType = "unspecified"
-	PostingWorkplaceTypeOnSite      PostingWorkplaceType = "on-site"
-	PostingWorkplaceTypeRemote      PostingWorkplaceType = "remote"
-	PostingWorkplaceTypeHybrid      PostingWorkplaceType = "hybrid"
-)
-
-// AllValues returns all PostingWorkplaceType values.
-func (PostingWorkplaceType) AllValues() []PostingWorkplaceType {
-	return []PostingWorkplaceType{
-		PostingWorkplaceTypeUnspecified,
-		PostingWorkplaceTypeOnSite,
-		PostingWorkplaceTypeRemote,
-		PostingWorkplaceTypeHybrid,
-	}
-}
-
-// MarshalText implements encoding.TextMarshaler.
-func (s PostingWorkplaceType) MarshalText() ([]byte, error) {
-	switch s {
-	case PostingWorkplaceTypeUnspecified:
-		return []byte(s), nil
-	case PostingWorkplaceTypeOnSite:
-		return []byte(s), nil
-	case PostingWorkplaceTypeRemote:
-		return []byte(s), nil
-	case PostingWorkplaceTypeHybrid:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
-}
-
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *PostingWorkplaceType) UnmarshalText(data []byte) error {
-	switch PostingWorkplaceType(data) {
-	case PostingWorkplaceTypeUnspecified:
-		*s = PostingWorkplaceTypeUnspecified
-		return nil
-	case PostingWorkplaceTypeOnSite:
-		*s = PostingWorkplaceTypeOnSite
-		return nil
-	case PostingWorkplaceTypeRemote:
-		*s = PostingWorkplaceTypeRemote
-		return nil
-	case PostingWorkplaceTypeHybrid:
-		*s = PostingWorkplaceTypeHybrid
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
 }
 
 type Postings []Posting
