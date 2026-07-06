@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
@@ -37,11 +36,7 @@ func TestServerListsJobTools(t *testing.T) {
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
-	adapterLever, err := ats.NewLeverAdapter("https://api.lever.co", http.DefaultClient)
-	require.NoError(t, err)
-	adapterAshby, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", http.DefaultClient)
-	require.NoError(t, err)
-	registry, err := ats.NewRegistry(ats.NewWorkdayAdapter(http.DefaultClient), adapterLever, adapterAshby)
+	registry, err := newATSRegistry(http.DefaultClient)
 	require.NoError(t, err)
 	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)

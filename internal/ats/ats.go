@@ -3,11 +3,25 @@
 // company and never learn which ATS serves it.
 package ats
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // PageSize is the fixed page size for every adapter. Workday caps limit at
 // 20 on at least one tenant, so 20 is the largest safe uniform value.
 const PageSize = 20
+
+// clampPage and totalPages centralize the unified pagination contract —
+// 1-based pages, fixed PageSize, ceil-div page count — so adapters can't
+// drift on it.
+func clampPage(p int) int { return max(p, 1) }
+
+func totalPages(total int) int { return (total + PageSize - 1) / PageSize }
+
+// isoDate renders the unified PostedAt format for upstreams that provide a
+// real timestamp.
+func isoDate(t time.Time) string { return t.UTC().Format("2006-01-02") }
 
 // Adapter is one ATS's implementation of the unified search interface.
 // Methods address a company by slug; slugs are declared by Roster() and
@@ -36,7 +50,7 @@ type CompanyInfo struct {
 // across adapters; how each maps them upstream is the adapter's business.
 type SearchParams struct {
 	Query    string              // keywords: titles, skills, tech — never locations
-	Location string              // fuzzy text match; "remote" is special-cased
+	Location string              // fuzzy text match; full-dump adapters special-case "remote" via their remote fields, workday matches location facet labels
 	Filters  map[string][]string // escape hatch; keys/values come from Filters(); OR within a key, AND across keys
 	Page     int                 // 1-based; values < 1 mean page 1
 }

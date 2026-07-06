@@ -62,7 +62,7 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 			return nil, err
 		}
 	}
-	page := max(p.Page, 1)
+	page := clampPage(p.Page)
 	rsp, err := client.SearchJobs(ctx, &workday.JobsRequest{
 		AppliedFacets: applied,
 		Limit:         PageSize,
@@ -97,12 +97,11 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 			URL:      url,
 		})
 	}
-	total := rsp.Total
 	return &SearchResult{
 		Jobs:       jobs,
-		TotalCount: total,
+		TotalCount: rsp.Total,
 		Page:       page,
-		TotalPages: (total + PageSize - 1) / PageSize,
+		TotalPages: totalPages(rsp.Total),
 	}, nil
 }
 
@@ -122,16 +121,7 @@ func (a *WorkdayAdapter) Filters(ctx context.Context, slug string) (FilterSet, e
 		}
 		seen[f.param][f.label] = true
 	}
-	fs := make(FilterSet, len(seen))
-	for param, labels := range seen {
-		list := make([]string, 0, len(labels))
-		for l := range labels {
-			list = append(list, l)
-		}
-		sort.Strings(list)
-		fs[param] = list
-	}
-	return fs, nil
+	return toFilterSet(seen), nil
 }
 
 func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
@@ -141,7 +131,7 @@ func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDe
 	}
 	loc, titleSlug, ok := workday.SplitExternalPath(jobID)
 	if !ok {
-		return nil, fmt.Errorf("workday: invalid job_id %q; pass the job_id returned by search_jobs_by_company", jobID)
+		return nil, fmt.Errorf("workday: invalid job_id %q; pass a job_id exactly as returned by the job search", jobID)
 	}
 	rsp, err := client.GetJobDetail(ctx, workday.GetJobDetailParams{Location: loc, TitleSlug: titleSlug})
 	if err != nil {
@@ -270,7 +260,7 @@ func resolveLocationFacet(flat []flatFacet, location string) (string, []string, 
 		}
 	}
 	if len(hits) == 0 {
-		return "", nil, fmt.Errorf("no location matching %q; call get_filters_by_company to see available location values", location)
+		return "", nil, fmt.Errorf("no location matching %q; list the company's filters to see available location values", location)
 	}
 	params := make([]string, 0, len(hits))
 	for p := range hits {
@@ -303,12 +293,7 @@ func resolveFacetValues(flat []flatFacet, key string, values []string) ([]string
 		}
 	}
 	if len(byLabel) == 0 {
-		keys := make([]string, 0, len(params))
-		for p := range params {
-			keys = append(keys, p)
-		}
-		sort.Strings(keys)
-		return nil, fmt.Errorf("unknown filter key %q; valid keys: %s", key, strings.Join(keys, ", "))
+		return nil, errUnknownFilterKey(key, params)
 	}
 	ids := make([]string, 0, len(values))
 	for _, v := range values {

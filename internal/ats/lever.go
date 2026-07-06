@@ -38,19 +38,11 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 }
 
 func (a *LeverAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
-	jobs, err := a.dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return searchDump(jobs, p)
+	return searchViaDump(ctx, a.dump, slug, p)
 }
 
 func (a *LeverAdapter) Filters(ctx context.Context, slug string) (FilterSet, error) {
-	jobs, err := a.dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return distinctFilters(jobs), nil
+	return filtersViaDump(ctx, a.dump, slug)
 }
 
 func (a *LeverAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
@@ -95,17 +87,15 @@ func (a *LeverAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		if p.WorkplaceType.Value != "" {
 			fields["workplaceType"] = p.WorkplaceType.Value
 		}
-		posted := time.UnixMilli(p.CreatedAt.Value).UTC()
 		jobs = append(jobs, dumpJob{
 			summary: JobSummary{
 				JobID:    p.ID,
 				Title:    p.Text,
 				Location: cat.Location.Value,
-				PostedAt: posted.Format("2006-01-02"),
+				PostedAt: leverPostedAt(&p),
 				URL:      p.HostedUrl.Value,
 			},
-			sortKey:     posted,
-			title:       p.Text,
+			sortKey:     time.UnixMilli(p.CreatedAt.Value).UTC(),
 			orgUnit:     cat.Team.Value + " " + cat.Department.Value,
 			description: p.DescriptionPlain.Value,
 			locations:   cat.Location.Value + " " + strings.Join(cat.AllLocations, " "),
@@ -149,5 +139,5 @@ func leverPostedAt(p *lever.Posting) string {
 	if !p.CreatedAt.Set {
 		return ""
 	}
-	return time.UnixMilli(p.CreatedAt.Value).UTC().Format("2006-01-02")
+	return isoDate(time.UnixMilli(p.CreatedAt.Value))
 }

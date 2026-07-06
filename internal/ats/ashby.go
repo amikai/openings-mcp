@@ -37,19 +37,11 @@ func (a *AshbyAdapter) Roster() []CompanyInfo {
 }
 
 func (a *AshbyAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
-	jobs, err := a.dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return searchDump(jobs, p)
+	return searchViaDump(ctx, a.dump, slug, p)
 }
 
 func (a *AshbyAdapter) Filters(ctx context.Context, slug string) (FilterSet, error) {
-	jobs, err := a.dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return distinctFilters(jobs), nil
+	return filtersViaDump(ctx, a.dump, slug)
 }
 
 func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
@@ -66,12 +58,12 @@ func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 			Title:       j.Title,
 			Company:     ashby.CompaniesByBoard[slug].Name,
 			Location:    ashbyLocations(j),
-			PostedAt:    j.PublishedAt.UTC().Format("2006-01-02"),
+			PostedAt:    isoDate(j.PublishedAt),
 			URL:         j.JobUrl,
 			Description: j.DescriptionPlain.Value,
 		}, nil
 	}
-	return nil, fmt.Errorf("ashby: job %q not found for company %q; pass the job_id returned by search_jobs_by_company", jobID, slug)
+	return nil, fmt.Errorf("ashby: job %q not found for company %q; pass a job_id exactly as returned by the job search", jobID, slug)
 }
 
 // board fetches the full job board, unwrapping ogen's union response.
@@ -120,11 +112,10 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 				JobID:    j.ID.Value,
 				Title:    j.Title,
 				Location: j.Location.Value,
-				PostedAt: j.PublishedAt.UTC().Format("2006-01-02"),
+				PostedAt: isoDate(j.PublishedAt),
 				URL:      j.JobUrl,
 			},
 			sortKey:     j.PublishedAt,
-			title:       j.Title,
 			orgUnit:     j.Department.Value + " " + j.Team.Value,
 			description: j.DescriptionPlain.Value,
 			locations:   ashbyLocations(j),
@@ -136,7 +127,8 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 }
 
 func ashbyLocations(j ashby.JobPosting) string {
-	parts := []string{j.Location.Value}
+	parts := make([]string, 0, 1+len(j.SecondaryLocations))
+	parts = append(parts, j.Location.Value)
 	for _, s := range j.SecondaryLocations {
 		parts = append(parts, s.Location.Value)
 	}

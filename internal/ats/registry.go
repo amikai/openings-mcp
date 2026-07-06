@@ -14,12 +14,19 @@ type registryEntry struct {
 	name    string
 }
 
+// slugEntry pairs a roster slug with its precomputed normalized form, so
+// the suggestion path doesn't re-normalize the whole roster on every miss.
+type slugEntry struct {
+	slug string
+	norm string
+}
+
 // Registry is the read-only union of every adapter's roster, built once at
 // startup. It owns name resolution; adapters never see unresolved input.
 type Registry struct {
 	bySlug map[string]registryEntry // key: normalize(slug)
 	byName map[string]registryEntry // key: normalize(display name)
-	slugs  []string                 // original slugs, sorted, for suggestions
+	slugs  []slugEntry              // sorted by slug, for suggestions
 }
 
 // NewRegistry unions the adapters' rosters. A slug or normalized display
@@ -45,10 +52,10 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 					c.Name, a.Name(), prev.name, prev.adapter.Name())
 			}
 			r.byName[nameKey] = e
-			r.slugs = append(r.slugs, c.Slug)
+			r.slugs = append(r.slugs, slugEntry{slug: c.Slug, norm: slugKey})
 		}
 	}
-	sort.Strings(r.slugs)
+	sort.Slice(r.slugs, func(i, j int) bool { return r.slugs[i].slug < r.slugs[j].slug })
 	return r, nil
 }
 
@@ -90,13 +97,13 @@ func (r *Registry) suggest(key string, n int) []string {
 		dist int
 	}
 	ranked := make([]scored, 0, len(r.slugs))
-	for _, slug := range r.slugs {
-		norm := normalize(slug)
-		dist := levenshtein(key, norm)
-		if strings.Contains(norm, key) || strings.Contains(key, norm) {
-			dist = 0
+	for _, s := range r.slugs {
+		// Substring hits win outright; levenshtein only runs when needed.
+		dist := 0
+		if !strings.Contains(s.norm, key) && !strings.Contains(key, s.norm) {
+			dist = levenshtein(key, s.norm)
 		}
-		ranked = append(ranked, scored{slug: slug, dist: dist})
+		ranked = append(ranked, scored{slug: s.slug, dist: dist})
 	}
 	sort.Slice(ranked, func(i, j int) bool {
 		if ranked[i].dist != ranked[j].dist {

@@ -39,8 +39,8 @@ var (
 const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104 and Cake.me (Taiwan-centric) and LinkedIn (global), plus the careers sites of Google, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering hundreds of companies' official careers sites behind one company parameter.
 
 Tool selection:
-- When the user names a specific company, try search_jobs_by_company first; it covers hundreds of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, 104, ...) when the company isn't covered.
-- When the user names a site or company, use that provider's tools.
+- When the user names a specific site (104, Cake.me, LinkedIn), use that site's tools.
+- When the user names a specific company: use its dedicated tools if it has them (google, nvidia, tsmc); otherwise try search_jobs_by_company — it covers hundreds of companies, and when a name isn't recognized its error message suggests the closest supported ones. Fall back to the job-board tools when the company isn't covered there either.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, and LinkedIn) rather than a single company's careers site.
 
 Query construction:
@@ -128,16 +128,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 	jarLinkedin, _ := cookiejar.New(nil)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", &http.Client{Timeout: 30 * time.Second, Jar: jarLinkedin})
 
-	adapterWorkday := ats.NewWorkdayAdapter(hc)
-	adapterLever, err := ats.NewLeverAdapter("https://api.lever.co", hc)
-	if err != nil {
-		return err
-	}
-	adapterAshby, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
-	if err != nil {
-		return err
-	}
-	registry, err := ats.NewRegistry(adapterWorkday, adapterLever, adapterAshby)
+	registry, err := newATSRegistry(hc)
 	if err != nil {
 		return err
 	}
@@ -148,6 +139,20 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 		return err
 	}
 	return nil
+}
+
+// newATSRegistry wires the unified company adapters over one shared
+// connection pool, against the providers' production endpoints.
+func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
+	adapterLever, err := ats.NewLeverAdapter("https://api.lever.co", hc)
+	if err != nil {
+		return nil, err
+	}
+	adapterAshby, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
+	if err != nil {
+		return nil, err
+	}
+	return ats.NewRegistry(ats.NewWorkdayAdapter(hc), adapterLever, adapterAshby)
 }
 
 func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, cTsmc *tsmc.Client, cGoogle *google.Client, cLinkedin *linkedin.Client, registry *ats.Registry, logger *slog.Logger) *mcp.Server {

@@ -1,6 +1,7 @@
 package ats
 
 import (
+	"context"
 	"fmt"
 	"sort"
 	"strings"
@@ -14,12 +15,30 @@ import (
 type dumpJob struct {
 	summary     JobSummary
 	sortKey     time.Time         // posting time, for deterministic newest-first ordering
-	title       string            // query tier 1
-	orgUnit     string            // query tier 2: team/department text
+	orgUnit     string            // query tier 2: team/department text (tier 1 is summary.Title)
 	description string            // query tier 3: full JD plain text
 	locations   string            // every location string joined, for fuzzy matching
 	fields      map[string]string // structured dimensions, e.g. "team" -> "Platform"
 	isRemote    bool
+}
+
+// searchViaDump and filtersViaDump are the whole Search/Filters
+// implementation for full-dump adapters; each adapter contributes only its
+// dump function.
+func searchViaDump(ctx context.Context, dump func(context.Context, string) ([]dumpJob, error), slug string, p SearchParams) (*SearchResult, error) {
+	jobs, err := dump(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	return searchDump(jobs, p)
+}
+
+func filtersViaDump(ctx context.Context, dump func(context.Context, string) ([]dumpJob, error), slug string) (FilterSet, error) {
+	jobs, err := dump(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	return distinctFilters(jobs), nil
 }
 
 // searchDump filters, ranks, and pages a full board dump. The upstream has
@@ -30,71 +49,80 @@ func searchDump(jobs []dumpJob, p SearchParams) (*SearchResult, error) {
 	if err := validateFilterKeys(jobs, p.Filters); err != nil {
 		return nil, err
 	}
-	matched := make([]dumpJob, 0, len(jobs))
-	for _, j := range jobs {
-		if matchQuery(j, p.Query) && matchLocation(j, p.Location) && matchFilters(j, p.Filters) {
-			matched = append(matched, j)
+	// Loop-invariant normalizations, hoisted out of the per-job matchers.
+	words := strings.Fields(strings.ToLower(p.Query))
+	loc := strings.ToLower(strings.TrimSpace(p.Location))
+
+	// matched carries pointers plus a precomputed rank: sorting fat dumpJob
+	// values (they hold full JD text) and re-ranking inside the comparator
+	// would dominate the search cost on large boards.
+	type scoredJob struct {
+		job  *dumpJob
+		rank int
+	}
+	matched := make([]scoredJob, 0, len(jobs))
+	for i := range jobs {
+		j := &jobs[i]
+		// Cheapest predicates first: map lookups and a small Contains
+		// before matchQuery builds the full-JD search blob.
+		if !matchFilters(j, p.Filters) || !matchLocation(j, loc) || !matchQuery(j, words) {
+			continue
 		}
+		matched = append(matched, scoredJob{job: j, rank: queryRank(j, words)})
 	}
 	sort.Slice(matched, func(i, k int) bool {
 		a, b := matched[i], matched[k]
-		ra, rb := queryRank(a, p.Query), queryRank(b, p.Query)
-		if ra != rb {
-			return ra < rb
+		if a.rank != b.rank {
+			return a.rank < b.rank
 		}
-		if !a.sortKey.Equal(b.sortKey) {
-			return a.sortKey.After(b.sortKey)
+		if !a.job.sortKey.Equal(b.job.sortKey) {
+			return a.job.sortKey.After(b.job.sortKey)
 		}
-		return a.summary.JobID < b.summary.JobID
+		return a.job.summary.JobID < b.job.summary.JobID
 	})
 
-	page := max(p.Page, 1)
+	page := clampPage(p.Page)
 	total := len(matched)
-	totalPages := (total + PageSize - 1) / PageSize
 	start := min((page-1)*PageSize, total)
 	end := min(start+PageSize, total)
 	out := make([]JobSummary, 0, end-start)
-	for _, j := range matched[start:end] {
-		out = append(out, j.summary)
+	for _, m := range matched[start:end] {
+		out = append(out, m.job.summary)
 	}
-	return &SearchResult{Jobs: out, TotalCount: total, Page: page, TotalPages: totalPages}, nil
+	return &SearchResult{Jobs: out, TotalCount: total, Page: page, TotalPages: totalPages(total)}, nil
 }
 
 // matchQuery requires every query word somewhere in the job's text.
 // Ranking (title hits first) happens separately in queryRank.
-func matchQuery(j dumpJob, query string) bool {
-	words := strings.Fields(strings.ToLower(query))
+func matchQuery(j *dumpJob, words []string) bool {
 	if len(words) == 0 {
 		return true
 	}
-	blob := strings.ToLower(j.title + " " + j.orgUnit + " " + j.description)
+	blob := strings.ToLower(j.summary.Title + " " + j.orgUnit + " " + j.description)
+	return containsAllWords(blob, words)
+}
+
+// queryRank orders matches: 0 when the title alone satisfies the whole
+// query, 1 otherwise. A title hit is a far stronger signal than a JD-body
+// mention.
+func queryRank(j *dumpJob, words []string) int {
+	if len(words) == 0 || containsAllWords(strings.ToLower(j.summary.Title), words) {
+		return 0
+	}
+	return 1
+}
+
+func containsAllWords(text string, words []string) bool {
 	for _, w := range words {
-		if !strings.Contains(blob, w) {
+		if !strings.Contains(text, w) {
 			return false
 		}
 	}
 	return true
 }
 
-// queryRank orders matches: 0 when the title alone satisfies the whole
-// query, 1 otherwise. A title hit is a far stronger signal than a JD-body
-// mention.
-func queryRank(j dumpJob, query string) int {
-	words := strings.Fields(strings.ToLower(query))
-	if len(words) == 0 {
-		return 0
-	}
-	title := strings.ToLower(j.title)
-	for _, w := range words {
-		if !strings.Contains(title, w) {
-			return 1
-		}
-	}
-	return 0
-}
-
-func matchLocation(j dumpJob, location string) bool {
-	loc := strings.ToLower(strings.TrimSpace(location))
+// matchLocation takes the already-lowercased, trimmed location.
+func matchLocation(j *dumpJob, loc string) bool {
 	if loc == "" {
 		return true
 	}
@@ -104,7 +132,7 @@ func matchLocation(j dumpJob, location string) bool {
 	return strings.Contains(strings.ToLower(j.locations), loc)
 }
 
-func matchFilters(j dumpJob, filters map[string][]string) bool {
+func matchFilters(j *dumpJob, filters map[string][]string) bool {
 	for key, values := range filters {
 		actual := j.fields[key]
 		if actual == "" {
@@ -131,30 +159,37 @@ func validateFilterKeys(jobs []dumpJob, filters map[string][]string) error {
 		return nil
 	}
 	valid := make(map[string]bool)
-	for _, j := range jobs {
-		for k := range j.fields {
+	for i := range jobs {
+		for k := range jobs[i].fields {
 			valid[k] = true
 		}
 	}
 	for key := range filters {
 		if !valid[key] {
-			keys := make([]string, 0, len(valid))
-			for k := range valid {
-				keys = append(keys, k)
-			}
-			sort.Strings(keys)
-			return fmt.Errorf("unknown filter key %q; valid keys: %s", key, strings.Join(keys, ", "))
+			return errUnknownFilterKey(key, valid)
 		}
 	}
 	return nil
+}
+
+// errUnknownFilterKey is the one teaching error both adapter families
+// return for an unknown filter dimension — part of keeping the families
+// indistinguishable to the LLM.
+func errUnknownFilterKey(key string, valid map[string]bool) error {
+	keys := make([]string, 0, len(valid))
+	for k := range valid {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return fmt.Errorf("unknown filter key %q; valid keys: %s", key, strings.Join(keys, ", "))
 }
 
 // distinctFilters enumerates a dump's structured dimensions — the
 // full-dump family's implementation of get_filters.
 func distinctFilters(jobs []dumpJob) FilterSet {
 	seen := make(map[string]map[string]bool)
-	for _, j := range jobs {
-		for k, v := range j.fields {
+	for i := range jobs {
+		for k, v := range jobs[i].fields {
 			if v == "" {
 				continue
 			}
@@ -164,6 +199,12 @@ func distinctFilters(jobs []dumpJob) FilterSet {
 			seen[k][v] = true
 		}
 	}
+	return toFilterSet(seen)
+}
+
+// toFilterSet flattens dimension→value sets into the sorted FilterSet both
+// adapter families return.
+func toFilterSet(seen map[string]map[string]bool) FilterSet {
 	fs := make(FilterSet, len(seen))
 	for k, values := range seen {
 		list := make([]string, 0, len(values))

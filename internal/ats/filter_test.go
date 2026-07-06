@@ -10,7 +10,6 @@ func dj(id, title, orgUnit, desc, loc string, posted time.Time, fields map[strin
 	return dumpJob{
 		summary:     JobSummary{JobID: id, Title: title, Location: loc, PostedAt: posted.Format("2006-01-02"), URL: "https://example.com/" + id},
 		sortKey:     posted,
-		title:       title,
 		orgUnit:     orgUnit,
 		description: desc,
 		locations:   loc,
