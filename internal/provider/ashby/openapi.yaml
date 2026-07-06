@@ -1,0 +1,317 @@
+openapi: 3.1.0
+
+info:
+  title: Ashby Public Job Posting API
+  description: >
+    Client surface for Ashby's public job posting API
+    (https://developers.ashbyhq.com/docs/public-job-posting-api). Ashby is a
+    multi-tenant ATS: each customer organization hosts a public job board at
+    `https://jobs.ashbyhq.com/{jobBoardName}`, and the same `jobBoardName`
+    path segment selects the organization here.
+
+    The API is a single unauthenticated endpoint that returns every listed
+    job for the organization in one response, each job already carrying its
+    full HTML and plain-text description. There is no server-side search,
+    filtering, pagination, or separate detail endpoint - callers filter
+    client-side.
+
+    Observed behaviors (live `ashby` board, 2026-07-06): `apiVersion` is the
+    JSON string "1"; an unknown board name returns HTTP 404 with the
+    plain-text body `Not Found`; fields without data are omitted from the
+    response rather than sent as null.
+  version: "1.0.0"
+
+servers:
+  - url: https://api.ashbyhq.com
+    description: Production
+
+tags:
+  - name: Jobs
+    description: Public job board listing
+
+paths:
+  /posting-api/job-board/{jobBoardName}:
+    get:
+      tags: [Jobs]
+      summary: List all job postings on an organization's job board
+      description: >
+        Returns every listed job posting for the organization in a single
+        response. Each posting includes the full description, so there is no
+        follow-up detail request.
+      operationId: getJobBoard
+      parameters:
+        - name: jobBoardName
+          in: path
+          required: true
+          description: >
+            The organization's job board slug - the trailing path segment of
+            its Ashby-hosted board URL
+            `https://jobs.ashbyhq.com/{jobBoardName}`.
+          schema:
+            type: string
+          example: ashby
+        - name: includeCompensation
+          in: query
+          required: false
+          description: >
+            When true, each job posting additionally carries a
+            `compensation` object with structured salary/equity/bonus data.
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: The organization's job board.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobBoardResponse"
+        "404":
+          description: No job board exists with the given name.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Not Found
+
+components:
+  schemas:
+    JobBoardResponse:
+      type: object
+      required: [apiVersion, jobs]
+      properties:
+        apiVersion:
+          type: string
+          description: API version. Observed as the JSON string "1".
+          example: "1"
+        jobs:
+          type: array
+          description: Every listed job posting for the organization.
+          items:
+            $ref: "#/components/schemas/JobPosting"
+
+    JobPosting:
+      type: object
+      description: >
+        One published job posting. Per the official docs, fields without
+        data are omitted from the response rather than sent as null.
+      required:
+        - title
+        - isRemote
+        - workplaceType
+        - employmentType
+        - publishedAt
+        - jobUrl
+        - applyUrl
+        - isListed
+      properties:
+        id:
+          type: string
+          description: >
+            Job posting UUID. Not listed in the official field reference but
+            observed on every job; `jobUrl` and `applyUrl` embed it.
+          example: 7458d4e9-da2e-47bd-98cb-adfda43d42b2
+        title:
+          type: string
+          description: Job title.
+          example: Engineering Manager, EU
+        department:
+          type: string
+          description: Department the job belongs to.
+          example: Engineering
+        team:
+          type: string
+          description: Immediate team the job belongs to.
+          example: EMEA Engineering
+        employmentType:
+          type: string
+          enum: [FullTime, PartTime, Intern, Contract, Temporary]
+          description: Employment type. The docs enumerate this set exhaustively.
+        location:
+          type: string
+          description: Primary location display name.
+          example: Remote - European Union
+        secondaryLocations:
+          type: array
+          description: Additional locations the job can be worked from.
+          items:
+            $ref: "#/components/schemas/SecondaryLocation"
+        publishedAt:
+          type: string
+          format: date-time
+          description: When the job was (last) published.
+          example: "2024-03-04T14:29:08.532+00:00"
+        isListed:
+          type: boolean
+          description: Whether the job appears on the public job board listing.
+        isRemote:
+          type: boolean
+          description: Whether the job is remote.
+        workplaceType:
+          type: string
+          enum: [OnSite, Remote, Hybrid]
+          description: Workplace arrangement. The docs enumerate this set exhaustively.
+        address:
+          $ref: "#/components/schemas/Address"
+        jobUrl:
+          type: string
+          description: URL of the Ashby-hosted job posting page.
+          example: https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2
+        applyUrl:
+          type: string
+          description: URL of the Ashby-hosted application page.
+          example: https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2/application
+        descriptionHtml:
+          type: string
+          description: Full job description as HTML.
+        descriptionPlain:
+          type: string
+          description: Full job description as plain text.
+        shouldDisplayCompensationOnJobPostings:
+          type: boolean
+          description: >
+            Not listed in the official field reference; observed on every
+            job when `includeCompensation=true` is requested.
+        compensation:
+          allOf:
+            - $ref: "#/components/schemas/Compensation"
+          description: >
+            Structured compensation data. Present only when the request set
+            `includeCompensation=true`.
+
+    SecondaryLocation:
+      type: object
+      properties:
+        location:
+          type: string
+          description: Location display name.
+          example: Spain
+        address:
+          $ref: "#/components/schemas/Address"
+
+    Address:
+      type: object
+      description: Wrapper object holding a postal address.
+      properties:
+        postalAddress:
+          $ref: "#/components/schemas/PostalAddress"
+
+    PostalAddress:
+      type: object
+      description: >
+        Schema.org-style postal address. Observed to use empty strings for
+        parts the organization did not fill in.
+      properties:
+        addressLocality:
+          type: string
+          description: City.
+        addressRegion:
+          type: string
+          description: State / province.
+        addressCountry:
+          type: string
+          description: Country.
+        postalCode:
+          type: string
+          description: Postal code.
+        streetAddress:
+          type: string
+          description: >
+            Street address. Not listed in the official field reference;
+            observed on boards that publish full office addresses.
+          example: 1 Post Street, Floor 15
+
+    Compensation:
+      type: object
+      description: Structured compensation data for one job posting.
+      properties:
+        compensationTierSummary:
+          type: string
+          nullable: true
+          description: >
+            Human-readable summary across all tiers. Observed as null when
+            the job publishes no compensation ranges (compensationTiers and
+            summaryComponents are then empty).
+          example: "€76K – €185K • Offers Equity • Offers Bonus"
+        scrapeableCompensationSalarySummary:
+          type: string
+          nullable: true
+          description: >
+            Salary-only summary intended for scrapers. Observed as null when
+            the job publishes no compensation ranges.
+          example: "€76K - €185K"
+        compensationTiers:
+          type: array
+          description: One entry per compensation tier (e.g. per geographic zone).
+          items:
+            $ref: "#/components/schemas/CompensationTier"
+        summaryComponents:
+          type: array
+          description: >
+            Components summarizing compensation across all tiers. Entries
+            omit `id` and `summary`.
+          items:
+            $ref: "#/components/schemas/CompensationComponent"
+
+    CompensationTier:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Tier identifier (UUID).
+        title:
+          type: string
+          nullable: true
+          description: Tier name. Observed as null when the tier is unnamed.
+          example: EU
+        tierSummary:
+          type: string
+          description: Human-readable summary of this tier.
+          example: "€76K – €185K • Offers Equity • Offers Bonus"
+        additionalInformation:
+          type: string
+          nullable: true
+          description: Extra details. Observed as null when absent.
+        components:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompensationComponent"
+
+    CompensationComponent:
+      type: object
+      description: >
+        One compensation component. `id` and `summary` appear on tier
+        components but are omitted from `summaryComponents` entries.
+      properties:
+        id:
+          type: string
+          description: Component identifier (UUID).
+        summary:
+          type: string
+          description: Human-readable summary of this component.
+          example: "€76K – €185K"
+        compensationType:
+          type: string
+          description: >
+            Component kind. Known values include Salary, EquityPercentage,
+            and Bonus, but the official docs mark the list as open ("and
+            others"), so this is deliberately not an enum.
+        interval:
+          type: string
+          description: >
+            Payout interval. Known values include "1 YEAR" and "NONE", but
+            the official docs mark the list as open ("and others"), so this
+            is deliberately not an enum.
+          example: 1 YEAR
+        currencyCode:
+          type: string
+          nullable: true
+          description: ISO 4217 currency code; null for non-monetary components.
+          example: EUR
+        minValue:
+          type: number
+          nullable: true
+          description: Minimum amount; null when the component has no range.
+        maxValue:
+          type: number
+          nullable: true
+          description: Maximum amount; null when the component has no range.
