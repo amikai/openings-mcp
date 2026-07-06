@@ -1,0 +1,314 @@
+openapi: 3.1.0
+
+info:
+  title: LinkedIn Guest Jobs Search
+  version: "1.0.0"
+  description: |
+    Client-side API specification for LinkedIn's unauthenticated ("guest") job
+    search surface. Reverse-engineered from the public jobs UI at
+    https://www.linkedin.com/jobs/search and from the python-jobspy reference
+    implementation (https://github.com/Bunsly/JobSpy, jobspy/linkedin/).
+
+    ## Architecture
+
+    Two independent endpoints, both **server-side rendered HTML**, no JSON API:
+
+    - `seeMoreJobPostings/search` — the endpoint LinkedIn's own frontend calls
+      for infinite-scroll pagination on the public jobs search page. Returns
+      an HTML fragment: a flat list of `<li>` job cards, not a full page.
+    - `jobs/view/{jobId}` — the full SSR job detail page (same URL a signed-out
+      visitor lands on after clicking a card).
+
+    Neither endpoint requires authentication, but both are aggressively
+    fingerprinted — see Key Behaviors below.
+
+    ## Key Behaviors
+
+    - **No login required, but session cookies matter.** A cold request with no
+      cookies to `jobs/view/{jobId}` frequently returns **HTTP 999** with a body
+      that redirects (via inline `<script>`) to `/authwall` — LinkedIn's
+      non-standard status code for bot-suspected traffic. The same request
+      succeeds once it carries the `Set-Cookie` values (`JSESSIONID`, `bcookie`,
+      `bscookie`, `lidc`, `__cf_bm`, ...) issued by a prior request to
+      `www.linkedin.com` in the same session — i.e. behave like a browser that
+      visited the search page first, not a disconnected one-shot client.
+      `seeMoreJobPostings/search` did not exhibit this on a cold request during
+      testing, but carrying cookies across both calls is recommended regardless.
+    - **Rate limiting**: sustained scraping gets a plain HTTP 429. LinkedIn is
+      the most restrictive of the job boards JobSpy supports; a single IP
+      typically gets limited around the 10th search request (observed: the
+      10th consecutive `seeMoreJobPostings/search` call returned 429 while the
+      first 9 were 200). The 429 carries **no `Retry-After` header** (nor any
+      `x-ratelimit-*` reset hint) — the body is a small Cloudflare block page,
+      so there is no server-provided wait time to honor. Recovery is waiting
+      (back off on your own fixed/exponential schedule) or rotating egress IP.
+    - **Pagination**: `start` is a zero-based result offset. Live testing
+      confirms the endpoint always returns exactly 10 cards per call
+      regardless of `start` (values 0, 10, 15, 25, 50, 75, 100, 125, 150, and
+      200 each returned exactly 10, in strict sequential order — `start` is a
+      precise per-item offset, not a page index). LinkedIn's own guest
+      frontend does not increment by 10, though: watching real
+      `/jobs/search` scroll traffic in a browser showed it requesting
+      `start=25`, `50`, `75`, `100`, ... The first 25 results are rendered
+      server-side in the initial full-page load rather than through this
+      endpoint, which is why the frontend's first XHR call to it already
+      starts at 25 — but its 25-per-step increment then silently skips
+      results at positions 10-24, 35-49, 60-74, and so on, since this
+      endpoint only ever serves 10 per call. That's a real gap in LinkedIn's
+      own guest UI, confirmed by direct query, not a theoretical one. A
+      caller working against this endpoint directly should start at `0` and
+      increment by the actual card count returned (10) to scrape without
+      gaps. Results are capped at roughly 1000 total regardless of `start`.
+    - **Job ID placement differs by endpoint**: the search card's `href` embeds
+      the numeric ID as the LAST hyphen-separated path segment
+      (`.../software-engineer-at-boostdraft-4422697744`), but the canonical
+      detail URL takes the ID ALONE with no required slug
+      (`jobs/view/4422697744`) — unlike some other sites' detail pages, the
+      slug is not optional trailing decoration on this endpoint, it's simply
+      never required at all.
+    - **Salary is rarely present.** Most cards/detail pages omit compensation
+      entirely; when shown it's free-text (e.g. "$120,000 - $150,000"), not a
+      structured field.
+
+servers:
+  - url: https://www.linkedin.com
+    description: LinkedIn (guest / unauthenticated)
+
+paths:
+  /jobs-guest/jobs/api/seeMoreJobPostings/search:
+    get:
+      operationId: searchJobs
+      summary: Search job listings (HTML fragment, infinite-scroll endpoint)
+      description: |
+        Returns a fragment of `<li>` job cards matching the given filters.
+        This is the exact endpoint the public jobs-search page calls internally
+        to load more results on scroll; it is not intended as a public API and
+        carries no version guarantee.
+      parameters:
+        - name: keywords
+          in: query
+          required: false
+          description: Free-text search query matched against job title, company, and description.
+          schema:
+            type: string
+          example: "software engineer"
+
+        - name: location
+          in: query
+          required: false
+          description: |
+            Free-text location. LinkedIn searches globally; this is the only
+            location-shaping parameter (no separate country code param).
+          schema:
+            type: string
+          example: "Taiwan"
+
+        - name: distance
+          in: query
+          required: false
+          description: Search radius in miles around `location`.
+          schema:
+            type: integer
+          example: 50
+
+        - name: f_WT
+          in: query
+          required: false
+          description: |
+            Workplace type filter. Single-select. This is the well-known
+            public mapping used by LinkedIn's own search UI; only `2` (Remote)
+            was exercised against the live site while building this spec —
+            `1` and `3` are documented from the UI's observable behavior, not
+            independently captured here.
+          schema:
+            type: integer
+            enum:
+              - 1 # On-site
+              - 2 # Remote
+              - 3 # Hybrid
+          example: 2
+
+        - name: f_JT
+          in: query
+          required: false
+          description: |
+            Job type filter, single letter code. Known values (from the
+            python-jobspy reference implementation's mapping); LinkedIn's UI
+            may expose additional types (e.g. Volunteer, Other) not listed here
+            because they aren't exercised by that reference mapping.
+          schema:
+            type: string
+            enum:
+              - F # Full-time
+              - P # Part-time
+              - C # Contract
+              - T # Temporary
+              - I # Internship
+          example: F
+
+        - name: pageNum
+          in: query
+          required: false
+          description: |
+            Always observed as `0` regardless of actual page — pagination is
+            driven entirely by `start`, not this parameter. Sent because
+            LinkedIn's own frontend always sends it; effect of other values
+            is undocumented.
+          schema:
+            type: integer
+            enum:
+              - 0
+          example: 0
+
+        - name: start
+          in: query
+          required: false
+          description: |
+            Zero-based result offset. The endpoint always returns exactly 10
+            cards per call regardless of this value, confirmed live across
+            `start=0..200`. LinkedIn's own guest frontend increments by 25
+            per scroll step instead of 10: its first XHR call to this
+            endpoint starts at `start=25` (the initial 25 results are
+            already rendered server-side in the full-page load), and the
+            `default: 25` here documents that observed real-browser starting
+            point rather than a confirmed server fallback for an omitted
+            parameter, which hasn't been tested. The frontend's 25-per-step
+            increment then skips 10 of every 25 positions this endpoint can
+            otherwise return. A caller scraping this endpoint directly
+            should start at `0` and increment by the actual card count
+            returned (10) to avoid that gap. Results are capped at roughly
+            1000 total regardless of how high `start` goes.
+          schema:
+            type: integer
+            default: 25
+          example: 25
+
+        - name: f_AL
+          in: query
+          required: false
+          description: |
+            Easy Apply filter. Only meaningful value is `true`; omit the
+            parameter entirely for no filter (any other value is not known to
+            do anything useful).
+          schema:
+            type: string
+            enum:
+              - "true"
+          example: "true"
+
+        - name: f_C
+          in: query
+          required: false
+          description: |
+            Comma-separated list of LinkedIn numeric company IDs. IDs are
+            opaque and must be resolved from a company's public page or a
+            prior search response, not guessed.
+          schema:
+            type: string
+          example: "1441,162479"
+
+        - name: f_TPR
+          in: query
+          required: false
+          description: |
+            Time-posted filter. Format is the literal letter `r` followed by
+            an age in seconds (e.g. `r86400` = past 24 hours). Not a fixed
+            enum — any positive integer of seconds is accepted.
+          schema:
+            type: string
+            pattern: '^r\d+$'
+          examples:
+            past_day:
+              summary: Past 24 hours
+              value: "r86400"
+            past_week:
+              summary: Past week
+              value: "r604800"
+            past_month:
+              summary: Past month
+              value: "r2592000"
+
+      responses:
+        "200":
+          description: |
+            An HTML fragment: zero or more `<li>` job cards. Each card
+            (`div.base-search-card`) carries the job's title, a link to the
+            detail page (`a.base-card__full-link`, numeric ID is the final
+            `-`-separated segment of the path), company name and link
+            (`h4.base-search-card__subtitle a`), location
+            (`span.job-search-card__location`), an ISO date
+            (`time.job-search-card__listdate[datetime]`), and occasionally a
+            salary range (`span.job-search-card__salary-info`).
+          content:
+            text/html:
+              schema:
+                type: string
+                description: HTML fragment containing zero or more job cards.
+        "429":
+          description: |
+            Rate limited (observed around the 10th consecutive request). No
+            response body worth parsing and no `Retry-After` header; back off
+            on your own schedule or rotate egress IP.
+
+  /jobs/view/{jobId}:
+    get:
+      operationId: getJobDetail
+      summary: Get full job detail page
+      description: |
+        Returns the SSR HTML page for a single job posting. The numeric ID
+        alone is sufficient — the slug LinkedIn's own links include before the
+        ID in search results is not required here.
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: Numeric job posting ID.
+          schema:
+            type: string
+            pattern: '^\d+$'
+          example: "4422697744"
+      responses:
+        "200":
+          description: |
+            Full HTML page. Relevant sections:
+            - Title (`h1.topcard__title`), company + location
+              (`span.topcard__flavor`), relative post age
+              (`span.posted-time-ago__text`)
+            - Full description (`div.show-more-less-html__markup`), embedded as
+              rich HTML (headings, lists, `<br>`) inside the text, not escaped
+            - A criteria list (`ul.description__job-criteria-list`), each
+              `li.description__job-criteria-item` pairing a
+              `h3.description__job-criteria-subheader` label (observed:
+              "Seniority level", "Employment type", "Job function",
+              "Industries") with a
+              `span.description__job-criteria-text--criteria` value. Not every
+              label is present on every posting; a "Workplace type" label has
+              been documented elsewhere but did not appear on the job used to
+              build this fixture.
+            - Company logo (`img.artdeco-entity-image[data-delayed-url]`)
+            - An optional direct-apply URL for jobs that redirect to an
+              external ATS, embedded in `<code id="applyUrl">` as a
+              comment-wrapped, `?url=`-prefixed, URL-encoded string. Absent
+              for jobs using LinkedIn's own Easy Apply (as in this spec's
+              fixture).
+          content:
+            text/html:
+              schema:
+                type: string
+                description: Full SSR HTML job detail page.
+        "404":
+          description: Job ID not found or posting removed/expired.
+        default:
+          description: |
+            Most notably HTTP **999** (not a standard code, so OpenAPI 3.1
+            requires documenting it here under `default` rather than as its
+            own response key): bot-suspected / no session. Body is a small
+            HTML page whose inline `<script>` redirects the browser to
+            `/authwall`. Observed on a cold request (no cookies from a prior
+            request to the same host); resolved by carrying cookies from a
+            preceding request forward, the same way a real browser session
+            would.
+          content:
+            text/html:
+              schema:
+                type: string
