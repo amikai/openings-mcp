@@ -140,6 +140,11 @@ func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, er
 		return nil, fmt.Errorf("keyword is required")
 	}
 	params.Keyword = job104.NewOptString(in.Keyword)
+	// Always on: without it, a keyword 104 recognizes as a company name (e.g.
+	// 聯發科) gets a pagination-less companyKeyword response instead of job
+	// results, which fails JobsResponse decoding. See the parameter's
+	// description in openapi.yaml.
+	params.ExcludeCompanyKeyword = job104.NewOptBool(true)
 
 	area := job104.AreaIDs[in.Area]
 	if err := area.Validate(); err != nil {

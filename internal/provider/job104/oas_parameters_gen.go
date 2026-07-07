@@ -86,8 +86,14 @@ func decodeGetJobDetailParams(args [1]string, argsEscaped bool, r *http.Request)
 // SearchJobsParams is parameters of searchJobs operation.
 type SearchJobsParams struct {
 	// Free-text keyword search.
-	Keyword OptString         `json:",omitempty,omitzero"`
-	Area    OptSearchJobsArea `json:",omitempty,omitzero"`
+	Keyword OptString `json:",omitempty,omitzero"`
+	// Always send `true`. When the keyword is one 104 recognizes as a company name (e.g. 聯發科), the
+	// API abandons the job search and replies `{"data":[],"metadata":{"companyKeyword":true}}` — no
+	// `pagination` — as a hint for its frontend to offer a company-page redirect; that shape fails this
+	// spec's JobsResponse decoding. Sending `excludeCompanyKeyword=true` disables the special-casing so
+	// such keywords return ordinary job results, and it has no effect on other keywords.
+	ExcludeCompanyKeyword OptBool           `json:",omitempty,omitzero"`
+	Area                  OptSearchJobsArea `json:",omitempty,omitzero"`
 	// Job type. `0` is accepted but a no-op (same as omitting `ro`). This is a soft filter, not a hard
 	// one: `metadata.pagination.total` reflects the true filtered count, but `data` is backfilled with
 	// non-matching postings past that count (e.g. `ro=2` returned 9 rows for `total=4`, 5 of them
@@ -118,6 +124,15 @@ func unpackSearchJobsParams(packed middleware.Parameters) (params SearchJobsPara
 		}
 		if v, ok := packed[key]; ok {
 			params.Keyword = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "excludeCompanyKeyword",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.ExcludeCompanyKeyword = v.(OptBool)
 		}
 	}
 	{
@@ -225,6 +240,47 @@ func decodeSearchJobsParams(args [0]string, argsEscaped bool, r *http.Request) (
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "keyword",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: excludeCompanyKeyword.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "excludeCompanyKeyword",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotExcludeCompanyKeywordVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotExcludeCompanyKeywordVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ExcludeCompanyKeyword.SetTo(paramsDotExcludeCompanyKeywordVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "excludeCompanyKeyword",
 			In:   "query",
 			Err:  err,
 		}

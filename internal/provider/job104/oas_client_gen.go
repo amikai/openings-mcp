@@ -254,6 +254,23 @@ func (c *Client) sendSearchJobs(ctx context.Context, params SearchJobsParams) (r
 		}
 	}
 	{
+		// Encode "excludeCompanyKeyword" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "excludeCompanyKeyword",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ExcludeCompanyKeyword.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "area" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "area",

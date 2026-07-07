@@ -24,6 +24,13 @@ const (
 	MockNotFoundJobCode = "mock-404"
 )
 
+// MockCompanyKeyword triggers the real API's company-keyword mode: searching
+// for it WITHOUT excludeCompanyKeyword=true returns the pagination-less
+// `{"data":[],"metadata":{"companyKeyword":true}}` shape 104 sends when it
+// recognizes the keyword as a company name; with the parameter it returns the
+// normal search fixture, as the real API does.
+const MockCompanyKeyword = "聯發科"
+
 // NewMockServer returns an httptest.Server that mimics the 104 API with
 // canned fixture responses, so tests never hit the real site. The caller
 // owns the server and must Close it.
@@ -32,6 +39,10 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/jobs/search/api/jobs", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("keyword") == MockErrorKeyword {
 			serveMockError(w, http.StatusInternalServerError, "internal error")
+			return
+		}
+		if r.URL.Query().Get("keyword") == MockCompanyKeyword && r.URL.Query().Get("excludeCompanyKeyword") != "true" {
+			serveMockJSON([]byte(`{"data":[],"metadata":{"companyKeyword":true}}`))(w, r)
 			return
 		}
 		serveMockJSON(mockJobsRsp)(w, r)

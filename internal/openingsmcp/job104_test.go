@@ -186,6 +186,29 @@ func TestJob104SearchJobE2E(t *testing.T) {
 	assert.Equal(t, wantResp, &got)
 }
 
+func TestJob104SearchJobsCompanyKeywordE2E(t *testing.T) {
+	clientSession, _ := testJob104MCPClientServer(t)
+
+	// A keyword 104 recognizes as a company name flips the API into a
+	// pagination-less companyKeyword response unless the handler sends
+	// excludeCompanyKeyword=true; the mock reproduces that behavior, so
+	// this call only succeeds when the parameter is actually on the wire.
+	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      "104_search_jobs",
+		Arguments: map[string]any{"keyword": job104.MockCompanyKeyword, "area": "Hsinchu"},
+	})
+	require.NoError(t, err)
+	require.False(t, callRes.IsError)
+
+	data, err := json.Marshal(callRes.StructuredContent)
+	require.NoError(t, err)
+	var got job104SearchOutput
+	require.NoError(t, json.Unmarshal(data, &got))
+
+	assert.NotEmpty(t, got.Data)
+	assert.Equal(t, job104Pagination{CurrentPage: 1, LastPage: 7, Total: 189}, got.Metadata.Pagination)
+}
+
 func TestJob104SearchJobsMissingRequiredE2E(t *testing.T) {
 	clientSession, _ := testJob104MCPClientServer(t)
 
@@ -444,13 +467,14 @@ func TestJob104MCPToHTTPRequest(t *testing.T) {
 	require.NoError(t, err)
 
 	want := &job104.SearchJobsParams{
-		Keyword:    job104.NewOptString("golang"),
-		Area:       job104.NewOptSearchJobsArea(job104.AreaIDs["Taipei"]),
-		Ro:         job104.NewOptSearchJobsRo(job104.SearchJobsRo2),
-		Order:      job104.NewOptSearchJobsOrder(job104.SearchJobsOrder2),
-		RemoteWork: job104.NewOptSearchJobsRemoteWork(job104.SearchJobsRemoteWork1),
-		Page:       job104.NewOptInt(2),
-		Edu:        []job104.SearchJobsEduItem{job104.SearchJobsEduItem4, job104.SearchJobsEduItem5},
+		Keyword:               job104.NewOptString("golang"),
+		ExcludeCompanyKeyword: job104.NewOptBool(true),
+		Area:                  job104.NewOptSearchJobsArea(job104.AreaIDs["Taipei"]),
+		Ro:                    job104.NewOptSearchJobsRo(job104.SearchJobsRo2),
+		Order:                 job104.NewOptSearchJobsOrder(job104.SearchJobsOrder2),
+		RemoteWork:            job104.NewOptSearchJobsRemoteWork(job104.SearchJobsRemoteWork1),
+		Page:                  job104.NewOptInt(2),
+		Edu:                   []job104.SearchJobsEduItem{job104.SearchJobsEduItem4, job104.SearchJobsEduItem5},
 	}
 	assert.Equal(t, want, got)
 }
@@ -478,8 +502,9 @@ func TestJob104MCPToHTTPRequestMinimal(t *testing.T) {
 	got, err := job104MCPToHTTPRequest(&job104SearchInput{Keyword: "golang", Area: "Taipei"})
 	require.NoError(t, err)
 	want := job104.SearchJobsParams{
-		Keyword: job104.NewOptString("golang"),
-		Area:    job104.NewOptSearchJobsArea(job104.AreaIDs["Taipei"]),
+		Keyword:               job104.NewOptString("golang"),
+		ExcludeCompanyKeyword: job104.NewOptBool(true),
+		Area:                  job104.NewOptSearchJobsArea(job104.AreaIDs["Taipei"]),
 	}
 	assert.Equal(t, want, *got)
 }

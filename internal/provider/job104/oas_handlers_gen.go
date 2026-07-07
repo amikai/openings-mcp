@@ -293,6 +293,10 @@ func (s *Server) handleSearchJobsRequest(args [0]string, argsEscaped bool, w htt
 					In:   "query",
 				}: params.Keyword,
 				{
+					Name: "excludeCompanyKeyword",
+					In:   "query",
+				}: params.ExcludeCompanyKeyword,
+				{
 					Name: "area",
 					In:   "query",
 				}: params.Area,

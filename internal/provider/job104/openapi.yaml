@@ -37,6 +37,21 @@ paths:
           schema:
             type: string
           example: "Golang"
+        - name: excludeCompanyKeyword
+          in: query
+          required: false
+          description: >
+            Always send `true`. When the keyword is one 104 recognizes as a
+            company name (e.g. 聯發科), the API abandons the job search and
+            replies `{"data":[],"metadata":{"companyKeyword":true}}` — no
+            `pagination` — as a hint for its frontend to offer a company-page
+            redirect; that shape fails this spec's JobsResponse decoding.
+            Sending `excludeCompanyKeyword=true` disables the special-casing
+            so such keywords return ordinary job results, and it has no
+            effect on other keywords.
+          schema:
+            type: boolean
+          example: true
         - name: area
           in: query
           required: false
