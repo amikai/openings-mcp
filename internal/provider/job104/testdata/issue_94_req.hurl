@@ -10,6 +10,7 @@ Accept: application/json, text/plain, */*
 Accept-Language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7
 Referer: https://www.104.com.tw/jobs/search/
 [Options]
+http1.1: true
 output: issue_94_rsp.json
 [QueryStringParams]
 keyword: 聯發科

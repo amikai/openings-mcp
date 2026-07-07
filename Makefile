@@ -1,4 +1,4 @@
-.PHONY: validate-openapi hurl-fmt hurl-lint
+.PHONY: validate-openapi hurl-fmt hurl-lint hurl-test
 
 OPENAPI_SPECS := \
 	internal/provider/cake/openapi.yaml \
@@ -25,3 +25,6 @@ hurl-fmt:
 
 hurl-lint:
 	@hurlfmt --check $(HURL_FILES)
+
+hurl-test:
+	@hurl --test --max-time 30 $(HURL_FILES)
