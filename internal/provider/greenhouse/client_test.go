@@ -318,6 +318,29 @@ func TestGetJobUnknownJobID(t *testing.T) {
 	assert.True(t, ok, "want *GetJobNotFound, got %T", res)
 }
 
+func TestListJobsWithContent(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+
+	res, err := client.ListJobs(context.Background(), ListJobsParams{
+		BoardToken: "safariai",
+		Content:    NewOptBool(true),
+	})
+	require.NoError(t, err)
+
+	got, ok := res.(*JobListResponse)
+	require.True(t, ok, "want *JobListResponse, got %T", res)
+	require.Len(t, got.Jobs, 5)
+	for _, j := range got.Jobs {
+		assert.NotEmpty(t, j.Content.Value, "job %d should carry content", j.ID.Value)
+		assert.NotEmpty(t, j.Departments, "job %d should carry departments", j.ID.Value)
+		assert.NotEmpty(t, j.Offices, "job %d should carry offices", j.ID.Value)
+	}
+}
+
 func mustOptDateTime(s string) OptDateTime {
 	tm, err := time.Parse(time.RFC3339, s)
 	if err != nil {

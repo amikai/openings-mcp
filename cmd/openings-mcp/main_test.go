@@ -36,7 +36,9 @@ func TestServerListsJobTools(t *testing.T) {
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
-	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	registry, err := newATSRegistry(http.DefaultClient)
+	require.NoError(t, err)
+	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)
@@ -65,6 +67,9 @@ func TestServerListsJobTools(t *testing.T) {
 		"google_get_job_detail",
 		"linkedin_search_jobs",
 		"linkedin_get_job_detail",
+		"search_jobs_by_company",
+		"get_filters_by_company",
+		"get_job_detail_by_company",
 	} {
 		assert.Contains(t, got, name)
 	}

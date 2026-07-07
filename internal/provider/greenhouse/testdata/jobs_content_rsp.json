@@ -1,0 +1,105 @@
+{
+  "jobs": [
+    {
+      "id": 6100001001,
+      "internal_job_id": 5200001001,
+      "title": "Senior Backend Engineer",
+      "company_name": "Safari AI",
+      "first_published": "2026-05-12T09:00:00-04:00",
+      "updated_at": "2026-05-12T09:00:00-04:00",
+      "requisition_id": "101",
+      "application_deadline": null,
+      "location": { "name": "New York, NY" },
+      "absolute_url": "https://job-boards.greenhouse.io/safariai/jobs/6100001001",
+      "language": "en",
+      "content": "&lt;div&gt;&lt;h2&gt;About the role&lt;/h2&gt;&lt;p&gt;We run our services on &lt;strong&gt;Kubernetes&lt;/strong&gt; and write them in Go.&lt;/p&gt;&lt;/div&gt;",
+      "departments": [
+        { "id": 7100001, "name": "Engineering", "parent_id": null, "child_ids": [] }
+      ],
+      "offices": [
+        { "id": 8100001, "name": "New York City, NY", "location": "New York, United States", "parent_id": null, "child_ids": [] }
+      ]
+    },
+    {
+      "id": 6100001002,
+      "internal_job_id": 5200001002,
+      "title": "Software Engineer, Agent Platform",
+      "company_name": "Safari AI",
+      "first_published": "2026-06-01T10:30:00-04:00",
+      "updated_at": "2026-06-01T10:30:00-04:00",
+      "requisition_id": "102",
+      "application_deadline": null,
+      "location": { "name": "San Francisco, CA" },
+      "absolute_url": "https://job-boards.greenhouse.io/safariai/jobs/6100001002",
+      "language": "en",
+      "content": "&lt;div&gt;&lt;p&gt;Build the core scheduling and orchestration services behind our product.&lt;/p&gt;&lt;/div&gt;",
+      "departments": [
+        { "id": 7100001, "name": "Engineering", "parent_id": null, "child_ids": [] }
+      ],
+      "offices": [
+        { "id": 8100002, "name": "San Francisco, CA", "location": "San Francisco, United States", "parent_id": null, "child_ids": [] }
+      ]
+    },
+    {
+      "id": 6100001003,
+      "internal_job_id": 5200001003,
+      "title": "Product Designer",
+      "company_name": "Safari AI",
+      "first_published": "2026-04-20T08:00:00-04:00",
+      "updated_at": "2026-04-20T08:00:00-04:00",
+      "requisition_id": "103",
+      "application_deadline": null,
+      "location": { "name": "Remote" },
+      "absolute_url": "https://job-boards.greenhouse.io/safariai/jobs/6100001003",
+      "language": "en",
+      "content": "&lt;div&gt;&lt;p&gt;Own end-to-end product design in &lt;em&gt;Figma&lt;/em&gt;, from discovery to polish.&lt;/p&gt;&lt;/div&gt;",
+      "departments": [
+        { "id": 7100002, "name": "Design", "parent_id": null, "child_ids": [] }
+      ],
+      "offices": [
+        { "id": 8100003, "name": "Remote - US", "location": "United States", "parent_id": null, "child_ids": [] }
+      ]
+    },
+    {
+      "id": 6100001004,
+      "internal_job_id": 5200001004,
+      "title": "Data Scientist",
+      "company_name": "Safari AI",
+      "first_published": "2026-06-10T09:00:00-04:00",
+      "updated_at": "2026-06-10T09:00:00-04:00",
+      "requisition_id": "104",
+      "application_deadline": null,
+      "location": { "name": "London, United Kingdom" },
+      "absolute_url": "https://job-boards.greenhouse.io/safariai/jobs/6100001004",
+      "language": "en",
+      "content": "&lt;div&gt;&lt;p&gt;Analyze usage data; agent platform experience is a plus.&lt;/p&gt;&lt;/div&gt;",
+      "departments": [
+        { "id": 7100003, "name": "Data", "parent_id": null, "child_ids": [] }
+      ],
+      "offices": [
+        { "id": 8100004, "name": "London", "location": "London, United Kingdom", "parent_id": null, "child_ids": [] }
+      ]
+    },
+    {
+      "id": 6100001005,
+      "internal_job_id": 5200001005,
+      "title": "Technical Recruiter",
+      "company_name": "Safari AI",
+      "first_published": "2026-03-15T12:00:00-04:00",
+      "updated_at": "2026-03-15T12:00:00-04:00",
+      "requisition_id": "105",
+      "application_deadline": null,
+      "location": { "name": "San Francisco, CA" },
+      "absolute_url": "https://job-boards.greenhouse.io/safariai/jobs/6100001005",
+      "language": "en",
+      "content": "&lt;div&gt;&lt;p&gt;Partner with hiring managers to grow the team.&lt;/p&gt;&lt;/div&gt;",
+      "departments": [
+        { "id": 7100004, "name": "People", "parent_id": null, "child_ids": [] }
+      ],
+      "offices": [
+        { "id": 8100002, "name": "San Francisco, CA", "location": "San Francisco, United States", "parent_id": null, "child_ids": [] }
+      ]
+    }
+  ],
+  "meta": { "total": 5 }
+}
