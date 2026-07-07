@@ -152,7 +152,11 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 	if err != nil {
 		return nil, err
 	}
-	return ats.NewRegistry(ats.NewWorkdayAdapter(hc), adapterLever, adapterAshby)
+	adapterGreenhouse, err := ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
+	if err != nil {
+		return nil, err
+	}
+	return ats.NewRegistry(ats.NewWorkdayAdapter(hc), adapterLever, adapterAshby, adapterGreenhouse)
 }
 
 func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, cTsmc *tsmc.Client, cGoogle *google.Client, cLinkedin *linkedin.Client, registry *ats.Registry, logger *slog.Logger) *mcp.Server {

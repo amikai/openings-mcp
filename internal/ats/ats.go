@@ -1,6 +1,6 @@
-// Package ats unifies the ATS-backed providers (workday, lever, ashby)
-// behind one company-parameterized search interface, so MCP clients name a
-// company and never learn which ATS serves it.
+// Package ats unifies the ATS-backed providers (workday, greenhouse,
+// lever, ashby) behind one company-parameterized search interface, so MCP
+// clients name a company and never learn which ATS serves it.
 package ats
 
 import (
@@ -28,8 +28,9 @@ func isoDate(t time.Time) string { return t.UTC().Format("2006-01-02") }
 // indexed by Registry, so a slug that reaches an adapter is always one it
 // declared.
 type Adapter interface {
-	// Name identifies the adapter ("workday", "lever", "ashby") in logs
-	// and error messages only; it never reaches tool schemas.
+	// Name identifies the adapter ("workday", "greenhouse", "lever",
+	// "ashby") in logs and error messages only; it never reaches tool
+	// schemas.
 	Name() string
 	// Roster lists every curated company on this ATS.
 	Roster() []CompanyInfo
