@@ -14,6 +14,12 @@ var mockJobsRsp []byte
 //go:embed testdata/job_detail_rsp.json
 var mockJobDetailRsp []byte
 
+// Real response captured by testdata/issue_94_req.sh — 104's company-keyword
+// mode (https://github.com/amikai/openings-mcp/issues/94).
+//
+//go:embed testdata/issue_94_rsp.json
+var mockCompanyKeywordRsp []byte
+
 // MockErrorKeyword and MockNotFoundJobCode trigger upstream-error responses
 // from the mock server so tests can exercise the non-200 paths: searching
 // for MockErrorKeyword returns a 500 and requesting MockNotFoundJobCode's
@@ -42,7 +48,7 @@ func NewMockServer() *httptest.Server {
 			return
 		}
 		if r.URL.Query().Get("keyword") == MockCompanyKeyword && r.URL.Query().Get("excludeCompanyKeyword") != "true" {
-			serveMockJSON([]byte(`{"data":[],"metadata":{"companyKeyword":true}}`))(w, r)
+			serveMockJSON(mockCompanyKeywordRsp)(w, r)
 			return
 		}
 		serveMockJSON(mockJobsRsp)(w, r)
