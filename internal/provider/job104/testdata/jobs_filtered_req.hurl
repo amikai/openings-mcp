@@ -13,7 +13,7 @@ Referer: https://www.104.com.tw/jobs/search/
 http1.1: true
 [QueryStringParams]
 keyword: Golang
-excludeCompanyKeyword: true
+excludeCompanyKeyword: true # without it, a keyword 104 recognizes as a company name gets the pagination-less companyKeyword response instead of a job search (issue #94; see issue_94_req.hurl)
 area: 6001001000
 ro: 1
 order: 2
