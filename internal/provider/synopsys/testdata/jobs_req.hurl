@@ -1,38 +1,22 @@
-# Filter/paginate job results (AJAX), with every documented query parameter
-# filled in, including a resolved location (Latitude/Longitude/LocationType/
-# LocationPath — required together for location filtering to take effect,
-# see ../openapi.yaml paths./search-jobs/results.get) and one active facet
-# filter group (Category = Engineering).
+# Filter/paginate job results (AJAX) — the exact request that captured
+# jobs_rsp.json (RecordsPerPage: 2). See ../openapi.yaml
+# paths./search-jobs/results.get for the full documented query parameter
+# surface (resolved-location filtering, facet filter groups, etc.).
 GET https://careers.synopsys.com/search-jobs/results
 Accept: application/json
-[Options]
-output: jobs_rsp.json
 [QueryStringParams]
-Keywords: verification engineer
-Location: Hsinchu, Taiwan
-Latitude: 24.80361
-Longitude: 120.96861
-LocationType: 4
-LocationPath: 1668284-7280291-1675103-1675151
+Keywords: software engineer
 CurrentPage: 1
-RecordsPerPage: 15
+RecordsPerPage: 2
 SortCriteria: 0
 SortDirection: 0
 Distance: 50
 RadiusUnitType: 0
-PostalCode: 95051
 ShowRadius: False
 IsPagination: False
 SearchType: 5
 ResultsType: 0
-ActiveFacetID: 8675488
 SearchResultsModuleName: Search Results
 SearchFiltersModuleName: Search Filters
-FacetFilters[0].ID: 8675488
-FacetFilters[0].FacetType: 1
-FacetFilters[0].Display: Engineering
-FacetFilters[0].Count: 533
-FacetFilters[0].IsApplied: true
-FacetFilters[0].FieldName:
 
 HTTP 200

@@ -3,8 +3,6 @@
 # see jobs_content_rsp.json for the content=true shape (hand-crafted, not a
 # live capture).
 GET https://boards-api.greenhouse.io/v1/boards/safariai/jobs
-[Options]
-output: jobs_rsp.json
 [QueryStringParams]
 content: false
 

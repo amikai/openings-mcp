@@ -10,6 +10,5 @@ Accept-Language: zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7
 Referer: https://www.104.com.tw/job/8uz4j
 [Options]
 http1.1: true
-output: job_detail_rsp.json
 
 HTTP 200

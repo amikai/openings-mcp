@@ -7,22 +7,16 @@
 # - `weaviate` (4 jobs at capture time; its jobs carry null isRemote and
 #   null workplaceType, which the official docs claim are always present)
 GET https://api.ashbyhq.com/posting-api/job-board/browserbase
-[Options]
-output: board_rsp.json
 
 HTTP 200
 
 GET https://api.ashbyhq.com/posting-api/job-board/browserbase
-[Options]
-output: board_comp_rsp.json
 [QueryStringParams]
 includeCompensation: true
 
 HTTP 200
 
 GET https://api.ashbyhq.com/posting-api/job-board/weaviate
-[Options]
-output: board_nulls_rsp.json
 [QueryStringParams]
 includeCompensation: true
 

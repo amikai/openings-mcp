@@ -10,8 +10,6 @@ User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 Accept: application/json, text/plain, */*
 Content-Type: application/json
 Referer: https://www.cake.me/jobs
-[Options]
-output: jobs_rsp.json
 {
   "query": "Golang",
   "sort_by": "popularity",

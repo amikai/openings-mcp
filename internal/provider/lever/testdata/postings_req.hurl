@@ -4,8 +4,6 @@
 # — leverdemo's small demo dataset would likely zero out under an arbitrary
 # filter value, breaking recapture.
 GET https://api.lever.co/v0/postings/leverdemo
-[Options]
-output: postings_rsp.json
 [QueryStringParams]
 mode: json
 skip: 0
