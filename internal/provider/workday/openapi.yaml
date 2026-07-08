@@ -8,11 +8,7 @@ info:
     their career sites. Each company has its own tenant, Workday instance,
     and site identifier, so the client can construct the target company's
     base URL at runtime and query job data through the same shared API
-    contract, documented here. 
-
-    OpenAPI requires a default value for each variable in the server URL
-    template, so the defaults are set to Workday's own careers site, which is
-    stable and always on.
+    contract, documented here.
 
     ## Multi-tenant URL shape
 

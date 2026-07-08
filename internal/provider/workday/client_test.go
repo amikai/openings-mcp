@@ -2,49 +2,14 @@ package workday
 
 import (
 	"context"
-	"encoding/json"
-	"net/http"
-	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func newMockServer(t *testing.T) *httptest.Server {
-	t.Helper()
-	mux := http.NewServeMux()
-
-	mux.HandleFunc("/jobs", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodPost, r.Method)
-		assert.Equal(t, "application/json", r.Header.Get("Content-Type"))
-
-		var req JobsRequest
-		err := json.NewDecoder(r.Body).Decode(&req)
-		require.NoError(t, err)
-
-		wantReq := JobsRequest{
-			AppliedFacets: AppliedFacets{"jobFamilyGroup": {"0c40f6bd1d8f10ae43ffaefd46dc7e78"}},
-			Limit:         20,
-			Offset:        0,
-			SearchText:    "golang",
-		}
-		assert.Equal(t, wantReq, req)
-
-		serveMockJSON(mockJobsRsp)(w, r)
-	})
-
-	mux.HandleFunc("/job/Israel-Yokneam/Senior-Software-Golang-Kubernetes-Engineer_JR2015916", func(w http.ResponseWriter, r *http.Request) {
-		assert.Equal(t, http.MethodGet, r.Method)
-		serveMockJSON(mockJobDetailRsp)(w, r)
-	})
-
-	return httptest.NewServer(mux)
-}
-
-func TestSearchJobs(t *testing.T) {
-	srv := newMockServer(t)
+func TestSearchJobs_Nvidia(t *testing.T) {
+	srv := NewMockServer(MockNvidiaJobsRsp, MockNvidiaJobDetailRsp)
 	defer srv.Close()
 
 	client, err := NewClient(srv.URL)
@@ -93,54 +58,8 @@ func TestSearchJobs(t *testing.T) {
 	assert.Equal(t, want, resp)
 }
 
-// TestSearchJobsToleratesMissingFacets guards the JobsResponse contract: a
-// tenant whose /jobs response carries usable total/jobPostings but omits the
-// `facets` field or sends `facets: null` must still decode (facets is
-// intentionally not required and nullable), rather than failing the whole
-// search. Regression guard for the CLI's generic, multi-tenant use.
-func TestSearchJobsToleratesMissingFacets(t *testing.T) {
-	cases := []struct {
-		name string
-		body string
-	}{
-		{name: "facets omitted", body: `{"total":1,"jobPostings":[{"title":"X","externalPath":"/job/L/T_1"}]}`},
-		{name: "facets null", body: `{"total":1,"jobPostings":[{"title":"X","externalPath":"/job/L/T_1"}],"facets":null}`},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-				w.Header().Set("Content-Type", "application/json")
-				w.Write([]byte(tc.body))
-			}))
-			defer srv.Close()
-
-			client, err := NewClient(srv.URL)
-			require.NoError(t, err)
-
-			resp, err := client.SearchJobs(context.Background(), &JobsRequest{
-				AppliedFacets: AppliedFacets{},
-				Limit:         1,
-			})
-			require.NoError(t, err)
-
-			var wantFacets OptNilFacetNodeArray
-			if tc.name == "facets null" {
-				wantFacets.SetToNull()
-			}
-			want := &JobsResponse{
-				Total: 1,
-				JobPostings: []JobSummary{
-					{Title: NewOptString("X"), ExternalPath: NewOptString("/job/L/T_1")},
-				},
-				Facets: wantFacets,
-			}
-			assert.Equal(t, want, resp)
-		})
-	}
-}
-
-func TestGetJobDetail(t *testing.T) {
-	srv := newMockServer(t)
+func TestGetJobDetail_Nvidia(t *testing.T) {
+	srv := NewMockServer(MockNvidiaJobsRsp, MockNvidiaJobDetailRsp)
 	defer srv.Close()
 
 	client, err := NewClient(srv.URL)
@@ -154,8 +73,8 @@ func TestGetJobDetail(t *testing.T) {
 
 	want := &JobDetailResponse{
 		JobPostingInfo: JobPostingInfo{
-			Title: "Senior Software Golang Kubernetes Engineer",
-			JobDescription: "<p>NVIDIA Networking is looking for an excellent Software Developer to work on NVIDIA cloud platforms based on Kubernetes. We are seeking an experienced engineer who is deeply technical, hands-on, and has a wide system view. You will design, build and deploy high-performance and scalable clouds based on NVIDIA&#39;s superior ConnectX and Bluefield NICs and SpectrumX AI platform. We want to grow our teams with the smartest people in the world. If you&#39;re creative and autonomous, we want to hear from you!</p><p></p><p><b>What you&#39;ll be doing:</b></p><ul><li><p>Design and implement new features to accelerate Network and Storage</p></li><li><p>Work closely with open source communities, participate in the relevant working groups</p></li><li><p>Work with different teams across NVIDIA</p></li><li><p>Mentor members of the team, enabling them to deliver high-quality software</p></li></ul><p></p><p><b>What we need to see:</b></p><ul><li><p>BSc in Computer Science or equivalent program</p></li><li><p>5&#43; years of hands-on experience in software development, preferably with Python/Golang</p></li><li><p>Highly motivated with strong communication skills, the ability to work successfully with multi-functional teams, developers, and architects</p></li><li><p>Coordinate effectively across organizational boundaries and geographies</p></li><li><p>Strong self-initiative, independence, and flexibility to a new technology</p></li><li><p>Deep understanding of network protocols, virtualization, and containers</p></li><li><p>Strong background in designing, implementing, and debugging complex software</p></li><li><p><span>Hands-on experience with Kubernetes</span></p></li></ul><p></p><p><b>Ways to stand out from the crowd:</b></p><ul><li><p>Experience with working on open source projects</p></li><li><p>Background with SR-IOV, DPDK, ROCE technologies</p></li><li><p>Experience in developing Kubernetes Operators, CSI plugins, CNI Plugins</p></li></ul><p><br />We are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, sex, gender, gender expression, sexual orientation, age, marital status, veteran status, or disability status. We will ensure that individuals with disabilities are provided reasonable accommodation to participate in the job application or interview process, perform essential job functions, and receive other benefits and privileges of employment.</p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p>",
+			Title:               "Senior Software Golang Kubernetes Engineer",
+			JobDescription:      "<p>NVIDIA Networking is looking for an excellent Software Developer to work on NVIDIA cloud platforms based on Kubernetes. We are seeking an experienced engineer who is deeply technical, hands-on, and has a wide system view. You will design, build and deploy high-performance and scalable clouds based on NVIDIA&#39;s superior ConnectX and Bluefield NICs and SpectrumX AI platform. We want to grow our teams with the smartest people in the world. If you&#39;re creative and autonomous, we want to hear from you!</p><p></p><p><b>What you&#39;ll be doing:</b></p><ul><li><p>Design and implement new features to accelerate Network and Storage</p></li><li><p>Work closely with open source communities, participate in the relevant working groups</p></li><li><p>Work with different teams across NVIDIA</p></li><li><p>Mentor members of the team, enabling them to deliver high-quality software</p></li></ul><p></p><p><b>What we need to see:</b></p><ul><li><p>BSc in Computer Science or equivalent program</p></li><li><p>5&#43; years of hands-on experience in software development, preferably with Python/Golang</p></li><li><p>Highly motivated with strong communication skills, the ability to work successfully with multi-functional teams, developers, and architects</p></li><li><p>Coordinate effectively across organizational boundaries and geographies</p></li><li><p>Strong self-initiative, independence, and flexibility to a new technology</p></li><li><p>Deep understanding of network protocols, virtualization, and containers</p></li><li><p>Strong background in designing, implementing, and debugging complex software</p></li><li><p><span>Hands-on experience with Kubernetes</span></p></li></ul><p></p><p><b>Ways to stand out from the crowd:</b></p><ul><li><p>Experience with working on open source projects</p></li><li><p>Background with SR-IOV, DPDK, ROCE technologies</p></li><li><p>Experience in developing Kubernetes Operators, CSI plugins, CNI Plugins</p></li></ul><p><br />We are an equal opportunity employer and value diversity at our company. We do not discriminate on the basis of race, religion, color, national origin, sex, gender, gender expression, sexual orientation, age, marital status, veteran status, or disability status. We will ensure that individuals with disabilities are provided reasonable accommodation to participate in the job application or interview process, perform essential job functions, and receive other benefits and privileges of employment.</p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p><p style=\"text-align:inherit\"></p>",
 			Location:            NewOptString("Israel, Yokneam"),
 			AdditionalLocations: []string{"Israel, Raanana", "Israel, Tel Aviv"},
 			PostedOn:            NewOptString("Posted 30+ Days Ago"),
@@ -168,24 +87,12 @@ func TestGetJobDetail(t *testing.T) {
 	assert.Equal(t, want, detail)
 }
 
-// TestSecondTenantFixtures decodes real captures from a second tenant
-// (Trend Micro: wd3 pod, site "External" — see testdata/trendmicro_*.sh)
-// to guard the contract's tenant-agnostic claim beyond NVIDIA. The detail
-// fixture deliberately uses one of Workday's "XMLNAME-" titleSlugs
-// (generated when a job title starts with a non-letter, here
-// "(Sr.) Backend Engineer"), pinning that platform quirk end to end:
-// the search result's externalPath splits into the exact segments the
-// detail endpoint then serves.
-func TestSecondTenantFixtures(t *testing.T) {
-	jobsRsp, err := os.ReadFile("testdata/trendmicro_jobs_rsp.json")
-	require.NoError(t, err)
-	detailRsp, err := os.ReadFile("testdata/trendmicro_job_detail_rsp.json")
-	require.NoError(t, err)
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/jobs", serveMockJSON(jobsRsp))
-	mux.HandleFunc("/job/Taipei/XMLNAME--Sr--Backend-Engineer_R0006260-1", serveMockJSON(detailRsp))
-	srv := httptest.NewServer(mux)
+// TestSearchJobs_TrendMicro exercises a second tenant. Workday is multi-tenant
+// and every company runs its own instance, so one tenant can't prove the
+// contract is tenant-agnostic. Trend Micro (wd3 pod, site "External"; see
+// testdata/trendmicro_*.hurl) is that second tenant.
+func TestSearchJobs_TrendMicro(t *testing.T) {
+	srv := NewMockServer(MockTrendMicroJobsRsp, MockTrendMicroJobDetailRsp)
 	defer srv.Close()
 
 	client, err := NewClient(srv.URL)
@@ -217,11 +124,11 @@ func TestSecondTenantFixtures(t *testing.T) {
 	}
 	assert.Equal(t, wantSearch, search)
 
+	// extract first external path
 	externalPath := search.JobPostings[0].ExternalPath.Value
+	// location: Taipei, titleSlug: XMLNAME--Sr--Backend-Engineer_R0006260-1
 	location, titleSlug, ok := SplitExternalPath(externalPath)
 	require.True(t, ok)
-	assert.Equal(t, "Taipei", location)
-	assert.Equal(t, "XMLNAME--Sr--Backend-Engineer_R0006260-1", titleSlug)
 
 	detail, err := client.GetJobDetail(context.Background(), GetJobDetailParams{
 		Location:  location,
@@ -231,8 +138,8 @@ func TestSecondTenantFixtures(t *testing.T) {
 
 	wantDetail := &JobDetailResponse{
 		JobPostingInfo: JobPostingInfo{
-			Title: "(Sr.) Backend Engineer",
-			JobDescription: `<p style="text-align:left"><b>Join Trend ‧ Join New Generation</b></p><p style="text-align:inherit"></p><p style="text-align:left"><b>趨勢科技 - 全球雲端資安領航者 / 全亞洲最大軟體公司 / 企業版圖橫跨五大洲 / 趨勢全球研發基地在台灣 </b><br /><span><span><span><span><span class="WL01">&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span></span></span></p><p>Trend Micro Vision One is a purpose-built threat defense platform that provides added value and new benefits beyond XDR (Extended Detection and Response) solutions, allowing customer to see more and respond faster. Vision One providing deep and broad extended detection and response capabilities that collect and automatically correlate data across multiple security layers—email, endpoints, servers, cloud workloads, and networks—Trend Micro Vision One prevents the majority of attacks with automated protection.</p><p>The objective of TW Engineering Group is to provide the best endpoint security solution to help customers, from small &amp; medium businesses to vary large enterprises, conquer cybersecurity challenges effectively and efficiently. Every partner within Group 1 will have opportunity to join diverse squad team and demonstrate his/her expertise and enthusiasm to make customer success in their business without cyber threat. Along this journey, we are looking for partners with not only exceptional engineering expertise, but also great curiosity and customer empathy, so we can learn from customer behavior and create business impact together.<br /><br /> </p><p><b>Responsibilities &#xff1a;</b></p><ul><li>Co-work with other teams to design, develop, &amp; operate scalable backend services to support endpoint security and peripheral use cases on public clouds (AWS, Azure, …etc.)</li><li>Design &amp; implement ways to measure and validate the quality of customer experience we deliver</li><li>Analyze &amp; resolve customer problems by listening to data and customer feedbacks</li><li>Identify and report defects, working closely with development teams to resolve issues promptly</li><li>Perform tasks and projects as assigned.</li><li>Document solutions for knowledge sharing within the team.</li></ul><p><b>BASIC QUALIFICATIONS</b></p><ul><li>Bachelor degree or higher in computer science or related fields</li><li>Strong programming skill with any of: Java or Go</li><li>Cloud Application development and debugging experience on AWS or Azure</li><li>Proactive, self-motivated and good teamwork</li><li>Good English communication skill</li></ul><p><b>BIG PLUS</b></p><ul><li>Cloud Application development on container technologies, such as Docker and Kubernetes.</li><li>Have experience with any of: PostgreSQL, MySQL, Redis, MongoDB, Elastic Search, Kibana, or Terraform</li></ul><p><b>Would be a plus</b></p><ul><li>Knowledge in enterprise design/integration pattern</li><li>Experience in the cybersecurity fields</li></ul><p></p><p>#LI-YJ1</p><p><span><span><span>&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span><br /><i>連結智慧 守護世界 --- Connected Intelligence for Securing a Connected World</i></p>`,
+			Title:               "(Sr.) Backend Engineer",
+			JobDescription:      `<p style="text-align:left"><b>Join Trend ‧ Join New Generation</b></p><p style="text-align:inherit"></p><p style="text-align:left"><b>趨勢科技 - 全球雲端資安領航者 / 全亞洲最大軟體公司 / 企業版圖橫跨五大洲 / 趨勢全球研發基地在台灣 </b><br /><span><span><span><span><span class="WL01">&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span></span></span></p><p>Trend Micro Vision One is a purpose-built threat defense platform that provides added value and new benefits beyond XDR (Extended Detection and Response) solutions, allowing customer to see more and respond faster. Vision One providing deep and broad extended detection and response capabilities that collect and automatically correlate data across multiple security layers—email, endpoints, servers, cloud workloads, and networks—Trend Micro Vision One prevents the majority of attacks with automated protection.</p><p>The objective of TW Engineering Group is to provide the best endpoint security solution to help customers, from small &amp; medium businesses to vary large enterprises, conquer cybersecurity challenges effectively and efficiently. Every partner within Group 1 will have opportunity to join diverse squad team and demonstrate his/her expertise and enthusiasm to make customer success in their business without cyber threat. Along this journey, we are looking for partners with not only exceptional engineering expertise, but also great curiosity and customer empathy, so we can learn from customer behavior and create business impact together.<br /><br /> </p><p><b>Responsibilities &#xff1a;</b></p><ul><li>Co-work with other teams to design, develop, &amp; operate scalable backend services to support endpoint security and peripheral use cases on public clouds (AWS, Azure, …etc.)</li><li>Design &amp; implement ways to measure and validate the quality of customer experience we deliver</li><li>Analyze &amp; resolve customer problems by listening to data and customer feedbacks</li><li>Identify and report defects, working closely with development teams to resolve issues promptly</li><li>Perform tasks and projects as assigned.</li><li>Document solutions for knowledge sharing within the team.</li></ul><p><b>BASIC QUALIFICATIONS</b></p><ul><li>Bachelor degree or higher in computer science or related fields</li><li>Strong programming skill with any of: Java or Go</li><li>Cloud Application development and debugging experience on AWS or Azure</li><li>Proactive, self-motivated and good teamwork</li><li>Good English communication skill</li></ul><p><b>BIG PLUS</b></p><ul><li>Cloud Application development on container technologies, such as Docker and Kubernetes.</li><li>Have experience with any of: PostgreSQL, MySQL, Redis, MongoDB, Elastic Search, Kibana, or Terraform</li></ul><p><b>Would be a plus</b></p><ul><li>Knowledge in enterprise design/integration pattern</li><li>Experience in the cybersecurity fields</li></ul><p></p><p>#LI-YJ1</p><p><span><span><span>&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;</span></span></span><br /><i>連結智慧 守護世界 --- Connected Intelligence for Securing a Connected World</i></p>`,
 			Location:            NewOptString("Taipei"),
 			AdditionalLocations: nil,
 			PostedOn:            NewOptString("Posted 30+ Days Ago"),

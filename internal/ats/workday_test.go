@@ -44,7 +44,7 @@ func recordingProxy(t *testing.T, inner string) (*httptest.Server, *[][]byte) {
 
 func testWorkdayAdapter(t *testing.T) (*WorkdayAdapter, *[][]byte) {
 	t.Helper()
-	mock := workday.NewMockServer()
+	mock := workday.NewMockServer(workday.MockNvidiaJobsRsp, workday.MockNvidiaJobDetailRsp)
 	t.Cleanup(mock.Close)
 	proxy, bodies := recordingProxy(t, mock.URL)
 	a := NewWorkdayAdapter(&http.Client{Timeout: 5 * time.Second})

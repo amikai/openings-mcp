@@ -6,19 +6,22 @@ import (
 	"net/http/httptest"
 )
 
-//go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+//go:embed testdata/nvidia_jobs_rsp.json
+var MockNvidiaJobsRsp []byte
 
-//go:embed testdata/job_detail_rsp.json
-var mockJobDetailRsp []byte
+//go:embed testdata/nvidia_job_detail_rsp.json
+var MockNvidiaJobDetailRsp []byte
 
-// NewMockServer returns an httptest.Server serving canned Workday CXS fixture
-// responses captured from a real tenant (see testdata/*.sh), so tests never
-// hit a live one. The caller owns the server and must Close it.
-func NewMockServer() *httptest.Server {
+//go:embed testdata/trendmicro_jobs_rsp.json
+var MockTrendMicroJobsRsp []byte
+
+//go:embed testdata/trendmicro_job_detail_rsp.json
+var MockTrendMicroJobDetailRsp []byte
+
+func NewMockServer(mockJobsRsp, mockJobDetailRsp []byte) *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/jobs", serveMockJSON(mockJobsRsp))
-	mux.HandleFunc("/job/", serveMockJSON(mockJobDetailRsp))
+	mux.HandleFunc("/job/{location}/{titleSlug}", serveMockJSON(mockJobDetailRsp))
 	return httptest.NewServer(mux)
 }
 
