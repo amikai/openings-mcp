@@ -79,28 +79,6 @@ With Docker instead, replace `openings-mcp` with `docker run -i --rm ghcr.io/ami
 claude mcp add openings-mcp -- docker run -i --rm ghcr.io/amikai/openings-mcp
 ```
 
-## Skills (optional)
-
-If your client is Claude Code, this repo ships two [Agent Skills](https://code.claude.com/docs/en/skills)
-that teach it to use the tools well — picking the right site, choosing
-between precise filtering and a broad sweep, and keeping token spend down:
-
-- **job-search** — strategy guide for one-off searches: single-company deep
-  dives, cross-company scans, and matching openings against your resume.
-- **job-tracking** — saved searches that report only postings that are new
-  since the last run (state lives in `~/.openings-mcp/watchlist.md`).
-
-Install by copying into your user skills directory:
-
-```
-git clone https://github.com/amikai/openings-mcp
-cp -r openings-mcp/skills/job-search openings-mcp/skills/job-tracking ~/.claude/skills/
-```
-
-Then invoke naturally ("find me backend jobs at nvidia") or explicitly with
-`/job-search` and `/job-tracking`. Other MCP clients can use the SKILL.md
-files as plain prompt guidance.
-
 ## Disclaimer
 
 This is an unofficial tool. It is not affiliated with, endorsed by, or
