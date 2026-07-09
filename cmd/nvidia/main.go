@@ -141,7 +141,8 @@ func buildAppliedFacets(jobCategory, jobType, timeType, locationType, country, s
 	return af
 }
 
-// labels returns sorted keys prefixed with an empty value for an unset flag.
+// labels returns sorted keys with an empty sentinel so ff leaves the enum
+// unset instead of choosing the first real value.
 func labels[V any](table map[string]V) []string {
 	l := make([]string, 0, len(table)+1)
 	l = append(l, "")

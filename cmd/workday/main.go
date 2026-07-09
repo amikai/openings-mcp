@@ -179,9 +179,9 @@ func runFacets(ctx context.Context, tenant string, timeout time.Duration, search
 	return nil
 }
 
-// printFacetNode renders groups and leaves from the facet tree. It uses
-// facetParameter, rather than Values length, to distinguish them when a group
-// temporarily has no values.
+// printFacetNode renders groups as "facetParameter (descriptor)" and leaves as
+// "descriptor  id=...  count=...". It uses facetParameter rather than Values
+// length to distinguish groups that temporarily have no values.
 func printFacetNode(node workday.FacetNode, depth int) {
 	indent := strings.Repeat("  ", depth)
 	if node.FacetParameter.Set {

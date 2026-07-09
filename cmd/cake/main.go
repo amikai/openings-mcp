@@ -228,7 +228,8 @@ func choices[T ~string](values []T) []string {
 	return out
 }
 
-// enumChoices prepends an empty value so the flag can mean "unset".
+// Include an empty sentinel so ff leaves the enum unset instead of choosing
+// the first real value.
 func enumChoices[T ~string](values []T) []string {
 	return append([]string{""}, choices(values)...)
 }

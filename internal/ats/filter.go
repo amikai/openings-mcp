@@ -19,6 +19,8 @@ type dumpJob struct {
 	isRemote    bool
 }
 
+// searchViaDump and filtersViaDump provide the shared Search/Filters flow for
+// adapters whose upstream exposes only a full-board dump.
 func searchViaDump(ctx context.Context, dump func(context.Context, string) ([]dumpJob, error), slug string, p SearchParams) (*SearchResult, error) {
 	jobs, err := dump(ctx, slug)
 	if err != nil {

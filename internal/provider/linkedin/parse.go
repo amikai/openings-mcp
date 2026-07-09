@@ -11,7 +11,8 @@ import (
 
 var remoteKeywords = []string{"remote", "work from home", "wfh"}
 
-// looksRemote scans text for remote-work terms; no match means on-site.
+// looksRemote is a text heuristic, not a structured LinkedIn field; no match
+// is treated as on-site.
 func looksRemote(parts ...string) bool {
 	joined := strings.ToLower(strings.Join(parts, " "))
 	for _, kw := range remoteKeywords {

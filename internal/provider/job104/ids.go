@@ -1,7 +1,8 @@
 package job104
 
-// AreaIDs maps labels to 104's opaque area codes. It covers the top two levels
-// of the site's region-picker data, including overseas regions.
+// AreaIDs maps labels to 104's opaque area codes; the codes cannot be derived
+// from labels. It intentionally covers only top-level regions/countries, not
+// district-level entries.
 var AreaIDs = map[string]SearchJobsArea{
 	// Taiwan
 	"Taipei":     SearchJobsArea("6001001000"),

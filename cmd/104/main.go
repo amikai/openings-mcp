@@ -166,7 +166,8 @@ func labels[T any](table map[string]T) []string {
 	return l
 }
 
-// enumChoices prepends an empty value so the flag can mean "unset".
+// Include an empty sentinel so ff leaves the enum unset instead of choosing
+// the first real value.
 func enumChoices[T any](table map[string]T) []string {
 	return append([]string{""}, labels(table)...)
 }

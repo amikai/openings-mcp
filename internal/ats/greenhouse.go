@@ -13,8 +13,9 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/greenhouse"
 )
 
-// GreenhouseAdapter serves Greenhouse companies. Search downloads the content
-// board because the API has no server-side filtering; detail uses one endpoint.
+// GreenhouseAdapter serves Greenhouse companies. Search fetches the full board
+// with content=true because descriptions, departments, and offices only exist
+// in that variant; the API has no server-side filtering.
 type GreenhouseAdapter struct {
 	client *greenhouse.Client
 }

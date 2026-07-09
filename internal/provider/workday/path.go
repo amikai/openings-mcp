@@ -6,8 +6,10 @@ import (
 	"strings"
 )
 
-// JobDetailKeyFromPath splits a Workday ExternalPath into the two path
-// parameters required by GetJobDetail. It rejects malformed or extra segments.
+// JobDetailKeyFromPath splits a path such as
+// "/job/{location}/{titleSlug}" into GetJobDetail's two parameters. The API
+// rejects a combined path because URI encoding escapes the separator; missing
+// prefixes, empty segments, and extra segments are rejected here.
 func JobDetailKeyFromPath(externalPath string) (location, titleSlug string, ok bool) {
 	rest, found := strings.CutPrefix(externalPath, "/job/")
 	if !found {

@@ -103,7 +103,8 @@ func buildJobsRequest(query, location string, hasRemote bool, targetLevel, skill
 	return req
 }
 
-// withUnset prepends an empty value so the flag can mean "unset".
+// withUnset includes an empty sentinel so ff leaves the enum unset instead of
+// choosing the first real value.
 func withUnset(choices []string) []string {
 	return append([]string{""}, choices...)
 }
