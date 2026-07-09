@@ -129,7 +129,7 @@ func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDe
 	if err != nil {
 		return nil, err
 	}
-	loc, titleSlug, ok := workday.SplitExternalPath(jobID)
+	loc, titleSlug, ok := workday.JobDetailKeyFromPath(jobID)
 	if !ok {
 		return nil, fmt.Errorf("workday: invalid job_id %q; pass a job_id exactly as returned by the job search", jobID)
 	}

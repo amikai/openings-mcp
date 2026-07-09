@@ -145,7 +145,7 @@ func runFacets(ctx context.Context, tenant string, timeout time.Duration, search
 	if tenant == "" {
 		return fmt.Errorf("--tenant is required")
 	}
-	company, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
+	_, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
 	if !ok {
 		return fmt.Errorf("tenant %q not found; run 'workday companies' to see supported tenants", tenant)
 	}
@@ -158,12 +158,12 @@ func runFacets(ctx context.Context, tenant string, timeout time.Duration, search
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := workday.NewClient(company.BaseURL())
+	client, err := workday.NewTenantClient()
 	if err != nil {
 		return err
 	}
 
-	search, err := client.SearchJobs(ctx, &workday.JobsRequest{
+	search, err := client.JobsByTenant(ctx, tenant, &workday.JobsRequest{
 		AppliedFacets: appliedFacets,
 		Limit:         1,
 		Offset:        0,
@@ -253,12 +253,12 @@ func runSearch(ctx context.Context, tenant string, timeout time.Duration, search
 	defer cancel()
 
 	baseURL := company.BaseURL()
-	client, err := workday.NewClient(baseURL)
+	client, err := workday.NewTenantClient()
 	if err != nil {
 		return err
 	}
 
-	search, err := client.SearchJobs(ctx, &workday.JobsRequest{
+	search, err := client.JobsByTenant(ctx, tenant, &workday.JobsRequest{
 		AppliedFacets: appliedFacets,
 		Limit:         limit,
 		Offset:        offset,
@@ -273,7 +273,7 @@ func runSearch(ctx context.Context, tenant string, timeout time.Duration, search
 	g.SetLimit(maxConcurrentDetailFetches)
 	for i, job := range search.JobPostings {
 		g.Go(func() error {
-			results[i] = fetchJobResult(gCtx, client, baseURL, job)
+			results[i] = fetchJobResult(gCtx, client, tenant, baseURL, job)
 			return nil
 		})
 	}
@@ -327,7 +327,7 @@ func printResultLocations(r jobResultJSON) {
 // cmd/nvidia's existing per-job fallback behavior. A summary with no
 // ExternalPath (an incomplete/transient Workday posting) can't be fetched at
 // all, so it's returned with a "no detail available" note rather than dropped.
-func fetchJobResult(ctx context.Context, client *workday.Client, baseURL string, job workday.JobSummary) jobResultJSON {
+func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, baseURL string, job workday.JobSummary) jobResultJSON {
 	r := jobResultJSON{Title: job.Title.Value, PostedOn: job.PostedOn.Value}
 
 	if job.ExternalPath.Value == "" {
@@ -336,7 +336,7 @@ func fetchJobResult(ctx context.Context, client *workday.Client, baseURL string,
 		return r
 	}
 
-	location, titleSlug, ok := workday.SplitExternalPath(job.ExternalPath.Value)
+	location, titleSlug, ok := workday.JobDetailKeyFromPath(job.ExternalPath.Value)
 	if !ok {
 		r.Error = fmt.Sprintf("could not split externalPath %q", job.ExternalPath.Value)
 		r.URL = fallbackURL(baseURL, job.ExternalPath.Value)
@@ -344,7 +344,7 @@ func fetchJobResult(ctx context.Context, client *workday.Client, baseURL string,
 		return r
 	}
 
-	detail, err := client.GetJobDetail(ctx, workday.GetJobDetailParams{Location: location, TitleSlug: titleSlug})
+	detail, err := client.JobDetailByTenant(ctx, tenant, location, titleSlug)
 	if err != nil {
 		r.Error = err.Error()
 		r.URL = fallbackURL(baseURL, job.ExternalPath.Value)
@@ -408,7 +408,7 @@ func fallbackURL(baseURL, externalPath string) string {
 	if err != nil {
 		return externalPath
 	}
-	// externalPath usually starts with "/", but SplitExternalPath treats a
+	// externalPath usually starts with "/", but JobDetailKeyFromPath treats a
 	// missing leading slash as just another malformed shape that lands here —
 	// don't let it glue the site segment and location together.
 	if !strings.HasPrefix(externalPath, "/") {

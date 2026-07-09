@@ -127,7 +127,7 @@ func TestSearchJobs_TrendMicro(t *testing.T) {
 	// extract first external path
 	externalPath := search.JobPostings[0].ExternalPath.Value
 	// location: Taipei, titleSlug: XMLNAME--Sr--Backend-Engineer_R0006260-1
-	location, titleSlug, ok := SplitExternalPath(externalPath)
+	location, titleSlug, ok := JobDetailKeyFromPath(externalPath)
 	require.True(t, ok)
 
 	detail, err := client.GetJobDetail(context.Background(), GetJobDetailParams{

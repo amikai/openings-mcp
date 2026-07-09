@@ -2,7 +2,7 @@ package workday
 
 import "testing"
 
-func TestSplitExternalPath(t *testing.T) {
+func TestJobDetailKeyFromPath(t *testing.T) {
 	cases := []struct {
 		name         string
 		externalPath string
@@ -57,9 +57,9 @@ func TestSplitExternalPath(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			gotLocation, gotTitle, gotOK := SplitExternalPath(tc.externalPath)
+			gotLocation, gotTitle, gotOK := JobDetailKeyFromPath(tc.externalPath)
 			if gotLocation != tc.wantLocation || gotTitle != tc.wantTitle || gotOK != tc.wantOK {
-				t.Errorf("SplitExternalPath(%q) = (%q, %q, %v), want (%q, %q, %v)",
+				t.Errorf("JobDetailKeyFromPath(%q) = (%q, %q, %v), want (%q, %q, %v)",
 					tc.externalPath, gotLocation, gotTitle, gotOK, tc.wantLocation, tc.wantTitle, tc.wantOK)
 			}
 		})

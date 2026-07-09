@@ -6,17 +6,18 @@ import (
 	"strings"
 )
 
-// SplitExternalPath splits a JobSummary.ExternalPath (e.g.
-// "/job/US-CA-Remote/Software-Engineer--CUDA_JR12345") into the two path
-// segments GetJobDetail expects. The API rejects a single combined path
-// parameter because standard URI encoders escape the "/" between them.
+// JobDetailKeyFromPath extracts the two GetJobDetail path parameters out of
+// a JobSummary.ExternalPath (e.g.
+// "/job/US-CA-Remote/Software-Engineer--CUDA_JR12345"). The API rejects a
+// single combined path parameter because standard URI encoders escape the
+// "/" between them, so callers need the segments split apart.
 //
 // It only accepts the exact "/job/{location}/{titleSlug}" shape, and
 // returns ok=false for anything else: a missing "/job/" prefix, an empty
 // segment, or extra path segments, whose "/" a URI encoder would
 // percent-encode into a shape the server rejects. Callers can then fall
 // back instead of sending a request that's guaranteed to fail.
-func SplitExternalPath(externalPath string) (location, titleSlug string, ok bool) {
+func JobDetailKeyFromPath(externalPath string) (location, titleSlug string, ok bool) {
 	rest, found := strings.CutPrefix(externalPath, "/job/")
 	if !found {
 		return "", "", false
