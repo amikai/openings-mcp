@@ -1,10 +1,3 @@
-# Demonstrates the full documented query parameter surface (see
-# ../openapi.yaml paths./search-jobs/results.get): a resolved location
-# (Latitude/Longitude/LocationType/LocationPath — required together for
-# location filtering to take effect) plus one active facet filter group
-# (Category = Engineering). See jobs_req.hurl for the exact minimal request
-# that captured jobs_rsp.json. Not wired to any committed fixture;
-# illustrative only.
 GET https://careers.synopsys.com/search-jobs/results
 Accept: application/json
 [QueryStringParams]

@@ -22,6 +22,10 @@ start: 0
 
 HTTP 200
 
+[Asserts]
+header "Content-Type" contains "text/html"
+xpath "//html" exists
+
 GET https://www.linkedin.com/jobs/view/4422697744
 authority: www.linkedin.com
 accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
@@ -34,3 +38,7 @@ user-agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (
 location: true
 
 HTTP 200
+
+[Asserts]
+header "Content-Type" contains "text/html"
+xpath "//html" exists

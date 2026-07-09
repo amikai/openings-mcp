@@ -1,9 +1,3 @@
-# Demonstrates every documented query parameter (see ../openapi.yaml
-# paths./jobs-guest/jobs/api/seeMoreJobPostings/search.get). distance is
-# included for completeness but is explicitly not implemented by this
-# client — its behavior was never confirmed against the live site. Not
-# wired to any committed fixture; illustrative only, and this exact filter
-# combination is unlikely to return real results.
 GET https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search
 authority: www.linkedin.com
 accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
@@ -24,3 +18,6 @@ f_C: 1441,162479
 f_TPR: r604800
 
 HTTP 200
+
+[Asserts]
+header "Content-Type" contains "text/html"

@@ -1,2 +1,6 @@
 # goreleaser output
 dist/
+
+# Local case studies and Serena metadata
+/case-study/
+/.serena/

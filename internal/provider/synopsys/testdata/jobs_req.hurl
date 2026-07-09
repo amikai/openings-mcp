@@ -1,7 +1,3 @@
-# Filter/paginate job results (AJAX) — the exact request that captured
-# jobs_rsp.json (RecordsPerPage: 2). See ../openapi.yaml
-# paths./search-jobs/results.get for the full documented query parameter
-# surface (resolved-location filtering, facet filter groups, etc.).
 GET https://careers.synopsys.com/search-jobs/results
 Accept: application/json
 [QueryStringParams]

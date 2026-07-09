@@ -1,9 +1,5 @@
-# https://github.com/amikai/openings-mcp/issues/94 — when the keyword is one
-# 104 recognizes as a company name (e.g. 聯發科), the API abandons the job
-# search and replies with this pagination-less companyKeyword shape unless
-# excludeCompanyKeyword=true is sent. excludeCompanyKeyword is deliberately
-# omitted here to reproduce that bug — see jobs_req.hurl for the normal,
-# fully-parameterized search.
+# Reproduces issue #94: company-name keywords return the companyKeyword shape
+# when excludeCompanyKeyword is omitted.
 GET https://www.104.com.tw/jobs/search/api/jobs
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
 Accept: application/json, text/plain, */*

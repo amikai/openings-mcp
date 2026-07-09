@@ -1,9 +1,3 @@
-# Demonstrates the full documented facet set (see ../openapi.yaml
-# paths./jobs.post, examples.filtered) — Engineering (jobFamilyGroup) +
-# Remote (locationHierarchy2) + United States (locationHierarchy1) on top of
-# a keyword search. See jobs_req.hurl for the exact minimal request that
-# captured jobs_rsp.json. Not wired to any committed fixture; illustrative
-# only.
 POST https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite/jobs
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36
 Accept: application/json
