@@ -204,11 +204,30 @@ func (s SearchJobsEduItem) Validate() error {
 	}
 }
 
+func (s SearchJobsJobexpItem) Validate() error {
+	switch s {
+	case 1:
+		return nil
+	case 3:
+		return nil
+	case 5:
+		return nil
+	case 10:
+		return nil
+	case 99:
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s SearchJobsOrder) Validate() error {
 	switch s {
 	case 1:
 		return nil
 	case 2:
+		return nil
+	case 13:
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

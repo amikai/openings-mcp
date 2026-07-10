@@ -160,12 +160,21 @@ paths:
             (Newest); `16` is an equivalent A/B-test variant. `order=1`
             (Relevance) is the default and what `order=15` also resolves
             to — `15` is not a separate Newest value despite older docs
-            claiming otherwise.
+            claiming otherwise. `order=13` (SalaryHigh) sorts by
+            `salaryLow` descending, tie-broken by `salaryHigh` descending,
+            and is not a pure sort: it drops postings without a disclosed
+            salary (待遇面議) from both `data` and
+            `metadata.pagination.total` (confirmed live: 8340 → 1647 for
+            the same keyword), aside from the promoted rows that leak into
+            `data` as with `ro`. It compares raw salary figures regardless
+            of pay period, so annual-salary postings sort above monthly
+            ones and hourly wages sink to the end.
           schema:
             type: integer
             enum:
               - 1 # Relevance (符合度高)
               - 2 # Newest (最近更新)
+              - 13 # SalaryHigh (待遇高→低; excludes undisclosed-salary postings)
           example: 2
         - name: page
           in: query
@@ -196,6 +205,32 @@ paths:
           style: form
           explode: false
           example: [4, 5]
+        - name: jobexp
+          in: query
+          required: false
+          description: >
+            Minimum-experience bracket, comma-separated for multiple (e.g.
+            `1,3`). Matches are OR'd (union) and the brackets are disjoint —
+            confirmed live: the five values' totals sum exactly to the
+            unfiltered total, and `1,3` returned exactly `1` + `3`. Any
+            other value is rejected with a 422 (`Items in jobexp is
+            invalid: validation.in`). Same soft-filter caveat as `ro`:
+            promoted rows leak into `data` (e.g. `jobexp=99` returned 32
+            rows of which 2 had non-matching `period` 0 and 4). Check each
+            JobSummary's `period` if you need a strict result set.
+          schema:
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1 # No requirement or under 1 year (不拘/1年以下)
+                - 3 # 1-3 years (1年以上)
+                - 5 # 3-5 years (3年以上)
+                - 10 # 5-10 years (5年以上)
+                - 99 # Over 10 years (10年以上)
+          style: form
+          explode: false
+          example: [1, 3]
         - name: remoteWork
           in: query
           required: false
@@ -321,6 +356,7 @@ components:
         - applyCnt
         - remoteWorkType
         - jobRo
+        - period
       properties:
         jobNo:
           type: string
@@ -368,6 +404,17 @@ components:
             The `ro` request param is a soft filter — check this field per
             entry if you need a strict result set (see the `ro` parameter
             description on searchJobs).
+        period:
+          type: integer
+          description: >
+            Minimum-experience code: 0 = no requirement (經歷不拘),
+            otherwise the posting's minimum years of experience plus one
+            (confirmed against job details: 2 = 1年以上, 4 = 3年以上,
+            11 = 10年以上). The `jobexp` request buckets group this field
+            (jobexp 1 → period 0-1, 3 → 2-3, 5 → 4-5, 10 → 6-10,
+            99 → 11+). `jobexp` is a soft filter — check this field per
+            entry if you need a strict result set (see the `jobexp`
+            parameter description on searchJobs).
 
     JobDetailResponse:
       type: object

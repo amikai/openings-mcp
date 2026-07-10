@@ -548,6 +548,12 @@ type JobSummary struct {
 	// filter — check this field per entry if you need a strict result set (see the `ro` parameter
 	// description on searchJobs).
 	JobRo int `json:"jobRo"`
+	// Minimum-experience code: 0 = no requirement (經歷不拘), otherwise the posting's minimum years of
+	// experience plus one (confirmed against job details: 2 = 1年以上, 4 = 3年以上, 11 =
+	// 10年以上). The `jobexp` request buckets group this field (jobexp 1 → period 0-1, 3 → 2-3, 5
+	// → 4-5, 10 → 6-10, 99 → 11+). `jobexp` is a soft filter — check this field per entry if you
+	// need a strict result set (see the `jobexp` parameter description on searchJobs).
+	Period int `json:"period"`
 }
 
 // GetJobNo returns the value of JobNo.
@@ -610,6 +616,11 @@ func (s *JobSummary) GetJobRo() int {
 	return s.JobRo
 }
 
+// GetPeriod returns the value of Period.
+func (s *JobSummary) GetPeriod() int {
+	return s.Period
+}
+
 // SetJobNo sets the value of JobNo.
 func (s *JobSummary) SetJobNo(val string) {
 	s.JobNo = val
@@ -668,6 +679,11 @@ func (s *JobSummary) SetRemoteWorkType(val int) {
 // SetJobRo sets the value of JobRo.
 func (s *JobSummary) SetJobRo(val int) {
 	s.JobRo = val
+}
+
+// SetPeriod sets the value of Period.
+func (s *JobSummary) SetPeriod(val int) {
+	s.Period = val
 }
 
 type JobSummaryLink struct {
@@ -1730,11 +1746,33 @@ func (SearchJobsEduItem) AllValues() []SearchJobsEduItem {
 	}
 }
 
+type SearchJobsJobexpItem int
+
+const (
+	SearchJobsJobexpItem1  SearchJobsJobexpItem = 1
+	SearchJobsJobexpItem3  SearchJobsJobexpItem = 3
+	SearchJobsJobexpItem5  SearchJobsJobexpItem = 5
+	SearchJobsJobexpItem10 SearchJobsJobexpItem = 10
+	SearchJobsJobexpItem99 SearchJobsJobexpItem = 99
+)
+
+// AllValues returns all SearchJobsJobexpItem values.
+func (SearchJobsJobexpItem) AllValues() []SearchJobsJobexpItem {
+	return []SearchJobsJobexpItem{
+		SearchJobsJobexpItem1,
+		SearchJobsJobexpItem3,
+		SearchJobsJobexpItem5,
+		SearchJobsJobexpItem10,
+		SearchJobsJobexpItem99,
+	}
+}
+
 type SearchJobsOrder int
 
 const (
-	SearchJobsOrder1 SearchJobsOrder = 1
-	SearchJobsOrder2 SearchJobsOrder = 2
+	SearchJobsOrder1  SearchJobsOrder = 1
+	SearchJobsOrder2  SearchJobsOrder = 2
+	SearchJobsOrder13 SearchJobsOrder = 13
 )
 
 // AllValues returns all SearchJobsOrder values.
@@ -1742,6 +1780,7 @@ func (SearchJobsOrder) AllValues() []SearchJobsOrder {
 	return []SearchJobsOrder{
 		SearchJobsOrder1,
 		SearchJobsOrder2,
+		SearchJobsOrder13,
 	}
 }
 

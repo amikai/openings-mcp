@@ -101,13 +101,25 @@ type SearchJobsParams struct {
 	Ro OptSearchJobsRo `json:",omitempty,omitzero"`
 	// Sort order. `order=2` biases toward today's `appearDate` first (Newest); `16` is an equivalent
 	// A/B-test variant. `order=1` (Relevance) is the default and what `order=15` also resolves to — `15`
-	// is not a separate Newest value despite older docs claiming otherwise.
+	// is not a separate Newest value despite older docs claiming otherwise. `order=13` (SalaryHigh) sorts
+	// by `salaryLow` descending, tie-broken by `salaryHigh` descending, and is not a pure sort: it drops
+	// postings without a disclosed salary (待遇面議) from both `data` and `metadata.pagination.total`
+	// (confirmed live: 8340 → 1647 for the same keyword), aside from the promoted rows that leak into
+	// `data` as with `ro`. It compares raw salary figures regardless of pay period, so annual-salary
+	// postings sort above monthly ones and hourly wages sink to the end.
 	Order OptSearchJobsOrder `json:",omitempty,omitzero"`
 	// 1-based page number.
 	Page OptInt `json:",omitempty,omitzero"`
 	// Education level, comma-separated for multiple (e.g. `4,5`). Matches are OR'd (union), not summed —
 	// a job matching more than one selected value is only counted once.
 	Edu []SearchJobsEduItem `json:",omitempty"`
+	// Minimum-experience bracket, comma-separated for multiple (e.g. `1,3`). Matches are OR'd (union) and
+	// the brackets are disjoint — confirmed live: the five values' totals sum exactly to the unfiltered
+	// total, and `1,3` returned exactly `1` + `3`. Any other value is rejected with a 422
+	// (`Items in jobexp is invalid: validation.in`). Same soft-filter caveat as `ro`: promoted rows leak
+	// into `data` (e.g. `jobexp=99` returned 32 rows of which 2 had non-matching `period` 0 and 4). Check
+	// each JobSummary's `period` if you need a strict result set.
+	Jobexp []SearchJobsJobexpItem `json:",omitempty"`
 	// Remote work type. Same soft-filter caveat as `ro`: `remoteWork=1` returned 14 rows for `total=9`,
 	// including 2 rows with `remoteWorkType=0` (fully on-site) and 2 with `remoteWorkType=2`.
 	RemoteWork OptSearchJobsRemoteWork `json:",omitempty,omitzero"`
@@ -178,6 +190,15 @@ func unpackSearchJobsParams(packed middleware.Parameters) (params SearchJobsPara
 		}
 		if v, ok := packed[key]; ok {
 			params.Edu = v.([]SearchJobsEduItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "jobexp",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Jobexp = v.([]SearchJobsJobexpItem)
 		}
 	}
 	{
@@ -580,6 +601,71 @@ func decodeSearchJobsParams(args [0]string, argsEscaped bool, r *http.Request) (
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "edu",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: jobexp.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "jobexp",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotJobexpVal SearchJobsJobexpItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotJobexpVal = SearchJobsJobexpItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Jobexp = append(params.Jobexp, paramsDotJobexpVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Jobexp {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "jobexp",
 			In:   "query",
 			Err:  err,
 		}

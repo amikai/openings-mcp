@@ -365,6 +365,32 @@ func (c *Client) sendSearchJobs(ctx context.Context, params SearchJobsParams) (r
 		}
 	}
 	{
+		// Encode "jobexp" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "jobexp",
+			Style:   uri.QueryStyleForm,
+			Explode: false,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Jobexp != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Jobexp {
+						if err := func() error {
+							return e.EncodeValue(conv.IntToString(int(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "remoteWork" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "remoteWork",

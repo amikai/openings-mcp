@@ -1390,9 +1390,13 @@ func (s *JobSummary) encodeFields(e *jx.Encoder) {
 		e.FieldStart("jobRo")
 		e.Int(s.JobRo)
 	}
+	{
+		e.FieldStart("period")
+		e.Int(s.Period)
+	}
 }
 
-var jsonFieldsNameOfJobSummary = [12]string{
+var jsonFieldsNameOfJobSummary = [13]string{
 	0:  "jobNo",
 	1:  "jobName",
 	2:  "custName",
@@ -1405,6 +1409,7 @@ var jsonFieldsNameOfJobSummary = [12]string{
 	9:  "applyCnt",
 	10: "remoteWorkType",
 	11: "jobRo",
+	12: "period",
 }
 
 // Decode decodes JobSummary from json.
@@ -1558,6 +1563,18 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"jobRo\"")
 			}
+		case "period":
+			requiredBitSet[1] |= 1 << 4
+			if err := func() error {
+				v, err := d.Int()
+				s.Period = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"period\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -1569,7 +1586,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 	var failures []validate.FieldError
 	for i, mask := range [2]uint8{
 		0b11111111,
-		0b00001111,
+		0b00011111,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
 			// Mask only required fields and check equality to mask using XOR.

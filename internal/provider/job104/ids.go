@@ -113,10 +113,25 @@ var RoIDs = map[string]SearchJobsRo{
 
 // OrderIDs maps a sort-order label to its order request value. See
 // SearchJobs's `order` parameter description in openapi.yaml — `15` was a
-// wrong prior guess for Newest; `2` is the confirmed value.
+// wrong prior guess for Newest; `2` is the confirmed value. SalaryHigh is
+// not a pure sort: it also drops undisclosed-salary (待遇面議) postings
+// from the results and total.
 var OrderIDs = map[string]SearchJobsOrder{
-	"Relevance": SearchJobsOrder1,
-	"Newest":    SearchJobsOrder2,
+	"Relevance":  SearchJobsOrder1,
+	"Newest":     SearchJobsOrder2,
+	"SalaryHigh": SearchJobsOrder13,
+}
+
+// JobExpIDs maps a minimum-experience-bracket label to its jobexp request
+// value. The server rejects any other value with a 422, and the five
+// brackets are disjoint — comma-joined multi-selects union like `edu`. See
+// SearchJobs's `jobexp` parameter description in openapi.yaml.
+var JobExpIDs = map[string]SearchJobsJobexpItem{
+	"Under1Year":  SearchJobsJobexpItem1,
+	"1To3Years":   SearchJobsJobexpItem3,
+	"3To5Years":   SearchJobsJobexpItem5,
+	"5To10Years":  SearchJobsJobexpItem10,
+	"Over10Years": SearchJobsJobexpItem99,
 }
 
 // RemoteWorkIDs maps a remote-work label to its remoteWork request value.
