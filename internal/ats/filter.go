@@ -2,7 +2,6 @@ package ats
 
 import (
 	"cmp"
-	"context"
 	"fmt"
 	"maps"
 	"slices"
@@ -22,25 +21,6 @@ type dumpJob struct {
 	locations   string            // every location string joined, for fuzzy matching
 	fields      map[string]string // structured dimensions, e.g. "team" -> "Platform"
 	isRemote    bool
-}
-
-// searchViaDump and filtersViaDump are the whole Search/Filters
-// implementation for full-dump adapters; each adapter contributes only its
-// dump function.
-func searchViaDump(ctx context.Context, dump func(context.Context, string) ([]dumpJob, error), slug string, p SearchParams) (*SearchResult, error) {
-	jobs, err := dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return searchDump(jobs, p)
-}
-
-func filtersViaDump(ctx context.Context, dump func(context.Context, string) ([]dumpJob, error), slug string) (FilterSet, error) {
-	jobs, err := dump(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return distinctFilters(jobs), nil
 }
 
 // searchDump filters, ranks, and pages a full board dump. The upstream has

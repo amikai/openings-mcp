@@ -56,11 +56,19 @@ func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 }
 
 func (a *LeverAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
-	return searchViaDump(ctx, a.dump, slug, p)
+	jobs, err := a.dump(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	return searchDump(jobs, p)
 }
 
 func (a *LeverAdapter) Filters(ctx context.Context, slug string) (FilterSet, error) {
-	return filtersViaDump(ctx, a.dump, slug)
+	jobs, err := a.dump(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	return distinctFilters(jobs), nil
 }
 
 func (a *LeverAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
