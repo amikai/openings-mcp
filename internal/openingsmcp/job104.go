@@ -48,8 +48,8 @@ var job104SearchInputRawSchema = []byte(`{
 		},
 		"sort": {
 			"type": "string",
-			"description": "Result order.",
-			"enum": ["Relevance", "Newest"]
+			"description": "Result order. SalaryHigh also excludes postings without a disclosed salary (待遇面議), not just sorting.",
+			"enum": ["Relevance", "Newest", "SalaryHigh"]
 		},
 		"remote": {
 			"type": "string",
@@ -63,6 +63,15 @@ var job104SearchInputRawSchema = []byte(`{
 			"items": {
 				"type": "string",
 				"enum": ["HighSchoolBelow", "HighSchool", "College", "University", "Master", "Doctorate"]
+			}
+		},
+		"experience": {
+			"type": "array",
+			"description": "Minimum-experience brackets, OR'd together. Soft filter — verify each result's experience.",
+			"uniqueItems": true,
+			"items": {
+				"type": "string",
+				"enum": ["Under1Year", "1To3Years", "3To5Years", "5To10Years", "Over10Years"]
 			}
 		},
 		"page": {
@@ -83,13 +92,14 @@ var job104SearchInputRawSchema = []byte(`{
 var job104SearchInputSchema = mustSchema(job104SearchInputRawSchema)
 
 type job104SearchInput struct {
-	Keyword string   `json:"keyword"` // required
-	Area    string   `json:"area"`    // required
-	JobType string   `json:"job_type,omitempty"`
-	Sort    string   `json:"sort,omitempty"`
-	Remote  string   `json:"remote,omitempty"`
-	Edu     []string `json:"edu,omitempty"`
-	Page    int      `json:"page,omitempty"`
+	Keyword    string   `json:"keyword"` // required
+	Area       string   `json:"area"`    // required
+	JobType    string   `json:"job_type,omitempty"`
+	Sort       string   `json:"sort,omitempty"`
+	Remote     string   `json:"remote,omitempty"`
+	Edu        []string `json:"edu,omitempty"`
+	Experience []string `json:"experience,omitempty"`
+	Page       int      `json:"page,omitempty"`
 }
 
 // job104SearchOutput reshapes job104.JobsResponse for the LLM, making it
@@ -184,6 +194,14 @@ func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, er
 		params.Edu = append(params.Edu, edu)
 	}
 
+	for _, label := range in.Experience {
+		exp := job104.JobExpIDs[label]
+		if err := exp.Validate(); err != nil {
+			return nil, fmt.Errorf("invalid experience %q: %w", label, err)
+		}
+		params.Jobexp = append(params.Jobexp, exp)
+	}
+
 	if in.Page > 0 {
 		params.Page = job104.NewOptInt(in.Page)
 	}
@@ -201,8 +219,9 @@ type job104JobSummary struct {
 	JobAddrNoDesc string `json:"jobAddrNoDesc"`
 	AppearDate    string `json:"appearDate" jsonschema:"Posting date, YYYYMMDD."`
 	ApplyCnt      int    `json:"applyCnt"`
-	Remote        string `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."` // remoteWorkType code → label; unknown code drops the field
-	JobType       string `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`            // jobRo code → label; unknown code drops the field
+	Remote        string `json:"remote,omitempty" jsonschema:"Remote-work label; matches the remote input values. Absent for on-site."`                                   // remoteWorkType code → label; unknown code drops the field
+	JobType       string `json:"job_type,omitempty" jsonschema:"Employment-basis label; matches the job_type input values."`                                              // jobRo code → label; unknown code drops the field
+	Experience    string `json:"experience" jsonschema:"Minimum-experience bracket label; matches the experience input values. Soft filter — verify against this field."` // period bucketed into the same brackets as the experience input
 }
 
 type job104SearchMetadata struct {
@@ -233,6 +252,25 @@ var job104RemoteWorkLabels = func() map[job104.SearchJobsRemoteWork]string {
 	return m
 }()
 
+// job104ExperienceLabel buckets a JobSummary's raw period value into the
+// same labels as the experience input, mirroring the jobexp/period mapping
+// documented on JobSummary.period in openapi.yaml (jobexp 1 → period 0-1,
+// 3 → 2-3, 5 → 4-5, 10 → 6-10, 99 → 11+).
+func job104ExperienceLabel(period int) string {
+	switch {
+	case period <= 1:
+		return "Under1Year"
+	case period <= 3:
+		return "1To3Years"
+	case period <= 5:
+		return "3To5Years"
+	case period <= 10:
+		return "5To10Years"
+	default:
+		return "Over10Years"
+	}
+}
+
 func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 	out := &job104SearchOutput{
 		Data: make([]job104JobSummary, 0, len(resp.Data)),
@@ -258,6 +296,7 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 			ApplyCnt:      j.ApplyCnt,
 			Remote:        job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType)],
 			JobType:       job104RoLabels[job104.SearchJobsRo(j.JobRo)],
+			Experience:    job104ExperienceLabel(j.Period),
 		})
 	}
 	return out
@@ -310,7 +349,7 @@ func job104Descriptions(in []job104.CodeDescription) []string {
 func RegisterJob104(s *mcp.Server, c *job104.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "104_search_jobs",
-		Description: "Search jobs on 104 (Taiwan's largest job board) by keyword and area, with optional job-type/remote/education/sort filters.",
+		Description: "Search jobs on 104 (Taiwan's largest job board) by keyword and area, with optional job-type/remote/education/experience/sort filters.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search 104 jobs", ReadOnlyHint: true},
 		InputSchema: job104SearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104SearchInput) (*mcp.CallToolResult, *job104SearchOutput, error) {
