@@ -1,8 +1,8 @@
 package ats
 
 import (
-	"context"
 	"net/http"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -36,7 +36,7 @@ func TestLeverRoster(t *testing.T) {
 
 func TestLeverSearchAll(t *testing.T) {
 	a := testLeverAdapter(t)
-	res, err := a.Search(context.Background(), "leverdemo", SearchParams{})
+	res, err := a.Search(t.Context(), "leverdemo", SearchParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -52,7 +52,7 @@ func TestLeverSearchAll(t *testing.T) {
 
 func TestLeverSearchQuery(t *testing.T) {
 	a := testLeverAdapter(t)
-	res, err := a.Search(context.Background(), "leverdemo", SearchParams{Query: "AbelsonTaylor"})
+	res, err := a.Search(t.Context(), "leverdemo", SearchParams{Query: "AbelsonTaylor"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -63,7 +63,7 @@ func TestLeverSearchQuery(t *testing.T) {
 
 func TestLeverSearchFilters(t *testing.T) {
 	a := testLeverAdapter(t)
-	res, err := a.Search(context.Background(), "leverdemo", SearchParams{
+	res, err := a.Search(t.Context(), "leverdemo", SearchParams{
 		Filters: map[string][]string{"team": {"Professional Services"}},
 	})
 	if err != nil {
@@ -76,24 +76,18 @@ func TestLeverSearchFilters(t *testing.T) {
 
 func TestLeverFilters(t *testing.T) {
 	a := testLeverAdapter(t)
-	fs, err := a.Filters(context.Background(), "leverdemo")
+	fs, err := a.Filters(t.Context(), "leverdemo")
 	if err != nil {
 		t.Fatal(err)
 	}
-	found := false
-	for _, v := range fs["team"] {
-		if v == "Professional Services" {
-			found = true
-		}
-	}
-	if !found {
+	if !slices.Contains(fs["team"], "Professional Services") {
 		t.Fatalf(`fs["team"] = %v, want it to contain "Professional Services"`, fs["team"])
 	}
 }
 
 func TestLeverDetail(t *testing.T) {
 	a := testLeverAdapter(t)
-	d, err := a.Detail(context.Background(), "leverdemo", "33538a2f-d27d-4a96-8f05-fa4b0e4d940e")
+	d, err := a.Detail(t.Context(), "leverdemo", "33538a2f-d27d-4a96-8f05-fa4b0e4d940e")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +104,7 @@ func TestLeverDetail(t *testing.T) {
 
 func TestLeverDetailNotFound(t *testing.T) {
 	a := testLeverAdapter(t)
-	if _, err := a.Detail(context.Background(), "leverdemo", lever.MockNotFoundPostingID); err == nil {
+	if _, err := a.Detail(t.Context(), "leverdemo", lever.MockNotFoundPostingID); err == nil {
 		t.Fatal("want error for unknown posting id")
 	}
 }

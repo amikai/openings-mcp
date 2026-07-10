@@ -3,6 +3,7 @@ package workday
 import "testing"
 
 func TestJobDetailKeyFromPath(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name         string
 		externalPath string
@@ -57,6 +58,7 @@ func TestJobDetailKeyFromPath(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			gotLocation, gotTitle, gotOK := JobDetailKeyFromPath(tc.externalPath)
 			if gotLocation != tc.wantLocation || gotTitle != tc.wantTitle || gotOK != tc.wantOK {
 				t.Errorf("JobDetailKeyFromPath(%q) = (%q, %q, %v), want (%q, %q, %v)",
@@ -67,6 +69,7 @@ func TestJobDetailKeyFromPath(t *testing.T) {
 }
 
 func TestPublicSiteURL(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
 		name    string
 		baseURL string
@@ -101,6 +104,7 @@ func TestPublicSiteURL(t *testing.T) {
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
+			t.Parallel()
 			got, err := PublicSiteURL(tc.baseURL)
 			if tc.wantErr {
 				if err == nil {

@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -39,7 +40,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(*keyword, *location, *category, *jobType, *employmentType, *page, *perPage)
+	req := buildJobsRequest(
+		*keyword,
+		*location,
+		*category,
+		*jobType,
+		*employmentType,
+		*page,
+		*perPage,
+	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -93,7 +102,10 @@ func main() {
 // the ids.go lookup tables. Labels are already validated against the flag's
 // enum at parse time, so a lookup miss here can't happen for a non-empty
 // label. An empty label (flag not set) leaves that filter unset.
-func buildJobsRequest(keyword, location, category, jobType, employmentType string, page, perPage int) *tsmc.JobsRequest {
+func buildJobsRequest(
+	keyword, location, category, jobType, employmentType string,
+	page, perPage int,
+) *tsmc.JobsRequest {
 	req := &tsmc.JobsRequest{
 		Keyword: keyword,
 		Page:    page,
@@ -119,13 +131,7 @@ func buildJobsRequest(keyword, location, category, jobType, employmentType strin
 // of silently falling back to the first real label — ffval.Enum's zero
 // Default only survives initialize() if it's itself in the Valid list.
 func labels[V any](table map[string]V) []string {
-	l := make([]string, 0, len(table)+1)
-	l = append(l, "")
-	for label := range table {
-		l = append(l, label)
-	}
-	sort.Strings(l)
-	return l
+	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
 // usageWithChoices appends a "one of: ..." list to base. ffhelp never

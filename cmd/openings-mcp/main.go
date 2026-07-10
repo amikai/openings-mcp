@@ -132,7 +132,16 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 		return err
 	}
 
-	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, registry, logger)
+	server := newServer(
+		c104,
+		cCake,
+		cNvidia,
+		cTsmc,
+		cGoogle,
+		cLinkedin,
+		registry,
+		logger,
+	)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
@@ -161,7 +170,16 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 // registry is wired up but not yet registered as MCP tools: the unified
 // company-tools feature (search_jobs_by_company etc.) is still in progress
 // and not part of this release's tool surface.
-func newServer(c104 *job104.Client, cCake *cake.Client, cNvidia *nvidia.Client, cTsmc *tsmc.Client, cGoogle *google.Client, cLinkedin *linkedin.Client, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
+func newServer(
+	c104 *job104.Client,
+	cCake *cake.Client,
+	cNvidia *nvidia.Client,
+	cTsmc *tsmc.Client,
+	cGoogle *google.Client,
+	cLinkedin *linkedin.Client,
+	registry *ats.Registry,
+	logger *slog.Logger,
+) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "openings-mcp", Version: version}, &mcp.ServerOptions{Instructions: serverInstructions, Logger: logger})
 	server.AddReceivingMiddleware(logging.ErrorLoggingMiddleware(logger))
 	openingsmcp.RegisterJob104(server, c104)

@@ -61,7 +61,19 @@ func main() {
 		ShortHelp: "list postings for a site, with optional filters",
 		Flags:     searchFlags,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(ctx, *site, *timeout, *locations, *commitments, *teams, *departments, *level, *limit, *skip, *format)
+			return runSearch(
+				ctx,
+				*site,
+				*timeout,
+				*locations,
+				*commitments,
+				*teams,
+				*departments,
+				*level,
+				*limit,
+				*skip,
+				*format,
+			)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
@@ -108,7 +120,7 @@ func main() {
 // Lever's URL shape wouldn't technically need the allowlist.
 func normalizeSite(site string) (string, error) {
 	if site == "" {
-		return "", fmt.Errorf("--site is required")
+		return "", errors.New("--site is required")
 	}
 	s := strings.ToLower(site)
 	if _, ok := lever.CompaniesBySite[s]; !ok {
@@ -144,7 +156,15 @@ type searchResultJSON struct {
 // runSearch fetches one page of postings with the given filters. The list
 // response already carries full posting content, so there are no
 // per-result detail fetches — one API call per invocation.
-func runSearch(ctx context.Context, site string, timeout time.Duration, locations, commitments, teams, departments []string, level string, limit, skip int, format string) error {
+func runSearch(
+	ctx context.Context,
+	site string,
+	timeout time.Duration,
+	locations, commitments, teams, departments []string,
+	level string,
+	limit, skip int,
+	format string,
+) error {
 	s, err := normalizeSite(site)
 	if err != nil {
 		return err
@@ -204,7 +224,7 @@ func runGet(ctx context.Context, site string, timeout time.Duration, postingID, 
 		return err
 	}
 	if postingID == "" {
-		return fmt.Errorf("a posting id argument is required (take it from a search result's id)")
+		return errors.New("a posting id argument is required (take it from a search result's id)")
 	}
 
 	ctx, cancel := context.WithTimeout(ctx, timeout)

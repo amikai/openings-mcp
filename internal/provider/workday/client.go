@@ -31,11 +31,11 @@ func NewTenantClient(opts ...ClientOption) (*TenantClient, error) {
 func serverURLByTenant(tenant string) (serverURL *url.URL, err error) {
 	company, ok := CompaniesByTenant[strings.ToLower(tenant)]
 	if !ok {
-		return nil, fmt.Errorf("tenant %s not found", tenant)
+		return nil, fmt.Errorf("tenant %q not found", tenant)
 	}
 	u, err := url.Parse(company.BaseURL())
 	if err != nil {
-		return nil, fmt.Errorf("parse base URL for tenant %s: %w", tenant, err)
+		return nil, fmt.Errorf("parse base URL for tenant %q: %w", tenant, err)
 	}
 	return u, nil
 }

@@ -137,7 +137,7 @@ func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, er
 	// callers and clients that skip schema validation — a missing area fails
 	// its enum Validate below (empty label maps to the zero value).
 	if in.Keyword == "" {
-		return nil, fmt.Errorf("keyword is required")
+		return nil, errors.New("keyword is required")
 	}
 	params.Keyword = job104.NewOptString(in.Keyword)
 	// Always on: without it, a keyword 104 recognizes as a company name (e.g.

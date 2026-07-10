@@ -2,6 +2,7 @@ package openingsmcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
@@ -115,12 +116,12 @@ func tsmcMCPToHTTPRequest(in *tsmcSearchInput) (*tsmc.JobsRequest, error) {
 	// The schema already marks keyword and location required; this guards
 	// direct callers and clients that skip schema validation.
 	if in.Keyword == "" {
-		return nil, fmt.Errorf("keyword is required")
+		return nil, errors.New("keyword is required")
 	}
 	req.Keyword = in.Keyword
 
 	if in.Location == "" {
-		return nil, fmt.Errorf("location is required")
+		return nil, errors.New("location is required")
 	}
 	loc, ok := tsmc.LocationIDs[in.Location]
 	if !ok {

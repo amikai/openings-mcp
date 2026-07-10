@@ -20,6 +20,7 @@ func findTool(tools []*mcp.Tool, toolName string) *mcp.Tool {
 }
 
 func testJob104MCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
+	t.Helper()
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
 	srv := job104.NewMockServer()
 	t.Cleanup(srv.Close)

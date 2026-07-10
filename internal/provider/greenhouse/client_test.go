@@ -1,7 +1,6 @@
 package greenhouse
 
 import (
-	"context"
 	"net/url"
 	"testing"
 	"time"
@@ -17,7 +16,7 @@ func TestListJobs(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.ListJobs(context.Background(), ListJobsParams{BoardToken: "safariai"})
+	res, err := client.ListJobs(t.Context(), ListJobsParams{BoardToken: "safariai"})
 	require.NoError(t, err)
 
 	got, ok := res.(*JobListResponse)
@@ -160,7 +159,7 @@ func TestListJobsUnknownBoardToken(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.ListJobs(context.Background(), ListJobsParams{BoardToken: "doesnotexist"})
+	res, err := client.ListJobs(t.Context(), ListJobsParams{BoardToken: "doesnotexist"})
 	require.NoError(t, err)
 
 	_, ok := res.(*ListJobsNotFound)
@@ -174,7 +173,7 @@ func TestGetJob(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJob(context.Background(), GetJobParams{BoardToken: "anthropic", JobID: 4461450008})
+	res, err := client.GetJob(t.Context(), GetJobParams{BoardToken: "anthropic", JobID: 4461450008})
 	require.NoError(t, err)
 
 	got, ok := res.(*JobDetail)
@@ -268,7 +267,7 @@ func TestGetJobWithQuestionsAndPayTransparency(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJob(context.Background(), GetJobParams{
+	res, err := client.GetJob(t.Context(), GetJobParams{
 		BoardToken:      "anthropic",
 		JobID:           4461450008,
 		Questions:       NewOptBool(true),
@@ -311,7 +310,7 @@ func TestGetJobUnknownJobID(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJob(context.Background(), GetJobParams{BoardToken: "anthropic", JobID: 999999999999})
+	res, err := client.GetJob(t.Context(), GetJobParams{BoardToken: "anthropic", JobID: 999999999999})
 	require.NoError(t, err)
 
 	_, ok := res.(*GetJobNotFound)
@@ -325,7 +324,7 @@ func TestListJobsWithContent(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.ListJobs(context.Background(), ListJobsParams{
+	res, err := client.ListJobs(t.Context(), ListJobsParams{
 		BoardToken: "safariai",
 		Content:    NewOptBool(true),
 	})

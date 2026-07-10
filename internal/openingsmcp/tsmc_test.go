@@ -11,6 +11,7 @@ import (
 )
 
 func testTsmcMCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
+	t.Helper()
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
 	srv := tsmc.NewMockServer()
 	t.Cleanup(srv.Close)

@@ -117,6 +117,7 @@ func TestLinkedinHTTPToMCPDetail(t *testing.T) {
 }
 
 func testLinkedinMCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
+	t.Helper()
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
 	srv := linkedin.NewMockServer()
 	t.Cleanup(srv.Close)

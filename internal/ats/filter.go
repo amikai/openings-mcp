@@ -1,9 +1,11 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
-	"sort"
+	"maps"
+	"slices"
 	"strings"
 	"time"
 )
@@ -70,15 +72,12 @@ func searchDump(jobs []dumpJob, p SearchParams) (*SearchResult, error) {
 		}
 		matched = append(matched, scoredJob{job: j, rank: queryRank(j, words)})
 	}
-	sort.Slice(matched, func(i, k int) bool {
-		a, b := matched[i], matched[k]
-		if a.rank != b.rank {
-			return a.rank < b.rank
-		}
-		if !a.job.sortKey.Equal(b.job.sortKey) {
-			return a.job.sortKey.After(b.job.sortKey)
-		}
-		return a.job.summary.JobID < b.job.summary.JobID
+	slices.SortFunc(matched, func(a, b scoredJob) int {
+		return cmp.Or(
+			cmp.Compare(a.rank, b.rank),
+			b.job.sortKey.Compare(a.job.sortKey), // newest first
+			strings.Compare(a.job.summary.JobID, b.job.summary.JobID),
+		)
 	})
 
 	page := clampPage(p.Page)
@@ -138,14 +137,7 @@ func matchFilters(j *dumpJob, filters map[string][]string) bool {
 		if actual == "" {
 			return false
 		}
-		hit := false
-		for _, v := range values {
-			if strings.EqualFold(actual, v) {
-				hit = true
-				break
-			}
-		}
-		if !hit {
+		if !slices.ContainsFunc(values, func(v string) bool { return strings.EqualFold(actual, v) }) {
 			return false
 		}
 	}
@@ -176,11 +168,7 @@ func validateFilterKeys(jobs []dumpJob, filters map[string][]string) error {
 // return for an unknown filter dimension — part of keeping the families
 // indistinguishable to the LLM.
 func errUnknownFilterKey(key string, valid map[string]bool) error {
-	keys := make([]string, 0, len(valid))
-	for k := range valid {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
+	keys := slices.Sorted(maps.Keys(valid))
 	return fmt.Errorf("unknown filter key %q; valid keys: %s", key, strings.Join(keys, ", "))
 }
 
@@ -207,12 +195,7 @@ func distinctFilters(jobs []dumpJob) FilterSet {
 func toFilterSet(seen map[string]map[string]bool) FilterSet {
 	fs := make(FilterSet, len(seen))
 	for k, values := range seen {
-		list := make([]string, 0, len(values))
-		for v := range values {
-			list = append(list, v)
-		}
-		sort.Strings(list)
-		fs[k] = list
+		fs[k] = slices.Sorted(maps.Keys(values))
 	}
 	return fs
 }

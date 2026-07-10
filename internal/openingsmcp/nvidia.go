@@ -158,7 +158,7 @@ func nvidiaMCPToHTTPRequest(in *nvidiaSearchInput) (*nvidia.JobsRequest, error) 
 	// country fails its enum Validate below (empty label maps to the zero
 	// value).
 	if in.Keyword == "" {
-		return nil, fmt.Errorf("keyword is required")
+		return nil, errors.New("keyword is required")
 	}
 	req.SearchText = in.Keyword
 

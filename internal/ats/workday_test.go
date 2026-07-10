@@ -1,11 +1,11 @@
 package ats
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -70,7 +70,7 @@ func TestWorkdayRosterDedupesShareClasses(t *testing.T) {
 
 func TestWorkdaySearchPlainIsOneRequest(t *testing.T) {
 	a, bodies := testWorkdayAdapter(t)
-	res, err := a.Search(context.Background(), "nvidia", SearchParams{Query: "golang"})
+	res, err := a.Search(t.Context(), "nvidia", SearchParams{Query: "golang"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +91,7 @@ func TestWorkdaySearchPlainIsOneRequest(t *testing.T) {
 
 func TestWorkdaySearchWithFiltersIsTwoRequests(t *testing.T) {
 	a, bodies := testWorkdayAdapter(t)
-	_, err := a.Search(context.Background(), "nvidia", SearchParams{
+	_, err := a.Search(t.Context(), "nvidia", SearchParams{
 		Filters: map[string][]string{"timeType": {"Full time"}},
 	})
 	if err != nil {
@@ -113,7 +113,7 @@ func TestWorkdaySearchWithFiltersIsTwoRequests(t *testing.T) {
 
 func TestWorkdaySearchLocationResolvesToFacet(t *testing.T) {
 	a, bodies := testWorkdayAdapter(t)
-	_, err := a.Search(context.Background(), "nvidia", SearchParams{Location: "Tel Aviv"})
+	_, err := a.Search(t.Context(), "nvidia", SearchParams{Location: "Tel Aviv"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +130,7 @@ func TestWorkdaySearchLocationResolvesToFacet(t *testing.T) {
 
 func TestWorkdayFilterValueNotFoundTeaches(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
-	_, err := a.Search(context.Background(), "nvidia", SearchParams{
+	_, err := a.Search(t.Context(), "nvidia", SearchParams{
 		Filters: map[string][]string{"timeType": {"Part time"}},
 	})
 	if err == nil {
@@ -143,7 +143,7 @@ func TestWorkdayFilterValueNotFoundTeaches(t *testing.T) {
 
 func TestWorkdayFilterKeyNotFoundTeaches(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
-	_, err := a.Search(context.Background(), "nvidia", SearchParams{
+	_, err := a.Search(t.Context(), "nvidia", SearchParams{
 		Filters: map[string][]string{"bogus": {"x"}},
 	})
 	if err == nil {
@@ -156,27 +156,21 @@ func TestWorkdayFilterKeyNotFoundTeaches(t *testing.T) {
 
 func TestWorkdayFilters(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
-	fs, err := a.Filters(context.Background(), "nvidia")
+	fs, err := a.Filters(t.Context(), "nvidia")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(fs["jobFamilyGroup"]) == 0 || len(fs["timeType"]) == 0 {
 		t.Fatalf("FilterSet missing expected dimensions: %v", fs)
 	}
-	found := false
-	for _, v := range fs["jobFamilyGroup"] {
-		if v == "Engineering" {
-			found = true
-		}
-	}
-	if !found {
+	if !slices.Contains(fs["jobFamilyGroup"], "Engineering") {
 		t.Errorf(`fs["jobFamilyGroup"] = %v, want it to contain "Engineering"`, fs["jobFamilyGroup"])
 	}
 }
 
 func TestWorkdayDetail(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
-	d, err := a.Detail(context.Background(), "nvidia", "/job/Israel-Tel-Aviv/Software-Golang-Kubernetes-Engineer_JR2020442")
+	d, err := a.Detail(t.Context(), "nvidia", "/job/Israel-Tel-Aviv/Software-Golang-Kubernetes-Engineer_JR2020442")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -193,7 +187,7 @@ func TestWorkdayDetail(t *testing.T) {
 
 func TestWorkdayDetailRejectsMalformedJobID(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
-	if _, err := a.Detail(context.Background(), "nvidia", "garbage"); err == nil {
+	if _, err := a.Detail(t.Context(), "nvidia", "garbage"); err == nil {
 		t.Fatal("want error for malformed job_id")
 	}
 }

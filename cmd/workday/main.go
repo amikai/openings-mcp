@@ -59,7 +59,14 @@ func main() {
 		ShortHelp: "discover a tenant's current facet tree (categories, locations, ...)",
 		Flags:     facetsFlags,
 		Exec: func(ctx context.Context, args []string) error {
-			return runFacets(ctx, *tenant, *timeout, *facetsSearchText, *facetsFacetArgs, *format)
+			return runFacets(
+				ctx,
+				*tenant,
+				*timeout,
+				*facetsSearchText,
+				*facetsFacetArgs,
+				*format,
+			)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, facetsCmd)
@@ -77,7 +84,16 @@ func main() {
 		ShortHelp: "search jobs and fetch full detail for each result",
 		Flags:     searchFlags,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(ctx, *tenant, *timeout, *searchText, *limit, *offset, *searchFacetArgs, *format)
+			return runSearch(
+				ctx,
+				*tenant,
+				*timeout,
+				*searchText,
+				*limit,
+				*offset,
+				*searchFacetArgs,
+				*format,
+			)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
@@ -141,9 +157,16 @@ func runCompanies(format string) error {
 // job is to read back JobsResponse.Facets — Limit is 1 because the actual
 // jobPostings aren't used here (see openapi.yaml's note that every /jobs
 // response, filtered or not, carries the full current facet tree).
-func runFacets(ctx context.Context, tenant string, timeout time.Duration, searchText string, facetArgs []string, format string) error {
+func runFacets(
+	ctx context.Context,
+	tenant string,
+	timeout time.Duration,
+	searchText string,
+	facetArgs []string,
+	format string,
+) error {
 	if tenant == "" {
-		return fmt.Errorf("--tenant is required")
+		return errors.New("--tenant is required")
 	}
 	_, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
 	if !ok {
@@ -235,9 +258,17 @@ type searchResultJSON struct {
 // listed with a "no detail available" note rather than silently dropped, so
 // "showing N" always matches the page's posting count) — one page per
 // invocation, no auto-pagination.
-func runSearch(ctx context.Context, tenant string, timeout time.Duration, searchText string, limit, offset int, facetArgs []string, format string) error {
+func runSearch(
+	ctx context.Context,
+	tenant string,
+	timeout time.Duration,
+	searchText string,
+	limit, offset int,
+	facetArgs []string,
+	format string,
+) error {
 	if tenant == "" {
-		return fmt.Errorf("--tenant is required")
+		return errors.New("--tenant is required")
 	}
 	company, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
 	if !ok {

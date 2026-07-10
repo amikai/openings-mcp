@@ -5,9 +5,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -41,7 +42,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	params, err := buildSearchParams(*keyword, *area, *ro, *order, *edu, *remoteWork, *s9, *page)
+	params, err := buildSearchParams(
+		*keyword,
+		*area,
+		*ro,
+		*order,
+		*edu,
+		*remoteWork,
+		*s9,
+		*page,
+	)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -97,7 +107,13 @@ func main() {
 // value via the lookup tables above. Labels are already validated against
 // the flag's enum at parse time. An empty label (flag not set) leaves that
 // field unset (unfiltered); page 0 leaves Page unset.
-func buildSearchParams(keyword, area, ro, order string, edu []string, remoteWork string, s9 []string, page int) (job104.SearchJobsParams, error) {
+func buildSearchParams(
+	keyword, area, ro, order string,
+	edu []string,
+	remoteWork string,
+	s9 []string,
+	page int,
+) (job104.SearchJobsParams, error) {
 	params := job104.SearchJobsParams{}
 	if keyword != "" {
 		params.Keyword = job104.NewOptString(keyword)
@@ -164,12 +180,7 @@ func writeDetail(w io.Writer, detail *job104.JobDetailResponse) {
 
 // labels returns the sorted keys of a generic lookup table.
 func labels[T any](table map[string]T) []string {
-	l := make([]string, 0, len(table))
-	for label := range table {
-		l = append(l, label)
-	}
-	sort.Strings(l)
-	return l
+	return slices.Sorted(maps.Keys(table))
 }
 
 // enumChoices is labels prefixed with "" so an ff.StringEnumLong flag can

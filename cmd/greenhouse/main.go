@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -150,9 +151,9 @@ func containsFold(s, sub string) bool {
 // the cents divide evenly (the common case), two decimals otherwise.
 func formatCents(cents int) string {
 	if cents%100 == 0 {
-		return fmt.Sprintf("%d", cents/100)
+		return strconv.Itoa(cents / 100)
 	}
-	return fmt.Sprintf("%.2f", float64(cents)/100)
+	return strconv.FormatFloat(float64(cents)/100, 'f', 2, 64)
 }
 
 // payRangeLine renders one pay range as "title: min – max CURRENCY". The
@@ -215,7 +216,7 @@ func runCompanies(format string) error {
 // curated board — same policy as cmd/ashby's fetchBoard front half.
 func normalizeBoard(board string) (string, error) {
 	if board == "" {
-		return "", fmt.Errorf("--board is required")
+		return "", errors.New("--board is required")
 	}
 	slug := strings.ToLower(board)
 	if _, ok := greenhouse.CompaniesByBoardToken[slug]; !ok {
@@ -286,7 +287,7 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 // pay_transparency=true so pay_input_ranges come back.
 func runGet(ctx context.Context, board string, timeout time.Duration, jobID int, format string) error {
 	if jobID == 0 {
-		return fmt.Errorf("--id is required (take it from a search result's ID)")
+		return errors.New("--id is required (take it from a search result's ID)")
 	}
 	slug, err := normalizeBoard(board)
 	if err != nil {

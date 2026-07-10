@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"io"
 	"log/slog"
 	"net/http"
@@ -26,7 +25,7 @@ type writeCloser struct {
 func (writeCloser) Close() error { return nil }
 
 func TestServerListsJobTools(t *testing.T) {
-	ctx := context.Background()
+	ctx := t.Context()
 	c104, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(http.DefaultClient))
 	require.NoError(t, err)
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(http.DefaultClient))

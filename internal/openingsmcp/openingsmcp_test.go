@@ -1,7 +1,6 @@
 package openingsmcp
 
 import (
-	"context"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -12,7 +11,7 @@ import (
 func assertTools(t *testing.T, server *mcp.Server, names ...string) {
 	t.Helper()
 
-	ctx := context.Background()
+	ctx := t.Context()
 	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)
