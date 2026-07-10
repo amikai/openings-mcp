@@ -41,6 +41,7 @@ const serverInstructions = `openings-mcp exposes job-search tools for six job bo
 Tool selection:
 - When the user names a site or company, use that provider's tools.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, and LinkedIn) rather than a single company's careers site.
+- search_jobs_by_company also accepts a careers-page URL on Workday, Greenhouse, Lever, or Ashby. When a company isn't in the supported list, find its careers page URL (e.g. via web search) and pass that URL as the company argument.
 
 Query construction:
 - Listen carefully to the user's stated criteria and map each one onto a search parameter when a matching parameter exists; enforce criteria the parameters cannot express by filtering the results yourself.

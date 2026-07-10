@@ -2,6 +2,7 @@ package ats
 
 import (
 	"context"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -12,7 +13,16 @@ import (
 // never reached by registry tests.
 type fakeAdapter struct {
 	name   string
+	host   string // careers host this fake claims, e.g. "jobs.fake-lever.example"
 	roster []CompanyInfo
+}
+
+func (f *fakeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	if f.host == "" || u.Hostname() != f.host {
+		return "", false
+	}
+	slug := firstPathSegment(u)
+	return slug, slug != ""
 }
 
 func (f *fakeAdapter) Name() string          { return f.name }
@@ -28,11 +38,11 @@ func (f *fakeAdapter) Detail(context.Context, string, string) (*JobDetail, error
 func testRegistry(t *testing.T) *Registry {
 	t.Helper()
 	r, err := NewRegistry(
-		&fakeAdapter{name: "workday", roster: []CompanyInfo{
+		&fakeAdapter{name: "workday", host: "jobs.fake-workday.example", roster: []CompanyInfo{
 			{Slug: "nvidia", Name: "NVIDIA Corp"},
 			{Slug: "workday", Name: "Workday, Inc."},
 		}},
-		&fakeAdapter{name: "lever", roster: []CompanyInfo{
+		&fakeAdapter{name: "lever", host: "jobs.fake-lever.example", roster: []CompanyInfo{
 			{Slug: "palantir", Name: "Palantir Technologies"},
 		}},
 	)
@@ -76,4 +86,27 @@ func TestNewRegistryRejectsDuplicateSlug(t *testing.T) {
 		&fakeAdapter{name: "lever", roster: []CompanyInfo{{Slug: "acme", Name: "Acme (Lever)"}}},
 	)
 	assert.Error(t, err, "want error for duplicate slug across adapters")
+}
+
+func TestResolveCareersURL(t *testing.T) {
+	r := testRegistry(t)
+	a, slug, err := r.Resolve("https://jobs.fake-lever.example/somestartup")
+	require.NoError(t, err)
+	assert.Equal(t, "lever", a.Name())
+	assert.Equal(t, "somestartup", slug)
+}
+
+func TestResolveCareersURLSchemeless(t *testing.T) {
+	r := testRegistry(t)
+	a, slug, err := r.Resolve("jobs.fake-workday.example/acme")
+	require.NoError(t, err)
+	assert.Equal(t, "workday", a.Name())
+	assert.Equal(t, "acme", slug)
+}
+
+func TestResolveUnrecognizedCareersURLTeaches(t *testing.T) {
+	r := testRegistry(t)
+	_, _, err := r.Resolve("https://careers.example.com/acme")
+	require.ErrorContains(t, err, "careers URL", "URL misses should get the URL error, not name suggestions")
+	assert.NotContains(t, err.Error(), "closest matches", "no levenshtein suggestions for URLs")
 }

@@ -1,9 +1,11 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -37,6 +39,22 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
+// leverHosts are Lever's public board hosts, including the EU variant.
+var leverHosts = map[string]bool{
+	"jobs.lever.co":    true,
+	"jobs.eu.lever.co": true,
+}
+
+// ParseCareersURL recognizes Lever-hosted board URLs; the first path
+// segment is the organization, which is already this adapter's slug form.
+func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	if !leverHosts[strings.ToLower(u.Hostname())] {
+		return "", false
+	}
+	org := firstPathSegment(u)
+	return org, org != ""
+}
+
 func (a *LeverAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	return searchViaDump(ctx, a.dump, slug, p)
 }
@@ -57,7 +75,7 @@ func (a *LeverAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 	return &JobDetail{
 		JobID:       p.ID,
 		Title:       p.Text,
-		Company:     lever.CompaniesBySite[slug].Name,
+		Company:     cmp.Or(lever.CompaniesBySite[slug].Name, slug),
 		Location:    leverLocations(p),
 		PostedAt:    leverPostedAt(p),
 		URL:         p.HostedUrl.Value,

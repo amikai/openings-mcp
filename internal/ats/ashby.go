@@ -1,9 +1,11 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/amikai/openings-mcp/internal/provider/ashby"
@@ -36,6 +38,17 @@ func (a *AshbyAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
+// ParseCareersURL recognizes Ashby-hosted board URLs; the first path
+// segment is the organization name, which is already this adapter's slug
+// form (URL-decoded — Ashby org names may contain spaces).
+func (a *AshbyAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	if strings.ToLower(u.Hostname()) != "jobs.ashbyhq.com" {
+		return "", false
+	}
+	org := firstPathSegment(u)
+	return org, org != ""
+}
+
 func (a *AshbyAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	return searchViaDump(ctx, a.dump, slug, p)
 }
@@ -56,7 +69,7 @@ func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 		return &JobDetail{
 			JobID:       j.ID.Value,
 			Title:       j.Title,
-			Company:     ashby.CompaniesByBoard[slug].Name,
+			Company:     cmp.Or(ashby.CompaniesByBoard[slug].Name, slug),
 			Location:    ashbyLocations(j),
 			PostedAt:    isoDate(j.PublishedAt),
 			URL:         j.JobUrl,

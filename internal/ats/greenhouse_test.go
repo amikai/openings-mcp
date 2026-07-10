@@ -145,3 +145,10 @@ func TestGreenhouseUnknownBoardUpstream(t *testing.T) {
 	_, err := a.Search(t.Context(), "doesnotexist", SearchParams{})
 	assert.Error(t, err, "want error when upstream returns 404")
 }
+
+func TestGreenhouseDetailCompanyFallsBackToSlug(t *testing.T) {
+	a := testGreenhouseAdapter(t)
+	d, err := a.Detail(t.Context(), greenhouse.MockNonRosterBoard, "4461450008")
+	require.NoError(t, err)
+	assert.Equal(t, greenhouse.MockNonRosterBoard, d.Company, "non-roster slug should be used as company name")
+}

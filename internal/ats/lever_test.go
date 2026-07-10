@@ -83,3 +83,13 @@ func TestLeverDetailNotFound(t *testing.T) {
 	_, err := a.Detail(t.Context(), "leverdemo", lever.MockNotFoundPostingID)
 	assert.Error(t, err, "want error for unknown posting id")
 }
+
+func TestLeverDetailCompanyFallsBackToSlug(t *testing.T) {
+	a := testLeverAdapter(t)
+	res, err := a.Search(t.Context(), "somestartup", SearchParams{})
+	require.NoError(t, err)
+	require.NotEmpty(t, res.Jobs)
+	d, err := a.Detail(t.Context(), "somestartup", res.Jobs[0].JobID)
+	require.NoError(t, err)
+	assert.Equal(t, "somestartup", d.Company, "non-roster slug should be used as company name")
+}

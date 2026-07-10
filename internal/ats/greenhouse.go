@@ -1,10 +1,12 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"html"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -40,6 +42,25 @@ func (a *GreenhouseAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
+// greenhouseHosts are the public board hosts Greenhouse serves careers
+// pages from, including the EU data-residency variants.
+var greenhouseHosts = map[string]bool{
+	"job-boards.greenhouse.io":    true,
+	"boards.greenhouse.io":        true,
+	"job-boards.eu.greenhouse.io": true,
+	"boards.eu.greenhouse.io":     true,
+}
+
+// ParseCareersURL recognizes Greenhouse-hosted board URLs; the first path
+// segment is the board token, which is already this adapter's slug form.
+func (a *GreenhouseAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	if !greenhouseHosts[strings.ToLower(u.Hostname())] {
+		return "", false
+	}
+	token := firstPathSegment(u)
+	return token, token != ""
+}
+
 func (a *GreenhouseAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	return searchViaDump(ctx, a.dump, slug, p)
 }
@@ -62,7 +83,7 @@ func (a *GreenhouseAdapter) Detail(ctx context.Context, slug, jobID string) (*Jo
 		return &JobDetail{
 			JobID:       jobID,
 			Title:       r.Title.Value,
-			Company:     greenhouse.CompaniesByBoardToken[strings.ToLower(slug)].Name,
+			Company:     cmp.Or(greenhouse.CompaniesByBoardToken[strings.ToLower(slug)].Name, slug),
 			Location:    r.Location.Value.Name.Value,
 			PostedAt:    greenhousePostedAt(r.FirstPublished),
 			URL:         r.AbsoluteURL.Value.String(),

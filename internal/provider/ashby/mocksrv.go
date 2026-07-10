@@ -15,6 +15,11 @@ const MockBoardName = "browserbase"
 // real boards null out (see testdata/board_req.hurl).
 const MockNullsBoardName = "weaviate"
 
+// MockNonRosterBoard is a board name deliberately absent from
+// companies.yaml, so ats-layer tests can exercise non-roster behavior. It
+// serves the same fixture as MockBoardName.
+const MockNonRosterBoard = "somestartup"
+
 //go:embed testdata/board_rsp.json
 var mockBoardRsp []byte
 
@@ -40,6 +45,7 @@ func NewMockServer() *httptest.Server {
 		serveMockJSON(mockBoardRsp)(w, r)
 	})
 	mux.HandleFunc("/posting-api/job-board/"+MockNullsBoardName, serveMockJSON(mockBoardNullsRsp))
+	mux.HandleFunc("/posting-api/job-board/"+MockNonRosterBoard, serveMockJSON(mockBoardRsp))
 	mux.HandleFunc("/posting-api/job-board/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(http.StatusNotFound)

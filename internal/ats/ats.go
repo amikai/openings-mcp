@@ -5,6 +5,7 @@ package ats
 
 import (
 	"context"
+	"net/url"
 	"time"
 )
 
@@ -24,9 +25,9 @@ func totalPages(total int) int { return (total + PageSize - 1) / PageSize }
 func isoDate(t time.Time) string { return t.UTC().Format("2006-01-02") }
 
 // Adapter is one ATS's implementation of the unified search interface.
-// Methods address a company by slug; slugs are declared by Roster() and
-// indexed by Registry, so a slug that reaches an adapter is always one it
-// declared.
+// Methods address a company by slug: either one declared by Roster() and
+// indexed by Registry, or one the adapter itself minted via
+// ParseCareersURL for careers-URL input.
 type Adapter interface {
 	// Name identifies the adapter ("workday", "greenhouse", "lever",
 	// "ashby") in logs and error messages only; it never reaches tool
@@ -34,6 +35,11 @@ type Adapter interface {
 	Name() string
 	// Roster lists every curated company on this ATS.
 	Roster() []CompanyInfo
+	// ParseCareersURL reports whether u is a careers-page URL on this ATS,
+	// and if so returns the slug that addresses that company. The slug may
+	// be a roster key or a self-describing form (workday returns the
+	// canonical careers URL for tenants outside its roster).
+	ParseCareersURL(u *url.URL) (slug string, ok bool)
 	Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error)
 	Filters(ctx context.Context, slug string) (FilterSet, error)
 	Detail(ctx context.Context, slug, jobID string) (*JobDetail, error)

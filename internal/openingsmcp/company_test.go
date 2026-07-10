@@ -2,6 +2,7 @@ package openingsmcp
 
 import (
 	"context"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -23,6 +24,7 @@ func (s *stubAdapter) Name() string { return "stub" }
 func (s *stubAdapter) Roster() []ats.CompanyInfo {
 	return []ats.CompanyInfo{{Slug: "acme", Name: "Acme Corp"}}
 }
+func (s *stubAdapter) ParseCareersURL(*url.URL) (string, bool) { return "", false }
 func (s *stubAdapter) Search(_ context.Context, _ string, p ats.SearchParams) (*ats.SearchResult, error) {
 	s.gotParams = p
 	return s.searchResult, nil

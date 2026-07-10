@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"slices"
 	"strings"
 
@@ -20,12 +21,18 @@ import (
 // call whenever location or filters are set).
 type WorkdayAdapter struct {
 	hc *http.Client
-	// baseURL derives a tenant's CXS base URL; tests point it at a mock.
-	baseURL func(workday.Company) string
+	// baseURL and siteBaseURL derive CXS base URLs for roster tenants and
+	// URL-resolved career sites respectively; tests point them at a mock.
+	baseURL     func(workday.Company) string
+	siteBaseURL func(workday.CareersSite) string
 }
 
 func NewWorkdayAdapter(hc *http.Client) *WorkdayAdapter {
-	return &WorkdayAdapter{hc: hc, baseURL: workday.Company.BaseURL}
+	return &WorkdayAdapter{
+		hc:          hc,
+		baseURL:     workday.Company.BaseURL,
+		siteBaseURL: workday.CareersSite.BaseURL,
+	}
 }
 
 func (a *WorkdayAdapter) Name() string { return "workday" }
@@ -48,7 +55,7 @@ func (a *WorkdayAdapter) Roster() []CompanyInfo {
 }
 
 func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
-	client, company, err := a.client(slug)
+	client, ts, err := a.client(slug)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +84,7 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 	// Public posting URLs derive from the tenant's career-site origin;
 	// derivation can fail only on malformed base URLs (e.g. a test mock),
 	// in which case summaries simply omit URLs.
-	publicURL, pubErr := workday.PublicSiteURL(a.baseURL(company))
+	publicURL, pubErr := workday.PublicSiteURL(ts.base)
 	jobs := make([]JobSummary, 0, len(rsp.JobPostings))
 	for _, js := range rsp.JobPostings {
 		path := js.ExternalPath.Value
@@ -126,7 +133,7 @@ func (a *WorkdayAdapter) Filters(ctx context.Context, slug string) (FilterSet, e
 }
 
 func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
-	client, company, err := a.client(slug)
+	client, ts, err := a.client(slug)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +157,7 @@ func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDe
 	return &JobDetail{
 		JobID:       jobID,
 		Title:       info.Title,
-		Company:     company.Name,
+		Company:     ts.name,
 		Location:    location,
 		PostedAt:    info.PostedOn.Value,
 		URL:         info.ExternalUrl.Value,
@@ -158,20 +165,57 @@ func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDe
 	}, nil
 }
 
-// client builds a per-tenant CXS client on demand. The wrapper is
-// stateless and cheap; connection pooling lives in the shared http.Client.
-func (a *WorkdayAdapter) client(slug string) (*workday.Client, workday.Company, error) {
-	company, ok := workday.CompaniesByTenant[slug]
+// ParseCareersURL recognizes myworkdayjobs.com careers URLs. Roster
+// tenants fold back to their roster slug so display names stay identical
+// to name-based resolution; unknown tenants get the canonical URL as a
+// self-describing slug (workday config is three values, which a bare
+// tenant slug can't carry).
+func (a *WorkdayAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	site, ok := workday.ParseCareersURL(u)
 	if !ok {
-		// Registry slugs come from this adapter's own Roster, so a miss is
-		// an internal inconsistency, not user error.
-		return nil, workday.Company{}, fmt.Errorf("workday: tenant %q not in roster", slug)
+		return "", false
 	}
-	c, err := workday.NewClient(a.baseURL(company), workday.WithClient(a.hc))
+	// site.Tenant is already lowercase: the provider parse lowercases the
+	// whole host before splitting.
+	if _, ok := workday.CompaniesByTenant[site.Tenant]; ok {
+		return site.Tenant, true
+	}
+	return site.CanonicalURL(), true
+}
+
+// tenantSite is one reachable career site, however the slug named it.
+// name feeds JobDetail.Company; base is the CXS base URL.
+type tenantSite struct {
+	name string
+	base string
+}
+
+// resolveSlug maps a slug to its career site: roster key first, then the
+// canonical-URL form ParseCareersURL hands out for non-roster tenants.
+func (a *WorkdayAdapter) resolveSlug(slug string) (tenantSite, error) {
+	if company, ok := workday.CompaniesByTenant[slug]; ok {
+		return tenantSite{name: company.Name, base: a.baseURL(company)}, nil
+	}
+	if u, ok := parseCareersInput(slug); ok {
+		if site, ok := workday.ParseCareersURL(u); ok {
+			return tenantSite{name: site.Tenant, base: a.siteBaseURL(site)}, nil
+		}
+	}
+	return tenantSite{}, fmt.Errorf("workday: unknown company %q; pass a roster slug or a myworkdayjobs.com careers URL", slug)
+}
+
+// client builds a per-site CXS client on demand. The wrapper is stateless
+// and cheap; connection pooling lives in the shared http.Client.
+func (a *WorkdayAdapter) client(slug string) (*workday.Client, tenantSite, error) {
+	ts, err := a.resolveSlug(slug)
 	if err != nil {
-		return nil, workday.Company{}, err
+		return nil, tenantSite{}, err
 	}
-	return c, company, nil
+	c, err := workday.NewClient(ts.base, workday.WithClient(a.hc))
+	if err != nil {
+		return nil, tenantSite{}, err
+	}
+	return c, ts, nil
 }
 
 // flatFacet is one facet leaf attributed to its nearest ancestor group

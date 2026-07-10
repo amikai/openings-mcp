@@ -26,9 +26,10 @@ type slugEntry struct {
 // Registry is the read-only union of every adapter's roster, built once at
 // startup. It owns name resolution; adapters never see unresolved input.
 type Registry struct {
-	bySlug map[string]registryEntry // key: normalize(slug)
-	byName map[string]registryEntry // key: normalize(display name)
-	slugs  []slugEntry              // sorted by slug, for suggestions
+	adapters []Adapter                // registration order; polled for careers-URL input
+	bySlug   map[string]registryEntry // key: normalize(slug)
+	byName   map[string]registryEntry // key: normalize(display name)
+	slugs    []slugEntry              // sorted by slug, for suggestions
 }
 
 // NewRegistry unions the adapters' rosters. A slug or normalized display
@@ -36,8 +37,9 @@ type Registry struct {
 // rather than silently shadowing one company with another.
 func NewRegistry(adapters ...Adapter) (*Registry, error) {
 	r := &Registry{
-		bySlug: make(map[string]registryEntry),
-		byName: make(map[string]registryEntry),
+		adapters: adapters,
+		bySlug:   make(map[string]registryEntry),
+		byName:   make(map[string]registryEntry),
 	}
 	for _, a := range adapters {
 		for _, c := range a.Roster() {
@@ -74,6 +76,14 @@ func (r *Registry) Resolve(company string) (Adapter, string, error) {
 	}
 	if e, ok := r.byName[key]; ok {
 		return e.adapter, e.slug, nil
+	}
+	if u, ok := parseCareersInput(company); ok {
+		for _, a := range r.adapters {
+			if slug, ok := a.ParseCareersURL(u); ok {
+				return a, slug, nil
+			}
+		}
+		return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: <tenant>.<wd*>.myworkdayjobs.com/<site>, job-boards.greenhouse.io/<board>, jobs.lever.co/<org>, jobs.ashbyhq.com/<org>", company)
 	}
 	return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
 		company, strings.Join(r.suggest(key, 3), ", "), len(r.bySlug))

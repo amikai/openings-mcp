@@ -49,6 +49,7 @@ func testWorkdayAdapter(t *testing.T) (*WorkdayAdapter, *[][]byte) {
 	proxy, bodies := recordingProxy(t, mock.URL)
 	a := NewWorkdayAdapter(&http.Client{Timeout: 5 * time.Second})
 	a.baseURL = func(workday.Company) string { return proxy.URL }
+	a.siteBaseURL = func(workday.CareersSite) string { return proxy.URL }
 	return a, bodies
 }
 
@@ -146,4 +147,42 @@ func TestWorkdayDetailRejectsMalformedJobID(t *testing.T) {
 	a, _ := testWorkdayAdapter(t)
 	_, err := a.Detail(t.Context(), "nvidia", "garbage")
 	assert.Error(t, err, "want error for malformed job_id")
+}
+
+func TestWorkdayParseCareersURL(t *testing.T) {
+	a := NewWorkdayAdapter(http.DefaultClient)
+
+	// A roster tenant folds back to its roster key, keeping display names.
+	slug, ok := a.ParseCareersURL(mustParseURL(t, "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAExternalCareerSite"))
+	require.True(t, ok)
+	assert.Equal(t, "nvidia", slug)
+
+	// An unknown tenant gets the canonical URL as a self-describing slug.
+	slug, ok = a.ParseCareersURL(mustParseURL(t, "https://stripe.wd5.myworkdayjobs.com/en-US/Stripe_Careers/job/SF/Eng_1"))
+	require.True(t, ok)
+	assert.Equal(t, "https://stripe.wd5.myworkdayjobs.com/Stripe_Careers", slug)
+
+	_, ok = a.ParseCareersURL(mustParseURL(t, "https://jobs.lever.co/acme"))
+	assert.False(t, ok)
+}
+
+func TestWorkdayURLSlugSearchAndDetail(t *testing.T) {
+	a, _ := testWorkdayAdapter(t)
+	urlSlug := "https://stripe.wd5.myworkdayjobs.com/Stripe_Careers"
+
+	res, err := a.Search(t.Context(), urlSlug, SearchParams{})
+	require.NoError(t, err)
+	assert.Equal(t, 27, res.TotalCount)
+	require.NotEmpty(t, res.Jobs)
+
+	d, err := a.Detail(t.Context(), urlSlug, res.Jobs[0].JobID)
+	require.NoError(t, err)
+	assert.Equal(t, "stripe", d.Company, "URL-resolved company name should be the tenant")
+	assert.NotEmpty(t, d.Description)
+}
+
+func TestWorkdayUnknownSlugTeaches(t *testing.T) {
+	a := NewWorkdayAdapter(http.DefaultClient)
+	_, err := a.Search(t.Context(), "not-a-tenant", SearchParams{})
+	require.ErrorContains(t, err, "careers URL", "error should teach the URL alternative")
 }
