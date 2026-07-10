@@ -32,6 +32,7 @@ func main() {
 		edu        = fs.StringSetLong("edu", usageWithChoices("Education (repeatable)", labels(job104.EduIDs)))
 		remoteWork = fs.StringEnumLong("remote-work", usageWithChoices("Remote work", labels(job104.RemoteWorkIDs)), enumChoices(job104.RemoteWorkIDs)...)
 		s9         = fs.StringSetLong("s9", usageWithChoices("Shift type (repeatable)", labels(job104.S9IDs)))
+		jobexp     = fs.StringSetLong("jobexp", usageWithChoices("Years of experience (repeatable)", labels(job104.JobExpIDs)))
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
@@ -50,6 +51,7 @@ func main() {
 		*edu,
 		*remoteWork,
 		*s9,
+		*jobexp,
 		*page,
 	)
 	if err != nil {
@@ -112,6 +114,7 @@ func buildSearchParams(
 	edu []string,
 	remoteWork string,
 	s9 []string,
+	jobexp []string,
 	page int,
 ) (job104.SearchJobsParams, error) {
 	params := job104.SearchJobsParams{}
@@ -146,6 +149,13 @@ func buildSearchParams(
 			return params, err
 		}
 		params.S9 = items
+	}
+	if len(jobexp) > 0 {
+		items, err := lookupList(job104.JobExpIDs, jobexp, "--jobexp")
+		if err != nil {
+			return params, err
+		}
+		params.Jobexp = items
 	}
 	return params, nil
 }
