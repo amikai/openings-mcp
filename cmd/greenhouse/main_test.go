@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"net/url"
 	"testing"
 	"time"
@@ -82,28 +81,28 @@ func TestRenderDescription(t *testing.T) {
 }
 
 func TestRunSearchMissingBoard(t *testing.T) {
-	err := runSearch(context.Background(), "", time.Second, "", "", "text")
+	err := runSearch(t.Context(), "", time.Second, "", "", "text")
 	assert.ErrorContains(t, err, "--board is required")
 }
 
 func TestRunSearchUnknownBoard(t *testing.T) {
-	err := runSearch(context.Background(), "doesnotexist-board-xyz", time.Second, "", "", "text")
+	err := runSearch(t.Context(), "doesnotexist-board-xyz", time.Second, "", "", "text")
 	assert.ErrorContains(t, err, `board "doesnotexist-board-xyz" not found`)
 	assert.ErrorContains(t, err, "greenhouse companies")
 }
 
 func TestRunGetMissingID(t *testing.T) {
-	err := runGet(context.Background(), "anthropic", time.Second, 0, "text")
+	err := runGet(t.Context(), "anthropic", time.Second, 0, "text")
 	assert.ErrorContains(t, err, "--id is required")
 }
 
 func TestRunGetMissingBoard(t *testing.T) {
-	err := runGet(context.Background(), "", time.Second, 123, "text")
+	err := runGet(t.Context(), "", time.Second, 123, "text")
 	assert.ErrorContains(t, err, "--board is required")
 }
 
 func TestRunGetUnknownBoard(t *testing.T) {
-	err := runGet(context.Background(), "doesnotexist-board-xyz", time.Second, 123, "text")
+	err := runGet(t.Context(), "doesnotexist-board-xyz", time.Second, 123, "text")
 	assert.ErrorContains(t, err, `board "doesnotexist-board-xyz" not found`)
 	assert.ErrorContains(t, err, "greenhouse companies")
 }

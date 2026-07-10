@@ -1,10 +1,11 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"net/http"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/jaytaylor/html2text"
@@ -266,11 +267,8 @@ func resolveLocationFacet(flat []flatFacet, location string) (string, []string, 
 	for p := range hits {
 		params = append(params, p)
 	}
-	sort.Slice(params, func(i, j int) bool {
-		if len(hits[params[i]]) != len(hits[params[j]]) {
-			return len(hits[params[i]]) > len(hits[params[j]])
-		}
-		return params[i] < params[j]
+	slices.SortFunc(params, func(a, b string) int {
+		return cmp.Or(cmp.Compare(len(hits[b]), len(hits[a])), strings.Compare(a, b))
 	})
 	return params[0], hits[params[0]], nil
 }
@@ -299,7 +297,7 @@ func resolveFacetValues(flat []flatFacet, key string, values []string) ([]string
 	for _, v := range values {
 		id, ok := byLabel[strings.ToLower(v)]
 		if !ok {
-			sort.Strings(labels)
+			slices.Sort(labels)
 			const maxListed = 20
 			listed := labels
 			suffix := ""

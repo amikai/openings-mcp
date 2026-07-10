@@ -4,8 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -47,7 +48,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	appliedFacets := buildAppliedFacets(*jobCategory, *jobType, *timeType, *locationType, *country, *site)
+	appliedFacets := buildAppliedFacets(
+		*jobCategory,
+		*jobType,
+		*timeType,
+		*locationType,
+		*country,
+		*site,
+	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -126,7 +134,9 @@ func main() {
 // via the facets.go lookup tables. Labels are already validated against the
 // flag's enum at parse time, so a lookup miss here can't happen for a
 // non-empty label. An empty label (flag not set) leaves that facet field nil.
-func buildAppliedFacets(jobCategory, jobType, timeType, locationType, country, site string) nvidia.AppliedFacets {
+func buildAppliedFacets(
+	jobCategory, jobType, timeType, locationType, country, site string,
+) nvidia.AppliedFacets {
 	var af nvidia.AppliedFacets
 	if jobCategory != "" {
 		af.JobFamilyGroup = []nvidia.AppliedFacetsJobFamilyGroupItem{nvidia.JobCategoryIDs[jobCategory]}
@@ -154,13 +164,7 @@ func buildAppliedFacets(jobCategory, jobType, timeType, locationType, country, s
 // of silently falling back to the first real label — ffval.Enum's zero
 // Default only survives initialize() if it's itself in the Valid list.
 func labels[V any](table map[string]V) []string {
-	l := make([]string, 0, len(table)+1)
-	l = append(l, "")
-	for label := range table {
-		l = append(l, label)
-	}
-	sort.Strings(l)
-	return l
+	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
 // usageWithChoices appends a comma-separated "one of: ..." list to base.

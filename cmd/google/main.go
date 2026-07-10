@@ -52,7 +52,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(*query, *location, *hasRemote, *targetLevel, *skills, *degree, *employmentType, *company, *sortBy, *page)
+	req := buildJobsRequest(
+		*query,
+		*location,
+		*hasRemote,
+		*targetLevel,
+		*skills,
+		*degree,
+		*employmentType,
+		*company,
+		*sortBy,
+		*page,
+	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -75,10 +86,22 @@ func main() {
 		details[job.ID] = detail
 	}
 
-	writeReport(os.Stdout, *query, *baseURL, search, jobs, details)
+	writeReport(
+		os.Stdout,
+		*query,
+		*baseURL,
+		search,
+		jobs,
+		details,
+	)
 }
 
-func buildJobsRequest(query, location string, hasRemote bool, targetLevel, skills, degree, employmentType, company, sortBy string, page int) *google.JobsRequest {
+func buildJobsRequest(
+	query, location string,
+	hasRemote bool,
+	targetLevel, skills, degree, employmentType, company, sortBy string,
+	page int,
+) *google.JobsRequest {
 	req := &google.JobsRequest{
 		Query:     query,
 		HasRemote: hasRemote,
@@ -126,7 +149,13 @@ func jobsForDetail(jobs []google.Job) []google.Job {
 	return jobs
 }
 
-func writeReport(w io.Writer, query, baseURL string, search *google.JobsResponse, jobs []google.Job, details map[string]*google.JobDetailResponse) {
+func writeReport(
+	w io.Writer,
+	query, baseURL string,
+	search *google.JobsResponse,
+	jobs []google.Job,
+	details map[string]*google.JobDetailResponse,
+) {
 	fmt.Fprintf(w, "Google Jobs Report\n")
 	fmt.Fprintf(w, "Query: %s\n", query)
 	fmt.Fprintf(w, "Found %d jobs; showing %d\n\n", len(search.Jobs), len(jobs))

@@ -25,7 +25,7 @@ func TestErrorLoggingMiddleware(t *testing.T) {
 	}
 
 	wrapped := middleware(dummyHandler)
-	_, err := wrapped(context.Background(), "test_method", nil)
+	_, err := wrapped(t.Context(), "test_method", nil)
 	assert.Error(t, err)
 
 	logOutput := buf.String()
@@ -45,7 +45,7 @@ func TestErrorLoggingMiddlewareSuccessLogsNothing(t *testing.T) {
 	}
 
 	wrapped := middleware(dummyHandler)
-	_, err := wrapped(context.Background(), "test_method", nil)
+	_, err := wrapped(t.Context(), "test_method", nil)
 	assert.NoError(t, err)
 	assert.Empty(t, buf.String())
 }

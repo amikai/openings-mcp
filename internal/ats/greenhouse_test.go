@@ -1,7 +1,6 @@
 package ats
 
 import (
-	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -40,7 +39,7 @@ func TestGreenhouseRoster(t *testing.T) {
 
 func TestGreenhouseSearchAll(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +58,7 @@ func TestGreenhouseSearchAll(t *testing.T) {
 		}
 	}
 	// 5 jobs < PageSize, so page 2 is empty but the envelope stays sane.
-	page2, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Page: 2})
+	page2, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Page: 2})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -70,7 +69,7 @@ func TestGreenhouseSearchAll(t *testing.T) {
 
 func TestGreenhouseSearchQueryRanksTitleFirst(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Query: "agent platform"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "agent platform"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +83,7 @@ func TestGreenhouseSearchQueryRanksTitleFirst(t *testing.T) {
 
 func TestGreenhouseSearchQueryMatchesJDBody(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Query: "kubernetes"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "kubernetes"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +95,7 @@ func TestGreenhouseSearchQueryMatchesJDBody(t *testing.T) {
 func TestGreenhouseSearchQueryMatchesOrgUnit(t *testing.T) {
 	a := testGreenhouseAdapter(t)
 	// "people" appears only in the Technical Recruiter job's department.
-	res, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Query: "people"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "people"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,14 +106,14 @@ func TestGreenhouseSearchQueryMatchesOrgUnit(t *testing.T) {
 
 func TestGreenhouseSearchLocation(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	remote, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Location: "remote"})
+	remote, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Location: "remote"})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if remote.TotalCount != 1 || remote.Jobs[0].Title != "Product Designer" {
 		t.Fatalf(`Location "remote" should fall back to location-text match, got %+v`, remote.Jobs)
 	}
-	london, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{Location: "london"})
+	london, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Location: "london"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,7 +124,7 @@ func TestGreenhouseSearchLocation(t *testing.T) {
 
 func TestGreenhouseSearchFilterDepartment(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(context.Background(), mockGreenhouseBoard, SearchParams{
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{
 		Filters: map[string][]string{"department": {"Engineering"}},
 	})
 	if err != nil {
@@ -138,7 +137,7 @@ func TestGreenhouseSearchFilterDepartment(t *testing.T) {
 
 func TestGreenhouseFilters(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	fs, err := a.Filters(context.Background(), mockGreenhouseBoard)
+	fs, err := a.Filters(t.Context(), mockGreenhouseBoard)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +154,7 @@ func TestGreenhouseFilters(t *testing.T) {
 
 func TestGreenhouseDetail(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	d, err := a.Detail(context.Background(), "anthropic", "4461450008")
+	d, err := a.Detail(t.Context(), "anthropic", "4461450008")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,21 +177,21 @@ func TestGreenhouseDetail(t *testing.T) {
 
 func TestGreenhouseDetailBadID(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	if _, err := a.Detail(context.Background(), "anthropic", "not-a-number"); err == nil {
+	if _, err := a.Detail(t.Context(), "anthropic", "not-a-number"); err == nil {
 		t.Fatal("want teaching error for non-numeric job id")
 	}
 }
 
 func TestGreenhouseDetailNotFound(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	if _, err := a.Detail(context.Background(), "anthropic", "999999999999"); err == nil {
+	if _, err := a.Detail(t.Context(), "anthropic", "999999999999"); err == nil {
 		t.Fatal("want error for unknown job id")
 	}
 }
 
 func TestGreenhouseUnknownBoardUpstream(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	if _, err := a.Search(context.Background(), "doesnotexist", SearchParams{}); err == nil {
+	if _, err := a.Search(t.Context(), "doesnotexist", SearchParams{}); err == nil {
 		t.Fatal("want error when upstream returns 404")
 	}
 }

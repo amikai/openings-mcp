@@ -3,6 +3,7 @@ package synopsys
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"regexp"
@@ -70,7 +71,7 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 	// xq -q "script[type='application/ld+json']" --html | jq '{title, datePosted, identifier, jobLocation}'
 	m := jsonLDRe.FindSubmatch(body)
 	if m == nil {
-		return nil, fmt.Errorf("no JSON-LD found")
+		return nil, errors.New("no JSON-LD found")
 	}
 
 	var ld struct {

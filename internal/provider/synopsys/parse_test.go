@@ -124,19 +124,24 @@ func TestParseJobDetailResponse(t *testing.T) {
 }
 
 func TestStripHTML(t *testing.T) {
+	t.Parallel()
 	cases := []struct {
+		name string
 		in   string
 		want string
 	}{
-		{"<p>Hello <b>world</b></p>", "Hello world"},
-		{"<p>a &amp; b</p>", "a & b"},
-		{"<p>foo &lt;bar&gt;</p>", "foo <bar>"},
-		{"<p>&nbsp;padded&nbsp;</p>", "padded"},
-		{"plain text", "plain text"},
-		{"", ""},
+		{"nested tags", "<p>Hello <b>world</b></p>", "Hello world"},
+		{"ampersand entity", "<p>a &amp; b</p>", "a & b"},
+		{"angle bracket entities", "<p>foo &lt;bar&gt;</p>", "foo <bar>"},
+		{"nbsp trimmed", "<p>&nbsp;padded&nbsp;</p>", "padded"},
+		{"plain text", "plain text", "plain text"},
+		{"empty", "", ""},
 	}
 	for _, c := range cases {
-		got := stripHTML(c.in)
-		assert.Equal(t, c.want, got, "input: %q", c.in)
+		t.Run(c.name, func(t *testing.T) {
+			t.Parallel()
+			got := stripHTML(c.in)
+			assert.Equal(t, c.want, got, "input: %q", c.in)
+		})
 	}
 }

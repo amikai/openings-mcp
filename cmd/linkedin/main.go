@@ -5,8 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"os"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -44,7 +45,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(*keywords, *location, *workplaceType, *jobType, *companyIDs, *postedWithin, *start)
+	req := buildJobsRequest(
+		*keywords,
+		*location,
+		*workplaceType,
+		*jobType,
+		*companyIDs,
+		*postedWithin,
+		*start,
+	)
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -67,10 +76,21 @@ func main() {
 		details[job.ID] = detail
 	}
 
-	writeReport(os.Stdout, *keywords, *baseURL, search, details)
+	writeReport(
+		os.Stdout,
+		*keywords,
+		*baseURL,
+		search,
+		details,
+	)
 }
 
-func buildJobsRequest(keywords, location, workplaceType, jobType string, companyIDs string, postedWithin time.Duration, start int) *linkedin.JobsRequest {
+func buildJobsRequest(
+	keywords, location, workplaceType, jobType string,
+	companyIDs string,
+	postedWithin time.Duration,
+	start int,
+) *linkedin.JobsRequest {
 	req := &linkedin.JobsRequest{
 		Keywords: keywords,
 		Location: location,
@@ -83,7 +103,7 @@ func buildJobsRequest(keywords, location, workplaceType, jobType string, company
 		req.JobType = linkedin.JobTypeIDs[jobType]
 	}
 	if companyIDs != "" {
-		for _, id := range strings.Split(companyIDs, ",") {
+		for id := range strings.SplitSeq(companyIDs, ",") {
 			if id = strings.TrimSpace(id); id != "" {
 				req.CompanyIDs = append(req.CompanyIDs, id)
 			}
@@ -99,13 +119,16 @@ func jobsForDetail(jobs []linkedin.Job, n int) []linkedin.Job {
 	if n <= 0 {
 		return nil
 	}
-	if n > len(jobs) {
-		n = len(jobs)
-	}
+	n = min(n, len(jobs))
 	return jobs[:n]
 }
 
-func writeReport(w io.Writer, keywords, baseURL string, search *linkedin.JobsResponse, details map[string]*linkedin.JobDetailResponse) {
+func writeReport(
+	w io.Writer,
+	keywords, baseURL string,
+	search *linkedin.JobsResponse,
+	details map[string]*linkedin.JobDetailResponse,
+) {
 	fmt.Fprintf(w, "LinkedIn Jobs Report\n")
 	fmt.Fprintf(w, "Keywords: %s\n", keywords)
 	fmt.Fprintf(w, "Found %d jobs\n\n", len(search.Jobs))
@@ -155,13 +178,7 @@ func writeDetail(w io.Writer, detail *linkedin.JobDetailResponse) {
 // silently falling back to the first real value — ffval.Enum's zero Default
 // only survives initialize() if it's itself in the Valid list.
 func labels(table map[string]string) []string {
-	l := make([]string, 0, len(table)+1)
-	l = append(l, "")
-	for label := range table {
-		l = append(l, label)
-	}
-	sort.Strings(l)
-	return l
+	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
 // usageWithChoices appends a "one of: ..." list to base. ffhelp never

@@ -11,6 +11,7 @@ import (
 )
 
 func testCakeMCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
+	t.Helper()
 	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
 	srv := cake.NewMockServer()
 	t.Cleanup(srv.Close)

@@ -119,11 +119,11 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 
 	doc, err := c.getHTML(ctx, u, c.baseURL+"/jobs/results")
 	if err != nil {
-		return nil, fmt.Errorf("job detail %s: %w", jobID, err)
+		return nil, fmt.Errorf("job detail %q: %w", jobID, err)
 	}
 	detail, ok := parseJobDetailHTML(doc, jobID)
 	if !ok {
-		return nil, fmt.Errorf("job detail %s: not found in response", jobID)
+		return nil, fmt.Errorf("job detail %q: not found in response", jobID)
 	}
 	return detail, nil
 }

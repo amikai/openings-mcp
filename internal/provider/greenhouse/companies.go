@@ -3,7 +3,7 @@ package greenhouse
 import (
 	_ "embed"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 
 	"github.com/goccy/go-yaml"
@@ -45,7 +45,7 @@ func mustLoadCompanies() []Company {
 	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("greenhouse: parse companies.yaml: %v", err))
 	}
-	sort.Slice(cs, func(i, j int) bool { return cs[i].Name < cs[j].Name })
+	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })
 	return cs
 }
 

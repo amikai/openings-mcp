@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"encoding/json"
 	"errors"
@@ -116,7 +117,7 @@ func runCompanies(format string) error {
 // unreachable for roster boards but reported rather than swallowed.
 func fetchBoard(ctx context.Context, board string, timeout time.Duration) (*ashby.JobBoardResponse, error) {
 	if board == "" {
-		return nil, fmt.Errorf("--board is required")
+		return nil, errors.New("--board is required")
 	}
 	slug := strings.ToLower(board)
 	if _, ok := ashby.CompaniesByBoard[slug]; !ok {
@@ -286,7 +287,7 @@ func printSummary(s jobSummaryJSON) {
 // the one job whose id matches, in full.
 func runGet(ctx context.Context, board string, timeout time.Duration, jobID, format string) error {
 	if jobID == "" {
-		return fmt.Errorf("--id is required")
+		return errors.New("--id is required")
 	}
 	resp, err := fetchBoard(ctx, board, timeout)
 	if err != nil {
@@ -322,9 +323,7 @@ func printJob(j ashby.JobPosting, format string) error {
 			desc = text
 		}
 	}
-	if desc == "" {
-		desc = j.DescriptionPlain.Value
-	}
+	desc = cmp.Or(desc, j.DescriptionPlain.Value)
 	if desc != "" {
 		fmt.Printf("\nDescription:\n%s\n", desc)
 	}
@@ -356,10 +355,7 @@ func printCompensation(c ashby.Compensation) {
 // salary $132K – $330K"), so it leads; compensationType and a non-NONE
 // interval qualify it.
 func componentLine(c ashby.CompensationComponent) string {
-	line := c.Summary.Value
-	if line == "" {
-		line = c.CompensationType.Value
-	}
+	line := cmp.Or(c.Summary.Value, c.CompensationType.Value)
 	var quals []string
 	if c.CompensationType.Value != "" && c.CompensationType.Value != line {
 		quals = append(quals, c.CompensationType.Value)

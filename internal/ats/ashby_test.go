@@ -1,7 +1,6 @@
 package ats
 
 import (
-	"context"
 	"net/http"
 	"strings"
 	"testing"
@@ -30,7 +29,7 @@ func TestAshbyRoster(t *testing.T) {
 
 func TestAshbySearchAll(t *testing.T) {
 	a := testAshbyAdapter(t)
-	res, err := a.Search(context.Background(), ashby.MockBoardName, SearchParams{})
+	res, err := a.Search(t.Context(), ashby.MockBoardName, SearchParams{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -46,7 +45,7 @@ func TestAshbySearchAll(t *testing.T) {
 
 func TestAshbySearchQueryAndFilters(t *testing.T) {
 	a := testAshbyAdapter(t)
-	res, err := a.Search(context.Background(), ashby.MockBoardName, SearchParams{Query: "agent platform"})
+	res, err := a.Search(t.Context(), ashby.MockBoardName, SearchParams{Query: "agent platform"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +53,7 @@ func TestAshbySearchQueryAndFilters(t *testing.T) {
 		t.Fatalf("got %+v, want the Agent Platform job first", res.Jobs)
 	}
 
-	filtered, err := a.Search(context.Background(), ashby.MockBoardName, SearchParams{
+	filtered, err := a.Search(t.Context(), ashby.MockBoardName, SearchParams{
 		Filters: map[string][]string{"employmentType": {"FullTime"}},
 	})
 	if err != nil {
@@ -67,7 +66,7 @@ func TestAshbySearchQueryAndFilters(t *testing.T) {
 
 func TestAshbyFilters(t *testing.T) {
 	a := testAshbyAdapter(t)
-	fs, err := a.Filters(context.Background(), ashby.MockBoardName)
+	fs, err := a.Filters(t.Context(), ashby.MockBoardName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func TestAshbyFilters(t *testing.T) {
 
 func TestAshbyDetailRefetchesBoard(t *testing.T) {
 	a := testAshbyAdapter(t)
-	d, err := a.Detail(context.Background(), ashby.MockBoardName, "7724fbe3-6a27-4418-9705-2dcc40751a16")
+	d, err := a.Detail(t.Context(), ashby.MockBoardName, "7724fbe3-6a27-4418-9705-2dcc40751a16")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -94,22 +93,22 @@ func TestAshbyDetailRefetchesBoard(t *testing.T) {
 
 func TestAshbyDetailNotFound(t *testing.T) {
 	a := testAshbyAdapter(t)
-	if _, err := a.Detail(context.Background(), ashby.MockBoardName, "no-such-id"); err == nil {
+	if _, err := a.Detail(t.Context(), ashby.MockBoardName, "no-such-id"); err == nil {
 		t.Fatal("want error for unknown job id")
 	}
 }
 
 func TestAshbyUnknownBoardUpstream(t *testing.T) {
 	a := testAshbyAdapter(t)
-	if _, err := a.Search(context.Background(), "not-in-mock", SearchParams{}); err == nil {
+	if _, err := a.Search(t.Context(), "not-in-mock", SearchParams{}); err == nil {
 		t.Fatal("want error when upstream returns 404")
 	}
 }
 
 func TestAshbySearchIsDeterministic(t *testing.T) {
 	a := testAshbyAdapter(t)
-	r1, _ := a.Search(context.Background(), ashby.MockBoardName, SearchParams{})
-	r2, _ := a.Search(context.Background(), ashby.MockBoardName, SearchParams{})
+	r1, _ := a.Search(t.Context(), ashby.MockBoardName, SearchParams{})
+	r2, _ := a.Search(t.Context(), ashby.MockBoardName, SearchParams{})
 	for i := range r1.Jobs {
 		if r1.Jobs[i].JobID != r2.Jobs[i].JobID {
 			t.Fatal("search order is not deterministic")

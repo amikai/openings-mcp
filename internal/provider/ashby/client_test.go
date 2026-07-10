@@ -1,7 +1,6 @@
 package ashby
 
 import (
-	"context"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -38,7 +37,7 @@ func TestGetJobBoard(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJobBoard(context.Background(), GetJobBoardParams{JobBoardName: MockBoardName})
+	res, err := client.GetJobBoard(t.Context(), GetJobBoardParams{JobBoardName: MockBoardName})
 	require.NoError(t, err)
 
 	board, ok := res.(*JobBoardResponse)
@@ -86,7 +85,7 @@ func TestGetJobBoardWithCompensation(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJobBoard(context.Background(), GetJobBoardParams{
+	res, err := client.GetJobBoard(t.Context(), GetJobBoardParams{
 		JobBoardName:        MockBoardName,
 		IncludeCompensation: NewOptBool(true),
 	})
@@ -142,7 +141,7 @@ func TestGetJobBoardNullFields(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJobBoard(context.Background(), GetJobBoardParams{JobBoardName: MockNullsBoardName})
+	res, err := client.GetJobBoard(t.Context(), GetJobBoardParams{JobBoardName: MockNullsBoardName})
 	require.NoError(t, err)
 
 	board, ok := res.(*JobBoardResponse)
@@ -164,7 +163,7 @@ func TestGetJobBoardNotFound(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	res, err := client.GetJobBoard(context.Background(), GetJobBoardParams{JobBoardName: "no-such-board"})
+	res, err := client.GetJobBoard(t.Context(), GetJobBoardParams{JobBoardName: "no-such-board"})
 	require.NoError(t, err)
 
 	nf, ok := res.(*GetJobBoardNotFound)

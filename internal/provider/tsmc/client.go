@@ -197,11 +197,11 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	u := c.baseURL + jobDetailPath + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
 	doc, err := c.getHTML(ctx, u, c.baseURL+jobsPath)
 	if err != nil {
-		return nil, fmt.Errorf("job detail %s: %w", jobID, err)
+		return nil, fmt.Errorf("job detail %q: %w", jobID, err)
 	}
 	detail, ok := parseDetailHTML(doc)
 	if !ok {
-		return nil, fmt.Errorf("job detail %s: not found in response", jobID)
+		return nil, fmt.Errorf("job detail %q: not found in response", jobID)
 	}
 	detail.ID = jobID
 	return &detail, nil

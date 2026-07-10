@@ -1,8 +1,10 @@
 package ats
 
 import (
+	"cmp"
+	"errors"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 	"unicode"
 )
@@ -55,7 +57,7 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 			r.slugs = append(r.slugs, slugEntry{slug: c.Slug, norm: slugKey})
 		}
 	}
-	sort.Slice(r.slugs, func(i, j int) bool { return r.slugs[i].slug < r.slugs[j].slug })
+	slices.SortFunc(r.slugs, func(a, b slugEntry) int { return strings.Compare(a.slug, b.slug) })
 	return r, nil
 }
 
@@ -65,7 +67,7 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 func (r *Registry) Resolve(company string) (Adapter, string, error) {
 	key := normalize(company)
 	if key == "" {
-		return nil, "", fmt.Errorf("company is required")
+		return nil, "", errors.New("company is required")
 	}
 	if e, ok := r.bySlug[key]; ok {
 		return e.adapter, e.slug, nil
@@ -105,11 +107,8 @@ func (r *Registry) suggest(key string, n int) []string {
 		}
 		ranked = append(ranked, scored{slug: s.slug, dist: dist})
 	}
-	sort.Slice(ranked, func(i, j int) bool {
-		if ranked[i].dist != ranked[j].dist {
-			return ranked[i].dist < ranked[j].dist
-		}
-		return ranked[i].slug < ranked[j].slug
+	slices.SortFunc(ranked, func(a, b scored) int {
+		return cmp.Or(cmp.Compare(a.dist, b.dist), strings.Compare(a.slug, b.slug))
 	})
 	if len(ranked) > n {
 		ranked = ranked[:n]

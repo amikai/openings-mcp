@@ -1,7 +1,6 @@
 package workday
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,7 +14,7 @@ func TestSearchJobs_Nvidia(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	resp, err := client.SearchJobs(context.Background(), &JobsRequest{
+	resp, err := client.SearchJobs(t.Context(), &JobsRequest{
 		AppliedFacets: AppliedFacets{"jobFamilyGroup": {"0c40f6bd1d8f10ae43ffaefd46dc7e78"}},
 		Limit:         20,
 		Offset:        0,
@@ -65,7 +64,7 @@ func TestGetJobDetail_Nvidia(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	detail, err := client.GetJobDetail(context.Background(), GetJobDetailParams{
+	detail, err := client.GetJobDetail(t.Context(), GetJobDetailParams{
 		Location:  "Israel-Yokneam",
 		TitleSlug: "Senior-Software-Golang-Kubernetes-Engineer_JR2015916",
 	})
@@ -98,7 +97,7 @@ func TestSearchJobs_TrendMicro(t *testing.T) {
 	client, err := NewClient(srv.URL)
 	require.NoError(t, err)
 
-	search, err := client.SearchJobs(context.Background(), &JobsRequest{
+	search, err := client.SearchJobs(t.Context(), &JobsRequest{
 		AppliedFacets: AppliedFacets{},
 		Limit:         5,
 		Offset:        0,
@@ -130,7 +129,7 @@ func TestSearchJobs_TrendMicro(t *testing.T) {
 	location, titleSlug, ok := JobDetailKeyFromPath(externalPath)
 	require.True(t, ok)
 
-	detail, err := client.GetJobDetail(context.Background(), GetJobDetailParams{
+	detail, err := client.GetJobDetail(t.Context(), GetJobDetailParams{
 		Location:  location,
 		TitleSlug: titleSlug,
 	})

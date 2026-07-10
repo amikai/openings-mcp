@@ -50,7 +50,7 @@ func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 	}}
 	reg := testCompanyRegistry(t, stub)
 
-	out, err := companySearch(context.Background(), reg, &companySearchInput{
+	out, err := companySearch(t.Context(), reg, &companySearchInput{
 		Company:  "Acme Corp",
 		Query:    "golang",
 		Location: "taipei",
@@ -73,7 +73,7 @@ func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 
 func TestCompanySearchUnknownCompanyTeaches(t *testing.T) {
 	reg := testCompanyRegistry(t, &stubAdapter{})
-	_, err := companySearch(context.Background(), reg, &companySearchInput{Company: "acme corp intl"})
+	_, err := companySearch(t.Context(), reg, &companySearchInput{Company: "acme corp intl"})
 	if err == nil {
 		t.Fatal("want teaching error")
 	}
@@ -85,7 +85,7 @@ func TestCompanySearchUnknownCompanyTeaches(t *testing.T) {
 func TestCompanyFilters(t *testing.T) {
 	stub := &stubAdapter{filterSet: ats.FilterSet{"team": {"ML", "Web"}}}
 	reg := testCompanyRegistry(t, stub)
-	out, err := companyFilters(context.Background(), reg, &companyFiltersInput{Company: "acme"})
+	out, err := companyFilters(t.Context(), reg, &companyFiltersInput{Company: "acme"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,7 +97,7 @@ func TestCompanyFilters(t *testing.T) {
 func TestCompanyDetail(t *testing.T) {
 	stub := &stubAdapter{detail: &ats.JobDetail{JobID: "j1", Title: "Engineer", Company: "Acme Corp", Description: "plain text"}}
 	reg := testCompanyRegistry(t, stub)
-	out, err := companyDetail(context.Background(), reg, &companyDetailInput{Company: "acme", JobID: "j1"})
+	out, err := companyDetail(t.Context(), reg, &companyDetailInput{Company: "acme", JobID: "j1"})
 	if err != nil {
 		t.Fatal(err)
 	}

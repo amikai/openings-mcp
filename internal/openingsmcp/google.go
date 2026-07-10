@@ -2,6 +2,7 @@ package openingsmcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/amikai/openings-mcp/internal/provider/google"
@@ -143,12 +144,12 @@ func googleMCPToHTTPRequest(in *googleSearchInput) (*google.JobsRequest, error) 
 	// The schema already marks keyword and location required; this guards
 	// direct callers and clients that skip schema validation.
 	if in.Keyword == "" {
-		return nil, fmt.Errorf("keyword is required")
+		return nil, errors.New("keyword is required")
 	}
 	req.Query = in.Keyword
 
 	if in.Location == "" {
-		return nil, fmt.Errorf("location is required")
+		return nil, errors.New("location is required")
 	}
 	req.Locations = []string{in.Location}
 
