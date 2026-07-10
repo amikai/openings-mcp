@@ -175,9 +175,10 @@ func (a *WorkdayAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	slug := strings.ToLower(site.Tenant)
-	if _, ok := workday.CompaniesByTenant[slug]; ok {
-		return slug, true
+	// site.Tenant is already lowercase: the provider parse lowercases the
+	// whole host before splitting.
+	if _, ok := workday.CompaniesByTenant[site.Tenant]; ok {
+		return site.Tenant, true
 	}
 	return site.CanonicalURL(), true
 }

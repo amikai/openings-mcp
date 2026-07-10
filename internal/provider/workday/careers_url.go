@@ -9,8 +9,7 @@ import (
 
 // CareersSite addresses one Workday career site by its public-URL parts,
 // for tenants outside the curated roster. It carries the same values
-// Company encodes; Host keeps the instance and domain verbatim so
-// myworkdaysite.com tenants work unchanged.
+// Company encodes; Host keeps the instance and domain verbatim.
 type CareersSite struct {
 	Host   string // e.g. "stripe.wd5.myworkdayjobs.com"
 	Tenant string // first host label
@@ -23,8 +22,14 @@ var localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
 
 // ParseCareersURL reports whether u is a Workday career-site URL and
 // extracts its parts. It accepts only the public host shape
-// <tenant>.<wd*>.myworkdayjobs.com (or myworkdaysite.com) with a site path
-// segment; locale prefixes and job deep links are tolerated and stripped.
+// <tenant>.<wd*>.myworkdayjobs.com with a site path segment; locale
+// prefixes and job deep links are tolerated and stripped.
+//
+// KNOWN ISSUE: myworkdaysite.com is listed in the domain check below, but
+// real URLs on that domain carry the tenant in the path, not the host
+// (wd<N>.myworkdaysite.com/<locale?>/recruiting/<tenant>/<site>), so they
+// never survive the four-label check and are always rejected. See
+// https://github.com/amikai/openings-mcp/issues/113 before extending.
 func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 	host := strings.ToLower(u.Hostname())
 	labels := strings.Split(host, ".")

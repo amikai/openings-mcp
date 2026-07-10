@@ -41,10 +41,19 @@ func TestParseCareersURL(t *testing.T) {
 			ok:   true,
 		},
 		{
+			// Pins current behavior only: this four-label myworkdaysite
+			// shape doesn't exist in the wild — real URLs on that domain
+			// put the tenant in the path and are rejected today (#113).
 			name: "myworkdaysite host kept verbatim",
 			raw:  "https://acme.wd1.myworkdaysite.com/recruiting",
 			want: CareersSite{Host: "acme.wd1.myworkdaysite.com", Tenant: "acme", Site: "recruiting"},
 			ok:   true,
+		},
+		{
+			// Real myworkdaysite.com shape; rejected until #113 is settled.
+			name: "myworkdaysite tenant-in-path rejected for now",
+			raw:  "https://wd5.myworkdaysite.com/en-US/recruiting/devonenergy/Careers",
+			ok:   false,
 		},
 		{
 			name: "query and fragment ignored",
