@@ -14,6 +14,7 @@ ro: 1
 order: 2
 page: 1
 edu: 4,5
+jobexp: 1,3 # comma-joined brackets union like edu; any value outside 1/3/5/10/99 is a 422 (issue #98)
 remoteWork: 1
 s9: 1,2
 

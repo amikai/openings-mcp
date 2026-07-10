@@ -317,6 +317,10 @@ func (s *Server) handleSearchJobsRequest(args [0]string, argsEscaped bool, w htt
 					In:   "query",
 				}: params.Edu,
 				{
+					Name: "jobexp",
+					In:   "query",
+				}: params.Jobexp,
+				{
 					Name: "remoteWork",
 					In:   "query",
 				}: params.RemoteWork,
