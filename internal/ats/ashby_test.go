@@ -92,3 +92,10 @@ func TestAshbySearchIsDeterministic(t *testing.T) {
 	}
 	assert.Truef(t, strings.HasPrefix(r1.Jobs[0].PostedAt, "20"), "PostedAt should be an ISO date, got %q", r1.Jobs[0].PostedAt)
 }
+
+func TestAshbyDetailCompanyFallsBackToSlug(t *testing.T) {
+	a := testAshbyAdapter(t)
+	d, err := a.Detail(t.Context(), ashby.MockNonRosterBoard, "7724fbe3-6a27-4418-9705-2dcc40751a16")
+	require.NoError(t, err)
+	assert.Equal(t, ashby.MockNonRosterBoard, d.Company, "non-roster slug should be used as company name")
+}

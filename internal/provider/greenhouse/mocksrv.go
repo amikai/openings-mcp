@@ -18,6 +18,10 @@ var mockJobDetailRsp []byte
 //go:embed testdata/job_detail_full_rsp.json
 var mockJobDetailFullRsp []byte
 
+// MockNonRosterBoard is a board token deliberately absent from
+// companies.yaml, so ats-layer tests can exercise non-roster behavior.
+const MockNonRosterBoard = "somestartup"
+
 // NewMockServer returns an httptest.Server serving canned Greenhouse Job
 // Board API fixture responses, so tests never hit a live board. Most
 // fixtures were captured from real boards (see testdata/*.sh);
@@ -42,6 +46,8 @@ func NewMockServer() *httptest.Server {
 		}
 		serveMockJSON(mockJobDetailRsp)(w, r)
 	})
+
+	mux.HandleFunc("/boards/"+MockNonRosterBoard+"/jobs/4461450008", serveMockJSON(mockJobDetailRsp))
 
 	mux.HandleFunc("/boards/doesnotexist/jobs", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
