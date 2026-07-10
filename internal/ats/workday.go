@@ -9,7 +9,6 @@ import (
 	"net/url"
 	"slices"
 	"strings"
-	"sync"
 
 	"github.com/jaytaylor/html2text"
 
@@ -39,7 +38,10 @@ func NewWorkdayAdapter(hc *http.Client) *WorkdayAdapter {
 
 func (a *WorkdayAdapter) Name() string { return "workday" }
 
-var buildWorkdayCompanyInfo = sync.OnceValue(func() []CompanyInfo {
+// Roster dedupes by tenant slug: fox and dowjones each hold two
+// share-class rows in companies.yaml sharing one tenant, and the registry
+// treats duplicate slugs as curation bugs.
+func (a *WorkdayAdapter) Roster() []CompanyInfo {
 	seen := make(map[string]bool, len(workday.Companies))
 	infos := make([]CompanyInfo, 0, len(workday.Companies))
 	for _, c := range workday.Companies {
@@ -51,13 +53,6 @@ var buildWorkdayCompanyInfo = sync.OnceValue(func() []CompanyInfo {
 		infos = append(infos, CompanyInfo{Slug: slug, Name: c.Name})
 	}
 	return infos
-})
-
-// Roster dedupes by tenant slug: fox and dowjones each hold two
-// share-class rows in companies.yaml sharing one tenant, and the registry
-// treats duplicate slugs as curation bugs.
-func (a *WorkdayAdapter) Roster() []CompanyInfo {
-	return slices.Clone(buildWorkdayCompanyInfo())
 }
 
 func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
