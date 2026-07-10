@@ -213,7 +213,7 @@ func cakeJobURL(pagePath, path string) string {
 func RegisterCake(s *mcp.Server, c *cake.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "cake_search_jobs",
-		Description: "Search jobs on Cake.me (formerly CakeResume) by keyword and location, with optional job-type/seniority/remote/sort filters.",
+		Description: "Search jobs on Cake.me (formerly CakeResume), a Taiwan-focused job board.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Cake.me jobs", ReadOnlyHint: true},
 		InputSchema: cakeSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeSearchInput) (*mcp.CallToolResult, *cakeSearchOutput, error) {

@@ -233,7 +233,7 @@ func googleJobURL(id string) string {
 func RegisterGoogle(s *mcp.Server, c *google.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "google_search_jobs",
-		Description: "Search jobs on the Google Careers site by keyword and location, with optional remote/experience-level/skills/degree/employment-type/company/sort filters.",
+		Description: "Search jobs on the Google Careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Google Careers jobs", ReadOnlyHint: true},
 		InputSchema: googleSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *googleSearchInput) (*mcp.CallToolResult, *googleSearchOutput, error) {

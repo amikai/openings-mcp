@@ -203,7 +203,7 @@ func tsmcJobURL(slug, id string) string {
 func RegisterTsmc(s *mcp.Server, c *tsmc.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "tsmc_search_jobs",
-		Description: "Search jobs on the TSMC careers site by keyword and location, with optional category/job-type/employment-type filters.",
+		Description: "Search jobs on the TSMC careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search TSMC jobs", ReadOnlyHint: true},
 		InputSchema: tsmcSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *tsmcSearchInput) (*mcp.CallToolResult, *tsmcSearchOutput, error) {

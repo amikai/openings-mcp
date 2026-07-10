@@ -349,7 +349,7 @@ func job104Descriptions(in []job104.CodeDescription) []string {
 func RegisterJob104(s *mcp.Server, c *job104.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "104_search_jobs",
-		Description: "Search jobs on 104 (Taiwan's largest job board) by keyword and area, with optional job-type/remote/education/experience/sort filters.",
+		Description: "Search jobs on 104 (Taiwan's largest job board).",
 		Annotations: &mcp.ToolAnnotations{Title: "Search 104 jobs", ReadOnlyHint: true},
 		InputSchema: job104SearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104SearchInput) (*mcp.CallToolResult, *job104SearchOutput, error) {

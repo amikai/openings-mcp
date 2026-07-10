@@ -20,7 +20,7 @@ var nvidiaSearchInputRawSchema = []byte(`{
 		},
 		"job_category": {
 			"type": "string",
-			"description": "Job Category/Family Group filter.",
+			"description": "Job category filter.",
 			"enum": [
 				"Engineering", "Sales", "Operations", "Program Manager", "Marketing",
 				"Research", "IT - Information Technology", "Univ Employment", "Finance",
@@ -29,7 +29,7 @@ var nvidiaSearchInputRawSchema = []byte(`{
 		},
 		"job_type": {
 			"type": "string",
-			"description": "Job Type / Worker Sub Type filter.",
+			"description": "Job type filter.",
 			"enum": [
 				"Regular Employee", "Management", "New College Graduate",
 				"Intern (Fixed Term)", "Regular Employee (Fixed Term)", "Academic (Fixed Term)"
@@ -251,7 +251,7 @@ func nvidiaHTTPToMCPDetail(detail *nvidia.JobDetailResponse) *nvidiaDetailOutput
 func RegisterNvidia(s *mcp.Server, c *nvidia.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "nvidia_search_jobs",
-		Description: "Search jobs on NVIDIA careers site by keyword and country, with optional job-category/job-type/time-type/location-type/site filters.",
+		Description: "Search jobs on the NVIDIA careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search NVIDIA jobs", ReadOnlyHint: true},
 		InputSchema: nvidiaSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *nvidiaSearchInput) (*mcp.CallToolResult, *nvidiaSearchOutput, error) {

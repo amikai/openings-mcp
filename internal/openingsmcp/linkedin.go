@@ -190,7 +190,7 @@ func linkedinHTTPToMCPDetail(detail *linkedin.JobDetailResponse) *linkedinDetail
 func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "linkedin_search_jobs",
-		Description: "Search jobs on LinkedIn's public guest job-search surface. LinkedIn's rate limiting is aggressive; back off instead of retrying on a 429. Page start in steps of 10.",
+		Description: "Search jobs on LinkedIn's public guest job-search surface. LinkedIn's rate limiting is aggressive; back off instead of retrying on a 429.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search LinkedIn jobs", ReadOnlyHint: true},
 		InputSchema: linkedinSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
