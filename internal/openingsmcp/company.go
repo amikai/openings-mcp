@@ -16,7 +16,7 @@ var companySearchInputRawSchema = []byte(`{
 	"properties": {
 		"company": {
 			"type": "string",
-			"description": "Company name or slug, e.g. 'nvidia' or 'NVIDIA Corp', or a careers-page URL on a supported ATS (Workday, Greenhouse, Lever, Ashby), e.g. 'https://jobs.lever.co/acme'. If a name isn't recognized, the error message suggests the closest supported companies."
+			"description": "Company name or slug, e.g. 'nvidia' or 'NVIDIA Corp', or a company's public careers-page URL, e.g. 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite'. If a name isn't recognized, the error message suggests the closest supported companies."
 		},
 		"query": {
 			"type": "string",
@@ -105,7 +105,7 @@ func companySearch(ctx context.Context, reg *ats.Registry, in *companySearchInpu
 }
 
 type companyFiltersInput struct {
-	Company string `json:"company" jsonschema:"Company name, slug, or careers-page URL, e.g. 'nvidia' or 'https://jobs.lever.co/acme'."`
+	Company string `json:"company" jsonschema:"Company name, slug, or public careers-page URL, e.g. 'nvidia' or 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite'."`
 }
 
 type companyFiltersOutput struct {
@@ -125,7 +125,7 @@ func companyFilters(ctx context.Context, reg *ats.Registry, in *companyFiltersIn
 }
 
 type companyDetailInput struct {
-	Company string `json:"company" jsonschema:"Company name, slug, or careers-page URL, e.g. 'nvidia' or 'https://jobs.lever.co/acme'."`
+	Company string `json:"company" jsonschema:"Company name, slug, or public careers-page URL, e.g. 'nvidia' or 'https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite'."`
 	JobID   string `json:"job_id" jsonschema:"job_id from search_jobs_by_company results."`
 }
 
@@ -163,7 +163,7 @@ func companyDetail(ctx context.Context, reg *ats.Registry, in *companyDetailInpu
 func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "search_jobs_by_company",
-		Description: "Search a specific company's official job openings by company name. Covers hundreds of companies; if the company isn't recognized, the error suggests the closest supported names. Companies outside the list can be searched by passing their careers-page URL (Workday, Greenhouse, Lever, or Ashby) as company. Results are summaries — use get_job_detail_by_company for full descriptions.",
+		Description: "Search a specific company's official job openings by company name. Covers hundreds of companies; if the company isn't recognized, the error suggests the closest supported names. Companies outside the list can be searched by passing their public careers-page URL as company. Results are summaries — use get_job_detail_by_company for full descriptions.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search jobs by company", ReadOnlyHint: true},
 		InputSchema: companySearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companySearchInput) (*mcp.CallToolResult, *companySearchOutput, error) {

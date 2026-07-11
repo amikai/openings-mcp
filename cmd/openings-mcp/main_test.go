@@ -66,15 +66,11 @@ func TestServerListsJobTools(t *testing.T) {
 		"google_get_job_detail",
 		"linkedin_search_jobs",
 		"linkedin_get_job_detail",
-	} {
-		assert.Contains(t, got, name)
-	}
-	for _, name := range []string{
 		"search_jobs_by_company",
 		"get_filters_by_company",
 		"get_job_detail_by_company",
 	} {
-		assert.NotContains(t, got, name)
+		assert.Contains(t, got, name)
 	}
 }
 
