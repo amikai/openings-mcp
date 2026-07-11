@@ -215,7 +215,7 @@ func nvidiaMCPToHTTPRequest(in *nvidiaSearchInput) (*nvidia.JobsRequest, error) 
 
 func nvidiaHTTPToMCPResponse(resp *nvidia.JobsResponse) *nvidiaSearchOutput {
 	out := &nvidiaSearchOutput{
-		Total: resp.Total,
+		Total: resp.Total.Value,
 		Data:  make([]nvidiaJobSummary, 0, len(resp.JobPostings)),
 	}
 	for _, j := range resp.JobPostings {
@@ -231,12 +231,12 @@ func nvidiaHTTPToMCPResponse(resp *nvidia.JobsResponse) *nvidiaSearchOutput {
 
 func nvidiaHTTPToMCPDetail(detail *nvidia.JobDetailResponse) *nvidiaDetailOutput {
 	info := detail.JobPostingInfo
-	descText, err := html2text.FromString(info.JobDescription, html2text.Options{})
+	descText, err := html2text.FromString(info.JobDescription.Value, html2text.Options{})
 	if err != nil {
-		descText = info.JobDescription
+		descText = info.JobDescription.Value
 	}
 	return &nvidiaDetailOutput{
-		Title:               info.Title,
+		Title:               info.Title.Value,
 		Description:         descText,
 		Location:            info.Location.Or(""),
 		AdditionalLocations: info.AdditionalLocations,

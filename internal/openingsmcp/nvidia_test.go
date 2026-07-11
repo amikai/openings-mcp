@@ -165,19 +165,19 @@ func TestNvidiaSearchJobsInvalidEnumE2E(t *testing.T) {
 
 func TestNvidiaHTTPToMCPResponse(t *testing.T) {
 	in := nvidia.JobsResponse{
-		Total: 2,
+		Total: nvidia.NewNilInt(2),
 		JobPostings: []nvidia.JobSummary{
 			{
-				Title:         nvidia.NewOptString("t1"),
+				Title:         nvidia.NewOptNilString("t1"),
 				ExternalPath:  nvidia.NewOptString("p1"),
-				LocationsText: nvidia.NewOptString("l1"),
-				PostedOn:      nvidia.NewOptString("d1"),
+				LocationsText: nvidia.NewOptNilString("l1"),
+				PostedOn:      nvidia.NewOptNilString("d1"),
 			},
 			{
-				Title:         nvidia.NewOptString("t2"),
+				Title:         nvidia.NewOptNilString("t2"),
 				ExternalPath:  nvidia.NewOptString("p2"),
-				LocationsText: nvidia.NewOptString("l2"),
-				PostedOn:      nvidia.NewOptString("d2"),
+				LocationsText: nvidia.NewOptNilString("l2"),
+				PostedOn:      nvidia.NewOptNilString("d2"),
 			},
 		},
 	}
@@ -196,14 +196,14 @@ func TestNvidiaHTTPToMCPResponse(t *testing.T) {
 func TestNvidiaHTTPToMCPDetail(t *testing.T) {
 	in := nvidia.JobDetailResponse{
 		JobPostingInfo: nvidia.JobPostingInfo{
-			Title:               "t",
-			JobDescription:      "<p>d</p>",
-			Location:            nvidia.NewOptString("l"),
+			Title:               nvidia.NewNilString("t"),
+			JobDescription:      nvidia.NewNilString("<p>d</p>"),
+			Location:            nvidia.NewOptNilString("l"),
 			AdditionalLocations: []string{"al"},
-			PostedOn:            nvidia.NewOptString("po"),
-			TimeType:            nvidia.NewOptString("tt"),
-			JobReqId:            nvidia.NewOptString("id"),
-			ExternalUrl:         nvidia.NewOptString("url"),
+			PostedOn:            nvidia.NewOptNilString("po"),
+			TimeType:            nvidia.NewOptNilString("tt"),
+			JobReqId:            nvidia.NewOptNilString("id"),
+			ExternalUrl:         nvidia.NewOptNilString("url"),
 		},
 	}
 	got := nvidiaHTTPToMCPDetail(&in)
