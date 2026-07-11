@@ -4,9 +4,9 @@
 
 **Goal:** A standalone CLI `cmd/verify-companies` that verifies every curated companies.yaml entry by running a real search through the unified `internal/ats` adapters and reports each entry's total job count.
 
-**Architecture:** One `main.go`. Adapters are constructed with the same base URLs as `cmd/openings-mcp/main.go`; rosters come from `Adapter.Roster()`, verification calls `Adapter.Search(slug, page 1)`, a bounded worker pool fans out, and results print as text or JSON with exit code 1 (any INVALID) / 2 (no INVALID but any ERROR) / 0.
+**Architecture:** One `main.go`. Adapters are constructed with the same base URLs as `cmd/openings-mcp/main.go`; rosters come from `Adapter.Roster()`, verification calls `Adapter.Search(slug, page 1)`, a bounded worker pool fans out, and results print as text or JSON with exit code 1 (any ERROR) / 0 (all OK).
 
-**Tech Stack:** Go 1.26, `ff/v4` (repo's CLI convention), `internal/ats`, ogen runtime (`validate`) for error classification.
+**Tech Stack:** Go 1.26, `ff/v4` (repo's CLI convention), `internal/ats`.
 
 Spec: `docs/superpowers/specs/2026-07-12-verify-companies-cmd-design.md`
 
@@ -14,8 +14,8 @@ Spec: `docs/superpowers/specs/2026-07-12-verify-companies-cmd-design.md`
 
 - No test file — per user decision, `cmd/verify-companies/main.go` only.
 - Do NOT git commit — the user commits manually (standing preference overrides this skill's commit steps).
-- Classification: Search success → OK with `TotalCount`; upstream 404 (all providers) or 422 (workday) → INVALID; anything else → ERROR.
-- The cmd imports `internal/ats` but no `internal/provider/*` package. Typed status-code errors are matched via `interface{ error; GetStatusCode() int }` plus ogen's `*validate.UnexpectedStatusCodeError`; ashby/greenhouse typed 404s arrive as errors containing `"not found upstream"`.
+- Classification is binary: Search success → OK with `TotalCount`; any Search error → ERROR with the error message as detail.
+- The cmd imports `internal/ats` but no `internal/provider/*` package.
 
 ---
 
@@ -25,7 +25,7 @@ Spec: `docs/superpowers/specs/2026-07-12-verify-companies-cmd-design.md`
 - Create: `cmd/verify-companies/main.go`
 
 **Interfaces:**
-- Consumes: `ats.NewLeverAdapter(baseURL, *http.Client)`, `ats.NewAshbyAdapter(baseURL, *http.Client)`, `ats.NewGreenhouseAdapter(baseURL, *http.Client)` (all return `(*XxxAdapter, error)`), `ats.NewWorkdayAdapter(*http.Client)`; `ats.Adapter` (`Name() string`, `Roster() []ats.CompanyInfo`, `Search(ctx, slug string, ats.SearchParams) (*ats.SearchResult, error)`); `ats.CompanyInfo{Slug, Name string}`; `ats.SearchResult.TotalCount int`; `validate.UnexpectedStatusCodeError` from `github.com/ogen-go/ogen/validate`.
+- Consumes: `ats.NewLeverAdapter(baseURL, *http.Client)`, `ats.NewAshbyAdapter(baseURL, *http.Client)`, `ats.NewGreenhouseAdapter(baseURL, *http.Client)` (all return `(*XxxAdapter, error)`), `ats.NewWorkdayAdapter(*http.Client)`; `ats.Adapter` (`Name() string`, `Roster() []ats.CompanyInfo`, `Search(ctx, slug string, ats.SearchParams) (*ats.SearchResult, error)`); `ats.CompanyInfo{Slug, Name string}`; `ats.SearchResult.TotalCount int`.
 - Produces: the `verify-companies` binary; nothing consumes it.
 
 - [ ] **Step 1: Write `cmd/verify-companies/main.go`**
@@ -52,7 +52,6 @@ import (
 	"text/tabwriter"
 	"time"
 
-	"github.com/ogen-go/ogen/validate"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 
@@ -62,13 +61,12 @@ import (
 // providerOrder fixes the --provider default and the report's grouping order.
 var providerOrder = []string{"ashby", "greenhouse", "lever", "workday"}
 
-// Result statuses. INVALID means upstream said the identifier is gone;
-// ERROR means the check couldn't decide (timeout, 5xx, network or decode
-// error).
+// Result statuses. ERROR covers every failed check — a stale identifier
+// (upstream 404) and a transient failure (timeout, 5xx) alike; Detail
+// carries the error message for telling them apart.
 const (
-	statusOK      = "OK"
-	statusInvalid = "INVALID"
-	statusError   = "ERROR"
+	statusOK    = "OK"
+	statusError = "ERROR"
 )
 
 // check is one roster entry to verify against its adapter.
@@ -79,7 +77,7 @@ type check struct {
 }
 
 // result is one classified check: OK carries the company's total job
-// count; INVALID and ERROR carry the error message in Detail.
+// count; ERROR carries the error message in Detail.
 type result struct {
 	Provider string `json:"provider"`
 	Company  string `json:"company"`
@@ -98,14 +96,14 @@ func main() {
 		format      = fs.StringEnumLong("format", "output format", "text", "json")
 	)
 
-	var invalidCount, errorCount int
+	var errorCount int
 	cmd := &ff.Command{
 		Name:  "verify-companies",
 		Usage: "verify-companies [--provider LIST] [--timeout D] [--concurrency N] [--format text|json]",
 		Flags: fs,
 		Exec: func(ctx context.Context, args []string) error {
 			var err error
-			invalidCount, errorCount, err = run(ctx, *providers, *timeout, *concurrency, *format)
+			errorCount, err = run(ctx, *providers, *timeout, *concurrency, *format)
 			return err
 		},
 	}
@@ -123,26 +121,23 @@ func main() {
 		fmt.Fprintln(os.Stderr, "err:", err)
 		os.Exit(1)
 	}
-	switch {
-	case invalidCount > 0:
+	if errorCount > 0 {
 		os.Exit(1)
-	case errorCount > 0:
-		os.Exit(2)
 	}
 }
 
-func run(ctx context.Context, providerList string, timeout time.Duration, concurrency int, format string) (invalid, errs int, err error) {
+func run(ctx context.Context, providerList string, timeout time.Duration, concurrency int, format string) (errs int, err error) {
 	names, err := parseProviders(providerList)
 	if err != nil {
-		return 0, 0, err
+		return 0, err
 	}
 	if concurrency < 1 {
-		return 0, 0, fmt.Errorf("--concurrency must be at least 1, got %d", concurrency)
+		return 0, fmt.Errorf("--concurrency must be at least 1, got %d", concurrency)
 	}
 
 	adapters, err := buildAdapters(names)
 	if err != nil {
-		return 0, 0, err
+		return 0, err
 	}
 	results := runChecks(ctx, buildChecks(adapters), timeout, concurrency)
 
@@ -151,8 +146,8 @@ func run(ctx context.Context, providerList string, timeout time.Duration, concur
 	} else {
 		printText(results)
 	}
-	_, invalid, errs = tally(results)
-	return invalid, errs, err
+	_, errs, _ = tally(results)
+	return errs, err
 }
 
 // parseProviders validates the --provider list and returns it in
@@ -240,12 +235,7 @@ func (c check) do(ctx context.Context, timeout time.Duration) result {
 
 	res, err := c.adapter.Search(ctx, c.slug, ats.SearchParams{Page: 1})
 	if err != nil {
-		r.Detail = err.Error()
-		if isGone(err, c.adapter.Name()) {
-			r.Status = statusInvalid
-		} else {
-			r.Status = statusError
-		}
+		r.Status, r.Detail = statusError, err.Error()
 		return r
 	}
 	r.Status = statusOK
@@ -253,38 +243,9 @@ func (c check) do(ctx context.Context, timeout time.Duration) result {
 	return r
 }
 
-// isGone reports whether err means the roster identifier no longer exists
-// upstream: HTTP 404 for every provider, plus 422 for workday (its response
-// to an unknown tenant). Lever and workday surface typed status-code errors
-// (matched by GetStatusCode, with ogen's UnexpectedStatusCodeError as
-// fallback); the ashby and greenhouse adapters translate their typed 404
-// responses into "not found upstream" errors before any status code is
-// visible.
-func isGone(err error, provider string) bool {
-	code := 0
-	var scErr interface {
-		error
-		GetStatusCode() int
-	}
-	var unexpected *validate.UnexpectedStatusCodeError
-	switch {
-	case errors.As(err, &scErr):
-		code = scErr.GetStatusCode()
-	case errors.As(err, &unexpected):
-		code = unexpected.StatusCode
-	}
-	if code == http.StatusNotFound {
-		return true
-	}
-	if provider == "workday" && code == http.StatusUnprocessableEntity {
-		return true
-	}
-	return strings.Contains(err.Error(), "not found upstream")
-}
-
 // printText writes one line per entry plus a summary. Jobs is shown only
-// for OK entries; Detail only for non-OK entries, where it explains the
-// classification.
+// for OK entries; Detail only for ERROR entries, where it explains the
+// failure.
 func printText(results []result) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, r := range results {
@@ -295,36 +256,38 @@ func printText(results []result) {
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", r.Status, r.Provider, r.Company, r.Slug, jobs, detail)
 	}
 	w.Flush()
-	ok, invalid, errs := tally(results)
-	fmt.Printf("\ntotal %d: ok %d, invalid %d, error %d\n", len(results), ok, invalid, errs)
+	ok, errs, zero := tally(results)
+	fmt.Printf("\ntotal %d: ok %d, error %d, zero-job %d\n", len(results), ok, errs, zero)
 }
 
 func printJSON(results []result) error {
-	ok, invalid, errs := tally(results)
+	ok, errs, zero := tally(results)
 	out := struct {
 		Results []result       `json:"results"`
 		Summary map[string]int `json:"summary"`
 	}{
 		Results: results,
-		Summary: map[string]int{"ok": ok, "invalid": invalid, "error": errs},
+		Summary: map[string]int{"ok": ok, "error": errs, "zero_job": zero},
 	}
 	enc := json.NewEncoder(os.Stdout)
 	enc.SetIndent("", "  ")
 	return enc.Encode(out)
 }
 
-func tally(results []result) (ok, invalid, errs int) {
+// tally counts results per status; zero counts the OK entries whose board
+// is live but currently lists no jobs.
+func tally(results []result) (ok, errs, zero int) {
 	for _, r := range results {
-		switch r.Status {
-		case statusOK:
+		if r.Status == statusOK {
 			ok++
-		case statusInvalid:
-			invalid++
-		default:
-			errs++
+			if r.Jobs == 0 {
+				zero++
+			}
+			continue
 		}
+		errs++
 	}
-	return ok, invalid, errs
+	return ok, errs, zero
 }
 ```
 
@@ -342,7 +305,7 @@ Run:
 ```bash
 go run ./cmd/verify-companies --provider lever
 ```
-Expected: 20 lines `OK  lever  <company>  <slug>  <jobs>` with non-zero job counts, summary `total 20: ok 20, invalid 0, error 0`, exit code 0 (`echo $?`).
+Expected: 20 lines `OK  lever  <company>  <slug>  <jobs>`, summary `total 20: ok 20, error 0, zero-job <n>`, exit code 0 (`echo $?`).
 
 - [ ] **Step 4: Verify JSON format and flag validation**
 
@@ -351,7 +314,7 @@ Run:
 go run ./cmd/verify-companies --provider lever --format json | head -20
 go run ./cmd/verify-companies --provider nope; echo "exit=$?"
 ```
-Expected: JSON object with `results` (each result has a `jobs` field) and `summary`; second command prints `err: unknown provider "nope" ...` and `exit=1`.
+Expected: JSON object with `results` (each result has a `jobs` field) and `summary` (`ok`/`error`/`zero_job`); second command prints `err: unknown provider "nope" ...` and `exit=1`.
 
 - [ ] **Step 5: Full sweep across all four providers**
 
@@ -359,7 +322,7 @@ Run:
 ```bash
 go build ./cmd/verify-companies && ./verify-companies; echo "exit=$?"
 ```
-Expected: ~550 lines with job counts. Exit 0 if everything is live; exit 1 with INVALID lines if entries have gone stale (that output is the audit deliverable for issue #91); exit 2 if only transient ERRORs. Rerun once if ERRORs look transient.
+Expected: ~353 lines with job counts (the workday roster's two shared-tenant duplicate rows are deduped by `Roster()`). Exit 0 if everything is live; exit 1 with ERROR lines otherwise — stale identifiers show upstream 404/not-found messages (that output is the audit deliverable for issue #91); rerun once if errors look transient.
 
 - [ ] **Step 6: Do NOT commit**
 
@@ -367,6 +330,6 @@ Leave changes uncommitted; the user commits manually.
 
 ## Self-review notes
 
-- Spec coverage: adapter-based verification, job counts, structure (ats-only imports), all four flags, text/JSON output, exit codes 0/1/2 — all in Task 1.
+- Spec coverage: adapter-based verification, job counts, structure (ats-only imports), all four flags, text/JSON output with zero-job summary, exit codes 0/1 — all in Task 1.
 - No placeholders; single task because the spec is one self-contained file.
-- Signatures checked against `internal/ats`: constructor arities, `Adapter` methods, `CompanyInfo{Slug, Name}`, `SearchResult.TotalCount`; `GetStatusCode()` exists on lever/workday `ErrorResponseStatusCode`.
+- Signatures checked against `internal/ats`: constructor arities, `Adapter` methods, `CompanyInfo{Slug, Name}`, `SearchResult.TotalCount`.
