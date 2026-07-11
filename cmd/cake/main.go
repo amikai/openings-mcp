@@ -98,10 +98,8 @@ func main() {
 	for _, job := range search.Data {
 		detail, err := client.GetJobDetail(ctx, cake.GetJobDetailParams{Path: job.Path})
 		if err != nil {
-			// One stale posting must not discard the summaries and details
-			// already fetched; the report renders jobs without details.
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.Path, err)
-			continue
+			os.Exit(1)
 		}
 		details[job.Path] = detail
 	}

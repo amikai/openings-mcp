@@ -80,10 +80,8 @@ func main() {
 	for _, job := range jobs {
 		detail, err := client.JobDetail(ctx, job.ID)
 		if err != nil {
-			// One stale posting must not discard the summaries and details
-			// already fetched; the report renders jobs without details.
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.ID, err)
-			continue
+			os.Exit(1)
 		}
 		details[job.ID] = detail
 	}
