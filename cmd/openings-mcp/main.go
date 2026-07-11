@@ -36,12 +36,13 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools for six job boards: 104 and Cake.me (both Taiwan-centric) and LinkedIn (global), plus the official careers sites of Google, NVIDIA, and TSMC.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104 and Cake.me (Taiwan-centric) and LinkedIn (global), plus the careers sites of Google, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering hundreds of companies behind one company parameter.
 
 Tool selection:
+- When the user names a specific company, try search_jobs_by_company first; it covers hundreds of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, 104, ...) when the company isn't covered.
 - When the user names a site or company, use that provider's tools.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, and LinkedIn) rather than a single company's careers site.
-- search_jobs_by_company also accepts a careers-page URL on Workday, Greenhouse, Lever, or Ashby. When a company isn't in the supported list, find its careers page URL (e.g. via web search) and pass that URL as the company argument.
+- search_jobs_by_company also accepts a company's public careers-page URL. When a company isn't in the supported list, find its careers page URL (e.g. via web search) and pass that URL as the company argument.
 
 Query construction:
 - Listen carefully to the user's stated criteria and map each one onto a search parameter when a matching parameter exists; enforce criteria the parameters cannot express by filtering the results yourself.
@@ -151,26 +152,13 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 }
 
 // newATSRegistry wires the unified company adapters over one shared
-// connection pool, against the providers' production endpoints.
+// connection pool, against the providers' production endpoints. Only
+// Workday is wired in for now; the other ATS adapters (Lever, Ashby,
+// Greenhouse) stay unregistered until they're ready to ship.
 func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
-	adapterLever, err := ats.NewLeverAdapter("https://api.lever.co", hc)
-	if err != nil {
-		return nil, err
-	}
-	adapterAshby, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
-	if err != nil {
-		return nil, err
-	}
-	adapterGreenhouse, err := ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
-	if err != nil {
-		return nil, err
-	}
-	return ats.NewRegistry(ats.NewWorkdayAdapter(hc), adapterLever, adapterAshby, adapterGreenhouse)
+	return ats.NewRegistry(ats.NewWorkdayAdapter(hc))
 }
 
-// registry is wired up but not yet registered as MCP tools: the unified
-// company-tools feature (search_jobs_by_company etc.) is still in progress
-// and not part of this release's tool surface.
 func newServer(
 	c104 *job104.Client,
 	cCake *cake.Client,
@@ -189,5 +177,6 @@ func newServer(
 	openingsmcp.RegisterTsmc(server, cTsmc)
 	openingsmcp.RegisterGoogle(server, cGoogle)
 	openingsmcp.RegisterLinkedin(server, cLinkedin)
+	openingsmcp.RegisterCompany(server, registry)
 	return server
 }

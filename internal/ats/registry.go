@@ -89,10 +89,32 @@ func (r *Registry) Resolve(company string) (Adapter, string, error) {
 				return a, slug, nil
 			}
 		}
-		return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: <tenant>.<wd*>.myworkdayjobs.com/<site>, job-boards.greenhouse.io/<board>, jobs.lever.co/<org>, jobs.ashbyhq.com/<org>", company)
+		return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
 	}
 	return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
 		company, strings.Join(r.suggest(key, 3), ", "), len(r.bySlug))
+}
+
+// careersHostPatternsByAdapter maps each known adapter name to the
+// careers-page URL shape it recognizes, so the "unrecognized careers URL"
+// error only advertises hosts the registry actually has an adapter for.
+var careersHostPatternsByAdapter = map[string]string{
+	"workday":    "<tenant>.<wd*>.myworkdayjobs.com/<site>",
+	"greenhouse": "job-boards.greenhouse.io/<board>",
+	"lever":      "jobs.lever.co/<org>",
+	"ashby":      "jobs.ashbyhq.com/<org>",
+}
+
+// careersHostPatterns lists the careers-page URL shapes for r's registered
+// adapters, in registration order.
+func (r *Registry) careersHostPatterns() []string {
+	patterns := make([]string, 0, len(r.adapters))
+	for _, a := range r.adapters {
+		if p, ok := careersHostPatternsByAdapter[a.Name()]; ok {
+			patterns = append(patterns, p)
+		}
+	}
+	return patterns
 }
 
 // normalize folds case and strips everything but letters and digits, so
