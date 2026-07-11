@@ -1,4 +1,5 @@
-// Package logging provides MCP server middleware for error auditing.
+// Package logging provides MCP server middleware for error auditing and
+// panic recovery.
 package logging
 
 import (

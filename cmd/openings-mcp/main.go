@@ -171,6 +171,9 @@ func newServer(
 ) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "openings-mcp", Version: version}, &mcp.ServerOptions{Instructions: serverInstructions, Logger: logger})
 	server.AddReceivingMiddleware(logging.ErrorLoggingMiddleware(logger))
+	// Registered last so it wraps outermost, catching panics from tool
+	// handlers and from other middleware alike.
+	server.AddReceivingMiddleware(logging.RecoveryMiddleware(logger))
 	openingsmcp.RegisterJob104(server, c104)
 	openingsmcp.RegisterCake(server, cCake)
 	openingsmcp.RegisterNvidia(server, cNvidia)
