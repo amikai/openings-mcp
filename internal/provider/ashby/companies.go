@@ -16,8 +16,8 @@ var companiesYAML []byte
 // drawn from a curated list (internal/provider/ashby/companies.yaml). Every
 // entry was verified against the live posting API — HTTP 200 with a
 // non-empty jobs array — and its board page title checked against the
-// expected company name; testdata/verify_companies.sh re-verifies the
-// roster. It's keyed by board slug (e.g. "openai"), the same identifier the
+// expected company name; cmd/verify-companies re-verifies the roster.
+// It's keyed by board slug (e.g. "openai"), the same identifier the
 // API takes as its jobBoardName path parameter.
 type Company struct {
 	Name  string `yaml:"company" json:"company"`
