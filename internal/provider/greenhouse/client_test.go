@@ -28,15 +28,15 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5019966007),
 				InternalJobID:       NewOptNilInt(4577205007),
-				Title:               NewOptString("GTM and Business Operations Lead"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("GTM and Business Operations Lead"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-01-09T14:59:08-05:00"),
 				UpdatedAt:           mustOptDateTime("2026-03-18T10:32:18-04:00"),
 				RequisitionID:       NewOptNilString("51"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Location:            NewOptLocation(Location{Name: NewOptString("Miami")}),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Miami")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5019966007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -45,16 +45,16 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5117812007),
 				InternalJobID:       NewOptNilInt(4622921007),
-				Title:               NewOptString("GTM Engineering Intern"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("GTM Engineering Intern"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-04-27T17:56:30-04:00"),
 				UpdatedAt:           mustOptDateTime("2026-04-27T17:56:30-04:00"),
 				RequisitionID:       NewOptNilString("59"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Education:           NewOptJobSummaryEducation(JobSummaryEducationEducationRequired),
-				Location:            NewOptLocation(Location{Name: NewOptString("Remote")}),
+				Education:           NewOptNilJobSummaryEducation(JobSummaryEducationEducationRequired),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Remote")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5117812007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -63,15 +63,15 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(4677712007),
 				InternalJobID:       NewOptNilInt(4398021007),
-				Title:               NewOptString("Head of Client Success (East Cost candidates only)"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("Head of Client Success (East Cost candidates only)"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2025-05-15T17:13:34-04:00"),
 				UpdatedAt:           mustOptDateTime("2026-03-18T10:32:18-04:00"),
 				RequisitionID:       NewOptNilString("48"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Location:            NewOptLocation(Location{Name: NewOptString("Miami, FL or Remote")}),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Miami, FL or Remote")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/4677712007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -80,16 +80,16 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5024708007),
 				InternalJobID:       NewOptNilInt(4579740007),
-				Title:               NewOptString("Head of Partnerships"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("Head of Partnerships"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-03-18T15:23:19-04:00"),
 				UpdatedAt:           mustOptDateTime("2026-03-18T15:30:59-04:00"),
 				RequisitionID:       NewOptNilString("53"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Education:           NewOptJobSummaryEducation(JobSummaryEducationEducationRequired),
-				Location:            NewOptLocation(Location{Name: NewOptString("Miami, FL")}),
+				Education:           NewOptNilJobSummaryEducation(JobSummaryEducationEducationRequired),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Miami, FL")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5024708007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -98,15 +98,15 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5020246007),
 				InternalJobID:       NewOptNilInt(4577366007),
-				Title:               NewOptString("MBA Intern (Spring and/or Summer '26)"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("MBA Intern (Spring and/or Summer '26)"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-01-13T18:31:34-05:00"),
 				UpdatedAt:           mustOptDateTime("2026-03-18T10:32:18-04:00"),
 				RequisitionID:       NewOptNilString("52"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Location:            NewOptLocation(Location{Name: NewOptString("Remote")}),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Remote")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5020246007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -115,16 +115,16 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5033427007),
 				InternalJobID:       NewOptNilInt(4583748007),
-				Title:               NewOptString("Opportunity Hire, ex-founder/founding engineer"),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("Opportunity Hire, ex-founder/founding engineer"),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-01-23T17:15:16-05:00"),
 				UpdatedAt:           mustOptDateTime("2026-03-18T10:32:18-04:00"),
 				RequisitionID:       NewOptNilString("55"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Education:           NewOptJobSummaryEducation(JobSummaryEducationEducationRequired),
-				Location:            NewOptLocation(Location{Name: NewOptString("North America")}),
+				Education:           NewOptNilJobSummaryEducation(JobSummaryEducationEducationRequired),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("North America")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5033427007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -133,15 +133,15 @@ func TestListJobs(t *testing.T) {
 			{
 				ID:                  NewOptInt(5077155007),
 				InternalJobID:       NewOptNilInt(4604233007),
-				Title:               NewOptString("Sales Development Representative "),
-				CompanyName:         NewOptString("Safari AI"),
+				Title:               NewOptNilString("Sales Development Representative "),
+				CompanyName:         NewOptNilString("Safari AI"),
 				FirstPublished:      mustOptDateTime("2026-03-12T09:36:40-04:00"),
 				UpdatedAt:           mustOptDateTime("2026-04-01T09:05:55-04:00"),
 				RequisitionID:       NewOptNilString("58"),
 				ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
-				Location:            NewOptLocation(Location{Name: NewOptString("Miami, Florida, United States")}),
+				Location:            NewOptLocation(Location{Name: NewOptNilString("Miami, Florida, United States")}),
 				AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/safariai/jobs/5077155007"),
-				Language:            NewOptString("en"),
+				Language:            NewOptNilString("en"),
 				Metadata:            OptNilJobSummaryMetadataItemArray{Set: true, Null: true},
 				DataCompliance: []DataCompliance{
 					{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
@@ -181,14 +181,14 @@ func TestGetJob(t *testing.T) {
 
 	want := &JobDetail{
 		ID:                  NewOptInt(4461450008),
-		Title:               NewOptString("Account Executive, AI Native "),
-		CompanyName:         NewOptString("Anthropic"),
+		Title:               NewOptNilString("Account Executive, AI Native "),
+		CompanyName:         NewOptNilString("Anthropic"),
 		FirstPublished:      mustOptDateTime("2024-12-20T13:53:38-05:00"),
 		UpdatedAt:           mustOptDateTime("2026-06-08T20:49:32-04:00"),
 		ApplicationDeadline: OptNilDateTime{Set: true, Null: true},
 		RequisitionID:       NewOptNilString("3356"),
-		Location:            NewOptLocation(Location{Name: NewOptString("San Francisco, CA | New York City, NY")}),
-		Content: NewOptString(`&lt;div class=&quot;content-intro&quot;&gt;&lt;h2&gt;&lt;strong&gt;About Anthropic&lt;/strong&gt;&lt;/h2&gt;
+		Location:            NewOptLocation(Location{Name: NewOptNilString("San Francisco, CA | New York City, NY")}),
+		Content: NewOptNilString(`&lt;div class=&quot;content-intro&quot;&gt;&lt;h2&gt;&lt;strong&gt;About Anthropic&lt;/strong&gt;&lt;/h2&gt;
 &lt;p&gt;Anthropic’s mission is to create reliable, interpretable, and steerable AI systems. We want AI to be safe and beneficial for our users and for society as a whole. Our team is a quickly growing group of committed researchers, engineers, policy experts, and business leaders working together to build beneficial AI systems.&lt;/p&gt;&lt;/div&gt;&lt;div&gt;
 &lt;h2&gt;About the role&lt;/h2&gt;
 &lt;/div&gt;
@@ -231,23 +231,21 @@ func TestGetJob(t *testing.T) {
 &lt;h2&gt;&lt;strong&gt;Come work with us!&lt;/strong&gt;&lt;/h2&gt;
 &lt;p&gt;Anthropic is a public benefit corporation headquartered in San Francisco. We offer competitive compensation and benefits, optional equity donation matching, generous vacation and parental leave, flexible working hours, and a lovely office space in which to collaborate with colleagues. &lt;strong data-stringify-type=&quot;bold&quot;&gt;Guidance on Candidates&#39; AI Usage:&lt;/strong&gt;&amp;nbsp;Learn about&amp;nbsp;&lt;a class=&quot;c-link&quot; href=&quot;https://www.anthropic.com/candidate-ai-guidance&quot; target=&quot;_blank&quot; data-stringify-link=&quot;https://www.anthropic.com/candidate-ai-guidance&quot; data-sk=&quot;tooltip_parent&quot;&gt;our policy&lt;/a&gt; for using AI in our application process.&lt;/p&gt;&lt;/div&gt;`),
 		AbsoluteURL:         mustOptURI("https://job-boards.greenhouse.io/anthropic/jobs/4461450008"),
-		Language:            NewOptString("en"),
+		Language:            NewOptNilString("en"),
 		InternalJobID:       NewOptNilInt(4147866008),
 		IncludeAiDisclaimer: OptNilBool{Set: true, Null: true},
 		AiDisclaimer:        OptNilString{Set: true, Null: true},
 		AiOptOutRequestURL:  OptNilURI{Set: true, Null: true},
-		Metadata: NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{
-			{ID: NewOptInt(4036944008), Name: NewOptString("Location Type"), Value: NewOptString("On-Site"), ValueType: NewOptString("single_select")},
-		}),
+		Metadata: NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{{}}),
 		DataCompliance: []DataCompliance{
 			{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
 		},
 		Departments: []Department{
-			{ID: NewOptInt(4002062008), Name: NewOptString("Sales"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
+			{ID: NewOptInt(4002062008), Name: NewOptNilString("Sales"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
 		},
 		Offices: []Office{
-			{ID: NewOptInt(4001219008), Name: NewOptString("New York City, NY"), Location: NewOptString("New York, New York, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
-			{ID: NewOptInt(4001218008), Name: NewOptString("San Francisco, CA"), Location: NewOptString("San Francisco, California, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
+			{ID: NewOptInt(4001219008), Name: NewOptNilString("New York City, NY"), Location: NewOptNilString("New York, New York, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
+			{ID: NewOptInt(4001218008), Name: NewOptNilString("San Francisco, CA"), Location: NewOptNilString("San Francisco, California, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
 		},
 	}
 	assert.Equal(t, want, got)
@@ -340,18 +338,18 @@ func TestListJobsWithContent(t *testing.T) {
 	}
 }
 
-func mustOptDateTime(s string) OptDateTime {
+func mustOptDateTime(s string) OptNilDateTime {
 	tm, err := time.Parse(time.RFC3339, s)
 	if err != nil {
 		panic(err)
 	}
-	return NewOptDateTime(tm)
+	return NewOptNilDateTime(tm)
 }
 
-func mustOptURI(s string) OptURI {
+func mustOptURI(s string) OptNilURI {
 	u, err := url.Parse(s)
 	if err != nil {
 		panic(err)
 	}
-	return NewOptURI(*u)
+	return NewOptNilURI(*u)
 }

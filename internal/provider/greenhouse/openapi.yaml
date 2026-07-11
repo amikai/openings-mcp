@@ -85,6 +85,7 @@ components:
       properties:
         name:
           type: string
+          nullable: true
 
     Department:
       type: object
@@ -93,6 +94,7 @@ components:
           type: integer
         name:
           type: string
+          nullable: true
         parent_id:
           type: integer
           nullable: true
@@ -108,8 +110,10 @@ components:
           type: integer
         name:
           type: string
+          nullable: true
         location:
           type: string
+          nullable: true
         parent_id:
           type: integer
           nullable: true
@@ -129,14 +133,18 @@ components:
           description: Null for prospect posts.
         title:
           type: string
+          nullable: true
         company_name:
           type: string
+          nullable: true
         first_published:
           type: string
           format: date-time
+          nullable: true
         updated_at:
           type: string
           format: date-time
+          nullable: true
         requisition_id:
           type: string
           nullable: true
@@ -146,6 +154,7 @@ components:
           nullable: true
         education:
           type: string
+          nullable: true
           description: Only present on some boards.
           enum:
             - education_required
@@ -155,8 +164,10 @@ components:
         absolute_url:
           type: string
           format: uri
+          nullable: true
         language:
           type: string
+          nullable: true
         metadata:
           type: array
           nullable: true
@@ -168,6 +179,7 @@ components:
             $ref: "#/components/schemas/DataCompliance"
         content:
           type: string
+          nullable: true
           description: Only present when `content=true` is passed. HTML entity-encoded.
         departments:
           type: array
@@ -329,20 +341,25 @@ components:
           type: integer
         title:
           type: string
+          nullable: true
         company_name:
           type: string
+          nullable: true
         first_published:
           type: string
           format: date-time
+          nullable: true
         updated_at:
           type: string
           format: date-time
+          nullable: true
         application_deadline:
           type: string
           format: date-time
           nullable: true
         education:
           type: string
+          nullable: true
           description: Only present on some boards.
           enum:
             - education_required
@@ -354,11 +371,14 @@ components:
           $ref: "#/components/schemas/Location"
         content:
           type: string
+          nullable: true
         absolute_url:
           type: string
           format: uri
+          nullable: true
         language:
           type: string
+          nullable: true
         internal_job_id:
           type: integer
           nullable: true
@@ -386,15 +406,6 @@ components:
           nullable: true
           items:
             type: object
-            properties:
-              id:
-                type: integer
-              name:
-                type: string
-              value_type:
-                type: string
-              value:
-                type: string
         data_compliance:
           type: array
           items:

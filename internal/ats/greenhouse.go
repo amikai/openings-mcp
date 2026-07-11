@@ -190,7 +190,7 @@ func greenhouseDescription(content string) string {
 	return text
 }
 
-func greenhousePostedAt(t greenhouse.OptDateTime) string {
+func greenhousePostedAt(t greenhouse.OptNilDateTime) string {
 	if !t.Set {
 		return ""
 	}
