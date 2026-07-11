@@ -57,9 +57,9 @@ func TestBuildSearchParamsPageZeroLeavesPageUnset(t *testing.T) {
 
 func TestWriteDetail(t *testing.T) {
 	d := detail("Go Engineer", "Build Go services")
-	d.Data.JobDetail.Salary = job104.NewOptString("60k-80k")
-	d.Data.Condition.WorkExp = job104.NewOptString("3 years")
-	d.Data.Condition.Edu = job104.NewOptString("Bachelor")
+	d.Data.JobDetail.Salary = job104.NewOptNilString("60k-80k")
+	d.Data.Condition.WorkExp = job104.NewOptNilString("3 years")
+	d.Data.Condition.Edu = job104.NewOptNilString("Bachelor")
 
 	var buf bytes.Buffer
 	writeDetail(&buf, d)
@@ -76,7 +76,7 @@ func TestWriteDetail(t *testing.T) {
 
 func detail(title, description string) *job104.JobDetailResponse {
 	d := &job104.JobDetailResponse{}
-	d.Data.Header.JobName = title
-	d.Data.JobDetail.JobDescription = job104.NewOptString(description)
+	d.Data.Header.JobName = job104.NewNilString(title)
+	d.Data.JobDetail.JobDescription = job104.NewOptNilString(description)
 	return d
 }

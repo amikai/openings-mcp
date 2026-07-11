@@ -381,13 +381,13 @@ func TestJob104SalaryTypeLabels(t *testing.T) {
 func TestJob104HTTPToMCPResponse(t *testing.T) {
 	in := job104.JobsResponse{
 		Data: []job104.JobSummary{
-			{JobNo: "1", JobName: "onsite", CustName: "c1", CustNo: "n1", Link: job104.JobSummaryLink{Job: "j1", Cust: "u1"}, SalaryHigh: 2, SalaryLow: 1, S10: 30, JobAddrNoDesc: "a1", AppearDate: "20260101", ApplyCnt: 3, RemoteWorkType: 0, JobRo: 1, Period: 0},
-			{JobNo: "2", JobName: "full-remote", CustName: "c2", CustNo: "n2", Link: job104.JobSummaryLink{Job: "j2", Cust: "u2"}, SalaryHigh: 0, SalaryLow: 0, S10: 10, JobAddrNoDesc: "a2", AppearDate: "20260102", ApplyCnt: 4, RemoteWorkType: 1, JobRo: 2, Period: 4},
-			{JobNo: "3", JobName: "hybrid", CustName: "c3", CustNo: "n3", Link: job104.JobSummaryLink{Job: "j3", Cust: "u3"}, SalaryHigh: 9, SalaryLow: 5, S10: 50, JobAddrNoDesc: "a3", AppearDate: "20260103", ApplyCnt: 5, RemoteWorkType: 2, JobRo: 4, Period: 11},
-			{JobNo: "4", JobName: "unknown-codes", CustName: "c4", CustNo: "n4", Link: job104.JobSummaryLink{Job: "j4", Cust: "u4"}, SalaryHigh: 0, SalaryLow: 0, S10: 9, JobAddrNoDesc: "a4", AppearDate: "20260104", ApplyCnt: 6, RemoteWorkType: 9, JobRo: 9, Period: 7},
+			{JobNo: job104.NewNilString("1"), JobName: job104.NewNilString("onsite"), CustName: job104.NewNilString("c1"), CustNo: job104.NewNilString("n1"), Link: job104.JobSummaryLink{Job: "j1", Cust: job104.NewNilString("u1")}, SalaryHigh: job104.NewNilInt(2), SalaryLow: job104.NewNilInt(1), S10: job104.NewNilInt(30), JobAddrNoDesc: job104.NewNilString("a1"), AppearDate: job104.NewNilString("20260101"), ApplyCnt: job104.NewNilInt(3), RemoteWorkType: job104.NewNilInt(0), JobRo: job104.NewNilInt(1), Period: job104.NewNilInt(0)},
+			{JobNo: job104.NewNilString("2"), JobName: job104.NewNilString("full-remote"), CustName: job104.NewNilString("c2"), CustNo: job104.NewNilString("n2"), Link: job104.JobSummaryLink{Job: "j2", Cust: job104.NewNilString("u2")}, SalaryHigh: job104.NewNilInt(0), SalaryLow: job104.NewNilInt(0), S10: job104.NewNilInt(10), JobAddrNoDesc: job104.NewNilString("a2"), AppearDate: job104.NewNilString("20260102"), ApplyCnt: job104.NewNilInt(4), RemoteWorkType: job104.NewNilInt(1), JobRo: job104.NewNilInt(2), Period: job104.NewNilInt(4)},
+			{JobNo: job104.NewNilString("3"), JobName: job104.NewNilString("hybrid"), CustName: job104.NewNilString("c3"), CustNo: job104.NewNilString("n3"), Link: job104.JobSummaryLink{Job: "j3", Cust: job104.NewNilString("u3")}, SalaryHigh: job104.NewNilInt(9), SalaryLow: job104.NewNilInt(5), S10: job104.NewNilInt(50), JobAddrNoDesc: job104.NewNilString("a3"), AppearDate: job104.NewNilString("20260103"), ApplyCnt: job104.NewNilInt(5), RemoteWorkType: job104.NewNilInt(2), JobRo: job104.NewNilInt(4), Period: job104.NewNilInt(11)},
+			{JobNo: job104.NewNilString("4"), JobName: job104.NewNilString("unknown-codes"), CustName: job104.NewNilString("c4"), CustNo: job104.NewNilString("n4"), Link: job104.JobSummaryLink{Job: "j4", Cust: job104.NewNilString("u4")}, SalaryHigh: job104.NewNilInt(0), SalaryLow: job104.NewNilInt(0), S10: job104.NewNilInt(9), JobAddrNoDesc: job104.NewNilString("a4"), AppearDate: job104.NewNilString("20260104"), ApplyCnt: job104.NewNilInt(6), RemoteWorkType: job104.NewNilInt(9), JobRo: job104.NewNilInt(9), Period: job104.NewNilInt(7)},
 		},
 		Metadata: job104.JobsResponseMetadata{
-			Pagination: job104.JobsResponseMetadataPagination{CurrentPage: 1, LastPage: 2, Total: 34},
+			Pagination: job104.JobsResponseMetadataPagination{CurrentPage: job104.NewNilInt(1), LastPage: job104.NewNilInt(2), Total: job104.NewNilInt(34)},
 		},
 	}
 	got := job104HTTPToMCPResponse(&in)
@@ -412,42 +412,42 @@ func TestJob104HTTPToMCPResponse(t *testing.T) {
 func TestJob104HTTPToMCPDetail(t *testing.T) {
 	in := job104.JobDetailResponse{
 		Data: job104.JobDetail{
-			Header: job104.JobDetailHeader{JobName: "j", CustName: "c", CustUrl: "u", AppearDate: "2026/01/01", IsSaved: true, IsApplied: false},
+			Header: job104.JobDetailHeader{JobName: job104.NewNilString("j"), CustName: job104.NewNilString("c"), CustUrl: job104.NewNilString("u"), AppearDate: job104.NewNilString("2026/01/01"), IsSaved: job104.NewNilBool(true), IsApplied: job104.NewNilBool(false)},
 			Contact: job104.JobDetailContact{
-				HrName: job104.NewOptString("hr"),
-				Email:  job104.NewOptString("e@x"),
-				Reply:  job104.NewOptString(""),
+				HrName: job104.NewOptNilString("hr"),
+				Email:  job104.NewOptNilString("e@x"),
+				Reply:  job104.NewOptNilString(""),
 			},
 			Condition: job104.JobDetailCondition{
-				WorkExp: job104.NewOptString("exp"),
-				Edu:     job104.NewOptString("edu"),
+				WorkExp: job104.NewOptNilString("exp"),
+				Edu:     job104.NewOptNilString("edu"),
 				Major:   []string{"m1"},
 				Specialty: []job104.CodeDescription{
-					{Code: job104.NewOptString("s1"), Description: job104.NewOptString("d1")},
+					{Code: job104.NewOptNilString("s1"), Description: job104.NewOptNilString("d1")},
 				},
 			},
-			Welfare: job104.JobDetailWelfare{Welfare: job104.NewOptString("w")},
+			Welfare: job104.JobDetailWelfare{Welfare: job104.NewOptNilString("w")},
 			JobDetail: job104.JobDetailJobDetail{
-				JobDescription: job104.NewOptString("desc"),
+				JobDescription: job104.NewOptNilString("desc"),
 				JobCategory: []job104.CodeDescription{
-					{Code: job104.NewOptString("k1"), Description: job104.NewOptString("kd1")},
+					{Code: job104.NewOptNilString("k1"), Description: job104.NewOptNilString("kd1")},
 				},
-				Salary:        job104.NewOptString("sal"),
-				SalaryMin:     job104.NewOptInt(10),
-				SalaryMax:     job104.NewOptInt(20),
-				JobType:       job104.NewOptInt(1),
-				AddressRegion: job104.NewOptString("region"),
-				AddressDetail: job104.NewOptString("detail"),
-				ManageResp:    job104.NewOptString("mr"),
-				NeedEmp:       job104.NewOptString("ne"),
+				Salary:        job104.NewOptNilString("sal"),
+				SalaryMin:     job104.NewOptNilInt(10),
+				SalaryMax:     job104.NewOptNilInt(20),
+				JobType:       job104.NewOptNilInt(1),
+				AddressRegion: job104.NewOptNilString("region"),
+				AddressDetail: job104.NewOptNilString("detail"),
+				ManageResp:    job104.NewOptNilString("mr"),
+				NeedEmp:       job104.NewOptNilString("ne"),
 				RemoteWork: job104.OptNilJobDetailJobDetailRemoteWork{
 					Set:   true,
-					Value: job104.JobDetailJobDetailRemoteWork{Type: job104.NewOptInt(1), Description: job104.NewOptString("遠端")},
+					Value: job104.JobDetailJobDetailRemoteWork{Type: job104.NewOptNilInt(1), Description: job104.NewOptNilString("遠端")},
 				},
 			},
-			Industry:  "ind",
-			Employees: "9人",
-			CustNo:    "cn",
+			Industry:  job104.NewNilString("ind"),
+			Employees: job104.NewNilString("9人"),
+			CustNo:    job104.NewNilString("cn"),
 		},
 	}
 	got := job104HTTPToMCPDetail(&in, "jc1")
@@ -485,14 +485,14 @@ func TestJob104HTTPToMCPDetail(t *testing.T) {
 func TestJob104HTTPToMCPDetailNullRemoteUnknownJobType(t *testing.T) {
 	in := job104.JobDetailResponse{
 		Data: job104.JobDetail{
-			Header: job104.JobDetailHeader{JobName: "j", CustName: "c", CustUrl: "u", AppearDate: "2026/01/01"},
+			Header: job104.JobDetailHeader{JobName: job104.NewNilString("j"), CustName: job104.NewNilString("c"), CustUrl: job104.NewNilString("u"), AppearDate: job104.NewNilString("2026/01/01")},
 			JobDetail: job104.JobDetailJobDetail{
-				JobType:    job104.NewOptInt(9),
+				JobType:    job104.NewOptNilInt(9),
 				RemoteWork: job104.OptNilJobDetailJobDetailRemoteWork{Set: true, Null: true},
 			},
-			Industry:  "ind",
-			Employees: "9人",
-			CustNo:    "cn",
+			Industry:  job104.NewNilString("ind"),
+			Employees: job104.NewNilString("9人"),
+			CustNo:    job104.NewNilString("cn"),
 		},
 	}
 	got := job104HTTPToMCPDetail(&in, "jc1")

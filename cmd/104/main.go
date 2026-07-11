@@ -76,20 +76,20 @@ func main() {
 
 	p := search.Metadata.Pagination
 	fmt.Printf("104 Jobs Report\n")
-	fmt.Printf("Found %d jobs (page %d/%d); showing %d\n\n", p.Total, p.CurrentPage, p.LastPage, len(search.Data))
+	fmt.Printf("Found %d jobs (page %d/%d); showing %d\n\n", p.Total.Value, p.CurrentPage.Value, p.LastPage.Value, len(search.Data))
 
 	for i, job := range search.Data {
 		code := job104.JobCodeFromURL(job.Link.Job)
-		fmt.Printf("%d. [%s] %s\n", i+1, code, job.JobName)
-		fmt.Printf("Company: %s\n", job.CustName)
-		if job.JobAddrNoDesc != "" {
-			fmt.Printf("Location: %s\n", job.JobAddrNoDesc)
+		fmt.Printf("%d. [%s] %s\n", i+1, code, job.JobName.Value)
+		fmt.Printf("Company: %s\n", job.CustName.Value)
+		if job.JobAddrNoDesc.Value != "" {
+			fmt.Printf("Location: %s\n", job.JobAddrNoDesc.Value)
 		}
 		// ro/remoteWork are soft filters server-side — the true match count
 		// is search.Metadata.Pagination.Total, but individual entries here
 		// can fail to match what was asked for. Surface the raw values so
 		// that's visible instead of silently assumed.
-		fmt.Printf("jobRo=%d remoteWorkType=%d\n", job.JobRo, job.RemoteWorkType)
+		fmt.Printf("jobRo=%d remoteWorkType=%d\n", job.JobRo.Value, job.RemoteWorkType.Value)
 		if code == "" {
 			fmt.Println()
 			continue

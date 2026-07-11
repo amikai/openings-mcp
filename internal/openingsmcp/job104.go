@@ -290,28 +290,28 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 		Data: make([]job104JobSummary, 0, len(resp.Data)),
 		Metadata: job104SearchMetadata{
 			Pagination: job104Pagination{
-				CurrentPage: resp.Metadata.Pagination.CurrentPage,
-				LastPage:    resp.Metadata.Pagination.LastPage,
-				Total:       resp.Metadata.Pagination.Total,
+				CurrentPage: resp.Metadata.Pagination.CurrentPage.Value,
+				LastPage:    resp.Metadata.Pagination.LastPage.Value,
+				Total:       resp.Metadata.Pagination.Total.Value,
 			},
 		},
 	}
 	for _, j := range resp.Data {
 		out.Data = append(out.Data, job104JobSummary{
 			JobCode:       job104.JobCodeFromURL(j.Link.Job),
-			JobName:       j.JobName,
-			CompanyName:   j.CustName,
+			JobName:       j.JobName.Value,
+			CompanyName:   j.CustName.Value,
 			URL:           j.Link.Job,
-			CompanyURL:    j.Link.Cust,
-			SalaryHigh:    j.SalaryHigh,
-			SalaryLow:     j.SalaryLow,
-			SalaryType:    job104SalaryTypeLabels[j.S10],
-			JobAddrNoDesc: j.JobAddrNoDesc,
-			AppearDate:    j.AppearDate,
-			ApplyCnt:      j.ApplyCnt,
-			Remote:        job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType)],
-			JobType:       job104RoLabels[job104.SearchJobsRo(j.JobRo)],
-			Experience:    job104ExperienceLabel(j.Period),
+			CompanyURL:    j.Link.Cust.Value,
+			SalaryHigh:    j.SalaryHigh.Value,
+			SalaryLow:     j.SalaryLow.Value,
+			SalaryType:    job104SalaryTypeLabels[j.S10.Value],
+			JobAddrNoDesc: j.JobAddrNoDesc.Value,
+			AppearDate:    j.AppearDate.Value,
+			ApplyCnt:      j.ApplyCnt.Value,
+			Remote:        job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType.Value)],
+			JobType:       job104RoLabels[job104.SearchJobsRo(j.JobRo.Value)],
+			Experience:    job104ExperienceLabel(j.Period.Value),
 		})
 	}
 	return out
@@ -320,11 +320,11 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job104DetailOutput {
 	d := resp.Data
 	out := &job104DetailOutput{
-		JobName:        d.Header.JobName,
-		CompanyName:    d.Header.CustName,
+		JobName:        d.Header.JobName.Value,
+		CompanyName:    d.Header.CustName.Value,
 		URL:            "https://www.104.com.tw/job/" + jobCode,
-		CompanyURL:     d.Header.CustUrl,
-		AppearDate:     d.Header.AppearDate,
+		CompanyURL:     d.Header.CustUrl.Value,
+		AppearDate:     d.Header.AppearDate.Value,
 		JobDescription: d.JobDetail.JobDescription.Or(""),
 		JobCategory:    job104Descriptions(d.JobDetail.JobCategory),
 		Salary:         d.JobDetail.Salary.Or(""),
@@ -340,8 +340,8 @@ func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job1
 		ManageResp:     d.JobDetail.ManageResp.Or(""),
 		NeedEmp:        d.JobDetail.NeedEmp.Or(""),
 		Welfare:        d.Welfare.Welfare.Or(""),
-		Industry:       d.Industry,
-		Employees:      d.Employees,
+		Industry:       d.Industry.Value,
+		Employees:      d.Employees.Value,
 	}
 	if rw, ok := d.JobDetail.RemoteWork.Get(); ok {
 		out.Remote = job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
