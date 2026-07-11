@@ -16,6 +16,7 @@ require (
 	github.com/google/jsonschema-go v0.4.3
 	github.com/google/uuid v1.6.0
 	github.com/jaytaylor/html2text v0.0.0-20260303211410-1a4bdc82ecec
+	github.com/maypok86/otter/v2 v2.3.0
 	github.com/modelcontextprotocol/go-sdk v1.6.1
 	github.com/ogen-go/ogen v1.23.0
 	github.com/peterbourgon/ff/v4 v4.0.0-beta.1
