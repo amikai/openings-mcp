@@ -1,29 +1,35 @@
 <h1 align="center">openings-mcp</h1>
 
 <p align="center">
-  <strong>Search job listings from any MCP client — job boards and company career sites, one server.</strong>
+  <strong>Search job listings from any MCP client: job boards and company career sites, one server.</strong>
 </p>
 
 <p align="center">
   <img src="assets/openings_demo.gif" alt="Demo of openings-mcp searching job listings from Claude Code" width="800">
 </p>
 
-**openings-mcp** searches job listings across job boards and company career sites —
-currently **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**,
-**[LinkedIn](https://www.linkedin.com)** (public search),
-**[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
-**[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
-**[TSMC careers](https://careers.tsmc.com)** —
-from any MCP client: Claude Code, Codex, Gemini CLI, and others.
+**openings-mcp** searches job listings across job boards and company career
+sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 
-⚠️ This server can consume a lot of tokens, especially when your client explores
-multiple postings or fetches full job details, so consider using a cheaper model.
+- **Job boards**: **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**,
+  and **[LinkedIn](https://www.linkedin.com)** (public search).
+- **Company career sites**: 350+ companies hosted on the
+  **[Workday](https://www.workday.com)**, **[Ashby](https://www.ashbyhq.com)**,
+  **[Greenhouse](https://www.greenhouse.com)**, and **[Lever](https://www.lever.co)**
+  ATS platforms, all behind one company-search tool. A company outside the
+  built-in roster works too: pass its careers-page URL on any of those platforms.
+- **Dedicated sites**: **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
+  **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
+  **[TSMC careers](https://careers.tsmc.com)**.
+
+⚠️ Token use adds up fast when your client explores multiple postings or
+fetches full job details, so consider a cheaper model.
 
 > **Disclaimer:** This is an unofficial, personal-use tool. It is not affiliated
 > with, endorsed by, or sponsored by 104 Corporation, TSMC, or any other job
 > board or company whose listings it searches. It calls each site's public web
 > endpoints; please respect their terms of service and use it at a reasonable,
-> low frequency. No scraped job data is distributed with this project.
+> low frequency. The project ships no scraped job data.
 
 ## Install
 
@@ -86,16 +92,16 @@ supported by 104 Corporation, TSMC, or any other job board or company whose
 listings it searches.
 
 Some providers rely on undocumented APIs that may change or stop working at
-any time without notice. Job listing data belongs to the respective sites and
-is fetched on your behalf when you invoke a tool — nothing is stored or
-redistributed by this project.
+any time without notice. Job listing data belongs to the respective sites. The
+server fetches it on your behalf when you invoke a tool and stores or
+redistributes nothing.
 
 Use this tool for personal job searching at a human pace. Every request goes
 out from your own machine, and a site may throttle or temporarily block your
 IP if too many arrive too quickly. The server does not rate-limit requests,
 so a client that pages through many results or fetches lots of job details in
-one go can trip these limits. No login is involved, so your accounts on these
-sites are not at risk. You are responsible for complying with the terms of
+one go can trip these limits. The server never logs in, so your accounts on
+these sites are not at risk. You are responsible for complying with the terms of
 service of each site you query; do not use it for bulk scraping or data
 harvesting.
 
