@@ -295,10 +295,10 @@ func (s *DemographicQuestions) SetQuestions(val []DemographicQuestion) {
 
 // Ref: #/components/schemas/Department
 type Department struct {
-	ID       OptInt    `json:"id"`
-	Name     OptString `json:"name"`
-	ParentID OptNilInt `json:"parent_id"`
-	ChildIds []int     `json:"child_ids"`
+	ID       OptInt       `json:"id"`
+	Name     OptNilString `json:"name"`
+	ParentID OptNilInt    `json:"parent_id"`
+	ChildIds []int        `json:"child_ids"`
 }
 
 // GetID returns the value of ID.
@@ -307,7 +307,7 @@ func (s *Department) GetID() OptInt {
 }
 
 // GetName returns the value of Name.
-func (s *Department) GetName() OptString {
+func (s *Department) GetName() OptNilString {
 	return s.Name
 }
 
@@ -327,7 +327,7 @@ func (s *Department) SetID(val OptInt) {
 }
 
 // SetName sets the value of Name.
-func (s *Department) SetName(val OptString) {
+func (s *Department) SetName(val OptNilString) {
 	s.Name = val
 }
 
@@ -349,23 +349,23 @@ func (*GetJobNotFound) getJobRes() {}
 // Ref: #/components/schemas/JobDetail
 type JobDetail struct {
 	ID                  OptInt         `json:"id"`
-	Title               OptString      `json:"title"`
-	CompanyName         OptString      `json:"company_name"`
-	FirstPublished      OptDateTime    `json:"first_published"`
-	UpdatedAt           OptDateTime    `json:"updated_at"`
+	Title               OptNilString   `json:"title"`
+	CompanyName         OptNilString   `json:"company_name"`
+	FirstPublished      OptNilDateTime `json:"first_published"`
+	UpdatedAt           OptNilDateTime `json:"updated_at"`
 	ApplicationDeadline OptNilDateTime `json:"application_deadline"`
 	// Only present on some boards.
-	Education           OptJobDetailEducation `json:"education"`
-	RequisitionID       OptNilString          `json:"requisition_id"`
-	Location            OptLocation           `json:"location"`
-	Content             OptString             `json:"content"`
-	AbsoluteURL         OptURI                `json:"absolute_url"`
-	Language            OptString             `json:"language"`
-	InternalJobID       OptNilInt             `json:"internal_job_id"`
-	IncludeAiDisclaimer OptNilBool            `json:"include_ai_disclaimer"`
-	AiDisclaimer        OptNilString          `json:"ai_disclaimer"`
-	AiOptOutRequestURL  OptNilURI             `json:"ai_opt_out_request_url"`
-	LocationQuestions   []Question            `json:"location_questions"`
+	Education           OptNilJobDetailEducation `json:"education"`
+	RequisitionID       OptNilString             `json:"requisition_id"`
+	Location            OptLocation              `json:"location"`
+	Content             OptNilString             `json:"content"`
+	AbsoluteURL         OptNilURI                `json:"absolute_url"`
+	Language            OptNilString             `json:"language"`
+	InternalJobID       OptNilInt                `json:"internal_job_id"`
+	IncludeAiDisclaimer OptNilBool               `json:"include_ai_disclaimer"`
+	AiDisclaimer        OptNilString             `json:"ai_disclaimer"`
+	AiOptOutRequestURL  OptNilURI                `json:"ai_opt_out_request_url"`
+	LocationQuestions   []Question               `json:"location_questions"`
 	// Present only when `questions=true` is passed.
 	Questions      []Question                       `json:"questions"`
 	Metadata       OptNilJobDetailMetadataItemArray `json:"metadata"`
@@ -386,22 +386,22 @@ func (s *JobDetail) GetID() OptInt {
 }
 
 // GetTitle returns the value of Title.
-func (s *JobDetail) GetTitle() OptString {
+func (s *JobDetail) GetTitle() OptNilString {
 	return s.Title
 }
 
 // GetCompanyName returns the value of CompanyName.
-func (s *JobDetail) GetCompanyName() OptString {
+func (s *JobDetail) GetCompanyName() OptNilString {
 	return s.CompanyName
 }
 
 // GetFirstPublished returns the value of FirstPublished.
-func (s *JobDetail) GetFirstPublished() OptDateTime {
+func (s *JobDetail) GetFirstPublished() OptNilDateTime {
 	return s.FirstPublished
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *JobDetail) GetUpdatedAt() OptDateTime {
+func (s *JobDetail) GetUpdatedAt() OptNilDateTime {
 	return s.UpdatedAt
 }
 
@@ -411,7 +411,7 @@ func (s *JobDetail) GetApplicationDeadline() OptNilDateTime {
 }
 
 // GetEducation returns the value of Education.
-func (s *JobDetail) GetEducation() OptJobDetailEducation {
+func (s *JobDetail) GetEducation() OptNilJobDetailEducation {
 	return s.Education
 }
 
@@ -426,17 +426,17 @@ func (s *JobDetail) GetLocation() OptLocation {
 }
 
 // GetContent returns the value of Content.
-func (s *JobDetail) GetContent() OptString {
+func (s *JobDetail) GetContent() OptNilString {
 	return s.Content
 }
 
 // GetAbsoluteURL returns the value of AbsoluteURL.
-func (s *JobDetail) GetAbsoluteURL() OptURI {
+func (s *JobDetail) GetAbsoluteURL() OptNilURI {
 	return s.AbsoluteURL
 }
 
 // GetLanguage returns the value of Language.
-func (s *JobDetail) GetLanguage() OptString {
+func (s *JobDetail) GetLanguage() OptNilString {
 	return s.Language
 }
 
@@ -511,22 +511,22 @@ func (s *JobDetail) SetID(val OptInt) {
 }
 
 // SetTitle sets the value of Title.
-func (s *JobDetail) SetTitle(val OptString) {
+func (s *JobDetail) SetTitle(val OptNilString) {
 	s.Title = val
 }
 
 // SetCompanyName sets the value of CompanyName.
-func (s *JobDetail) SetCompanyName(val OptString) {
+func (s *JobDetail) SetCompanyName(val OptNilString) {
 	s.CompanyName = val
 }
 
 // SetFirstPublished sets the value of FirstPublished.
-func (s *JobDetail) SetFirstPublished(val OptDateTime) {
+func (s *JobDetail) SetFirstPublished(val OptNilDateTime) {
 	s.FirstPublished = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *JobDetail) SetUpdatedAt(val OptDateTime) {
+func (s *JobDetail) SetUpdatedAt(val OptNilDateTime) {
 	s.UpdatedAt = val
 }
 
@@ -536,7 +536,7 @@ func (s *JobDetail) SetApplicationDeadline(val OptNilDateTime) {
 }
 
 // SetEducation sets the value of Education.
-func (s *JobDetail) SetEducation(val OptJobDetailEducation) {
+func (s *JobDetail) SetEducation(val OptNilJobDetailEducation) {
 	s.Education = val
 }
 
@@ -551,17 +551,17 @@ func (s *JobDetail) SetLocation(val OptLocation) {
 }
 
 // SetContent sets the value of Content.
-func (s *JobDetail) SetContent(val OptString) {
+func (s *JobDetail) SetContent(val OptNilString) {
 	s.Content = val
 }
 
 // SetAbsoluteURL sets the value of AbsoluteURL.
-func (s *JobDetail) SetAbsoluteURL(val OptURI) {
+func (s *JobDetail) SetAbsoluteURL(val OptNilURI) {
 	s.AbsoluteURL = val
 }
 
 // SetLanguage sets the value of Language.
-func (s *JobDetail) SetLanguage(val OptString) {
+func (s *JobDetail) SetLanguage(val OptNilString) {
 	s.Language = val
 }
 
@@ -674,52 +674,7 @@ func (s *JobDetailEducation) UnmarshalText(data []byte) error {
 	}
 }
 
-type JobDetailMetadataItem struct {
-	ID        OptInt    `json:"id"`
-	Name      OptString `json:"name"`
-	ValueType OptString `json:"value_type"`
-	Value     OptString `json:"value"`
-}
-
-// GetID returns the value of ID.
-func (s *JobDetailMetadataItem) GetID() OptInt {
-	return s.ID
-}
-
-// GetName returns the value of Name.
-func (s *JobDetailMetadataItem) GetName() OptString {
-	return s.Name
-}
-
-// GetValueType returns the value of ValueType.
-func (s *JobDetailMetadataItem) GetValueType() OptString {
-	return s.ValueType
-}
-
-// GetValue returns the value of Value.
-func (s *JobDetailMetadataItem) GetValue() OptString {
-	return s.Value
-}
-
-// SetID sets the value of ID.
-func (s *JobDetailMetadataItem) SetID(val OptInt) {
-	s.ID = val
-}
-
-// SetName sets the value of Name.
-func (s *JobDetailMetadataItem) SetName(val OptString) {
-	s.Name = val
-}
-
-// SetValueType sets the value of ValueType.
-func (s *JobDetailMetadataItem) SetValueType(val OptString) {
-	s.ValueType = val
-}
-
-// SetValue sets the value of Value.
-func (s *JobDetailMetadataItem) SetValue(val OptString) {
-	s.Value = val
-}
+type JobDetailMetadataItem struct{}
 
 // Ref: #/components/schemas/JobListResponse
 type JobListResponse struct {
@@ -768,21 +723,21 @@ type JobSummary struct {
 	ID OptInt `json:"id"`
 	// Null for prospect posts.
 	InternalJobID       OptNilInt      `json:"internal_job_id"`
-	Title               OptString      `json:"title"`
-	CompanyName         OptString      `json:"company_name"`
-	FirstPublished      OptDateTime    `json:"first_published"`
-	UpdatedAt           OptDateTime    `json:"updated_at"`
+	Title               OptNilString   `json:"title"`
+	CompanyName         OptNilString   `json:"company_name"`
+	FirstPublished      OptNilDateTime `json:"first_published"`
+	UpdatedAt           OptNilDateTime `json:"updated_at"`
 	RequisitionID       OptNilString   `json:"requisition_id"`
 	ApplicationDeadline OptNilDateTime `json:"application_deadline"`
 	// Only present on some boards.
-	Education      OptJobSummaryEducation            `json:"education"`
+	Education      OptNilJobSummaryEducation         `json:"education"`
 	Location       OptLocation                       `json:"location"`
-	AbsoluteURL    OptURI                            `json:"absolute_url"`
-	Language       OptString                         `json:"language"`
+	AbsoluteURL    OptNilURI                         `json:"absolute_url"`
+	Language       OptNilString                      `json:"language"`
 	Metadata       OptNilJobSummaryMetadataItemArray `json:"metadata"`
 	DataCompliance []DataCompliance                  `json:"data_compliance"`
 	// Only present when `content=true` is passed. HTML entity-encoded.
-	Content     OptString    `json:"content"`
+	Content     OptNilString `json:"content"`
 	Departments []Department `json:"departments"`
 	Offices     []Office     `json:"offices"`
 }
@@ -798,22 +753,22 @@ func (s *JobSummary) GetInternalJobID() OptNilInt {
 }
 
 // GetTitle returns the value of Title.
-func (s *JobSummary) GetTitle() OptString {
+func (s *JobSummary) GetTitle() OptNilString {
 	return s.Title
 }
 
 // GetCompanyName returns the value of CompanyName.
-func (s *JobSummary) GetCompanyName() OptString {
+func (s *JobSummary) GetCompanyName() OptNilString {
 	return s.CompanyName
 }
 
 // GetFirstPublished returns the value of FirstPublished.
-func (s *JobSummary) GetFirstPublished() OptDateTime {
+func (s *JobSummary) GetFirstPublished() OptNilDateTime {
 	return s.FirstPublished
 }
 
 // GetUpdatedAt returns the value of UpdatedAt.
-func (s *JobSummary) GetUpdatedAt() OptDateTime {
+func (s *JobSummary) GetUpdatedAt() OptNilDateTime {
 	return s.UpdatedAt
 }
 
@@ -828,7 +783,7 @@ func (s *JobSummary) GetApplicationDeadline() OptNilDateTime {
 }
 
 // GetEducation returns the value of Education.
-func (s *JobSummary) GetEducation() OptJobSummaryEducation {
+func (s *JobSummary) GetEducation() OptNilJobSummaryEducation {
 	return s.Education
 }
 
@@ -838,12 +793,12 @@ func (s *JobSummary) GetLocation() OptLocation {
 }
 
 // GetAbsoluteURL returns the value of AbsoluteURL.
-func (s *JobSummary) GetAbsoluteURL() OptURI {
+func (s *JobSummary) GetAbsoluteURL() OptNilURI {
 	return s.AbsoluteURL
 }
 
 // GetLanguage returns the value of Language.
-func (s *JobSummary) GetLanguage() OptString {
+func (s *JobSummary) GetLanguage() OptNilString {
 	return s.Language
 }
 
@@ -858,7 +813,7 @@ func (s *JobSummary) GetDataCompliance() []DataCompliance {
 }
 
 // GetContent returns the value of Content.
-func (s *JobSummary) GetContent() OptString {
+func (s *JobSummary) GetContent() OptNilString {
 	return s.Content
 }
 
@@ -883,22 +838,22 @@ func (s *JobSummary) SetInternalJobID(val OptNilInt) {
 }
 
 // SetTitle sets the value of Title.
-func (s *JobSummary) SetTitle(val OptString) {
+func (s *JobSummary) SetTitle(val OptNilString) {
 	s.Title = val
 }
 
 // SetCompanyName sets the value of CompanyName.
-func (s *JobSummary) SetCompanyName(val OptString) {
+func (s *JobSummary) SetCompanyName(val OptNilString) {
 	s.CompanyName = val
 }
 
 // SetFirstPublished sets the value of FirstPublished.
-func (s *JobSummary) SetFirstPublished(val OptDateTime) {
+func (s *JobSummary) SetFirstPublished(val OptNilDateTime) {
 	s.FirstPublished = val
 }
 
 // SetUpdatedAt sets the value of UpdatedAt.
-func (s *JobSummary) SetUpdatedAt(val OptDateTime) {
+func (s *JobSummary) SetUpdatedAt(val OptNilDateTime) {
 	s.UpdatedAt = val
 }
 
@@ -913,7 +868,7 @@ func (s *JobSummary) SetApplicationDeadline(val OptNilDateTime) {
 }
 
 // SetEducation sets the value of Education.
-func (s *JobSummary) SetEducation(val OptJobSummaryEducation) {
+func (s *JobSummary) SetEducation(val OptNilJobSummaryEducation) {
 	s.Education = val
 }
 
@@ -923,12 +878,12 @@ func (s *JobSummary) SetLocation(val OptLocation) {
 }
 
 // SetAbsoluteURL sets the value of AbsoluteURL.
-func (s *JobSummary) SetAbsoluteURL(val OptURI) {
+func (s *JobSummary) SetAbsoluteURL(val OptNilURI) {
 	s.AbsoluteURL = val
 }
 
 // SetLanguage sets the value of Language.
-func (s *JobSummary) SetLanguage(val OptString) {
+func (s *JobSummary) SetLanguage(val OptNilString) {
 	s.Language = val
 }
 
@@ -943,7 +898,7 @@ func (s *JobSummary) SetDataCompliance(val []DataCompliance) {
 }
 
 // SetContent sets the value of Content.
-func (s *JobSummary) SetContent(val OptString) {
+func (s *JobSummary) SetContent(val OptNilString) {
 	s.Content = val
 }
 
@@ -1008,26 +963,26 @@ func (*ListJobsNotFound) listJobsRes() {}
 
 // Ref: #/components/schemas/Location
 type Location struct {
-	Name OptString `json:"name"`
+	Name OptNilString `json:"name"`
 }
 
 // GetName returns the value of Name.
-func (s *Location) GetName() OptString {
+func (s *Location) GetName() OptNilString {
 	return s.Name
 }
 
 // SetName sets the value of Name.
-func (s *Location) SetName(val OptString) {
+func (s *Location) SetName(val OptNilString) {
 	s.Name = val
 }
 
 // Ref: #/components/schemas/Office
 type Office struct {
-	ID       OptInt    `json:"id"`
-	Name     OptString `json:"name"`
-	Location OptString `json:"location"`
-	ParentID OptNilInt `json:"parent_id"`
-	ChildIds []int     `json:"child_ids"`
+	ID       OptInt       `json:"id"`
+	Name     OptNilString `json:"name"`
+	Location OptNilString `json:"location"`
+	ParentID OptNilInt    `json:"parent_id"`
+	ChildIds []int        `json:"child_ids"`
 }
 
 // GetID returns the value of ID.
@@ -1036,12 +991,12 @@ func (s *Office) GetID() OptInt {
 }
 
 // GetName returns the value of Name.
-func (s *Office) GetName() OptString {
+func (s *Office) GetName() OptNilString {
 	return s.Name
 }
 
 // GetLocation returns the value of Location.
-func (s *Office) GetLocation() OptString {
+func (s *Office) GetLocation() OptNilString {
 	return s.Location
 }
 
@@ -1061,12 +1016,12 @@ func (s *Office) SetID(val OptInt) {
 }
 
 // SetName sets the value of Name.
-func (s *Office) SetName(val OptString) {
+func (s *Office) SetName(val OptNilString) {
 	s.Name = val
 }
 
 // SetLocation sets the value of Location.
-func (s *Office) SetLocation(val OptString) {
+func (s *Office) SetLocation(val OptNilString) {
 	s.Location = val
 }
 
@@ -1120,52 +1075,6 @@ func (o OptBool) Get() (v bool, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptBool) Or(d bool) bool {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptDateTime returns new OptDateTime with value set to v.
-func NewOptDateTime(v time.Time) OptDateTime {
-	return OptDateTime{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptDateTime is optional time.Time.
-type OptDateTime struct {
-	Value time.Time
-	Set   bool
-}
-
-// IsSet returns true if OptDateTime was set.
-func (o OptDateTime) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptDateTime) Reset() {
-	var v time.Time
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptDateTime) SetTo(v time.Time) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptDateTime) Get() (v time.Time, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptDateTime) Or(d time.Time) time.Time {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1264,52 +1173,6 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
-// NewOptJobDetailEducation returns new OptJobDetailEducation with value set to v.
-func NewOptJobDetailEducation(v JobDetailEducation) OptJobDetailEducation {
-	return OptJobDetailEducation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJobDetailEducation is optional JobDetailEducation.
-type OptJobDetailEducation struct {
-	Value JobDetailEducation
-	Set   bool
-}
-
-// IsSet returns true if OptJobDetailEducation was set.
-func (o OptJobDetailEducation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJobDetailEducation) Reset() {
-	var v JobDetailEducation
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJobDetailEducation) SetTo(v JobDetailEducation) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJobDetailEducation) Get() (v JobDetailEducation, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJobDetailEducation) Or(d JobDetailEducation) JobDetailEducation {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptJobListResponseMeta returns new OptJobListResponseMeta with value set to v.
 func NewOptJobListResponseMeta(v JobListResponseMeta) OptJobListResponseMeta {
 	return OptJobListResponseMeta{
@@ -1350,52 +1213,6 @@ func (o OptJobListResponseMeta) Get() (v JobListResponseMeta, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptJobListResponseMeta) Or(d JobListResponseMeta) JobListResponseMeta {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptJobSummaryEducation returns new OptJobSummaryEducation with value set to v.
-func NewOptJobSummaryEducation(v JobSummaryEducation) OptJobSummaryEducation {
-	return OptJobSummaryEducation{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptJobSummaryEducation is optional JobSummaryEducation.
-type OptJobSummaryEducation struct {
-	Value JobSummaryEducation
-	Set   bool
-}
-
-// IsSet returns true if OptJobSummaryEducation was set.
-func (o OptJobSummaryEducation) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptJobSummaryEducation) Reset() {
-	var v JobSummaryEducation
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptJobSummaryEducation) SetTo(v JobSummaryEducation) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptJobSummaryEducation) Get() (v JobSummaryEducation, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptJobSummaryEducation) Or(d JobSummaryEducation) JobSummaryEducation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1788,6 +1605,74 @@ func (o OptNilInt) Or(d int) int {
 	return d
 }
 
+// NewOptNilJobDetailEducation returns new OptNilJobDetailEducation with value set to v.
+func NewOptNilJobDetailEducation(v JobDetailEducation) OptNilJobDetailEducation {
+	return OptNilJobDetailEducation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilJobDetailEducation is optional nullable JobDetailEducation.
+type OptNilJobDetailEducation struct {
+	Value JobDetailEducation
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilJobDetailEducation was set.
+func (o OptNilJobDetailEducation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilJobDetailEducation) Reset() {
+	var v JobDetailEducation
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilJobDetailEducation) SetTo(v JobDetailEducation) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilJobDetailEducation) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilJobDetailEducation) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v JobDetailEducation
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilJobDetailEducation) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilJobDetailEducation) Get() (v JobDetailEducation, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilJobDetailEducation) Or(d JobDetailEducation) JobDetailEducation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilJobDetailMetadataItemArray returns new OptNilJobDetailMetadataItemArray with value set to v.
 func NewOptNilJobDetailMetadataItemArray(v []JobDetailMetadataItem) OptNilJobDetailMetadataItemArray {
 	return OptNilJobDetailMetadataItemArray{
@@ -1850,6 +1735,74 @@ func (o OptNilJobDetailMetadataItemArray) Get() (v []JobDetailMetadataItem, ok b
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilJobDetailMetadataItemArray) Or(d []JobDetailMetadataItem) []JobDetailMetadataItem {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilJobSummaryEducation returns new OptNilJobSummaryEducation with value set to v.
+func NewOptNilJobSummaryEducation(v JobSummaryEducation) OptNilJobSummaryEducation {
+	return OptNilJobSummaryEducation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilJobSummaryEducation is optional nullable JobSummaryEducation.
+type OptNilJobSummaryEducation struct {
+	Value JobSummaryEducation
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilJobSummaryEducation was set.
+func (o OptNilJobSummaryEducation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilJobSummaryEducation) Reset() {
+	var v JobSummaryEducation
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilJobSummaryEducation) SetTo(v JobSummaryEducation) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilJobSummaryEducation) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilJobSummaryEducation) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v JobSummaryEducation
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilJobSummaryEducation) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilJobSummaryEducation) Get() (v JobSummaryEducation, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilJobSummaryEducation) Or(d JobSummaryEducation) JobSummaryEducation {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -2192,52 +2145,6 @@ func (o OptString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptURI returns new OptURI with value set to v.
-func NewOptURI(v url.URL) OptURI {
-	return OptURI{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptURI is optional url.URL.
-type OptURI struct {
-	Value url.URL
-	Set   bool
-}
-
-// IsSet returns true if OptURI was set.
-func (o OptURI) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptURI) Reset() {
-	var v url.URL
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptURI) SetTo(v url.URL) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptURI) Get() (v url.URL, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptURI) Or(d url.URL) url.URL {
 	if v, ok := o.Get(); ok {
 		return v
 	}

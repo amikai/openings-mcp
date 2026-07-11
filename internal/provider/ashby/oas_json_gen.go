@@ -5,6 +5,7 @@ package ashby
 import (
 	"math/bits"
 	"strconv"
+	"time"
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
@@ -529,7 +530,7 @@ func (s *JobBoardResponse) Encode(e *jx.Encoder) {
 func (s *JobBoardResponse) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("apiVersion")
-		e.Str(s.ApiVersion)
+		s.ApiVersion.Encode(e)
 	}
 	{
 		e.FieldStart("jobs")
@@ -558,9 +559,7 @@ func (s *JobBoardResponse) Decode(d *jx.Decoder) error {
 		case "apiVersion":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.ApiVersion = string(v)
-				if err != nil {
+				if err := s.ApiVersion.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -658,7 +657,7 @@ func (s *JobPosting) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("title")
-		e.Str(s.Title)
+		s.Title.Encode(e)
 	}
 	{
 		if s.Department.Set {
@@ -694,11 +693,11 @@ func (s *JobPosting) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("publishedAt")
-		json.EncodeDateTime(e, s.PublishedAt)
+		s.PublishedAt.Encode(e, json.EncodeDateTime)
 	}
 	{
 		e.FieldStart("isListed")
-		e.Bool(s.IsListed)
+		s.IsListed.Encode(e)
 	}
 	{
 		e.FieldStart("isRemote")
@@ -716,11 +715,11 @@ func (s *JobPosting) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("jobUrl")
-		e.Str(s.JobUrl)
+		s.JobUrl.Encode(e)
 	}
 	{
 		e.FieldStart("applyUrl")
-		e.Str(s.ApplyUrl)
+		s.ApplyUrl.Encode(e)
 	}
 	{
 		if s.DescriptionHtml.Set {
@@ -791,9 +790,7 @@ func (s *JobPosting) Decode(d *jx.Decoder) error {
 		case "title":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
+				if err := s.Title.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -860,9 +857,7 @@ func (s *JobPosting) Decode(d *jx.Decoder) error {
 		case "publishedAt":
 			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				v, err := json.DecodeDateTime(d)
-				s.PublishedAt = v
-				if err != nil {
+				if err := s.PublishedAt.Decode(d, json.DecodeDateTime); err != nil {
 					return err
 				}
 				return nil
@@ -872,9 +867,7 @@ func (s *JobPosting) Decode(d *jx.Decoder) error {
 		case "isListed":
 			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
-				v, err := d.Bool()
-				s.IsListed = bool(v)
-				if err != nil {
+				if err := s.IsListed.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -914,9 +907,7 @@ func (s *JobPosting) Decode(d *jx.Decoder) error {
 		case "jobUrl":
 			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
-				v, err := d.Str()
-				s.JobUrl = string(v)
-				if err != nil {
+				if err := s.JobUrl.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -926,9 +917,7 @@ func (s *JobPosting) Decode(d *jx.Decoder) error {
 		case "applyUrl":
 			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
-				v, err := d.Str()
-				s.ApplyUrl = string(v)
-				if err != nil {
+				if err := s.ApplyUrl.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1167,6 +1156,96 @@ func (s *NilBool) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes time.Time as json.
+func (o NilDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	format(e, o.Value)
+}
+
+// Decode decodes time.Time from json.
+func (o *NilDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilDateTime to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v time.Time
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := format(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilDateTime) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e, json.EncodeDateTime)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilDateTime) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d, json.DecodeDateTime)
+}
+
+// Encode encodes JobPostingEmploymentType as json.
+func (o NilJobPostingEmploymentType) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes JobPostingEmploymentType from json.
+func (o *NilJobPostingEmploymentType) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilJobPostingEmploymentType to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v JobPostingEmploymentType
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilJobPostingEmploymentType) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilJobPostingEmploymentType) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes JobPostingWorkplaceType as json.
 func (o NilJobPostingWorkplaceType) Encode(e *jx.Encoder) {
 	if o.Null {
@@ -1211,37 +1290,48 @@ func (s *NilJobPostingWorkplaceType) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes bool as json.
-func (o OptBool) Encode(e *jx.Encoder) {
-	if !o.Set {
+// Encode encodes string as json.
+func (o NilString) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
 		return
 	}
-	e.Bool(bool(o.Value))
+	e.Str(string(o.Value))
 }
 
-// Decode decodes bool from json.
-func (o *OptBool) Decode(d *jx.Decoder) error {
+// Decode decodes string from json.
+func (o *NilString) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptBool to nil")
+		return errors.New("invalid: unable to decode NilString to nil")
 	}
-	o.Set = true
-	v, err := d.Bool()
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v string
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Str()
 	if err != nil {
 		return err
 	}
-	o.Value = bool(v)
+	o.Value = string(v)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptBool) MarshalJSON() ([]byte, error) {
+func (s NilString) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptBool) UnmarshalJSON(data []byte) error {
+func (s *NilString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1324,6 +1414,57 @@ func (s OptNilAddress) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilAddress) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes bool as json.
+func (o OptNilBool) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Bool(bool(o.Value))
+}
+
+// Decode decodes bool from json.
+func (o *OptNilBool) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBool to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v bool
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	v, err := d.Bool()
+	if err != nil {
+		return err
+	}
+	o.Value = bool(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBool) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBool) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

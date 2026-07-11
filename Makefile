@@ -1,6 +1,7 @@
 .PHONY: validate-openapi hurl-fmt hurl-lint hurl-test
 
 OPENAPI_SPECS := \
+	internal/provider/ashby/openapi.yaml \
 	internal/provider/cake/openapi.yaml \
 	internal/provider/google/openapi.yaml \
 	internal/provider/greenhouse/openapi.yaml \

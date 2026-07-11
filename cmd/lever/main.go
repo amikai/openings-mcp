@@ -272,14 +272,14 @@ func toPostingJSON(p lever.Posting) postingJSON {
 	cats := p.Categories.Value
 	r := postingJSON{
 		ID:          p.ID,
-		Title:       p.Text,
+		Title:       p.Text.Value,
 		URL:         p.HostedUrl.Value,
 		Team:        cats.Team.Value,
 		Commitment:  cats.Commitment.Value,
 		Description: p.DescriptionPlain.Value,
 	}
-	if p.CreatedAt.Set {
-		r.CreatedAt = time.UnixMilli(p.CreatedAt.Value).UTC().Format("2006-01-02")
+	if v, ok := p.CreatedAt.Get(); ok {
+		r.CreatedAt = time.UnixMilli(v).UTC().Format("2006-01-02")
 	}
 	setLocations(&r, postingLocations(p)...)
 	return r

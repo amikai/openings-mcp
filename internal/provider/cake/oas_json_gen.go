@@ -271,27 +271,27 @@ func (s *JobDetail) Encode(e *jx.Encoder) {
 func (s *JobDetail) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("id")
-		e.Int(s.ID)
+		s.ID.Encode(e)
 	}
 	{
 		e.FieldStart("path")
-		e.Str(s.Path)
+		s.Path.Encode(e)
 	}
 	{
 		e.FieldStart("page_path")
-		e.Str(s.PagePath)
+		s.PagePath.Encode(e)
 	}
 	{
 		e.FieldStart("title")
-		e.Str(s.Title)
+		s.Title.Encode(e)
 	}
 	{
 		e.FieldStart("description")
-		e.Str(s.Description)
+		s.Description.Encode(e)
 	}
 	{
 		e.FieldStart("requirements")
-		e.Str(s.Requirements)
+		s.Requirements.Encode(e)
 	}
 }
 
@@ -316,9 +316,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "id":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Int()
-				s.ID = int(v)
-				if err != nil {
+				if err := s.ID.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -328,9 +326,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "path":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.Path = string(v)
-				if err != nil {
+				if err := s.Path.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -340,9 +336,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "page_path":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.PagePath = string(v)
-				if err != nil {
+				if err := s.PagePath.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -352,9 +346,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "title":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
+				if err := s.Title.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -364,9 +356,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "description":
 			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				v, err := d.Str()
-				s.Description = string(v)
-				if err != nil {
+				if err := s.Description.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -376,9 +366,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "requirements":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Str()
-				s.Requirements = string(v)
-				if err != nil {
+				if err := s.Requirements.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1496,11 +1484,11 @@ func (s *JobSearchItem) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("title")
-		e.Str(s.Title)
+		s.Title.Encode(e)
 	}
 	{
 		e.FieldStart("description")
-		e.Str(s.Description)
+		s.Description.Encode(e)
 	}
 	{
 		if s.Page.Set {
@@ -1541,9 +1529,7 @@ func (s *JobSearchItem) Decode(d *jx.Decoder) error {
 		case "title":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.Title = string(v)
-				if err != nil {
+				if err := s.Title.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1553,9 +1539,7 @@ func (s *JobSearchItem) Decode(d *jx.Decoder) error {
 		case "description":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.Description = string(v)
-				if err != nil {
+				if err := s.Description.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1639,7 +1623,7 @@ func (s *JobSearchPage) Encode(e *jx.Encoder) {
 func (s *JobSearchPage) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("path")
-		e.Str(s.Path)
+		s.Path.Encode(e)
 	}
 }
 
@@ -1659,9 +1643,7 @@ func (s *JobSearchPage) Decode(d *jx.Decoder) error {
 		case "path":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.Path = string(v)
-				if err != nil {
+				if err := s.Path.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1935,19 +1917,19 @@ func (s *JobSearchResponse) Encode(e *jx.Encoder) {
 func (s *JobSearchResponse) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("total_entries")
-		e.Int(s.TotalEntries)
+		s.TotalEntries.Encode(e)
 	}
 	{
 		e.FieldStart("total_pages")
-		e.Int(s.TotalPages)
+		s.TotalPages.Encode(e)
 	}
 	{
 		e.FieldStart("per_page")
-		e.Int(s.PerPage)
+		s.PerPage.Encode(e)
 	}
 	{
 		e.FieldStart("current_page")
-		e.Int(s.CurrentPage)
+		s.CurrentPage.Encode(e)
 	}
 	{
 		e.FieldStart("data")
@@ -1979,9 +1961,7 @@ func (s *JobSearchResponse) Decode(d *jx.Decoder) error {
 		case "total_entries":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Int()
-				s.TotalEntries = int(v)
-				if err != nil {
+				if err := s.TotalEntries.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1991,9 +1971,7 @@ func (s *JobSearchResponse) Decode(d *jx.Decoder) error {
 		case "total_pages":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Int()
-				s.TotalPages = int(v)
-				if err != nil {
+				if err := s.TotalPages.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2003,9 +1981,7 @@ func (s *JobSearchResponse) Decode(d *jx.Decoder) error {
 		case "per_page":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Int()
-				s.PerPage = int(v)
-				if err != nil {
+				if err := s.PerPage.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2015,9 +1991,7 @@ func (s *JobSearchResponse) Decode(d *jx.Decoder) error {
 		case "current_page":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Int()
-				s.CurrentPage = int(v)
-				if err != nil {
+				if err := s.CurrentPage.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2094,6 +2068,98 @@ func (s *JobSearchResponse) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *JobSearchResponse) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int as json.
+func (o NilInt) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Int(int(o.Value))
+}
+
+// Decode decodes int from json.
+func (o *NilInt) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilInt to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v int
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	o.Value = int(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilInt) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes string as json.
+func (o NilString) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *NilString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilString to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v string
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2395,41 +2461,6 @@ func (s OptNilString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilString) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes string as json.
-func (o OptString) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes string from json.
-func (o *OptString) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptString to nil")
-	}
-	o.Set = true
-	v, err := d.Str()
-	if err != nil {
-		return err
-	}
-	o.Value = string(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptString) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

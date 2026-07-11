@@ -203,8 +203,15 @@ func (s *JobPosting) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if err := s.EmploymentType.Validate(); err != nil {
-			return err
+		if value, ok := s.EmploymentType.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {

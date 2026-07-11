@@ -336,10 +336,13 @@ components:
               properties:
                 currentPage:
                   type: integer
+                  nullable: true
                 lastPage:
                   type: integer
+                  nullable: true
                 total:
                   type: integer
+                  nullable: true
 
     JobSummary:
       type: object
@@ -361,14 +364,18 @@ components:
       properties:
         jobNo:
           type: string
+          nullable: true
         jobName:
           type: string
+          nullable: true
           example: "GoLang Developer"
         custName:
           type: string
+          nullable: true
           example: "曜驊智能股份有限公司"
         custNo:
           type: string
+          nullable: true
         link:
           type: object
           required: [job, cust]
@@ -379,8 +386,10 @@ components:
               example: "https://www.104.com.tw/job/624o1"
             cust:
               type: string
+              nullable: true
         salaryHigh:
           type: integer
+          nullable: true
           description: >
             Upper bound of the salary range, in TWD (all 104 postings quote
             新台幣) per the period given by `s10`. 9999999 is 104's "no
@@ -388,11 +397,13 @@ components:
             actual figure.
         salaryLow:
           type: integer
+          nullable: true
           description: >
             Lower bound of the salary range, in TWD per the period given by
             `s10`.
         s10:
           type: integer
+          nullable: true
           description: >
             Salary type of `salaryLow`/`salaryHigh`: 10 = negotiable
             (待遇面議; both bounds are 0), 30 = hourly (時薪), 40 = daily
@@ -401,14 +412,18 @@ components:
             keyword=時薪 results and their job-detail salary strings.
         jobAddrNoDesc:
           type: string
+          nullable: true
           example: "台北市內湖區"
         appearDate:
           type: string
+          nullable: true
           example: "20260515"
         applyCnt:
           type: integer
+          nullable: true
         remoteWorkType:
           type: integer
+          nullable: true
           description: >
             0 = not remote; matches the remoteWork request values otherwise.
             The `remoteWork` request param is a soft filter — check this
@@ -416,6 +431,7 @@ components:
             `remoteWork` parameter description on searchJobs).
         jobRo:
           type: integer
+          nullable: true
           description: >
             Matches the `ro` request values (1 = Full-time, 2 = Part-time).
             The `ro` request param is a soft filter — check this field per
@@ -423,6 +439,7 @@ components:
             description on searchJobs).
         period:
           type: integer
+          nullable: true
           description: >
             Minimum-experience code: 0 = no requirement (經歷不拘),
             otherwise the posting's minimum years of experience plus one
@@ -460,34 +477,45 @@ components:
           properties:
             jobName:
               type: string
+              nullable: true
             custName:
               type: string
+              nullable: true
             custUrl:
               type: string
+              nullable: true
             appearDate:
               type: string
+              nullable: true
               example: "2026/06/22"
             isSaved:
               type: boolean
+              nullable: true
             isApplied:
               type: boolean
+              nullable: true
         contact:
           type: object
           properties:
             hrName:
               type: string
+              nullable: true
             email:
               type: string
+              nullable: true
             reply:
               type: string
+              nullable: true
         condition:
           type: object
           properties:
             workExp:
               type: string
+              nullable: true
               example: "不拘"
             edu:
               type: string
+              nullable: true
               example: "大學以上"
             major:
               type: array
@@ -502,32 +530,42 @@ components:
           properties:
             welfare:
               type: string
+              nullable: true
         jobDetail:
           type: object
           properties:
             jobDescription:
               type: string
+              nullable: true
             jobCategory:
               type: array
               items:
                 $ref: "#/components/schemas/CodeDescription"
             salary:
               type: string
+              nullable: true
               example: "待遇面議"
             salaryMin:
               type: integer
+              nullable: true
             salaryMax:
               type: integer
+              nullable: true
             jobType:
               type: integer
+              nullable: true
             addressRegion:
               type: string
+              nullable: true
             addressDetail:
               type: string
+              nullable: true
             manageResp:
               type: string
+              nullable: true
             needEmp:
               type: string
+              nullable: true
             remoteWork:
               type: object
               nullable: true
@@ -538,26 +576,34 @@ components:
               properties:
                 type:
                   type: integer
+                  nullable: true
                 description:
                   type: string
+                  nullable: true
         industry:
           type: string
+          nullable: true
         employees:
           type: string
+          nullable: true
         custNo:
           type: string
+          nullable: true
 
     CodeDescription:
       type: object
       properties:
         code:
           type: string
+          nullable: true
         description:
           type: string
+          nullable: true
 
     ErrorResponse:
       type: object
       properties:
         message:
           type: string
+          nullable: true
       additionalProperties: true

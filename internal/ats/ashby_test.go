@@ -99,3 +99,10 @@ func TestAshbyDetailCompanyFallsBackToSlug(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, ashby.MockNonRosterBoard, d.Company, "non-roster slug should be used as company name")
 }
+
+// TestAshbyPostedAtNull guards a present-but-explicitly-null publishedAt:
+// NilDateTime's zero Value must not be formatted as a fake date.
+func TestAshbyPostedAtNull(t *testing.T) {
+	assert.Empty(t, ashbyPostedAt(ashby.NilDateTime{Null: true}))
+	assert.Equal(t, "2026-05-01", ashbyPostedAt(ashby.NewNilDateTime(time.Date(2026, 5, 1, 9, 0, 0, 0, time.UTC))))
+}

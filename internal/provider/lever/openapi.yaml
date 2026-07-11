@@ -190,6 +190,7 @@ components:
           description: Unique posting id.
         text:
           type: string
+          nullable: true
           description: Posting title.
         categories:
           $ref: "#/components/schemas/PostingCategories"
@@ -202,11 +203,13 @@ components:
         createdAt:
           type: integer
           format: int64
+          nullable: true
           description: >
             Creation timestamp in epoch milliseconds. Returned by the live
             API; missing from the official field table.
         workplaceType:
           type: string
+          nullable: true
           description: >
             Primary workplace environment. Not filterable. The official
             docs list `unspecified`, `on-site`, `remote`, and `hybrid`,
@@ -216,21 +219,27 @@ components:
             page.
         opening:
           type: string
+          nullable: true
           description: Description opening (styled HTML).
         openingPlain:
           type: string
+          nullable: true
           description: Description opening (plaintext).
         description:
           type: string
+          nullable: true
           description: Combined opening and body (styled HTML).
         descriptionPlain:
           type: string
+          nullable: true
           description: Combined opening and body (plaintext).
         descriptionBody:
           type: string
+          nullable: true
           description: Body without opening (styled HTML).
         descriptionBodyPlain:
           type: string
+          nullable: true
           description: Body without opening (plaintext).
         lists:
           type: array
@@ -239,23 +248,29 @@ components:
             $ref: "#/components/schemas/PostingListEntry"
         additional:
           type: string
+          nullable: true
           description: Optional closing content (styled HTML); may be empty.
         additionalPlain:
           type: string
+          nullable: true
           description: Optional closing content (plaintext); may be empty.
         hostedUrl:
           type: string
+          nullable: true
           description: Lever-hosted posting page URL.
         applyUrl:
           type: string
+          nullable: true
           description: Lever-hosted application form URL.
         salaryRange:
           $ref: "#/components/schemas/SalaryRange"
         salaryDescription:
           type: string
+          nullable: true
           description: Optional salary range description (styled HTML).
         salaryDescriptionPlain:
           type: string
+          nullable: true
           description: Optional salary range description (plaintext).
 
     PostingCategories:
@@ -266,12 +281,16 @@ components:
       properties:
         location:
           type: string
+          nullable: true
         commitment:
           type: string
+          nullable: true
         team:
           type: string
+          nullable: true
         department:
           type: string
+          nullable: true
         allLocations:
           type: array
           items:
@@ -283,9 +302,11 @@ components:
       properties:
         text:
           type: string
+          nullable: true
           description: List section name, e.g. "Qualifications".
         content:
           type: string
+          nullable: true
           description: Unstyled HTML of the list elements.
 
     SalaryRange:
@@ -293,12 +314,16 @@ components:
       properties:
         currency:
           type: string
+          nullable: true
         interval:
           type: string
+          nullable: true
         min:
           type: number
+          nullable: true
         max:
           type: number
+          nullable: true
 
     ErrorResponse:
       type: object
@@ -306,9 +331,11 @@ components:
       properties:
         ok:
           type: boolean
+          nullable: true
           description: Always false on errors.
         error:
           type: string
+          nullable: true
       description: >
         Observed error body, e.g. `{"ok": false, "error": "Document not
         found"}` with a 404 for an unknown site or posting id.

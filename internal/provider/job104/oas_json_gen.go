@@ -262,15 +262,15 @@ func (s *JobDetail) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("industry")
-		e.Str(s.Industry)
+		s.Industry.Encode(e)
 	}
 	{
 		e.FieldStart("employees")
-		e.Str(s.Employees)
+		s.Employees.Encode(e)
 	}
 	{
 		e.FieldStart("custNo")
-		e.Str(s.CustNo)
+		s.CustNo.Encode(e)
 	}
 }
 
@@ -347,9 +347,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "industry":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Str()
-				s.Industry = string(v)
-				if err != nil {
+				if err := s.Industry.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -359,9 +357,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "employees":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				v, err := d.Str()
-				s.Employees = string(v)
-				if err != nil {
+				if err := s.Employees.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -371,9 +367,7 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 		case "custNo":
 			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				v, err := d.Str()
-				s.CustNo = string(v)
-				if err != nil {
+				if err := s.CustNo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -682,27 +676,27 @@ func (s *JobDetailHeader) Encode(e *jx.Encoder) {
 func (s *JobDetailHeader) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("jobName")
-		e.Str(s.JobName)
+		s.JobName.Encode(e)
 	}
 	{
 		e.FieldStart("custName")
-		e.Str(s.CustName)
+		s.CustName.Encode(e)
 	}
 	{
 		e.FieldStart("custUrl")
-		e.Str(s.CustUrl)
+		s.CustUrl.Encode(e)
 	}
 	{
 		e.FieldStart("appearDate")
-		e.Str(s.AppearDate)
+		s.AppearDate.Encode(e)
 	}
 	{
 		e.FieldStart("isSaved")
-		e.Bool(s.IsSaved)
+		s.IsSaved.Encode(e)
 	}
 	{
 		e.FieldStart("isApplied")
-		e.Bool(s.IsApplied)
+		s.IsApplied.Encode(e)
 	}
 }
 
@@ -727,9 +721,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "jobName":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.JobName = string(v)
-				if err != nil {
+				if err := s.JobName.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -739,9 +731,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "custName":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.CustName = string(v)
-				if err != nil {
+				if err := s.CustName.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -751,9 +741,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "custUrl":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.CustUrl = string(v)
-				if err != nil {
+				if err := s.CustUrl.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -763,9 +751,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "appearDate":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Str()
-				s.AppearDate = string(v)
-				if err != nil {
+				if err := s.AppearDate.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -775,9 +761,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "isSaved":
 			requiredBitSet[0] |= 1 << 4
 			if err := func() error {
-				v, err := d.Bool()
-				s.IsSaved = bool(v)
-				if err != nil {
+				if err := s.IsSaved.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -787,9 +771,7 @@ func (s *JobDetailHeader) Decode(d *jx.Decoder) error {
 		case "isApplied":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Bool()
-				s.IsApplied = bool(v)
-				if err != nil {
+				if err := s.IsApplied.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1344,19 +1326,19 @@ func (s *JobSummary) Encode(e *jx.Encoder) {
 func (s *JobSummary) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("jobNo")
-		e.Str(s.JobNo)
+		s.JobNo.Encode(e)
 	}
 	{
 		e.FieldStart("jobName")
-		e.Str(s.JobName)
+		s.JobName.Encode(e)
 	}
 	{
 		e.FieldStart("custName")
-		e.Str(s.CustName)
+		s.CustName.Encode(e)
 	}
 	{
 		e.FieldStart("custNo")
-		e.Str(s.CustNo)
+		s.CustNo.Encode(e)
 	}
 	{
 		e.FieldStart("link")
@@ -1364,39 +1346,39 @@ func (s *JobSummary) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("salaryHigh")
-		e.Int(s.SalaryHigh)
+		s.SalaryHigh.Encode(e)
 	}
 	{
 		e.FieldStart("salaryLow")
-		e.Int(s.SalaryLow)
+		s.SalaryLow.Encode(e)
 	}
 	{
 		e.FieldStart("s10")
-		e.Int(s.S10)
+		s.S10.Encode(e)
 	}
 	{
 		e.FieldStart("jobAddrNoDesc")
-		e.Str(s.JobAddrNoDesc)
+		s.JobAddrNoDesc.Encode(e)
 	}
 	{
 		e.FieldStart("appearDate")
-		e.Str(s.AppearDate)
+		s.AppearDate.Encode(e)
 	}
 	{
 		e.FieldStart("applyCnt")
-		e.Int(s.ApplyCnt)
+		s.ApplyCnt.Encode(e)
 	}
 	{
 		e.FieldStart("remoteWorkType")
-		e.Int(s.RemoteWorkType)
+		s.RemoteWorkType.Encode(e)
 	}
 	{
 		e.FieldStart("jobRo")
-		e.Int(s.JobRo)
+		s.JobRo.Encode(e)
 	}
 	{
 		e.FieldStart("period")
-		e.Int(s.Period)
+		s.Period.Encode(e)
 	}
 }
 
@@ -1429,9 +1411,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "jobNo":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.JobNo = string(v)
-				if err != nil {
+				if err := s.JobNo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1441,9 +1421,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "jobName":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.JobName = string(v)
-				if err != nil {
+				if err := s.JobName.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1453,9 +1431,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "custName":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Str()
-				s.CustName = string(v)
-				if err != nil {
+				if err := s.CustName.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1465,9 +1441,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "custNo":
 			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				v, err := d.Str()
-				s.CustNo = string(v)
-				if err != nil {
+				if err := s.CustNo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1487,9 +1461,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "salaryHigh":
 			requiredBitSet[0] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.SalaryHigh = int(v)
-				if err != nil {
+				if err := s.SalaryHigh.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1499,9 +1471,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "salaryLow":
 			requiredBitSet[0] |= 1 << 6
 			if err := func() error {
-				v, err := d.Int()
-				s.SalaryLow = int(v)
-				if err != nil {
+				if err := s.SalaryLow.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1511,9 +1481,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "s10":
 			requiredBitSet[0] |= 1 << 7
 			if err := func() error {
-				v, err := d.Int()
-				s.S10 = int(v)
-				if err != nil {
+				if err := s.S10.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1523,9 +1491,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "jobAddrNoDesc":
 			requiredBitSet[1] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.JobAddrNoDesc = string(v)
-				if err != nil {
+				if err := s.JobAddrNoDesc.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1535,9 +1501,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "appearDate":
 			requiredBitSet[1] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.AppearDate = string(v)
-				if err != nil {
+				if err := s.AppearDate.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1547,9 +1511,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "applyCnt":
 			requiredBitSet[1] |= 1 << 2
 			if err := func() error {
-				v, err := d.Int()
-				s.ApplyCnt = int(v)
-				if err != nil {
+				if err := s.ApplyCnt.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1559,9 +1521,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "remoteWorkType":
 			requiredBitSet[1] |= 1 << 3
 			if err := func() error {
-				v, err := d.Int()
-				s.RemoteWorkType = int(v)
-				if err != nil {
+				if err := s.RemoteWorkType.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1571,9 +1531,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "jobRo":
 			requiredBitSet[1] |= 1 << 4
 			if err := func() error {
-				v, err := d.Int()
-				s.JobRo = int(v)
-				if err != nil {
+				if err := s.JobRo.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1583,9 +1541,7 @@ func (s *JobSummary) Decode(d *jx.Decoder) error {
 		case "period":
 			requiredBitSet[1] |= 1 << 5
 			if err := func() error {
-				v, err := d.Int()
-				s.Period = int(v)
-				if err != nil {
+				if err := s.Period.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1664,7 +1620,7 @@ func (s *JobSummaryLink) encodeFields(e *jx.Encoder) {
 	}
 	{
 		e.FieldStart("cust")
-		e.Str(s.Cust)
+		s.Cust.Encode(e)
 	}
 }
 
@@ -1697,9 +1653,7 @@ func (s *JobSummaryLink) Decode(d *jx.Decoder) error {
 		case "cust":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.Cust = string(v)
-				if err != nil {
+				if err := s.Cust.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -1988,15 +1942,15 @@ func (s *JobsResponseMetadataPagination) Encode(e *jx.Encoder) {
 func (s *JobsResponseMetadataPagination) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("currentPage")
-		e.Int(s.CurrentPage)
+		s.CurrentPage.Encode(e)
 	}
 	{
 		e.FieldStart("lastPage")
-		e.Int(s.LastPage)
+		s.LastPage.Encode(e)
 	}
 	{
 		e.FieldStart("total")
-		e.Int(s.Total)
+		s.Total.Encode(e)
 	}
 }
 
@@ -2018,9 +1972,7 @@ func (s *JobsResponseMetadataPagination) Decode(d *jx.Decoder) error {
 		case "currentPage":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Int()
-				s.CurrentPage = int(v)
-				if err != nil {
+				if err := s.CurrentPage.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2030,9 +1982,7 @@ func (s *JobsResponseMetadataPagination) Decode(d *jx.Decoder) error {
 		case "lastPage":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Int()
-				s.LastPage = int(v)
-				if err != nil {
+				if err := s.LastPage.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2042,9 +1992,7 @@ func (s *JobsResponseMetadataPagination) Decode(d *jx.Decoder) error {
 		case "total":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				v, err := d.Int()
-				s.Total = int(v)
-				if err != nil {
+				if err := s.Total.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2107,20 +2055,77 @@ func (s *JobsResponseMetadataPagination) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes bool as json.
+func (o NilBool) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Bool(bool(o.Value))
+}
+
+// Decode decodes bool from json.
+func (o *NilBool) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilBool to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v bool
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Bool()
+	if err != nil {
+		return err
+	}
+	o.Value = bool(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilBool) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilBool) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes int as json.
-func (o OptInt) Encode(e *jx.Encoder) {
-	if !o.Set {
+func (o NilInt) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
 		return
 	}
 	e.Int(int(o.Value))
 }
 
 // Decode decodes int from json.
-func (o *OptInt) Decode(d *jx.Decoder) error {
+func (o *NilInt) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptInt to nil")
+		return errors.New("invalid: unable to decode NilInt to nil")
 	}
-	o.Set = true
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v int
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
 	v, err := d.Int()
 	if err != nil {
 		return err
@@ -2130,14 +2135,111 @@ func (o *OptInt) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptInt) MarshalJSON() ([]byte, error) {
+func (s NilInt) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptInt) UnmarshalJSON(data []byte) error {
+func (s *NilInt) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes string as json.
+func (o NilString) Encode(e *jx.Encoder) {
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes string from json.
+func (o *NilString) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode NilString to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v string
+		o.Value = v
+		o.Null = true
+		return nil
+	}
+	o.Null = false
+	v, err := d.Str()
+	if err != nil {
+		return err
+	}
+	o.Value = string(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s NilString) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *NilString) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int as json.
+func (o OptNilInt) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Int(int(o.Value))
+}
+
+// Decode decodes int from json.
+func (o *OptNilInt) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilInt to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v int
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	o.Value = int(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilInt) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilInt) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2192,19 +2294,35 @@ func (s *OptNilJobDetailJobDetailRemoteWork) UnmarshalJSON(data []byte) error {
 }
 
 // Encode encodes string as json.
-func (o OptString) Encode(e *jx.Encoder) {
+func (o OptNilString) Encode(e *jx.Encoder) {
 	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
 		return
 	}
 	e.Str(string(o.Value))
 }
 
 // Decode decodes string from json.
-func (o *OptString) Decode(d *jx.Decoder) error {
+func (o *OptNilString) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptString to nil")
+		return errors.New("invalid: unable to decode OptNilString to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v string
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
 	}
 	o.Set = true
+	o.Null = false
 	v, err := d.Str()
 	if err != nil {
 		return err
@@ -2214,14 +2332,14 @@ func (o *OptString) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptString) MarshalJSON() ([]byte, error) {
+func (s OptNilString) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptString) UnmarshalJSON(data []byte) error {
+func (s *OptNilString) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

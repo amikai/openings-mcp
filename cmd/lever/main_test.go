@@ -13,14 +13,14 @@ import (
 func TestToPostingJSON(t *testing.T) {
 	p := lever.Posting{
 		ID:               "id-1",
-		Text:             "Backend Engineer",
-		CreatedAt:        lever.NewOptInt64(1553186035299),
-		HostedUrl:        lever.NewOptString("https://jobs.lever.co/leverdemo/id-1"),
-		DescriptionPlain: lever.NewOptString("plain description"),
+		Text:             lever.NewNilString("Backend Engineer"),
+		CreatedAt:        lever.NewOptNilInt64(1553186035299),
+		HostedUrl:        lever.NewOptNilString("https://jobs.lever.co/leverdemo/id-1"),
+		DescriptionPlain: lever.NewOptNilString("plain description"),
 		Categories: lever.NewOptPostingCategories(lever.PostingCategories{
-			Location:     lever.NewOptString("Taipei"),
-			Team:         lever.NewOptString("Engineering"),
-			Commitment:   lever.NewOptString("Full-time"),
+			Location:     lever.NewOptNilString("Taipei"),
+			Team:         lever.NewOptNilString("Engineering"),
+			Commitment:   lever.NewOptNilString("Full-time"),
 			AllLocations: []string{"Taipei", "Tokyo"},
 		}),
 	}
@@ -42,9 +42,9 @@ func TestToPostingJSON(t *testing.T) {
 func TestToPostingJSONSingleLocationFallback(t *testing.T) {
 	p := lever.Posting{
 		ID:   "id-2",
-		Text: "Designer",
+		Text: lever.NewNilString("Designer"),
 		Categories: lever.NewOptPostingCategories(lever.PostingCategories{
-			Location: lever.NewOptString("Remote"),
+			Location: lever.NewOptNilString("Remote"),
 		}),
 	}
 
@@ -57,7 +57,7 @@ func TestToPostingJSONSingleLocationFallback(t *testing.T) {
 }
 
 func TestToPostingJSONNoCategories(t *testing.T) {
-	p := lever.Posting{ID: "id-3", Text: "PM"}
+	p := lever.Posting{ID: "id-3", Text: lever.NewNilString("PM")}
 
 	want := postingJSON{ID: "id-3", Title: "PM"}
 	assert.Equal(t, want, toPostingJSON(p))

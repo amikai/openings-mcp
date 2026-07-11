@@ -190,9 +190,10 @@ func greenhouseDescription(content string) string {
 	return text
 }
 
-func greenhousePostedAt(t greenhouse.OptDateTime) string {
-	if !t.Set {
+func greenhousePostedAt(t greenhouse.OptNilDateTime) string {
+	v, ok := t.Get()
+	if !ok {
 		return ""
 	}
-	return isoDate(t.Value)
+	return isoDate(v)
 }

@@ -96,18 +96,18 @@ func TestBuildSearchRequestZeroPagesLeftUnset(t *testing.T) {
 
 func TestWriteReportIncludesEveryJobDetail(t *testing.T) {
 	search := &cake.JobSearchResponse{
-		TotalEntries: 2,
-		TotalPages:   1,
-		PerPage:      20,
-		CurrentPage:  1,
+		TotalEntries: cake.NewNilInt(2),
+		TotalPages:   cake.NewNilInt(1),
+		PerPage:      cake.NewNilInt(20),
+		CurrentPage:  cake.NewNilInt(1),
 		Data: []cake.JobSearchItem{
-			{Path: "go-engineer", Title: "Go Engineer", Description: "Go preview"},
-			{Path: "backend-engineer", Title: "Backend Engineer", Description: "Backend preview"},
+			{Path: "go-engineer", Title: cake.NewNilString("Go Engineer"), Description: cake.NewNilString("Go preview")},
+			{Path: "backend-engineer", Title: cake.NewNilString("Backend Engineer"), Description: cake.NewNilString("Backend preview")},
 		},
 	}
 	details := map[string]*cake.JobDetail{
-		"go-engineer":      {Path: "go-engineer", Title: "Go Engineer", Description: "<p>Build Go services</p>", Requirements: "<p>Go</p>"},
-		"backend-engineer": {Path: "backend-engineer", Title: "Backend Engineer", Description: "<p>Build APIs</p>", Requirements: ""},
+		"go-engineer":      {Path: cake.NewNilString("go-engineer"), Title: cake.NewNilString("Go Engineer"), Description: cake.NewNilString("<p>Build Go services</p>"), Requirements: cake.NewNilString("<p>Go</p>")},
+		"backend-engineer": {Path: cake.NewNilString("backend-engineer"), Title: cake.NewNilString("Backend Engineer"), Description: cake.NewNilString("<p>Build APIs</p>"), Requirements: cake.NewNilString("")},
 	}
 
 	var buf bytes.Buffer

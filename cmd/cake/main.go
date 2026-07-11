@@ -248,10 +248,10 @@ func usageWithChoices(base string, choices []string) string {
 func writeReport(w io.Writer, keyword string, search *cake.JobSearchResponse, details map[string]*cake.JobDetail) {
 	fmt.Fprintf(w, "Cake Jobs Report\n")
 	fmt.Fprintf(w, "Keyword: %s\n", keyword)
-	fmt.Fprintf(w, "Found %d jobs (page %d/%d); showing %d\n\n", search.TotalEntries, search.CurrentPage, search.TotalPages, len(search.Data))
+	fmt.Fprintf(w, "Found %d jobs (page %d/%d); showing %d\n\n", search.TotalEntries.Value, search.CurrentPage.Value, search.TotalPages.Value, len(search.Data))
 
 	for i, job := range search.Data {
-		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.Path, job.Title)
+		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.Path, job.Title.Value)
 		if detail := details[job.Path]; detail != nil {
 			writeDetail(w, detail)
 		}
@@ -260,17 +260,17 @@ func writeReport(w io.Writer, keyword string, search *cake.JobSearchResponse, de
 }
 
 func writeDetail(w io.Writer, detail *cake.JobDetail) {
-	fmt.Fprintf(w, "URL: https://www.cake.me/companies/%s/jobs/%s\n", detail.PagePath, detail.Path)
-	description, err := html2text.FromString(detail.Description, html2text.Options{})
+	fmt.Fprintf(w, "URL: https://www.cake.me/companies/%s/jobs/%s\n", detail.PagePath.Value, detail.Path.Value)
+	description, err := html2text.FromString(detail.Description.Value, html2text.Options{})
 	if err != nil {
-		description = detail.Description
+		description = detail.Description.Value
 	}
 	if description != "" {
 		fmt.Fprintf(w, "Description:\n%s\n", description)
 	}
-	requirements, err := html2text.FromString(detail.Requirements, html2text.Options{})
+	requirements, err := html2text.FromString(detail.Requirements.Value, html2text.Options{})
 	if err != nil {
-		requirements = detail.Requirements
+		requirements = detail.Requirements.Value
 	}
 	if requirements != "" {
 		fmt.Fprintf(w, "Requirements: %s\n", requirements)

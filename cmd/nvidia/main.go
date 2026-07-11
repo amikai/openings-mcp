@@ -78,7 +78,7 @@ func main() {
 	}
 
 	fmt.Printf("NVIDIA Jobs Report\n")
-	fmt.Printf("Found %d jobs; showing %d\n\n", search.Total, len(search.JobPostings))
+	fmt.Printf("Found %d jobs; showing %d\n\n", search.Total.Value, len(search.JobPostings))
 
 	for i, job := range search.JobPostings {
 		fmt.Printf("%d. %s\n", i+1, job.Title.Value)
@@ -119,9 +119,9 @@ func main() {
 			fmt.Printf("URL: %s\n", detail.JobPostingInfo.ExternalUrl.Value)
 		}
 		printLocations(detail.JobPostingInfo)
-		description, err := html2text.FromString(detail.JobPostingInfo.JobDescription, html2text.Options{})
+		description, err := html2text.FromString(detail.JobPostingInfo.JobDescription.Value, html2text.Options{})
 		if err != nil {
-			description = detail.JobPostingInfo.JobDescription
+			description = detail.JobPostingInfo.JobDescription.Value
 		}
 		if description != "" {
 			fmt.Printf("Description:\n%s\n", description)

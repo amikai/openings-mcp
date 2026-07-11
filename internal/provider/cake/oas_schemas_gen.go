@@ -16,8 +16,8 @@ func (s *ErrorResponseStatusCode) Error() string {
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
 	ErrorCode OptNilString `json:"error_code"`
-	Msg       OptString    `json:"msg"`
-	Error     OptString    `json:"error"`
+	Msg       OptNilString `json:"msg"`
+	Error     OptNilString `json:"error"`
 	// Error detail. Often null, or an object for validation errors.
 	Detail          OptNilErrorResponseDetail `json:"detail"`
 	AdditionalProps ErrorResponseAdditional
@@ -29,12 +29,12 @@ func (s *ErrorResponse) GetErrorCode() OptNilString {
 }
 
 // GetMsg returns the value of Msg.
-func (s *ErrorResponse) GetMsg() OptString {
+func (s *ErrorResponse) GetMsg() OptNilString {
 	return s.Msg
 }
 
 // GetError returns the value of Error.
-func (s *ErrorResponse) GetError() OptString {
+func (s *ErrorResponse) GetError() OptNilString {
 	return s.Error
 }
 
@@ -54,12 +54,12 @@ func (s *ErrorResponse) SetErrorCode(val OptNilString) {
 }
 
 // SetMsg sets the value of Msg.
-func (s *ErrorResponse) SetMsg(val OptString) {
+func (s *ErrorResponse) SetMsg(val OptNilString) {
 	s.Msg = val
 }
 
 // SetError sets the value of Error.
-func (s *ErrorResponse) SetError(val OptString) {
+func (s *ErrorResponse) SetError(val OptNilString) {
 	s.Error = val
 }
 
@@ -126,75 +126,75 @@ func (s *ErrorResponseStatusCode) SetResponse(val ErrorResponse) {
 // retrieve the full job description content.
 // Ref: #/components/schemas/JobDetail
 type JobDetail struct {
-	ID   int    `json:"id"`
-	Path string `json:"path"`
+	ID   NilInt    `json:"id"`
+	Path NilString `json:"path"`
 	// Company/page slug associated with the job. Together with `path`, this forms the public website URL:
 	// `https://www.cake.me/companies/{page_path}/jobs/{path}`.
-	PagePath string `json:"page_path"`
-	Title    string `json:"title"`
+	PagePath NilString `json:"page_path"`
+	Title    NilString `json:"title"`
 	// Full job description as an HTML string.
-	Description string `json:"description"`
+	Description NilString `json:"description"`
 	// Job requirements as an HTML string. May be an empty string.
-	Requirements string `json:"requirements"`
+	Requirements NilString `json:"requirements"`
 }
 
 // GetID returns the value of ID.
-func (s *JobDetail) GetID() int {
+func (s *JobDetail) GetID() NilInt {
 	return s.ID
 }
 
 // GetPath returns the value of Path.
-func (s *JobDetail) GetPath() string {
+func (s *JobDetail) GetPath() NilString {
 	return s.Path
 }
 
 // GetPagePath returns the value of PagePath.
-func (s *JobDetail) GetPagePath() string {
+func (s *JobDetail) GetPagePath() NilString {
 	return s.PagePath
 }
 
 // GetTitle returns the value of Title.
-func (s *JobDetail) GetTitle() string {
+func (s *JobDetail) GetTitle() NilString {
 	return s.Title
 }
 
 // GetDescription returns the value of Description.
-func (s *JobDetail) GetDescription() string {
+func (s *JobDetail) GetDescription() NilString {
 	return s.Description
 }
 
 // GetRequirements returns the value of Requirements.
-func (s *JobDetail) GetRequirements() string {
+func (s *JobDetail) GetRequirements() NilString {
 	return s.Requirements
 }
 
 // SetID sets the value of ID.
-func (s *JobDetail) SetID(val int) {
+func (s *JobDetail) SetID(val NilInt) {
 	s.ID = val
 }
 
 // SetPath sets the value of Path.
-func (s *JobDetail) SetPath(val string) {
+func (s *JobDetail) SetPath(val NilString) {
 	s.Path = val
 }
 
 // SetPagePath sets the value of PagePath.
-func (s *JobDetail) SetPagePath(val string) {
+func (s *JobDetail) SetPagePath(val NilString) {
 	s.PagePath = val
 }
 
 // SetTitle sets the value of Title.
-func (s *JobDetail) SetTitle(val string) {
+func (s *JobDetail) SetTitle(val NilString) {
 	s.Title = val
 }
 
 // SetDescription sets the value of Description.
-func (s *JobDetail) SetDescription(val string) {
+func (s *JobDetail) SetDescription(val NilString) {
 	s.Description = val
 }
 
 // SetRequirements sets the value of Requirements.
-func (s *JobDetail) SetRequirements(val string) {
+func (s *JobDetail) SetRequirements(val NilString) {
 	s.Requirements = val
 }
 
@@ -1147,10 +1147,10 @@ func (s *JobSearchFiltersYearOfSeniorityItem) UnmarshalText(data []byte) error {
 // Ref: #/components/schemas/JobSearchItem
 type JobSearchItem struct {
 	// Path used to fetch full job detail.
-	Path  string `json:"path"`
-	Title string `json:"title"`
+	Path  string    `json:"path"`
+	Title NilString `json:"title"`
 	// Plain-text search-result description or preview.
-	Description string           `json:"description"`
+	Description NilString        `json:"description"`
 	Page        OptJobSearchPage `json:"page"`
 }
 
@@ -1160,12 +1160,12 @@ func (s *JobSearchItem) GetPath() string {
 }
 
 // GetTitle returns the value of Title.
-func (s *JobSearchItem) GetTitle() string {
+func (s *JobSearchItem) GetTitle() NilString {
 	return s.Title
 }
 
 // GetDescription returns the value of Description.
-func (s *JobSearchItem) GetDescription() string {
+func (s *JobSearchItem) GetDescription() NilString {
 	return s.Description
 }
 
@@ -1180,12 +1180,12 @@ func (s *JobSearchItem) SetPath(val string) {
 }
 
 // SetTitle sets the value of Title.
-func (s *JobSearchItem) SetTitle(val string) {
+func (s *JobSearchItem) SetTitle(val NilString) {
 	s.Title = val
 }
 
 // SetDescription sets the value of Description.
-func (s *JobSearchItem) SetDescription(val string) {
+func (s *JobSearchItem) SetDescription(val NilString) {
 	s.Description = val
 }
 
@@ -1198,16 +1198,16 @@ func (s *JobSearchItem) SetPage(val OptJobSearchPage) {
 // Ref: #/components/schemas/JobSearchPage
 type JobSearchPage struct {
 	// Company/page slug associated with the job.
-	Path string `json:"path"`
+	Path NilString `json:"path"`
 }
 
 // GetPath returns the value of Path.
-func (s *JobSearchPage) GetPath() string {
+func (s *JobSearchPage) GetPath() NilString {
 	return s.Path
 }
 
 // SetPath sets the value of Path.
-func (s *JobSearchPage) SetPath(val string) {
+func (s *JobSearchPage) SetPath(val NilString) {
 	s.Path = val
 }
 
@@ -1323,31 +1323,31 @@ func (s *JobSearchRequestSortBy) UnmarshalText(data []byte) error {
 // `query_id`; they are not required for the minimal search-then-detail workflow.
 // Ref: #/components/schemas/JobSearchResponse
 type JobSearchResponse struct {
-	TotalEntries int `json:"total_entries"`
-	TotalPages   int `json:"total_pages"`
+	TotalEntries NilInt `json:"total_entries"`
+	TotalPages   NilInt `json:"total_pages"`
 	// Page size. Echoes the request `per_page`; defaults to 20.
-	PerPage     int             `json:"per_page"`
-	CurrentPage int             `json:"current_page"`
+	PerPage     NilInt          `json:"per_page"`
+	CurrentPage NilInt          `json:"current_page"`
 	Data        []JobSearchItem `json:"data"`
 }
 
 // GetTotalEntries returns the value of TotalEntries.
-func (s *JobSearchResponse) GetTotalEntries() int {
+func (s *JobSearchResponse) GetTotalEntries() NilInt {
 	return s.TotalEntries
 }
 
 // GetTotalPages returns the value of TotalPages.
-func (s *JobSearchResponse) GetTotalPages() int {
+func (s *JobSearchResponse) GetTotalPages() NilInt {
 	return s.TotalPages
 }
 
 // GetPerPage returns the value of PerPage.
-func (s *JobSearchResponse) GetPerPage() int {
+func (s *JobSearchResponse) GetPerPage() NilInt {
 	return s.PerPage
 }
 
 // GetCurrentPage returns the value of CurrentPage.
-func (s *JobSearchResponse) GetCurrentPage() int {
+func (s *JobSearchResponse) GetCurrentPage() NilInt {
 	return s.CurrentPage
 }
 
@@ -1357,28 +1357,118 @@ func (s *JobSearchResponse) GetData() []JobSearchItem {
 }
 
 // SetTotalEntries sets the value of TotalEntries.
-func (s *JobSearchResponse) SetTotalEntries(val int) {
+func (s *JobSearchResponse) SetTotalEntries(val NilInt) {
 	s.TotalEntries = val
 }
 
 // SetTotalPages sets the value of TotalPages.
-func (s *JobSearchResponse) SetTotalPages(val int) {
+func (s *JobSearchResponse) SetTotalPages(val NilInt) {
 	s.TotalPages = val
 }
 
 // SetPerPage sets the value of PerPage.
-func (s *JobSearchResponse) SetPerPage(val int) {
+func (s *JobSearchResponse) SetPerPage(val NilInt) {
 	s.PerPage = val
 }
 
 // SetCurrentPage sets the value of CurrentPage.
-func (s *JobSearchResponse) SetCurrentPage(val int) {
+func (s *JobSearchResponse) SetCurrentPage(val NilInt) {
 	s.CurrentPage = val
 }
 
 // SetData sets the value of Data.
 func (s *JobSearchResponse) SetData(val []JobSearchItem) {
 	s.Data = val
+}
+
+// NewNilInt returns new NilInt with value set to v.
+func NewNilInt(v int) NilInt {
+	return NilInt{
+		Value: v,
+	}
+}
+
+// NilInt is nullable int.
+type NilInt struct {
+	Value int
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilInt) SetTo(v int) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilInt) SetToNull() {
+	o.Null = true
+	var v int
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilInt) Get() (v int, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptInt returns new OptInt with value set to v.
@@ -1787,52 +1877,6 @@ func (o OptNilString) Get() (v string, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilString) Or(d string) string {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptString returns new OptString with value set to v.
-func NewOptString(v string) OptString {
-	return OptString{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptString is optional string.
-type OptString struct {
-	Value string
-	Set   bool
-}
-
-// IsSet returns true if OptString was set.
-func (o OptString) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptString) Reset() {
-	var v string
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptString) SetTo(v string) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptString) Get() (v string, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}

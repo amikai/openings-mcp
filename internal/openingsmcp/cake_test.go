@@ -641,13 +641,13 @@ func TestCakeGetJobDetailE2E(t *testing.T) {
 
 func TestCakeHTTPToMCPResponse(t *testing.T) {
 	in := cake.JobSearchResponse{
-		TotalEntries: 2,
-		TotalPages:   1,
-		PerPage:      20,
-		CurrentPage:  1,
+		TotalEntries: cake.NewNilInt(2),
+		TotalPages:   cake.NewNilInt(1),
+		PerPage:      cake.NewNilInt(20),
+		CurrentPage:  cake.NewNilInt(1),
 		Data: []cake.JobSearchItem{
-			{Path: "p1", Title: "t1", Description: "d1", Page: cake.NewOptJobSearchPage(cake.JobSearchPage{Path: "pp1"})},
-			{Path: "p2", Title: "t2", Description: "d2"},
+			{Path: "p1", Title: cake.NewNilString("t1"), Description: cake.NewNilString("d1"), Page: cake.NewOptJobSearchPage(cake.JobSearchPage{Path: cake.NewNilString("pp1")})},
+			{Path: "p2", Title: cake.NewNilString("t2"), Description: cake.NewNilString("d2")},
 		},
 	}
 	got := cakeHTTPToMCPResponse(&in)
@@ -667,12 +667,12 @@ func TestCakeHTTPToMCPResponse(t *testing.T) {
 
 func TestCakeHTTPToMCPDetail(t *testing.T) {
 	in := cake.JobDetail{
-		ID:           7,
-		Path:         "p",
-		PagePath:     "pp",
-		Title:        "t",
-		Description:  "<p>d</p>",
-		Requirements: "<p>r</p>",
+		ID:           cake.NewNilInt(7),
+		Path:         cake.NewNilString("p"),
+		PagePath:     cake.NewNilString("pp"),
+		Title:        cake.NewNilString("t"),
+		Description:  cake.NewNilString("<p>d</p>"),
+		Requirements: cake.NewNilString("<p>r</p>"),
 	}
 	got := cakeHTTPToMCPDetail(&in)
 

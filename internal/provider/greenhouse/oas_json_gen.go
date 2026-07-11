@@ -1367,38 +1367,9 @@ func (s *JobDetailMetadataItem) Encode(e *jx.Encoder) {
 
 // encodeFields encodes fields.
 func (s *JobDetailMetadataItem) encodeFields(e *jx.Encoder) {
-	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
-	}
-	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
-		if s.ValueType.Set {
-			e.FieldStart("value_type")
-			s.ValueType.Encode(e)
-		}
-	}
-	{
-		if s.Value.Set {
-			e.FieldStart("value")
-			s.Value.Encode(e)
-		}
-	}
 }
 
-var jsonFieldsNameOfJobDetailMetadataItem = [4]string{
-	0: "id",
-	1: "name",
-	2: "value_type",
-	3: "value",
-}
+var jsonFieldsNameOfJobDetailMetadataItem = [0]string{}
 
 // Decode decodes JobDetailMetadataItem from json.
 func (s *JobDetailMetadataItem) Decode(d *jx.Decoder) error {
@@ -1408,50 +1379,9 @@ func (s *JobDetailMetadataItem) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "id":
-			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
-			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
-		case "value_type":
-			if err := func() error {
-				s.ValueType.Reset()
-				if err := s.ValueType.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"value_type\"")
-			}
-		case "value":
-			if err := func() error {
-				s.Value.Reset()
-				if err := s.Value.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"value\"")
-			}
 		default:
 			return d.Skip()
 		}
-		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode JobDetailMetadataItem")
 	}
@@ -2320,41 +2250,6 @@ func (s *OptBool) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes time.Time as json.
-func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
-	if !o.Set {
-		return
-	}
-	format(e, o.Value)
-}
-
-// Decode decodes time.Time from json.
-func (o *OptDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptDateTime to nil")
-	}
-	o.Set = true
-	v, err := format(d)
-	if err != nil {
-		return err
-	}
-	o.Value = v
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptDateTime) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeDateTime)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptDateTime) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeDateTime)
-}
-
 // Encode encodes DemographicQuestionType as json.
 func (o OptDemographicQuestionType) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2423,39 +2318,6 @@ func (s *OptInt) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes JobDetailEducation as json.
-func (o OptJobDetailEducation) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes JobDetailEducation from json.
-func (o *OptJobDetailEducation) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptJobDetailEducation to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptJobDetailEducation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobDetailEducation) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes JobListResponseMeta as json.
 func (o OptJobListResponseMeta) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2485,39 +2347,6 @@ func (s OptJobListResponseMeta) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptJobListResponseMeta) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes JobSummaryEducation as json.
-func (o OptJobSummaryEducation) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	e.Str(string(o.Value))
-}
-
-// Decode decodes JobSummaryEducation from json.
-func (o *OptJobSummaryEducation) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptJobSummaryEducation to nil")
-	}
-	o.Set = true
-	if err := o.Value.Decode(d); err != nil {
-		return err
-	}
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptJobSummaryEducation) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobSummaryEducation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2818,6 +2647,55 @@ func (s *OptNilInt) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes JobDetailEducation as json.
+func (o OptNilJobDetailEducation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes JobDetailEducation from json.
+func (o *OptNilJobDetailEducation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilJobDetailEducation to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v JobDetailEducation
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilJobDetailEducation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilJobDetailEducation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes []JobDetailMetadataItem as json.
 func (o OptNilJobDetailMetadataItemArray) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -2875,6 +2753,55 @@ func (s OptNilJobDetailMetadataItemArray) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNilJobDetailMetadataItemArray) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobSummaryEducation as json.
+func (o OptNilJobSummaryEducation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes JobSummaryEducation from json.
+func (o *OptNilJobSummaryEducation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilJobSummaryEducation to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v JobSummaryEducation
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilJobSummaryEducation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilJobSummaryEducation) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -3139,41 +3066,6 @@ func (s OptString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptString) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode encodes url.URL as json.
-func (o OptURI) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	json.EncodeURI(e, o.Value)
-}
-
-// Decode decodes url.URL from json.
-func (o *OptURI) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptURI to nil")
-	}
-	o.Set = true
-	v, err := json.DecodeURI(d)
-	if err != nil {
-		return err
-	}
-	o.Value = v
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptURI) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptURI) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

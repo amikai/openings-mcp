@@ -220,6 +220,7 @@ components:
       properties:
         total:
           type: integer
+          nullable: true
           description: >
             Total matching job count. Observed capped at 2000 on at least
             one tenant when unfiltered and exact once a filter narrows the
@@ -262,10 +263,12 @@ components:
       properties:
         facetParameter:
           type: string
+          nullable: true
           description: Facet parameter name; present on groups, absent on leaf values.
           example: "jobFamilyGroup"
         descriptor:
           type: string
+          nullable: true
           description: >
             Human-readable label: a value's display name on a leaf, a UI
             section title on a group. Some top-level groups omit it
@@ -277,6 +280,7 @@ components:
           example: "0c40f6bd1d8f10ae43ffaefd46dc7e78"
         count:
           type: integer
+          nullable: true
           description: Live matching job count for this leaf value.
           example: 1778
         values:
@@ -296,6 +300,7 @@ components:
       properties:
         title:
           type: string
+          nullable: true
           example: "Senior Software Engineer, Data Services"
         externalPath:
           type: string
@@ -303,10 +308,12 @@ components:
           example: "/job/US-CA-Santa-Clara/Senior-Software-Engineer--Data-Services_JR2003389"
         locationsText:
           type: string
+          nullable: true
           description: Human-readable location summary, e.g. a city or "N Locations".
           example: "2 Locations"
         postedOn:
           type: string
+          nullable: true
           description: Human-readable relative posting date.
           example: "Posted Today"
         bulletFields:
@@ -331,12 +338,15 @@ components:
       properties:
         title:
           type: string
+          nullable: true
           example: "Senior Software Engineer, Data Services"
         jobDescription:
           type: string
+          nullable: true
           description: Full HTML job description.
         location:
           type: string
+          nullable: true
           example: "US, CA, Santa Clara"
         additionalLocations:
           type: array
@@ -344,15 +354,19 @@ components:
             type: string
         postedOn:
           type: string
+          nullable: true
           example: "Posted Today"
         timeType:
           type: string
+          nullable: true
           example: "Full time"
         jobReqId:
           type: string
+          nullable: true
           example: "JR2003389"
         externalUrl:
           type: string
+          nullable: true
 
     ErrorResponse:
       type: object
@@ -362,10 +376,13 @@ components:
       properties:
         errorCode:
           type: string
+          nullable: true
           example: "HTTP_400"
         httpStatus:
           type: integer
+          nullable: true
           example: 400
         message:
           type: string
+          nullable: true
       additionalProperties: true

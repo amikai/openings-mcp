@@ -119,3 +119,11 @@ func TestLeverDetailCompanyFallsBackToSlug(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "somestartup", d.Company, "non-roster slug should be used as company name")
 }
+
+// TestLeverPostedAtNull guards a present-but-explicitly-null createdAt:
+// OptNilInt64's zero Value (epoch 0) must not be formatted as a fake
+// "1970-01-01" date.
+func TestLeverPostedAtNull(t *testing.T) {
+	assert.Empty(t, leverPostedAt(&lever.Posting{CreatedAt: lever.OptNilInt64{Set: true, Null: true}}))
+	assert.Equal(t, "2026-05-01", leverPostedAt(&lever.Posting{CreatedAt: lever.NewOptNilInt64(time.Date(2026, 5, 1, 9, 0, 0, 0, time.UTC).UnixMilli())}))
+}

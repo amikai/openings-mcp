@@ -41,7 +41,7 @@ func TestFetchJobResultUsesTenantClient(t *testing.T) {
 		"nvidia",
 		"https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite",
 		workday.JobSummary{
-			Title:        workday.NewOptString("Search title"),
+			Title:        workday.NewOptNilString("Search title"),
 			ExternalPath: workday.NewOptString("/job/Israel-Yokneam/Senior-Software-Golang-Kubernetes-Engineer_JR2015916"),
 		},
 	)

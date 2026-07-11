@@ -33,24 +33,24 @@ func (s *AppliedFacets) init() AppliedFacets {
 // Best-effort error body; exact fields vary per tenant, so unknown properties are allowed.
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
-	ErrorCode       OptString `json:"errorCode"`
-	HttpStatus      OptInt    `json:"httpStatus"`
-	Message         OptString `json:"message"`
+	ErrorCode       OptNilString `json:"errorCode"`
+	HttpStatus      OptNilInt    `json:"httpStatus"`
+	Message         OptNilString `json:"message"`
 	AdditionalProps ErrorResponseAdditional
 }
 
 // GetErrorCode returns the value of ErrorCode.
-func (s *ErrorResponse) GetErrorCode() OptString {
+func (s *ErrorResponse) GetErrorCode() OptNilString {
 	return s.ErrorCode
 }
 
 // GetHttpStatus returns the value of HttpStatus.
-func (s *ErrorResponse) GetHttpStatus() OptInt {
+func (s *ErrorResponse) GetHttpStatus() OptNilInt {
 	return s.HttpStatus
 }
 
 // GetMessage returns the value of Message.
-func (s *ErrorResponse) GetMessage() OptString {
+func (s *ErrorResponse) GetMessage() OptNilString {
 	return s.Message
 }
 
@@ -60,17 +60,17 @@ func (s *ErrorResponse) GetAdditionalProps() ErrorResponseAdditional {
 }
 
 // SetErrorCode sets the value of ErrorCode.
-func (s *ErrorResponse) SetErrorCode(val OptString) {
+func (s *ErrorResponse) SetErrorCode(val OptNilString) {
 	s.ErrorCode = val
 }
 
 // SetHttpStatus sets the value of HttpStatus.
-func (s *ErrorResponse) SetHttpStatus(val OptInt) {
+func (s *ErrorResponse) SetHttpStatus(val OptNilInt) {
 	s.HttpStatus = val
 }
 
 // SetMessage sets the value of Message.
-func (s *ErrorResponse) SetMessage(val OptString) {
+func (s *ErrorResponse) SetMessage(val OptNilString) {
 	s.Message = val
 }
 
@@ -124,25 +124,25 @@ func (s *ErrorResponseStatusCode) SetResponse(val ErrorResponse) {
 // Ref: #/components/schemas/FacetNode
 type FacetNode struct {
 	// Facet parameter name; present on groups, absent on leaf values.
-	FacetParameter OptString `json:"facetParameter"`
+	FacetParameter OptNilString `json:"facetParameter"`
 	// Human-readable label: a value's display name on a leaf, a UI section title on a group. Some
 	// top-level groups omit it entirely (observed on a tenant's `locationMainGroup`).
-	Descriptor OptString `json:"descriptor"`
+	Descriptor OptNilString `json:"descriptor"`
 	// Opaque tenant-specific GUID; present on leaf values, used in `appliedFacets`.
 	ID OptString `json:"id"`
 	// Live matching job count for this leaf value.
-	Count OptInt `json:"count"`
+	Count OptNilInt `json:"count"`
 	// Child nodes; present on groups, absent on leaves.
 	Values []FacetNode `json:"values"`
 }
 
 // GetFacetParameter returns the value of FacetParameter.
-func (s *FacetNode) GetFacetParameter() OptString {
+func (s *FacetNode) GetFacetParameter() OptNilString {
 	return s.FacetParameter
 }
 
 // GetDescriptor returns the value of Descriptor.
-func (s *FacetNode) GetDescriptor() OptString {
+func (s *FacetNode) GetDescriptor() OptNilString {
 	return s.Descriptor
 }
 
@@ -152,7 +152,7 @@ func (s *FacetNode) GetID() OptString {
 }
 
 // GetCount returns the value of Count.
-func (s *FacetNode) GetCount() OptInt {
+func (s *FacetNode) GetCount() OptNilInt {
 	return s.Count
 }
 
@@ -162,12 +162,12 @@ func (s *FacetNode) GetValues() []FacetNode {
 }
 
 // SetFacetParameter sets the value of FacetParameter.
-func (s *FacetNode) SetFacetParameter(val OptString) {
+func (s *FacetNode) SetFacetParameter(val OptNilString) {
 	s.FacetParameter = val
 }
 
 // SetDescriptor sets the value of Descriptor.
-func (s *FacetNode) SetDescriptor(val OptString) {
+func (s *FacetNode) SetDescriptor(val OptNilString) {
 	s.Descriptor = val
 }
 
@@ -177,7 +177,7 @@ func (s *FacetNode) SetID(val OptString) {
 }
 
 // SetCount sets the value of Count.
-func (s *FacetNode) SetCount(val OptInt) {
+func (s *FacetNode) SetCount(val OptNilInt) {
 	s.Count = val
 }
 
@@ -203,29 +203,29 @@ func (s *JobDetailResponse) SetJobPostingInfo(val JobPostingInfo) {
 
 // Ref: #/components/schemas/JobPostingInfo
 type JobPostingInfo struct {
-	Title string `json:"title"`
+	Title NilString `json:"title"`
 	// Full HTML job description.
-	JobDescription      string    `json:"jobDescription"`
-	Location            OptString `json:"location"`
-	AdditionalLocations []string  `json:"additionalLocations"`
-	PostedOn            OptString `json:"postedOn"`
-	TimeType            OptString `json:"timeType"`
-	JobReqId            OptString `json:"jobReqId"`
-	ExternalUrl         OptString `json:"externalUrl"`
+	JobDescription      NilString    `json:"jobDescription"`
+	Location            OptNilString `json:"location"`
+	AdditionalLocations []string     `json:"additionalLocations"`
+	PostedOn            OptNilString `json:"postedOn"`
+	TimeType            OptNilString `json:"timeType"`
+	JobReqId            OptNilString `json:"jobReqId"`
+	ExternalUrl         OptNilString `json:"externalUrl"`
 }
 
 // GetTitle returns the value of Title.
-func (s *JobPostingInfo) GetTitle() string {
+func (s *JobPostingInfo) GetTitle() NilString {
 	return s.Title
 }
 
 // GetJobDescription returns the value of JobDescription.
-func (s *JobPostingInfo) GetJobDescription() string {
+func (s *JobPostingInfo) GetJobDescription() NilString {
 	return s.JobDescription
 }
 
 // GetLocation returns the value of Location.
-func (s *JobPostingInfo) GetLocation() OptString {
+func (s *JobPostingInfo) GetLocation() OptNilString {
 	return s.Location
 }
 
@@ -235,37 +235,37 @@ func (s *JobPostingInfo) GetAdditionalLocations() []string {
 }
 
 // GetPostedOn returns the value of PostedOn.
-func (s *JobPostingInfo) GetPostedOn() OptString {
+func (s *JobPostingInfo) GetPostedOn() OptNilString {
 	return s.PostedOn
 }
 
 // GetTimeType returns the value of TimeType.
-func (s *JobPostingInfo) GetTimeType() OptString {
+func (s *JobPostingInfo) GetTimeType() OptNilString {
 	return s.TimeType
 }
 
 // GetJobReqId returns the value of JobReqId.
-func (s *JobPostingInfo) GetJobReqId() OptString {
+func (s *JobPostingInfo) GetJobReqId() OptNilString {
 	return s.JobReqId
 }
 
 // GetExternalUrl returns the value of ExternalUrl.
-func (s *JobPostingInfo) GetExternalUrl() OptString {
+func (s *JobPostingInfo) GetExternalUrl() OptNilString {
 	return s.ExternalUrl
 }
 
 // SetTitle sets the value of Title.
-func (s *JobPostingInfo) SetTitle(val string) {
+func (s *JobPostingInfo) SetTitle(val NilString) {
 	s.Title = val
 }
 
 // SetJobDescription sets the value of JobDescription.
-func (s *JobPostingInfo) SetJobDescription(val string) {
+func (s *JobPostingInfo) SetJobDescription(val NilString) {
 	s.JobDescription = val
 }
 
 // SetLocation sets the value of Location.
-func (s *JobPostingInfo) SetLocation(val OptString) {
+func (s *JobPostingInfo) SetLocation(val OptNilString) {
 	s.Location = val
 }
 
@@ -275,22 +275,22 @@ func (s *JobPostingInfo) SetAdditionalLocations(val []string) {
 }
 
 // SetPostedOn sets the value of PostedOn.
-func (s *JobPostingInfo) SetPostedOn(val OptString) {
+func (s *JobPostingInfo) SetPostedOn(val OptNilString) {
 	s.PostedOn = val
 }
 
 // SetTimeType sets the value of TimeType.
-func (s *JobPostingInfo) SetTimeType(val OptString) {
+func (s *JobPostingInfo) SetTimeType(val OptNilString) {
 	s.TimeType = val
 }
 
 // SetJobReqId sets the value of JobReqId.
-func (s *JobPostingInfo) SetJobReqId(val OptString) {
+func (s *JobPostingInfo) SetJobReqId(val OptNilString) {
 	s.JobReqId = val
 }
 
 // SetExternalUrl sets the value of ExternalUrl.
-func (s *JobPostingInfo) SetExternalUrl(val OptString) {
+func (s *JobPostingInfo) SetExternalUrl(val OptNilString) {
 	s.ExternalUrl = val
 }
 
@@ -299,20 +299,20 @@ func (s *JobPostingInfo) SetExternalUrl(val OptString) {
 // an empty `externalPath` rather than assuming every entry is fetchable.
 // Ref: #/components/schemas/JobSummary
 type JobSummary struct {
-	Title OptString `json:"title"`
+	Title OptNilString `json:"title"`
 	// Path for `GET /job/{location}/{titleSlug}` (leading slash included).
 	ExternalPath OptString `json:"externalPath"`
 	// Human-readable location summary, e.g. a city or "N Locations".
-	LocationsText OptString `json:"locationsText"`
+	LocationsText OptNilString `json:"locationsText"`
 	// Human-readable relative posting date.
-	PostedOn OptString `json:"postedOn"`
+	PostedOn OptNilString `json:"postedOn"`
 	// Short supplementary strings shown under the title in search results; in practice usually just the
 	// requisition id (e.g. `["JR2003389"]`), but treat as freeform.
 	BulletFields []string `json:"bulletFields"`
 }
 
 // GetTitle returns the value of Title.
-func (s *JobSummary) GetTitle() OptString {
+func (s *JobSummary) GetTitle() OptNilString {
 	return s.Title
 }
 
@@ -322,12 +322,12 @@ func (s *JobSummary) GetExternalPath() OptString {
 }
 
 // GetLocationsText returns the value of LocationsText.
-func (s *JobSummary) GetLocationsText() OptString {
+func (s *JobSummary) GetLocationsText() OptNilString {
 	return s.LocationsText
 }
 
 // GetPostedOn returns the value of PostedOn.
-func (s *JobSummary) GetPostedOn() OptString {
+func (s *JobSummary) GetPostedOn() OptNilString {
 	return s.PostedOn
 }
 
@@ -337,7 +337,7 @@ func (s *JobSummary) GetBulletFields() []string {
 }
 
 // SetTitle sets the value of Title.
-func (s *JobSummary) SetTitle(val OptString) {
+func (s *JobSummary) SetTitle(val OptNilString) {
 	s.Title = val
 }
 
@@ -347,12 +347,12 @@ func (s *JobSummary) SetExternalPath(val OptString) {
 }
 
 // SetLocationsText sets the value of LocationsText.
-func (s *JobSummary) SetLocationsText(val OptString) {
+func (s *JobSummary) SetLocationsText(val OptNilString) {
 	s.LocationsText = val
 }
 
 // SetPostedOn sets the value of PostedOn.
-func (s *JobSummary) SetPostedOn(val OptString) {
+func (s *JobSummary) SetPostedOn(val OptNilString) {
 	s.PostedOn = val
 }
 
@@ -417,7 +417,7 @@ func (s *JobsRequest) SetSearchText(val string) {
 type JobsResponse struct {
 	// Total matching job count. Observed capped at 2000 on at least one tenant when unfiltered and exact
 	// once a filter narrows the set; verify the cap per tenant.
-	Total       int          `json:"total"`
+	Total       NilInt       `json:"total"`
 	JobPostings []JobSummary `json:"jobPostings"`
 	// The facet tree for the current query, with live counts. It narrows along with `jobPostings`:
 	// `searchText` narrows it as much as an `appliedFacets` filter does, so it is only the tenant's
@@ -429,7 +429,7 @@ type JobsResponse struct {
 }
 
 // GetTotal returns the value of Total.
-func (s *JobsResponse) GetTotal() int {
+func (s *JobsResponse) GetTotal() NilInt {
 	return s.Total
 }
 
@@ -444,7 +444,7 @@ func (s *JobsResponse) GetFacets() OptNilFacetNodeArray {
 }
 
 // SetTotal sets the value of Total.
-func (s *JobsResponse) SetTotal(val int) {
+func (s *JobsResponse) SetTotal(val NilInt) {
 	s.Total = val
 }
 
@@ -458,46 +458,90 @@ func (s *JobsResponse) SetFacets(val OptNilFacetNodeArray) {
 	s.Facets = val
 }
 
-// NewOptInt returns new OptInt with value set to v.
-func NewOptInt(v int) OptInt {
-	return OptInt{
+// NewNilInt returns new NilInt with value set to v.
+func NewNilInt(v int) NilInt {
+	return NilInt{
 		Value: v,
-		Set:   true,
 	}
 }
 
-// OptInt is optional int.
-type OptInt struct {
+// NilInt is nullable int.
+type NilInt struct {
 	Value int
-	Set   bool
-}
-
-// IsSet returns true if OptInt was set.
-func (o OptInt) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptInt) Reset() {
-	var v int
-	o.Value = v
-	o.Set = false
+	Null  bool
 }
 
 // SetTo sets value to v.
-func (o *OptInt) SetTo(v int) {
-	o.Set = true
+func (o *NilInt) SetTo(v int) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilInt) SetToNull() {
+	o.Null = true
+	var v int
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptInt) Get() (v int, ok bool) {
-	if !o.Set {
+func (o NilInt) Get() (v int, ok bool) {
+	if o.Null {
 		return v, false
 	}
 	return o.Value, true
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptInt) Or(d int) int {
+func (o NilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -566,6 +610,142 @@ func (o OptNilFacetNodeArray) Get() (v []FacetNode, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilFacetNodeArray) Or(d []FacetNode) []FacetNode {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilInt returns new OptNilInt with value set to v.
+func NewOptNilInt(v int) OptNilInt {
+	return OptNilInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilInt is optional nullable int.
+type OptNilInt struct {
+	Value int
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilInt was set.
+func (o OptNilInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilInt) SetTo(v int) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilInt) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v int
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilInt) Get() (v int, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilString returns new OptNilString with value set to v.
+func NewOptNilString(v string) OptNilString {
+	return OptNilString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilString is optional nullable string.
+type OptNilString struct {
+	Value string
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilString was set.
+func (o OptNilString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilString) SetTo(v string) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilString) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}

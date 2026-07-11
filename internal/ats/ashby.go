@@ -76,11 +76,11 @@ func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 		}
 		return &JobDetail{
 			JobID:       j.ID.Value,
-			Title:       j.Title,
+			Title:       j.Title.Value,
 			Company:     cmp.Or(ashby.CompaniesByBoard[slug].Name, slug),
 			Location:    ashbyLocations(j),
-			PostedAt:    isoDate(j.PublishedAt),
-			URL:         j.JobUrl,
+			PostedAt:    ashbyPostedAt(j.PublishedAt),
+			URL:         j.JobUrl.Value,
 			Description: j.DescriptionPlain.Value,
 		}, nil
 	}
@@ -110,7 +110,7 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 	}
 	jobs := make([]dumpJob, 0, len(board.Jobs))
 	for _, j := range board.Jobs {
-		if !j.IsListed {
+		if !j.IsListed.Value {
 			continue
 		}
 		fields := map[string][]string{}
@@ -120,8 +120,8 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		if j.Team.Value != "" {
 			fields["team"] = []string{j.Team.Value}
 		}
-		if string(j.EmploymentType) != "" {
-			fields["employmentType"] = []string{string(j.EmploymentType)}
+		if string(j.EmploymentType.Value) != "" {
+			fields["employmentType"] = []string{string(j.EmploymentType.Value)}
 		}
 		// Real boards send null for workplaceType/isRemote (see provider
 		// fixture board_nulls_rsp.json); treat null as unspecified.
@@ -131,12 +131,12 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		jobs = append(jobs, dumpJob{
 			summary: JobSummary{
 				JobID:    j.ID.Value,
-				Title:    j.Title,
+				Title:    j.Title.Value,
 				Location: j.Location.Value,
-				PostedAt: isoDate(j.PublishedAt),
-				URL:      j.JobUrl,
+				PostedAt: ashbyPostedAt(j.PublishedAt),
+				URL:      j.JobUrl.Value,
 			},
-			sortKey:     j.PublishedAt,
+			sortKey:     j.PublishedAt.Value,
 			orgUnit:     j.Department.Value + " " + j.Team.Value,
 			description: j.DescriptionPlain.Value,
 			locations:   ashbyLocations(j),
@@ -145,6 +145,17 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		})
 	}
 	return jobs, nil
+}
+
+// ashbyPostedAt guards against a present-but-null publishedAt: NilDateTime's
+// zero Value would otherwise format as a fake date instead of the true
+// "unknown" state.
+func ashbyPostedAt(t ashby.NilDateTime) string {
+	v, ok := t.Get()
+	if !ok {
+		return ""
+	}
+	return isoDate(v)
 }
 
 func ashbyLocations(j ashby.JobPosting) string {

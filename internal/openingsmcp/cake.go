@@ -161,42 +161,42 @@ func cakeMCPToHTTPRequest(in *cakeSearchInput) (*cake.JobSearchRequest, error) {
 
 func cakeHTTPToMCPResponse(resp *cake.JobSearchResponse) *cakeSearchOutput {
 	out := &cakeSearchOutput{
-		TotalEntries: resp.TotalEntries,
-		TotalPages:   resp.TotalPages,
-		PerPage:      resp.PerPage,
-		CurrentPage:  resp.CurrentPage,
+		TotalEntries: resp.TotalEntries.Value,
+		TotalPages:   resp.TotalPages.Value,
+		PerPage:      resp.PerPage.Value,
+		CurrentPage:  resp.CurrentPage.Value,
 		Data:         make([]cakeJobSummary, 0, len(resp.Data)),
 	}
 	for _, j := range resp.Data {
 		pagePath := ""
 		if page, ok := j.Page.Get(); ok {
-			pagePath = page.Path
+			pagePath = page.Path.Value
 		}
 		out.Data = append(out.Data, cakeJobSummary{
 			Path:        j.Path,
 			URL:         cakeJobURL(pagePath, j.Path),
-			Title:       j.Title,
-			Description: j.Description,
+			Title:       j.Title.Value,
+			Description: j.Description.Value,
 		})
 	}
 	return out
 }
 
 func cakeHTTPToMCPDetail(detail *cake.JobDetail) *cakeDetailOutput {
-	descText, err := html2text.FromString(detail.Description, html2text.Options{})
+	descText, err := html2text.FromString(detail.Description.Value, html2text.Options{})
 	if err != nil {
-		descText = detail.Description
+		descText = detail.Description.Value
 	}
-	reqsText, err := html2text.FromString(detail.Requirements, html2text.Options{})
+	reqsText, err := html2text.FromString(detail.Requirements.Value, html2text.Options{})
 	if err != nil {
-		reqsText = detail.Requirements
+		reqsText = detail.Requirements.Value
 	}
 	return &cakeDetailOutput{
-		ID:           detail.ID,
-		Path:         detail.Path,
-		URL:          cakeJobURL(detail.PagePath, detail.Path),
-		PagePath:     detail.PagePath,
-		Title:        detail.Title,
+		ID:           detail.ID.Value,
+		Path:         detail.Path.Value,
+		URL:          cakeJobURL(detail.PagePath.Value, detail.Path.Value),
+		PagePath:     detail.PagePath.Value,
+		Title:        detail.Title.Value,
 		Description:  descText,
 		Requirements: reqsText,
 	}

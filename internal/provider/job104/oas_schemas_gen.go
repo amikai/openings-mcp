@@ -15,38 +15,38 @@ func (s *ErrorResponseStatusCode) Error() string {
 
 // Ref: #/components/schemas/CodeDescription
 type CodeDescription struct {
-	Code        OptString `json:"code"`
-	Description OptString `json:"description"`
+	Code        OptNilString `json:"code"`
+	Description OptNilString `json:"description"`
 }
 
 // GetCode returns the value of Code.
-func (s *CodeDescription) GetCode() OptString {
+func (s *CodeDescription) GetCode() OptNilString {
 	return s.Code
 }
 
 // GetDescription returns the value of Description.
-func (s *CodeDescription) GetDescription() OptString {
+func (s *CodeDescription) GetDescription() OptNilString {
 	return s.Description
 }
 
 // SetCode sets the value of Code.
-func (s *CodeDescription) SetCode(val OptString) {
+func (s *CodeDescription) SetCode(val OptNilString) {
 	s.Code = val
 }
 
 // SetDescription sets the value of Description.
-func (s *CodeDescription) SetDescription(val OptString) {
+func (s *CodeDescription) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
-	Message         OptString `json:"message"`
+	Message         OptNilString `json:"message"`
 	AdditionalProps ErrorResponseAdditional
 }
 
 // GetMessage returns the value of Message.
-func (s *ErrorResponse) GetMessage() OptString {
+func (s *ErrorResponse) GetMessage() OptNilString {
 	return s.Message
 }
 
@@ -56,7 +56,7 @@ func (s *ErrorResponse) GetAdditionalProps() ErrorResponseAdditional {
 }
 
 // SetMessage sets the value of Message.
-func (s *ErrorResponse) SetMessage(val OptString) {
+func (s *ErrorResponse) SetMessage(val OptNilString) {
 	s.Message = val
 }
 
@@ -109,9 +109,9 @@ type JobDetail struct {
 	Condition JobDetailCondition `json:"condition"`
 	Welfare   JobDetailWelfare   `json:"welfare"`
 	JobDetail JobDetailJobDetail `json:"jobDetail"`
-	Industry  string             `json:"industry"`
-	Employees string             `json:"employees"`
-	CustNo    string             `json:"custNo"`
+	Industry  NilString          `json:"industry"`
+	Employees NilString          `json:"employees"`
+	CustNo    NilString          `json:"custNo"`
 }
 
 // GetHeader returns the value of Header.
@@ -140,17 +140,17 @@ func (s *JobDetail) GetJobDetail() JobDetailJobDetail {
 }
 
 // GetIndustry returns the value of Industry.
-func (s *JobDetail) GetIndustry() string {
+func (s *JobDetail) GetIndustry() NilString {
 	return s.Industry
 }
 
 // GetEmployees returns the value of Employees.
-func (s *JobDetail) GetEmployees() string {
+func (s *JobDetail) GetEmployees() NilString {
 	return s.Employees
 }
 
 // GetCustNo returns the value of CustNo.
-func (s *JobDetail) GetCustNo() string {
+func (s *JobDetail) GetCustNo() NilString {
 	return s.CustNo
 }
 
@@ -180,34 +180,34 @@ func (s *JobDetail) SetJobDetail(val JobDetailJobDetail) {
 }
 
 // SetIndustry sets the value of Industry.
-func (s *JobDetail) SetIndustry(val string) {
+func (s *JobDetail) SetIndustry(val NilString) {
 	s.Industry = val
 }
 
 // SetEmployees sets the value of Employees.
-func (s *JobDetail) SetEmployees(val string) {
+func (s *JobDetail) SetEmployees(val NilString) {
 	s.Employees = val
 }
 
 // SetCustNo sets the value of CustNo.
-func (s *JobDetail) SetCustNo(val string) {
+func (s *JobDetail) SetCustNo(val NilString) {
 	s.CustNo = val
 }
 
 type JobDetailCondition struct {
-	WorkExp   OptString         `json:"workExp"`
-	Edu       OptString         `json:"edu"`
+	WorkExp   OptNilString      `json:"workExp"`
+	Edu       OptNilString      `json:"edu"`
 	Major     []string          `json:"major"`
 	Specialty []CodeDescription `json:"specialty"`
 }
 
 // GetWorkExp returns the value of WorkExp.
-func (s *JobDetailCondition) GetWorkExp() OptString {
+func (s *JobDetailCondition) GetWorkExp() OptNilString {
 	return s.WorkExp
 }
 
 // GetEdu returns the value of Edu.
-func (s *JobDetailCondition) GetEdu() OptString {
+func (s *JobDetailCondition) GetEdu() OptNilString {
 	return s.Edu
 }
 
@@ -222,12 +222,12 @@ func (s *JobDetailCondition) GetSpecialty() []CodeDescription {
 }
 
 // SetWorkExp sets the value of WorkExp.
-func (s *JobDetailCondition) SetWorkExp(val OptString) {
+func (s *JobDetailCondition) SetWorkExp(val OptNilString) {
 	s.WorkExp = val
 }
 
 // SetEdu sets the value of Edu.
-func (s *JobDetailCondition) SetEdu(val OptString) {
+func (s *JobDetailCondition) SetEdu(val OptNilString) {
 	s.Edu = val
 }
 
@@ -242,128 +242,128 @@ func (s *JobDetailCondition) SetSpecialty(val []CodeDescription) {
 }
 
 type JobDetailContact struct {
-	HrName OptString `json:"hrName"`
-	Email  OptString `json:"email"`
-	Reply  OptString `json:"reply"`
+	HrName OptNilString `json:"hrName"`
+	Email  OptNilString `json:"email"`
+	Reply  OptNilString `json:"reply"`
 }
 
 // GetHrName returns the value of HrName.
-func (s *JobDetailContact) GetHrName() OptString {
+func (s *JobDetailContact) GetHrName() OptNilString {
 	return s.HrName
 }
 
 // GetEmail returns the value of Email.
-func (s *JobDetailContact) GetEmail() OptString {
+func (s *JobDetailContact) GetEmail() OptNilString {
 	return s.Email
 }
 
 // GetReply returns the value of Reply.
-func (s *JobDetailContact) GetReply() OptString {
+func (s *JobDetailContact) GetReply() OptNilString {
 	return s.Reply
 }
 
 // SetHrName sets the value of HrName.
-func (s *JobDetailContact) SetHrName(val OptString) {
+func (s *JobDetailContact) SetHrName(val OptNilString) {
 	s.HrName = val
 }
 
 // SetEmail sets the value of Email.
-func (s *JobDetailContact) SetEmail(val OptString) {
+func (s *JobDetailContact) SetEmail(val OptNilString) {
 	s.Email = val
 }
 
 // SetReply sets the value of Reply.
-func (s *JobDetailContact) SetReply(val OptString) {
+func (s *JobDetailContact) SetReply(val OptNilString) {
 	s.Reply = val
 }
 
 type JobDetailHeader struct {
-	JobName    string `json:"jobName"`
-	CustName   string `json:"custName"`
-	CustUrl    string `json:"custUrl"`
-	AppearDate string `json:"appearDate"`
-	IsSaved    bool   `json:"isSaved"`
-	IsApplied  bool   `json:"isApplied"`
+	JobName    NilString `json:"jobName"`
+	CustName   NilString `json:"custName"`
+	CustUrl    NilString `json:"custUrl"`
+	AppearDate NilString `json:"appearDate"`
+	IsSaved    NilBool   `json:"isSaved"`
+	IsApplied  NilBool   `json:"isApplied"`
 }
 
 // GetJobName returns the value of JobName.
-func (s *JobDetailHeader) GetJobName() string {
+func (s *JobDetailHeader) GetJobName() NilString {
 	return s.JobName
 }
 
 // GetCustName returns the value of CustName.
-func (s *JobDetailHeader) GetCustName() string {
+func (s *JobDetailHeader) GetCustName() NilString {
 	return s.CustName
 }
 
 // GetCustUrl returns the value of CustUrl.
-func (s *JobDetailHeader) GetCustUrl() string {
+func (s *JobDetailHeader) GetCustUrl() NilString {
 	return s.CustUrl
 }
 
 // GetAppearDate returns the value of AppearDate.
-func (s *JobDetailHeader) GetAppearDate() string {
+func (s *JobDetailHeader) GetAppearDate() NilString {
 	return s.AppearDate
 }
 
 // GetIsSaved returns the value of IsSaved.
-func (s *JobDetailHeader) GetIsSaved() bool {
+func (s *JobDetailHeader) GetIsSaved() NilBool {
 	return s.IsSaved
 }
 
 // GetIsApplied returns the value of IsApplied.
-func (s *JobDetailHeader) GetIsApplied() bool {
+func (s *JobDetailHeader) GetIsApplied() NilBool {
 	return s.IsApplied
 }
 
 // SetJobName sets the value of JobName.
-func (s *JobDetailHeader) SetJobName(val string) {
+func (s *JobDetailHeader) SetJobName(val NilString) {
 	s.JobName = val
 }
 
 // SetCustName sets the value of CustName.
-func (s *JobDetailHeader) SetCustName(val string) {
+func (s *JobDetailHeader) SetCustName(val NilString) {
 	s.CustName = val
 }
 
 // SetCustUrl sets the value of CustUrl.
-func (s *JobDetailHeader) SetCustUrl(val string) {
+func (s *JobDetailHeader) SetCustUrl(val NilString) {
 	s.CustUrl = val
 }
 
 // SetAppearDate sets the value of AppearDate.
-func (s *JobDetailHeader) SetAppearDate(val string) {
+func (s *JobDetailHeader) SetAppearDate(val NilString) {
 	s.AppearDate = val
 }
 
 // SetIsSaved sets the value of IsSaved.
-func (s *JobDetailHeader) SetIsSaved(val bool) {
+func (s *JobDetailHeader) SetIsSaved(val NilBool) {
 	s.IsSaved = val
 }
 
 // SetIsApplied sets the value of IsApplied.
-func (s *JobDetailHeader) SetIsApplied(val bool) {
+func (s *JobDetailHeader) SetIsApplied(val NilBool) {
 	s.IsApplied = val
 }
 
 type JobDetailJobDetail struct {
-	JobDescription OptString         `json:"jobDescription"`
+	JobDescription OptNilString      `json:"jobDescription"`
 	JobCategory    []CodeDescription `json:"jobCategory"`
-	Salary         OptString         `json:"salary"`
-	SalaryMin      OptInt            `json:"salaryMin"`
-	SalaryMax      OptInt            `json:"salaryMax"`
-	JobType        OptInt            `json:"jobType"`
-	AddressRegion  OptString         `json:"addressRegion"`
-	AddressDetail  OptString         `json:"addressDetail"`
-	ManageResp     OptString         `json:"manageResp"`
-	NeedEmp        OptString         `json:"needEmp"`
+	Salary         OptNilString      `json:"salary"`
+	SalaryMin      OptNilInt         `json:"salaryMin"`
+	SalaryMax      OptNilInt         `json:"salaryMax"`
+	JobType        OptNilInt         `json:"jobType"`
+	AddressRegion  OptNilString      `json:"addressRegion"`
+	AddressDetail  OptNilString      `json:"addressDetail"`
+	ManageResp     OptNilString      `json:"manageResp"`
+	NeedEmp        OptNilString      `json:"needEmp"`
 	// Null for non-remote postings, not just absent. `type` matches the `remoteWork` request values (1 =
 	// Fully remote, 2 = Partial/hybrid remote).
 	RemoteWork OptNilJobDetailJobDetailRemoteWork `json:"remoteWork"`
 }
 
 // GetJobDescription returns the value of JobDescription.
-func (s *JobDetailJobDetail) GetJobDescription() OptString {
+func (s *JobDetailJobDetail) GetJobDescription() OptNilString {
 	return s.JobDescription
 }
 
@@ -373,42 +373,42 @@ func (s *JobDetailJobDetail) GetJobCategory() []CodeDescription {
 }
 
 // GetSalary returns the value of Salary.
-func (s *JobDetailJobDetail) GetSalary() OptString {
+func (s *JobDetailJobDetail) GetSalary() OptNilString {
 	return s.Salary
 }
 
 // GetSalaryMin returns the value of SalaryMin.
-func (s *JobDetailJobDetail) GetSalaryMin() OptInt {
+func (s *JobDetailJobDetail) GetSalaryMin() OptNilInt {
 	return s.SalaryMin
 }
 
 // GetSalaryMax returns the value of SalaryMax.
-func (s *JobDetailJobDetail) GetSalaryMax() OptInt {
+func (s *JobDetailJobDetail) GetSalaryMax() OptNilInt {
 	return s.SalaryMax
 }
 
 // GetJobType returns the value of JobType.
-func (s *JobDetailJobDetail) GetJobType() OptInt {
+func (s *JobDetailJobDetail) GetJobType() OptNilInt {
 	return s.JobType
 }
 
 // GetAddressRegion returns the value of AddressRegion.
-func (s *JobDetailJobDetail) GetAddressRegion() OptString {
+func (s *JobDetailJobDetail) GetAddressRegion() OptNilString {
 	return s.AddressRegion
 }
 
 // GetAddressDetail returns the value of AddressDetail.
-func (s *JobDetailJobDetail) GetAddressDetail() OptString {
+func (s *JobDetailJobDetail) GetAddressDetail() OptNilString {
 	return s.AddressDetail
 }
 
 // GetManageResp returns the value of ManageResp.
-func (s *JobDetailJobDetail) GetManageResp() OptString {
+func (s *JobDetailJobDetail) GetManageResp() OptNilString {
 	return s.ManageResp
 }
 
 // GetNeedEmp returns the value of NeedEmp.
-func (s *JobDetailJobDetail) GetNeedEmp() OptString {
+func (s *JobDetailJobDetail) GetNeedEmp() OptNilString {
 	return s.NeedEmp
 }
 
@@ -418,7 +418,7 @@ func (s *JobDetailJobDetail) GetRemoteWork() OptNilJobDetailJobDetailRemoteWork 
 }
 
 // SetJobDescription sets the value of JobDescription.
-func (s *JobDetailJobDetail) SetJobDescription(val OptString) {
+func (s *JobDetailJobDetail) SetJobDescription(val OptNilString) {
 	s.JobDescription = val
 }
 
@@ -428,42 +428,42 @@ func (s *JobDetailJobDetail) SetJobCategory(val []CodeDescription) {
 }
 
 // SetSalary sets the value of Salary.
-func (s *JobDetailJobDetail) SetSalary(val OptString) {
+func (s *JobDetailJobDetail) SetSalary(val OptNilString) {
 	s.Salary = val
 }
 
 // SetSalaryMin sets the value of SalaryMin.
-func (s *JobDetailJobDetail) SetSalaryMin(val OptInt) {
+func (s *JobDetailJobDetail) SetSalaryMin(val OptNilInt) {
 	s.SalaryMin = val
 }
 
 // SetSalaryMax sets the value of SalaryMax.
-func (s *JobDetailJobDetail) SetSalaryMax(val OptInt) {
+func (s *JobDetailJobDetail) SetSalaryMax(val OptNilInt) {
 	s.SalaryMax = val
 }
 
 // SetJobType sets the value of JobType.
-func (s *JobDetailJobDetail) SetJobType(val OptInt) {
+func (s *JobDetailJobDetail) SetJobType(val OptNilInt) {
 	s.JobType = val
 }
 
 // SetAddressRegion sets the value of AddressRegion.
-func (s *JobDetailJobDetail) SetAddressRegion(val OptString) {
+func (s *JobDetailJobDetail) SetAddressRegion(val OptNilString) {
 	s.AddressRegion = val
 }
 
 // SetAddressDetail sets the value of AddressDetail.
-func (s *JobDetailJobDetail) SetAddressDetail(val OptString) {
+func (s *JobDetailJobDetail) SetAddressDetail(val OptNilString) {
 	s.AddressDetail = val
 }
 
 // SetManageResp sets the value of ManageResp.
-func (s *JobDetailJobDetail) SetManageResp(val OptString) {
+func (s *JobDetailJobDetail) SetManageResp(val OptNilString) {
 	s.ManageResp = val
 }
 
 // SetNeedEmp sets the value of NeedEmp.
-func (s *JobDetailJobDetail) SetNeedEmp(val OptString) {
+func (s *JobDetailJobDetail) SetNeedEmp(val OptNilString) {
 	s.NeedEmp = val
 }
 
@@ -475,27 +475,27 @@ func (s *JobDetailJobDetail) SetRemoteWork(val OptNilJobDetailJobDetailRemoteWor
 // Null for non-remote postings, not just absent. `type` matches the `remoteWork` request values (1 =
 // Fully remote, 2 = Partial/hybrid remote).
 type JobDetailJobDetailRemoteWork struct {
-	Type        OptInt    `json:"type"`
-	Description OptString `json:"description"`
+	Type        OptNilInt    `json:"type"`
+	Description OptNilString `json:"description"`
 }
 
 // GetType returns the value of Type.
-func (s *JobDetailJobDetailRemoteWork) GetType() OptInt {
+func (s *JobDetailJobDetailRemoteWork) GetType() OptNilInt {
 	return s.Type
 }
 
 // GetDescription returns the value of Description.
-func (s *JobDetailJobDetailRemoteWork) GetDescription() OptString {
+func (s *JobDetailJobDetailRemoteWork) GetDescription() OptNilString {
 	return s.Description
 }
 
 // SetType sets the value of Type.
-func (s *JobDetailJobDetailRemoteWork) SetType(val OptInt) {
+func (s *JobDetailJobDetailRemoteWork) SetType(val OptNilInt) {
 	s.Type = val
 }
 
 // SetDescription sets the value of Description.
-func (s *JobDetailJobDetailRemoteWork) SetDescription(val OptString) {
+func (s *JobDetailJobDetailRemoteWork) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
@@ -515,73 +515,73 @@ func (s *JobDetailResponse) SetData(val JobDetail) {
 }
 
 type JobDetailWelfare struct {
-	Welfare OptString `json:"welfare"`
+	Welfare OptNilString `json:"welfare"`
 }
 
 // GetWelfare returns the value of Welfare.
-func (s *JobDetailWelfare) GetWelfare() OptString {
+func (s *JobDetailWelfare) GetWelfare() OptNilString {
 	return s.Welfare
 }
 
 // SetWelfare sets the value of Welfare.
-func (s *JobDetailWelfare) SetWelfare(val OptString) {
+func (s *JobDetailWelfare) SetWelfare(val OptNilString) {
 	s.Welfare = val
 }
 
 // Ref: #/components/schemas/JobSummary
 type JobSummary struct {
-	JobNo    string         `json:"jobNo"`
-	JobName  string         `json:"jobName"`
-	CustName string         `json:"custName"`
-	CustNo   string         `json:"custNo"`
+	JobNo    NilString      `json:"jobNo"`
+	JobName  NilString      `json:"jobName"`
+	CustName NilString      `json:"custName"`
+	CustNo   NilString      `json:"custNo"`
 	Link     JobSummaryLink `json:"link"`
 	// Upper bound of the salary range, in TWD (all 104 postings quote 新台幣) per the period given by
 	// `s10`. 9999999 is 104's "no disclosed upper bound" sentinel (e.g. 月薪60000元以上), not an
 	// actual figure.
-	SalaryHigh int `json:"salaryHigh"`
+	SalaryHigh NilInt `json:"salaryHigh"`
 	// Lower bound of the salary range, in TWD per the period given by `s10`.
-	SalaryLow int `json:"salaryLow"`
+	SalaryLow NilInt `json:"salaryLow"`
 	// Salary type of `salaryLow`/`salaryHigh`: 10 = negotiable (待遇面議; both bounds are 0), 30 =
 	// hourly (時薪), 40 = daily (日薪), 50 = monthly (月薪), 60 = yearly (年薪), 70 = part-time
 	// monthly (部分工時(月薪)). 30 and 70 confirmed live against keyword=時薪 results and their
 	// job-detail salary strings.
-	S10           int    `json:"s10"`
-	JobAddrNoDesc string `json:"jobAddrNoDesc"`
-	AppearDate    string `json:"appearDate"`
-	ApplyCnt      int    `json:"applyCnt"`
+	S10           NilInt    `json:"s10"`
+	JobAddrNoDesc NilString `json:"jobAddrNoDesc"`
+	AppearDate    NilString `json:"appearDate"`
+	ApplyCnt      NilInt    `json:"applyCnt"`
 	// 0 = not remote; matches the remoteWork request values otherwise. The `remoteWork` request param is a
 	// soft filter — check this field per entry if you need a strict result set (see the `remoteWork`
 	// parameter description on searchJobs).
-	RemoteWorkType int `json:"remoteWorkType"`
+	RemoteWorkType NilInt `json:"remoteWorkType"`
 	// Matches the `ro` request values (1 = Full-time, 2 = Part-time). The `ro` request param is a soft
 	// filter — check this field per entry if you need a strict result set (see the `ro` parameter
 	// description on searchJobs).
-	JobRo int `json:"jobRo"`
+	JobRo NilInt `json:"jobRo"`
 	// Minimum-experience code: 0 = no requirement (經歷不拘), otherwise the posting's minimum years of
 	// experience plus one (confirmed against job details: 2 = 1年以上, 4 = 3年以上, 11 =
 	// 10年以上). The `jobexp` request buckets group this field (jobexp 1 → period 0-1, 3 → 2-3, 5
 	// → 4-5, 10 → 6-10, 99 → 11+). `jobexp` is a soft filter — check this field per entry if you
 	// need a strict result set (see the `jobexp` parameter description on searchJobs).
-	Period int `json:"period"`
+	Period NilInt `json:"period"`
 }
 
 // GetJobNo returns the value of JobNo.
-func (s *JobSummary) GetJobNo() string {
+func (s *JobSummary) GetJobNo() NilString {
 	return s.JobNo
 }
 
 // GetJobName returns the value of JobName.
-func (s *JobSummary) GetJobName() string {
+func (s *JobSummary) GetJobName() NilString {
 	return s.JobName
 }
 
 // GetCustName returns the value of CustName.
-func (s *JobSummary) GetCustName() string {
+func (s *JobSummary) GetCustName() NilString {
 	return s.CustName
 }
 
 // GetCustNo returns the value of CustNo.
-func (s *JobSummary) GetCustNo() string {
+func (s *JobSummary) GetCustNo() NilString {
 	return s.CustNo
 }
 
@@ -591,67 +591,67 @@ func (s *JobSummary) GetLink() JobSummaryLink {
 }
 
 // GetSalaryHigh returns the value of SalaryHigh.
-func (s *JobSummary) GetSalaryHigh() int {
+func (s *JobSummary) GetSalaryHigh() NilInt {
 	return s.SalaryHigh
 }
 
 // GetSalaryLow returns the value of SalaryLow.
-func (s *JobSummary) GetSalaryLow() int {
+func (s *JobSummary) GetSalaryLow() NilInt {
 	return s.SalaryLow
 }
 
 // GetS10 returns the value of S10.
-func (s *JobSummary) GetS10() int {
+func (s *JobSummary) GetS10() NilInt {
 	return s.S10
 }
 
 // GetJobAddrNoDesc returns the value of JobAddrNoDesc.
-func (s *JobSummary) GetJobAddrNoDesc() string {
+func (s *JobSummary) GetJobAddrNoDesc() NilString {
 	return s.JobAddrNoDesc
 }
 
 // GetAppearDate returns the value of AppearDate.
-func (s *JobSummary) GetAppearDate() string {
+func (s *JobSummary) GetAppearDate() NilString {
 	return s.AppearDate
 }
 
 // GetApplyCnt returns the value of ApplyCnt.
-func (s *JobSummary) GetApplyCnt() int {
+func (s *JobSummary) GetApplyCnt() NilInt {
 	return s.ApplyCnt
 }
 
 // GetRemoteWorkType returns the value of RemoteWorkType.
-func (s *JobSummary) GetRemoteWorkType() int {
+func (s *JobSummary) GetRemoteWorkType() NilInt {
 	return s.RemoteWorkType
 }
 
 // GetJobRo returns the value of JobRo.
-func (s *JobSummary) GetJobRo() int {
+func (s *JobSummary) GetJobRo() NilInt {
 	return s.JobRo
 }
 
 // GetPeriod returns the value of Period.
-func (s *JobSummary) GetPeriod() int {
+func (s *JobSummary) GetPeriod() NilInt {
 	return s.Period
 }
 
 // SetJobNo sets the value of JobNo.
-func (s *JobSummary) SetJobNo(val string) {
+func (s *JobSummary) SetJobNo(val NilString) {
 	s.JobNo = val
 }
 
 // SetJobName sets the value of JobName.
-func (s *JobSummary) SetJobName(val string) {
+func (s *JobSummary) SetJobName(val NilString) {
 	s.JobName = val
 }
 
 // SetCustName sets the value of CustName.
-func (s *JobSummary) SetCustName(val string) {
+func (s *JobSummary) SetCustName(val NilString) {
 	s.CustName = val
 }
 
 // SetCustNo sets the value of CustNo.
-func (s *JobSummary) SetCustNo(val string) {
+func (s *JobSummary) SetCustNo(val NilString) {
 	s.CustNo = val
 }
 
@@ -661,54 +661,54 @@ func (s *JobSummary) SetLink(val JobSummaryLink) {
 }
 
 // SetSalaryHigh sets the value of SalaryHigh.
-func (s *JobSummary) SetSalaryHigh(val int) {
+func (s *JobSummary) SetSalaryHigh(val NilInt) {
 	s.SalaryHigh = val
 }
 
 // SetSalaryLow sets the value of SalaryLow.
-func (s *JobSummary) SetSalaryLow(val int) {
+func (s *JobSummary) SetSalaryLow(val NilInt) {
 	s.SalaryLow = val
 }
 
 // SetS10 sets the value of S10.
-func (s *JobSummary) SetS10(val int) {
+func (s *JobSummary) SetS10(val NilInt) {
 	s.S10 = val
 }
 
 // SetJobAddrNoDesc sets the value of JobAddrNoDesc.
-func (s *JobSummary) SetJobAddrNoDesc(val string) {
+func (s *JobSummary) SetJobAddrNoDesc(val NilString) {
 	s.JobAddrNoDesc = val
 }
 
 // SetAppearDate sets the value of AppearDate.
-func (s *JobSummary) SetAppearDate(val string) {
+func (s *JobSummary) SetAppearDate(val NilString) {
 	s.AppearDate = val
 }
 
 // SetApplyCnt sets the value of ApplyCnt.
-func (s *JobSummary) SetApplyCnt(val int) {
+func (s *JobSummary) SetApplyCnt(val NilInt) {
 	s.ApplyCnt = val
 }
 
 // SetRemoteWorkType sets the value of RemoteWorkType.
-func (s *JobSummary) SetRemoteWorkType(val int) {
+func (s *JobSummary) SetRemoteWorkType(val NilInt) {
 	s.RemoteWorkType = val
 }
 
 // SetJobRo sets the value of JobRo.
-func (s *JobSummary) SetJobRo(val int) {
+func (s *JobSummary) SetJobRo(val NilInt) {
 	s.JobRo = val
 }
 
 // SetPeriod sets the value of Period.
-func (s *JobSummary) SetPeriod(val int) {
+func (s *JobSummary) SetPeriod(val NilInt) {
 	s.Period = val
 }
 
 type JobSummaryLink struct {
 	// Public job posting URL; the trailing path segment is the job code.
-	Job  string `json:"job"`
-	Cust string `json:"cust"`
+	Job  string    `json:"job"`
+	Cust NilString `json:"cust"`
 }
 
 // GetJob returns the value of Job.
@@ -717,7 +717,7 @@ func (s *JobSummaryLink) GetJob() string {
 }
 
 // GetCust returns the value of Cust.
-func (s *JobSummaryLink) GetCust() string {
+func (s *JobSummaryLink) GetCust() NilString {
 	return s.Cust
 }
 
@@ -727,7 +727,7 @@ func (s *JobSummaryLink) SetJob(val string) {
 }
 
 // SetCust sets the value of Cust.
-func (s *JobSummaryLink) SetCust(val string) {
+func (s *JobSummaryLink) SetCust(val NilString) {
 	s.Cust = val
 }
 
@@ -772,39 +772,174 @@ func (s *JobsResponseMetadata) SetPagination(val JobsResponseMetadataPagination)
 }
 
 type JobsResponseMetadataPagination struct {
-	CurrentPage int `json:"currentPage"`
-	LastPage    int `json:"lastPage"`
-	Total       int `json:"total"`
+	CurrentPage NilInt `json:"currentPage"`
+	LastPage    NilInt `json:"lastPage"`
+	Total       NilInt `json:"total"`
 }
 
 // GetCurrentPage returns the value of CurrentPage.
-func (s *JobsResponseMetadataPagination) GetCurrentPage() int {
+func (s *JobsResponseMetadataPagination) GetCurrentPage() NilInt {
 	return s.CurrentPage
 }
 
 // GetLastPage returns the value of LastPage.
-func (s *JobsResponseMetadataPagination) GetLastPage() int {
+func (s *JobsResponseMetadataPagination) GetLastPage() NilInt {
 	return s.LastPage
 }
 
 // GetTotal returns the value of Total.
-func (s *JobsResponseMetadataPagination) GetTotal() int {
+func (s *JobsResponseMetadataPagination) GetTotal() NilInt {
 	return s.Total
 }
 
 // SetCurrentPage sets the value of CurrentPage.
-func (s *JobsResponseMetadataPagination) SetCurrentPage(val int) {
+func (s *JobsResponseMetadataPagination) SetCurrentPage(val NilInt) {
 	s.CurrentPage = val
 }
 
 // SetLastPage sets the value of LastPage.
-func (s *JobsResponseMetadataPagination) SetLastPage(val int) {
+func (s *JobsResponseMetadataPagination) SetLastPage(val NilInt) {
 	s.LastPage = val
 }
 
 // SetTotal sets the value of Total.
-func (s *JobsResponseMetadataPagination) SetTotal(val int) {
+func (s *JobsResponseMetadataPagination) SetTotal(val NilInt) {
 	s.Total = val
+}
+
+// NewNilBool returns new NilBool with value set to v.
+func NewNilBool(v bool) NilBool {
+	return NilBool{
+		Value: v,
+	}
+}
+
+// NilBool is nullable bool.
+type NilBool struct {
+	Value bool
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilBool) SetTo(v bool) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilBool) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilBool) SetToNull() {
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilInt returns new NilInt with value set to v.
+func NewNilInt(v int) NilInt {
+	return NilInt{
+		Value: v,
+	}
+}
+
+// NilInt is nullable int.
+type NilInt struct {
+	Value int
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilInt) SetTo(v int) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilInt) SetToNull() {
+	o.Null = true
+	var v int
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilInt) Get() (v int, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptBool returns new OptBool with value set to v.
@@ -899,6 +1034,74 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
+// NewOptNilInt returns new OptNilInt with value set to v.
+func NewOptNilInt(v int) OptNilInt {
+	return OptNilInt{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilInt is optional nullable int.
+type OptNilInt struct {
+	Value int
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilInt was set.
+func (o OptNilInt) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilInt) Reset() {
+	var v int
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilInt) SetTo(v int) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilInt) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilInt) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v int
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilInt) Get() (v int, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptNilJobDetailJobDetailRemoteWork returns new OptNilJobDetailJobDetailRemoteWork with value set to v.
 func NewOptNilJobDetailJobDetailRemoteWork(v JobDetailJobDetailRemoteWork) OptNilJobDetailJobDetailRemoteWork {
 	return OptNilJobDetailJobDetailRemoteWork{
@@ -961,6 +1164,74 @@ func (o OptNilJobDetailJobDetailRemoteWork) Get() (v JobDetailJobDetailRemoteWor
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilJobDetailJobDetailRemoteWork) Or(d JobDetailJobDetailRemoteWork) JobDetailJobDetailRemoteWork {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilString returns new OptNilString with value set to v.
+func NewOptNilString(v string) OptNilString {
+	return OptNilString{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilString is optional nullable string.
+type OptNilString struct {
+	Value string
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilString was set.
+func (o OptNilString) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilString) Reset() {
+	var v string
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilString) SetTo(v string) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilString) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilString) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}

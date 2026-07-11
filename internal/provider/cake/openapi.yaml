@@ -374,16 +374,20 @@ components:
       properties:
         total_entries:
           type: integer
+          nullable: true
           example: 360
         total_pages:
           type: integer
+          nullable: true
           example: 18
         per_page:
           type: integer
+          nullable: true
           description: Page size. Echoes the request `per_page`; defaults to 20.
           example: 20
         current_page:
           type: integer
+          nullable: true
           example: 1
         data:
           type: array
@@ -403,9 +407,11 @@ components:
           example: "senior-golang-web-backend-engineer-taoyuan"
         title:
           type: string
+          nullable: true
           example: "資深 Golang 網頁後端工程師(桃園)"
         description:
           type: string
+          nullable: true
           description: Plain-text search-result description or preview.
           example: "【職務內容】\n維護現有系統與功能、新專案開發..."
         page:
@@ -418,6 +424,7 @@ components:
       properties:
         path:
           type: string
+          nullable: true
           description: Company/page slug associated with the job.
           example: "lctech_"
 
@@ -430,12 +437,15 @@ components:
       properties:
         id:
           type: integer
+          nullable: true
           example: 46590
         path:
           type: string
+          nullable: true
           example: "senior-golang-web-backend-engineer-taoyuan"
         page_path:
           type: string
+          nullable: true
           description: >
             Company/page slug associated with the job. Together with `path`,
             this forms the public website URL:
@@ -443,13 +453,16 @@ components:
           example: "lctech_"
         title:
           type: string
+          nullable: true
           example: "資深 Golang 網頁後端工程師(桃園)"
         description:
           type: string
+          nullable: true
           description: Full job description as an HTML string.
           example: "<p>【職務內容】</p><p>維護現有系統與功能...</p>"
         requirements:
           type: string
+          nullable: true
           description: Job requirements as an HTML string. May be an empty string.
           example: "<p><strong>【基本條件】</strong></p>"
 
@@ -462,9 +475,11 @@ components:
           example: null
         msg:
           type: string
+          nullable: true
           example: "Resource not found"
         error:
           type: string
+          nullable: true
           example: "Resource not found"
         detail:
           type: object

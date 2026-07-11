@@ -17,27 +17,27 @@ func (s *ErrorResponseStatusCode) Error() string {
 // Ref: #/components/schemas/ErrorResponse
 type ErrorResponse struct {
 	// Always false on errors.
-	Ok    bool   `json:"ok"`
-	Error string `json:"error"`
+	Ok    NilBool   `json:"ok"`
+	Error NilString `json:"error"`
 }
 
 // GetOk returns the value of Ok.
-func (s *ErrorResponse) GetOk() bool {
+func (s *ErrorResponse) GetOk() NilBool {
 	return s.Ok
 }
 
 // GetError returns the value of Error.
-func (s *ErrorResponse) GetError() string {
+func (s *ErrorResponse) GetError() NilString {
 	return s.Error
 }
 
 // SetOk sets the value of Ok.
-func (s *ErrorResponse) SetOk(val bool) {
+func (s *ErrorResponse) SetOk(val NilBool) {
 	s.Ok = val
 }
 
 // SetError sets the value of Error.
-func (s *ErrorResponse) SetError(val string) {
+func (s *ErrorResponse) SetError(val NilString) {
 	s.Error = val
 }
 
@@ -101,46 +101,90 @@ func (s *ListPostingsMode) UnmarshalText(data []byte) error {
 	}
 }
 
-// NewOptFloat64 returns new OptFloat64 with value set to v.
-func NewOptFloat64(v float64) OptFloat64 {
-	return OptFloat64{
+// NewNilBool returns new NilBool with value set to v.
+func NewNilBool(v bool) NilBool {
+	return NilBool{
 		Value: v,
-		Set:   true,
 	}
 }
 
-// OptFloat64 is optional float64.
-type OptFloat64 struct {
-	Value float64
-	Set   bool
-}
-
-// IsSet returns true if OptFloat64 was set.
-func (o OptFloat64) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptFloat64) Reset() {
-	var v float64
-	o.Value = v
-	o.Set = false
+// NilBool is nullable bool.
+type NilBool struct {
+	Value bool
+	Null  bool
 }
 
 // SetTo sets value to v.
-func (o *OptFloat64) SetTo(v float64) {
-	o.Set = true
+func (o *NilBool) SetTo(v bool) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilBool) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilBool) SetToNull() {
+	o.Null = true
+	var v bool
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptFloat64) Get() (v float64, ok bool) {
-	if !o.Set {
+func (o NilBool) Get() (v bool, ok bool) {
+	if o.Null {
 		return v, false
 	}
 	return o.Value, true
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptFloat64) Or(d float64) float64 {
+func (o NilBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -193,38 +237,60 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
-// NewOptInt64 returns new OptInt64 with value set to v.
-func NewOptInt64(v int64) OptInt64 {
-	return OptInt64{
+// NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
+func NewOptNilFloat64(v float64) OptNilFloat64 {
+	return OptNilFloat64{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptInt64 is optional int64.
-type OptInt64 struct {
-	Value int64
+// OptNilFloat64 is optional nullable float64.
+type OptNilFloat64 struct {
+	Value float64
 	Set   bool
+	Null  bool
 }
 
-// IsSet returns true if OptInt64 was set.
-func (o OptInt64) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilFloat64 was set.
+func (o OptNilFloat64) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptInt64) Reset() {
-	var v int64
+func (o *OptNilFloat64) Reset() {
+	var v float64
 	o.Value = v
 	o.Set = false
+	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptInt64) SetTo(v int64) {
+func (o *OptNilFloat64) SetTo(v float64) {
 	o.Set = true
+	o.Null = false
 	o.Value = v
 }
 
+// IsNull returns true if value is Null.
+func (o OptNilFloat64) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilFloat64) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v float64
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilFloat64) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
 // Get returns value and boolean that denotes whether value was set.
-func (o OptInt64) Get() (v int64, ok bool) {
+func (o OptNilFloat64) Get() (v float64, ok bool) {
+	if o.Null {
+		return v, false
+	}
 	if !o.Set {
 		return v, false
 	}
@@ -232,7 +298,75 @@ func (o OptInt64) Get() (v int64, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptInt64) Or(d int64) int64 {
+func (o OptNilFloat64) Or(d float64) float64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilInt64 returns new OptNilInt64 with value set to v.
+func NewOptNilInt64(v int64) OptNilInt64 {
+	return OptNilInt64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilInt64 is optional nullable int64.
+type OptNilInt64 struct {
+	Value int64
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilInt64 was set.
+func (o OptNilInt64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilInt64) Reset() {
+	var v int64
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilInt64) SetTo(v int64) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilInt64) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilInt64) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v int64
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilInt64) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilInt64) Get() (v int64, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilInt64) Or(d int64) int64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -450,45 +584,45 @@ type Posting struct {
 	// Unique posting id.
 	ID string `json:"id"`
 	// Posting title.
-	Text       string               `json:"text"`
+	Text       NilString            `json:"text"`
 	Categories OptPostingCategories `json:"categories"`
 	// ISO 3166-1 alpha-2 country code, or null when unknown. Not filterable.
 	Country OptNilString `json:"country"`
 	// Creation timestamp in epoch milliseconds. Returned by the live API; missing from the official field
 	// table.
-	CreatedAt OptInt64 `json:"createdAt"`
+	CreatedAt OptNilInt64 `json:"createdAt"`
 	// Primary workplace environment. Not filterable. The official docs list `unspecified`, `on-site`,
 	// `remote`, and `hybrid`, but live tenants have been observed returning `onsite` (no hyphen) too, so
 	// this is deliberately not a closed enum — one unexpected value would otherwise fail decoding for
 	// the whole page.
-	WorkplaceType OptString `json:"workplaceType"`
+	WorkplaceType OptNilString `json:"workplaceType"`
 	// Description opening (styled HTML).
-	Opening OptString `json:"opening"`
+	Opening OptNilString `json:"opening"`
 	// Description opening (plaintext).
-	OpeningPlain OptString `json:"openingPlain"`
+	OpeningPlain OptNilString `json:"openingPlain"`
 	// Combined opening and body (styled HTML).
-	Description OptString `json:"description"`
+	Description OptNilString `json:"description"`
 	// Combined opening and body (plaintext).
-	DescriptionPlain OptString `json:"descriptionPlain"`
+	DescriptionPlain OptNilString `json:"descriptionPlain"`
 	// Body without opening (styled HTML).
-	DescriptionBody OptString `json:"descriptionBody"`
+	DescriptionBody OptNilString `json:"descriptionBody"`
 	// Body without opening (plaintext).
-	DescriptionBodyPlain OptString `json:"descriptionBodyPlain"`
+	DescriptionBodyPlain OptNilString `json:"descriptionBodyPlain"`
 	// Extra lists such as requirements and benefits.
 	Lists []PostingListEntry `json:"lists"`
 	// Optional closing content (styled HTML); may be empty.
-	Additional OptString `json:"additional"`
+	Additional OptNilString `json:"additional"`
 	// Optional closing content (plaintext); may be empty.
-	AdditionalPlain OptString `json:"additionalPlain"`
+	AdditionalPlain OptNilString `json:"additionalPlain"`
 	// Lever-hosted posting page URL.
-	HostedUrl OptString `json:"hostedUrl"`
+	HostedUrl OptNilString `json:"hostedUrl"`
 	// Lever-hosted application form URL.
-	ApplyUrl    OptString      `json:"applyUrl"`
+	ApplyUrl    OptNilString   `json:"applyUrl"`
 	SalaryRange OptSalaryRange `json:"salaryRange"`
 	// Optional salary range description (styled HTML).
-	SalaryDescription OptString `json:"salaryDescription"`
+	SalaryDescription OptNilString `json:"salaryDescription"`
 	// Optional salary range description (plaintext).
-	SalaryDescriptionPlain OptString `json:"salaryDescriptionPlain"`
+	SalaryDescriptionPlain OptNilString `json:"salaryDescriptionPlain"`
 }
 
 // GetID returns the value of ID.
@@ -497,7 +631,7 @@ func (s *Posting) GetID() string {
 }
 
 // GetText returns the value of Text.
-func (s *Posting) GetText() string {
+func (s *Posting) GetText() NilString {
 	return s.Text
 }
 
@@ -512,42 +646,42 @@ func (s *Posting) GetCountry() OptNilString {
 }
 
 // GetCreatedAt returns the value of CreatedAt.
-func (s *Posting) GetCreatedAt() OptInt64 {
+func (s *Posting) GetCreatedAt() OptNilInt64 {
 	return s.CreatedAt
 }
 
 // GetWorkplaceType returns the value of WorkplaceType.
-func (s *Posting) GetWorkplaceType() OptString {
+func (s *Posting) GetWorkplaceType() OptNilString {
 	return s.WorkplaceType
 }
 
 // GetOpening returns the value of Opening.
-func (s *Posting) GetOpening() OptString {
+func (s *Posting) GetOpening() OptNilString {
 	return s.Opening
 }
 
 // GetOpeningPlain returns the value of OpeningPlain.
-func (s *Posting) GetOpeningPlain() OptString {
+func (s *Posting) GetOpeningPlain() OptNilString {
 	return s.OpeningPlain
 }
 
 // GetDescription returns the value of Description.
-func (s *Posting) GetDescription() OptString {
+func (s *Posting) GetDescription() OptNilString {
 	return s.Description
 }
 
 // GetDescriptionPlain returns the value of DescriptionPlain.
-func (s *Posting) GetDescriptionPlain() OptString {
+func (s *Posting) GetDescriptionPlain() OptNilString {
 	return s.DescriptionPlain
 }
 
 // GetDescriptionBody returns the value of DescriptionBody.
-func (s *Posting) GetDescriptionBody() OptString {
+func (s *Posting) GetDescriptionBody() OptNilString {
 	return s.DescriptionBody
 }
 
 // GetDescriptionBodyPlain returns the value of DescriptionBodyPlain.
-func (s *Posting) GetDescriptionBodyPlain() OptString {
+func (s *Posting) GetDescriptionBodyPlain() OptNilString {
 	return s.DescriptionBodyPlain
 }
 
@@ -557,22 +691,22 @@ func (s *Posting) GetLists() []PostingListEntry {
 }
 
 // GetAdditional returns the value of Additional.
-func (s *Posting) GetAdditional() OptString {
+func (s *Posting) GetAdditional() OptNilString {
 	return s.Additional
 }
 
 // GetAdditionalPlain returns the value of AdditionalPlain.
-func (s *Posting) GetAdditionalPlain() OptString {
+func (s *Posting) GetAdditionalPlain() OptNilString {
 	return s.AdditionalPlain
 }
 
 // GetHostedUrl returns the value of HostedUrl.
-func (s *Posting) GetHostedUrl() OptString {
+func (s *Posting) GetHostedUrl() OptNilString {
 	return s.HostedUrl
 }
 
 // GetApplyUrl returns the value of ApplyUrl.
-func (s *Posting) GetApplyUrl() OptString {
+func (s *Posting) GetApplyUrl() OptNilString {
 	return s.ApplyUrl
 }
 
@@ -582,12 +716,12 @@ func (s *Posting) GetSalaryRange() OptSalaryRange {
 }
 
 // GetSalaryDescription returns the value of SalaryDescription.
-func (s *Posting) GetSalaryDescription() OptString {
+func (s *Posting) GetSalaryDescription() OptNilString {
 	return s.SalaryDescription
 }
 
 // GetSalaryDescriptionPlain returns the value of SalaryDescriptionPlain.
-func (s *Posting) GetSalaryDescriptionPlain() OptString {
+func (s *Posting) GetSalaryDescriptionPlain() OptNilString {
 	return s.SalaryDescriptionPlain
 }
 
@@ -597,7 +731,7 @@ func (s *Posting) SetID(val string) {
 }
 
 // SetText sets the value of Text.
-func (s *Posting) SetText(val string) {
+func (s *Posting) SetText(val NilString) {
 	s.Text = val
 }
 
@@ -612,42 +746,42 @@ func (s *Posting) SetCountry(val OptNilString) {
 }
 
 // SetCreatedAt sets the value of CreatedAt.
-func (s *Posting) SetCreatedAt(val OptInt64) {
+func (s *Posting) SetCreatedAt(val OptNilInt64) {
 	s.CreatedAt = val
 }
 
 // SetWorkplaceType sets the value of WorkplaceType.
-func (s *Posting) SetWorkplaceType(val OptString) {
+func (s *Posting) SetWorkplaceType(val OptNilString) {
 	s.WorkplaceType = val
 }
 
 // SetOpening sets the value of Opening.
-func (s *Posting) SetOpening(val OptString) {
+func (s *Posting) SetOpening(val OptNilString) {
 	s.Opening = val
 }
 
 // SetOpeningPlain sets the value of OpeningPlain.
-func (s *Posting) SetOpeningPlain(val OptString) {
+func (s *Posting) SetOpeningPlain(val OptNilString) {
 	s.OpeningPlain = val
 }
 
 // SetDescription sets the value of Description.
-func (s *Posting) SetDescription(val OptString) {
+func (s *Posting) SetDescription(val OptNilString) {
 	s.Description = val
 }
 
 // SetDescriptionPlain sets the value of DescriptionPlain.
-func (s *Posting) SetDescriptionPlain(val OptString) {
+func (s *Posting) SetDescriptionPlain(val OptNilString) {
 	s.DescriptionPlain = val
 }
 
 // SetDescriptionBody sets the value of DescriptionBody.
-func (s *Posting) SetDescriptionBody(val OptString) {
+func (s *Posting) SetDescriptionBody(val OptNilString) {
 	s.DescriptionBody = val
 }
 
 // SetDescriptionBodyPlain sets the value of DescriptionBodyPlain.
-func (s *Posting) SetDescriptionBodyPlain(val OptString) {
+func (s *Posting) SetDescriptionBodyPlain(val OptNilString) {
 	s.DescriptionBodyPlain = val
 }
 
@@ -657,22 +791,22 @@ func (s *Posting) SetLists(val []PostingListEntry) {
 }
 
 // SetAdditional sets the value of Additional.
-func (s *Posting) SetAdditional(val OptString) {
+func (s *Posting) SetAdditional(val OptNilString) {
 	s.Additional = val
 }
 
 // SetAdditionalPlain sets the value of AdditionalPlain.
-func (s *Posting) SetAdditionalPlain(val OptString) {
+func (s *Posting) SetAdditionalPlain(val OptNilString) {
 	s.AdditionalPlain = val
 }
 
 // SetHostedUrl sets the value of HostedUrl.
-func (s *Posting) SetHostedUrl(val OptString) {
+func (s *Posting) SetHostedUrl(val OptNilString) {
 	s.HostedUrl = val
 }
 
 // SetApplyUrl sets the value of ApplyUrl.
-func (s *Posting) SetApplyUrl(val OptString) {
+func (s *Posting) SetApplyUrl(val OptNilString) {
 	s.ApplyUrl = val
 }
 
@@ -682,42 +816,42 @@ func (s *Posting) SetSalaryRange(val OptSalaryRange) {
 }
 
 // SetSalaryDescription sets the value of SalaryDescription.
-func (s *Posting) SetSalaryDescription(val OptString) {
+func (s *Posting) SetSalaryDescription(val OptNilString) {
 	s.SalaryDescription = val
 }
 
 // SetSalaryDescriptionPlain sets the value of SalaryDescriptionPlain.
-func (s *Posting) SetSalaryDescriptionPlain(val OptString) {
+func (s *Posting) SetSalaryDescriptionPlain(val OptNilString) {
 	s.SalaryDescriptionPlain = val
 }
 
 // The primary posting location is `location` and also appears in `allLocations`.
 // Ref: #/components/schemas/PostingCategories
 type PostingCategories struct {
-	Location     OptString `json:"location"`
-	Commitment   OptString `json:"commitment"`
-	Team         OptString `json:"team"`
-	Department   OptString `json:"department"`
-	AllLocations []string  `json:"allLocations"`
+	Location     OptNilString `json:"location"`
+	Commitment   OptNilString `json:"commitment"`
+	Team         OptNilString `json:"team"`
+	Department   OptNilString `json:"department"`
+	AllLocations []string     `json:"allLocations"`
 }
 
 // GetLocation returns the value of Location.
-func (s *PostingCategories) GetLocation() OptString {
+func (s *PostingCategories) GetLocation() OptNilString {
 	return s.Location
 }
 
 // GetCommitment returns the value of Commitment.
-func (s *PostingCategories) GetCommitment() OptString {
+func (s *PostingCategories) GetCommitment() OptNilString {
 	return s.Commitment
 }
 
 // GetTeam returns the value of Team.
-func (s *PostingCategories) GetTeam() OptString {
+func (s *PostingCategories) GetTeam() OptNilString {
 	return s.Team
 }
 
 // GetDepartment returns the value of Department.
-func (s *PostingCategories) GetDepartment() OptString {
+func (s *PostingCategories) GetDepartment() OptNilString {
 	return s.Department
 }
 
@@ -727,22 +861,22 @@ func (s *PostingCategories) GetAllLocations() []string {
 }
 
 // SetLocation sets the value of Location.
-func (s *PostingCategories) SetLocation(val OptString) {
+func (s *PostingCategories) SetLocation(val OptNilString) {
 	s.Location = val
 }
 
 // SetCommitment sets the value of Commitment.
-func (s *PostingCategories) SetCommitment(val OptString) {
+func (s *PostingCategories) SetCommitment(val OptNilString) {
 	s.Commitment = val
 }
 
 // SetTeam sets the value of Team.
-func (s *PostingCategories) SetTeam(val OptString) {
+func (s *PostingCategories) SetTeam(val OptNilString) {
 	s.Team = val
 }
 
 // SetDepartment sets the value of Department.
-func (s *PostingCategories) SetDepartment(val OptString) {
+func (s *PostingCategories) SetDepartment(val OptNilString) {
 	s.Department = val
 }
 
@@ -754,28 +888,28 @@ func (s *PostingCategories) SetAllLocations(val []string) {
 // Ref: #/components/schemas/PostingListEntry
 type PostingListEntry struct {
 	// List section name, e.g. "Qualifications".
-	Text string `json:"text"`
+	Text NilString `json:"text"`
 	// Unstyled HTML of the list elements.
-	Content string `json:"content"`
+	Content NilString `json:"content"`
 }
 
 // GetText returns the value of Text.
-func (s *PostingListEntry) GetText() string {
+func (s *PostingListEntry) GetText() NilString {
 	return s.Text
 }
 
 // GetContent returns the value of Content.
-func (s *PostingListEntry) GetContent() string {
+func (s *PostingListEntry) GetContent() NilString {
 	return s.Content
 }
 
 // SetText sets the value of Text.
-func (s *PostingListEntry) SetText(val string) {
+func (s *PostingListEntry) SetText(val NilString) {
 	s.Text = val
 }
 
 // SetContent sets the value of Content.
-func (s *PostingListEntry) SetContent(val string) {
+func (s *PostingListEntry) SetContent(val NilString) {
 	s.Content = val
 }
 
@@ -783,48 +917,48 @@ type Postings []Posting
 
 // Ref: #/components/schemas/SalaryRange
 type SalaryRange struct {
-	Currency OptString  `json:"currency"`
-	Interval OptString  `json:"interval"`
-	Min      OptFloat64 `json:"min"`
-	Max      OptFloat64 `json:"max"`
+	Currency OptNilString  `json:"currency"`
+	Interval OptNilString  `json:"interval"`
+	Min      OptNilFloat64 `json:"min"`
+	Max      OptNilFloat64 `json:"max"`
 }
 
 // GetCurrency returns the value of Currency.
-func (s *SalaryRange) GetCurrency() OptString {
+func (s *SalaryRange) GetCurrency() OptNilString {
 	return s.Currency
 }
 
 // GetInterval returns the value of Interval.
-func (s *SalaryRange) GetInterval() OptString {
+func (s *SalaryRange) GetInterval() OptNilString {
 	return s.Interval
 }
 
 // GetMin returns the value of Min.
-func (s *SalaryRange) GetMin() OptFloat64 {
+func (s *SalaryRange) GetMin() OptNilFloat64 {
 	return s.Min
 }
 
 // GetMax returns the value of Max.
-func (s *SalaryRange) GetMax() OptFloat64 {
+func (s *SalaryRange) GetMax() OptNilFloat64 {
 	return s.Max
 }
 
 // SetCurrency sets the value of Currency.
-func (s *SalaryRange) SetCurrency(val OptString) {
+func (s *SalaryRange) SetCurrency(val OptNilString) {
 	s.Currency = val
 }
 
 // SetInterval sets the value of Interval.
-func (s *SalaryRange) SetInterval(val OptString) {
+func (s *SalaryRange) SetInterval(val OptNilString) {
 	s.Interval = val
 }
 
 // SetMin sets the value of Min.
-func (s *SalaryRange) SetMin(val OptFloat64) {
+func (s *SalaryRange) SetMin(val OptNilFloat64) {
 	s.Min = val
 }
 
 // SetMax sets the value of Max.
-func (s *SalaryRange) SetMax(val OptFloat64) {
+func (s *SalaryRange) SetMax(val OptNilFloat64) {
 	s.Max = val
 }

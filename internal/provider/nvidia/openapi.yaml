@@ -403,6 +403,7 @@ components:
       properties:
         total:
           type: integer
+          nullable: true
           description: >
             Total matching job count. Capped at 2000 when no facets or search
             text are applied; exact once any filter narrows the result set.
@@ -423,6 +424,7 @@ components:
       properties:
         title:
           type: string
+          nullable: true
           example: "Software Engineer, CUDA-Q"
         externalPath:
           type: string
@@ -430,10 +432,12 @@ components:
           example: "/job/US-CA-Remote/Software-Engineer--CUDA-Q_JR2011649"
         locationsText:
           type: string
+          nullable: true
           description: Human-readable location summary, e.g. a city or "N Locations".
           example: "2 Locations"
         postedOn:
           type: string
+          nullable: true
           description: Human-readable relative posting date.
           example: "Posted 30+ Days Ago"
 
@@ -450,12 +454,15 @@ components:
       properties:
         title:
           type: string
+          nullable: true
           example: "Software Engineer, CUDA-Q"
         jobDescription:
           type: string
+          nullable: true
           description: Full HTML job description.
         location:
           type: string
+          nullable: true
           example: "US, CA, Remote"
         additionalLocations:
           type: array
@@ -463,25 +470,32 @@ components:
             type: string
         postedOn:
           type: string
+          nullable: true
           example: "Posted 30+ Days Ago"
         timeType:
           type: string
+          nullable: true
           example: "Full time"
         jobReqId:
           type: string
+          nullable: true
           example: "JR2011649"
         externalUrl:
           type: string
+          nullable: true
 
     ErrorResponse:
       type: object
       properties:
         errorCode:
           type: string
+          nullable: true
           example: "HTTP_400"
         httpStatus:
           type: integer
+          nullable: true
           example: 400
         message:
           type: string
+          nullable: true
       additionalProperties: true

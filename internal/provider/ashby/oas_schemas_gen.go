@@ -85,15 +85,15 @@ func (s *Compensation) SetSummaryComponents(val []CompensationComponent) {
 // Ref: #/components/schemas/CompensationComponent
 type CompensationComponent struct {
 	// Component identifier (UUID).
-	ID OptString `json:"id"`
+	ID OptNilString `json:"id"`
 	// Human-readable summary of this component.
-	Summary OptString `json:"summary"`
+	Summary OptNilString `json:"summary"`
 	// Component kind. Known values include Salary, EquityPercentage, and Bonus, but the official docs mark
 	// the list as open ("and others"), so this is deliberately not an enum.
-	CompensationType OptString `json:"compensationType"`
+	CompensationType OptNilString `json:"compensationType"`
 	// Payout interval. Known values include "1 YEAR" and "NONE", but the official docs mark the list as
 	// open ("and others"), so this is deliberately not an enum.
-	Interval OptString `json:"interval"`
+	Interval OptNilString `json:"interval"`
 	// ISO 4217 currency code; null for non-monetary components.
 	CurrencyCode OptNilString `json:"currencyCode"`
 	// Minimum amount; null when the component has no range.
@@ -103,22 +103,22 @@ type CompensationComponent struct {
 }
 
 // GetID returns the value of ID.
-func (s *CompensationComponent) GetID() OptString {
+func (s *CompensationComponent) GetID() OptNilString {
 	return s.ID
 }
 
 // GetSummary returns the value of Summary.
-func (s *CompensationComponent) GetSummary() OptString {
+func (s *CompensationComponent) GetSummary() OptNilString {
 	return s.Summary
 }
 
 // GetCompensationType returns the value of CompensationType.
-func (s *CompensationComponent) GetCompensationType() OptString {
+func (s *CompensationComponent) GetCompensationType() OptNilString {
 	return s.CompensationType
 }
 
 // GetInterval returns the value of Interval.
-func (s *CompensationComponent) GetInterval() OptString {
+func (s *CompensationComponent) GetInterval() OptNilString {
 	return s.Interval
 }
 
@@ -138,22 +138,22 @@ func (s *CompensationComponent) GetMaxValue() OptNilFloat64 {
 }
 
 // SetID sets the value of ID.
-func (s *CompensationComponent) SetID(val OptString) {
+func (s *CompensationComponent) SetID(val OptNilString) {
 	s.ID = val
 }
 
 // SetSummary sets the value of Summary.
-func (s *CompensationComponent) SetSummary(val OptString) {
+func (s *CompensationComponent) SetSummary(val OptNilString) {
 	s.Summary = val
 }
 
 // SetCompensationType sets the value of CompensationType.
-func (s *CompensationComponent) SetCompensationType(val OptString) {
+func (s *CompensationComponent) SetCompensationType(val OptNilString) {
 	s.CompensationType = val
 }
 
 // SetInterval sets the value of Interval.
-func (s *CompensationComponent) SetInterval(val OptString) {
+func (s *CompensationComponent) SetInterval(val OptNilString) {
 	s.Interval = val
 }
 
@@ -175,18 +175,18 @@ func (s *CompensationComponent) SetMaxValue(val OptNilFloat64) {
 // Ref: #/components/schemas/CompensationTier
 type CompensationTier struct {
 	// Tier identifier (UUID).
-	ID OptString `json:"id"`
+	ID OptNilString `json:"id"`
 	// Tier name. Observed as null when the tier is unnamed.
 	Title OptNilString `json:"title"`
 	// Human-readable summary of this tier.
-	TierSummary OptString `json:"tierSummary"`
+	TierSummary OptNilString `json:"tierSummary"`
 	// Extra details. Observed as null when absent.
 	AdditionalInformation OptNilString            `json:"additionalInformation"`
 	Components            []CompensationComponent `json:"components"`
 }
 
 // GetID returns the value of ID.
-func (s *CompensationTier) GetID() OptString {
+func (s *CompensationTier) GetID() OptNilString {
 	return s.ID
 }
 
@@ -196,7 +196,7 @@ func (s *CompensationTier) GetTitle() OptNilString {
 }
 
 // GetTierSummary returns the value of TierSummary.
-func (s *CompensationTier) GetTierSummary() OptString {
+func (s *CompensationTier) GetTierSummary() OptNilString {
 	return s.TierSummary
 }
 
@@ -211,7 +211,7 @@ func (s *CompensationTier) GetComponents() []CompensationComponent {
 }
 
 // SetID sets the value of ID.
-func (s *CompensationTier) SetID(val OptString) {
+func (s *CompensationTier) SetID(val OptNilString) {
 	s.ID = val
 }
 
@@ -221,7 +221,7 @@ func (s *CompensationTier) SetTitle(val OptNilString) {
 }
 
 // SetTierSummary sets the value of TierSummary.
-func (s *CompensationTier) SetTierSummary(val OptString) {
+func (s *CompensationTier) SetTierSummary(val OptNilString) {
 	s.TierSummary = val
 }
 
@@ -254,13 +254,13 @@ func (*GetJobBoardNotFound) getJobBoardRes() {}
 // Ref: #/components/schemas/JobBoardResponse
 type JobBoardResponse struct {
 	// API version. Observed as the JSON string "1".
-	ApiVersion string `json:"apiVersion"`
+	ApiVersion NilString `json:"apiVersion"`
 	// Every listed job posting for the organization.
 	Jobs []JobPosting `json:"jobs"`
 }
 
 // GetApiVersion returns the value of ApiVersion.
-func (s *JobBoardResponse) GetApiVersion() string {
+func (s *JobBoardResponse) GetApiVersion() NilString {
 	return s.ApiVersion
 }
 
@@ -270,7 +270,7 @@ func (s *JobBoardResponse) GetJobs() []JobPosting {
 }
 
 // SetApiVersion sets the value of ApiVersion.
-func (s *JobBoardResponse) SetApiVersion(val string) {
+func (s *JobBoardResponse) SetApiVersion(val NilString) {
 	s.ApiVersion = val
 }
 
@@ -289,21 +289,21 @@ type JobPosting struct {
 	// `applyUrl` embed it.
 	ID OptString `json:"id"`
 	// Job title.
-	Title string `json:"title"`
+	Title NilString `json:"title"`
 	// Department the job belongs to.
-	Department OptString `json:"department"`
+	Department OptNilString `json:"department"`
 	// Immediate team the job belongs to.
-	Team OptString `json:"team"`
+	Team OptNilString `json:"team"`
 	// Employment type. The docs enumerate this set exhaustively.
-	EmploymentType JobPostingEmploymentType `json:"employmentType"`
+	EmploymentType NilJobPostingEmploymentType `json:"employmentType"`
 	// Primary location display name.
-	Location OptString `json:"location"`
+	Location OptNilString `json:"location"`
 	// Additional locations the job can be worked from.
 	SecondaryLocations []SecondaryLocation `json:"secondaryLocations"`
 	// When the job was (last) published.
-	PublishedAt time.Time `json:"publishedAt"`
+	PublishedAt NilDateTime `json:"publishedAt"`
 	// Whether the job appears on the public job board listing.
-	IsListed bool `json:"isListed"`
+	IsListed NilBool `json:"isListed"`
 	// Whether the job is remote. The official docs say always present; observed as null on many boards
 	// (openai, clickhouse, cohere, ...).
 	IsRemote NilBool `json:"isRemote"`
@@ -314,16 +314,16 @@ type JobPosting struct {
 	// (clickhouse, eightsleep, zapier, ...).
 	Address OptNilAddress `json:"address"`
 	// URL of the Ashby-hosted job posting page.
-	JobUrl string `json:"jobUrl"`
+	JobUrl NilString `json:"jobUrl"`
 	// URL of the Ashby-hosted application page.
-	ApplyUrl string `json:"applyUrl"`
+	ApplyUrl NilString `json:"applyUrl"`
 	// Full job description as HTML.
-	DescriptionHtml OptString `json:"descriptionHtml"`
+	DescriptionHtml OptNilString `json:"descriptionHtml"`
 	// Full job description as plain text.
-	DescriptionPlain OptString `json:"descriptionPlain"`
+	DescriptionPlain OptNilString `json:"descriptionPlain"`
 	// Not listed in the official field reference; observed on every job when `includeCompensation=true` is
 	// requested.
-	ShouldDisplayCompensationOnJobPostings OptBool `json:"shouldDisplayCompensationOnJobPostings"`
+	ShouldDisplayCompensationOnJobPostings OptNilBool `json:"shouldDisplayCompensationOnJobPostings"`
 	// Structured compensation data. Present only when the request set `includeCompensation=true`.
 	Compensation OptCompensation `json:"compensation"`
 }
@@ -334,27 +334,27 @@ func (s *JobPosting) GetID() OptString {
 }
 
 // GetTitle returns the value of Title.
-func (s *JobPosting) GetTitle() string {
+func (s *JobPosting) GetTitle() NilString {
 	return s.Title
 }
 
 // GetDepartment returns the value of Department.
-func (s *JobPosting) GetDepartment() OptString {
+func (s *JobPosting) GetDepartment() OptNilString {
 	return s.Department
 }
 
 // GetTeam returns the value of Team.
-func (s *JobPosting) GetTeam() OptString {
+func (s *JobPosting) GetTeam() OptNilString {
 	return s.Team
 }
 
 // GetEmploymentType returns the value of EmploymentType.
-func (s *JobPosting) GetEmploymentType() JobPostingEmploymentType {
+func (s *JobPosting) GetEmploymentType() NilJobPostingEmploymentType {
 	return s.EmploymentType
 }
 
 // GetLocation returns the value of Location.
-func (s *JobPosting) GetLocation() OptString {
+func (s *JobPosting) GetLocation() OptNilString {
 	return s.Location
 }
 
@@ -364,12 +364,12 @@ func (s *JobPosting) GetSecondaryLocations() []SecondaryLocation {
 }
 
 // GetPublishedAt returns the value of PublishedAt.
-func (s *JobPosting) GetPublishedAt() time.Time {
+func (s *JobPosting) GetPublishedAt() NilDateTime {
 	return s.PublishedAt
 }
 
 // GetIsListed returns the value of IsListed.
-func (s *JobPosting) GetIsListed() bool {
+func (s *JobPosting) GetIsListed() NilBool {
 	return s.IsListed
 }
 
@@ -389,27 +389,27 @@ func (s *JobPosting) GetAddress() OptNilAddress {
 }
 
 // GetJobUrl returns the value of JobUrl.
-func (s *JobPosting) GetJobUrl() string {
+func (s *JobPosting) GetJobUrl() NilString {
 	return s.JobUrl
 }
 
 // GetApplyUrl returns the value of ApplyUrl.
-func (s *JobPosting) GetApplyUrl() string {
+func (s *JobPosting) GetApplyUrl() NilString {
 	return s.ApplyUrl
 }
 
 // GetDescriptionHtml returns the value of DescriptionHtml.
-func (s *JobPosting) GetDescriptionHtml() OptString {
+func (s *JobPosting) GetDescriptionHtml() OptNilString {
 	return s.DescriptionHtml
 }
 
 // GetDescriptionPlain returns the value of DescriptionPlain.
-func (s *JobPosting) GetDescriptionPlain() OptString {
+func (s *JobPosting) GetDescriptionPlain() OptNilString {
 	return s.DescriptionPlain
 }
 
 // GetShouldDisplayCompensationOnJobPostings returns the value of ShouldDisplayCompensationOnJobPostings.
-func (s *JobPosting) GetShouldDisplayCompensationOnJobPostings() OptBool {
+func (s *JobPosting) GetShouldDisplayCompensationOnJobPostings() OptNilBool {
 	return s.ShouldDisplayCompensationOnJobPostings
 }
 
@@ -424,27 +424,27 @@ func (s *JobPosting) SetID(val OptString) {
 }
 
 // SetTitle sets the value of Title.
-func (s *JobPosting) SetTitle(val string) {
+func (s *JobPosting) SetTitle(val NilString) {
 	s.Title = val
 }
 
 // SetDepartment sets the value of Department.
-func (s *JobPosting) SetDepartment(val OptString) {
+func (s *JobPosting) SetDepartment(val OptNilString) {
 	s.Department = val
 }
 
 // SetTeam sets the value of Team.
-func (s *JobPosting) SetTeam(val OptString) {
+func (s *JobPosting) SetTeam(val OptNilString) {
 	s.Team = val
 }
 
 // SetEmploymentType sets the value of EmploymentType.
-func (s *JobPosting) SetEmploymentType(val JobPostingEmploymentType) {
+func (s *JobPosting) SetEmploymentType(val NilJobPostingEmploymentType) {
 	s.EmploymentType = val
 }
 
 // SetLocation sets the value of Location.
-func (s *JobPosting) SetLocation(val OptString) {
+func (s *JobPosting) SetLocation(val OptNilString) {
 	s.Location = val
 }
 
@@ -454,12 +454,12 @@ func (s *JobPosting) SetSecondaryLocations(val []SecondaryLocation) {
 }
 
 // SetPublishedAt sets the value of PublishedAt.
-func (s *JobPosting) SetPublishedAt(val time.Time) {
+func (s *JobPosting) SetPublishedAt(val NilDateTime) {
 	s.PublishedAt = val
 }
 
 // SetIsListed sets the value of IsListed.
-func (s *JobPosting) SetIsListed(val bool) {
+func (s *JobPosting) SetIsListed(val NilBool) {
 	s.IsListed = val
 }
 
@@ -479,27 +479,27 @@ func (s *JobPosting) SetAddress(val OptNilAddress) {
 }
 
 // SetJobUrl sets the value of JobUrl.
-func (s *JobPosting) SetJobUrl(val string) {
+func (s *JobPosting) SetJobUrl(val NilString) {
 	s.JobUrl = val
 }
 
 // SetApplyUrl sets the value of ApplyUrl.
-func (s *JobPosting) SetApplyUrl(val string) {
+func (s *JobPosting) SetApplyUrl(val NilString) {
 	s.ApplyUrl = val
 }
 
 // SetDescriptionHtml sets the value of DescriptionHtml.
-func (s *JobPosting) SetDescriptionHtml(val OptString) {
+func (s *JobPosting) SetDescriptionHtml(val OptNilString) {
 	s.DescriptionHtml = val
 }
 
 // SetDescriptionPlain sets the value of DescriptionPlain.
-func (s *JobPosting) SetDescriptionPlain(val OptString) {
+func (s *JobPosting) SetDescriptionPlain(val OptNilString) {
 	s.DescriptionPlain = val
 }
 
 // SetShouldDisplayCompensationOnJobPostings sets the value of ShouldDisplayCompensationOnJobPostings.
-func (s *JobPosting) SetShouldDisplayCompensationOnJobPostings(val OptBool) {
+func (s *JobPosting) SetShouldDisplayCompensationOnJobPostings(val OptNilBool) {
 	s.ShouldDisplayCompensationOnJobPostings = val
 }
 
@@ -666,6 +666,96 @@ func (o NilBool) Or(d bool) bool {
 	return d
 }
 
+// NewNilDateTime returns new NilDateTime with value set to v.
+func NewNilDateTime(v time.Time) NilDateTime {
+	return NilDateTime{
+		Value: v,
+	}
+}
+
+// NilDateTime is nullable time.Time.
+type NilDateTime struct {
+	Value time.Time
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilDateTime) SetTo(v time.Time) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilDateTime) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilDateTime) SetToNull() {
+	o.Null = true
+	var v time.Time
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilDateTime) Get() (v time.Time, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilDateTime) Or(d time.Time) time.Time {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilJobPostingEmploymentType returns new NilJobPostingEmploymentType with value set to v.
+func NewNilJobPostingEmploymentType(v JobPostingEmploymentType) NilJobPostingEmploymentType {
+	return NilJobPostingEmploymentType{
+		Value: v,
+	}
+}
+
+// NilJobPostingEmploymentType is nullable JobPostingEmploymentType.
+type NilJobPostingEmploymentType struct {
+	Value JobPostingEmploymentType
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilJobPostingEmploymentType) SetTo(v JobPostingEmploymentType) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilJobPostingEmploymentType) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilJobPostingEmploymentType) SetToNull() {
+	o.Null = true
+	var v JobPostingEmploymentType
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilJobPostingEmploymentType) Get() (v JobPostingEmploymentType, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilJobPostingEmploymentType) Or(d JobPostingEmploymentType) JobPostingEmploymentType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewNilJobPostingWorkplaceType returns new NilJobPostingWorkplaceType with value set to v.
 func NewNilJobPostingWorkplaceType(v JobPostingWorkplaceType) NilJobPostingWorkplaceType {
 	return NilJobPostingWorkplaceType{
@@ -705,6 +795,51 @@ func (o NilJobPostingWorkplaceType) Get() (v JobPostingWorkplaceType, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o NilJobPostingWorkplaceType) Or(d JobPostingWorkplaceType) JobPostingWorkplaceType {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewNilString returns new NilString with value set to v.
+func NewNilString(v string) NilString {
+	return NilString{
+		Value: v,
+	}
+}
+
+// NilString is nullable string.
+type NilString struct {
+	Value string
+	Null  bool
+}
+
+// SetTo sets value to v.
+func (o *NilString) SetTo(v string) {
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o NilString) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *NilString) SetToNull() {
+	o.Null = true
+	var v string
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o NilString) Get() (v string, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o NilString) Or(d string) string {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -865,6 +1000,74 @@ func (o OptNilAddress) Get() (v Address, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNilAddress) Or(d Address) Address {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBool returns new OptNilBool with value set to v.
+func NewOptNilBool(v bool) OptNilBool {
+	return OptNilBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBool is optional nullable bool.
+type OptNilBool struct {
+	Value bool
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBool was set.
+func (o OptNilBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBool) SetTo(v bool) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBool) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilBool) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilBool) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBool) Or(d bool) bool {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1104,78 +1307,78 @@ func (o OptString) Or(d string) string {
 // Ref: #/components/schemas/PostalAddress
 type PostalAddress struct {
 	// City.
-	AddressLocality OptString `json:"addressLocality"`
+	AddressLocality OptNilString `json:"addressLocality"`
 	// State / province.
-	AddressRegion OptString `json:"addressRegion"`
+	AddressRegion OptNilString `json:"addressRegion"`
 	// Country.
-	AddressCountry OptString `json:"addressCountry"`
+	AddressCountry OptNilString `json:"addressCountry"`
 	// Postal code.
-	PostalCode OptString `json:"postalCode"`
+	PostalCode OptNilString `json:"postalCode"`
 	// Street address. Not listed in the official field reference; observed on boards that publish full
 	// office addresses.
-	StreetAddress OptString `json:"streetAddress"`
+	StreetAddress OptNilString `json:"streetAddress"`
 }
 
 // GetAddressLocality returns the value of AddressLocality.
-func (s *PostalAddress) GetAddressLocality() OptString {
+func (s *PostalAddress) GetAddressLocality() OptNilString {
 	return s.AddressLocality
 }
 
 // GetAddressRegion returns the value of AddressRegion.
-func (s *PostalAddress) GetAddressRegion() OptString {
+func (s *PostalAddress) GetAddressRegion() OptNilString {
 	return s.AddressRegion
 }
 
 // GetAddressCountry returns the value of AddressCountry.
-func (s *PostalAddress) GetAddressCountry() OptString {
+func (s *PostalAddress) GetAddressCountry() OptNilString {
 	return s.AddressCountry
 }
 
 // GetPostalCode returns the value of PostalCode.
-func (s *PostalAddress) GetPostalCode() OptString {
+func (s *PostalAddress) GetPostalCode() OptNilString {
 	return s.PostalCode
 }
 
 // GetStreetAddress returns the value of StreetAddress.
-func (s *PostalAddress) GetStreetAddress() OptString {
+func (s *PostalAddress) GetStreetAddress() OptNilString {
 	return s.StreetAddress
 }
 
 // SetAddressLocality sets the value of AddressLocality.
-func (s *PostalAddress) SetAddressLocality(val OptString) {
+func (s *PostalAddress) SetAddressLocality(val OptNilString) {
 	s.AddressLocality = val
 }
 
 // SetAddressRegion sets the value of AddressRegion.
-func (s *PostalAddress) SetAddressRegion(val OptString) {
+func (s *PostalAddress) SetAddressRegion(val OptNilString) {
 	s.AddressRegion = val
 }
 
 // SetAddressCountry sets the value of AddressCountry.
-func (s *PostalAddress) SetAddressCountry(val OptString) {
+func (s *PostalAddress) SetAddressCountry(val OptNilString) {
 	s.AddressCountry = val
 }
 
 // SetPostalCode sets the value of PostalCode.
-func (s *PostalAddress) SetPostalCode(val OptString) {
+func (s *PostalAddress) SetPostalCode(val OptNilString) {
 	s.PostalCode = val
 }
 
 // SetStreetAddress sets the value of StreetAddress.
-func (s *PostalAddress) SetStreetAddress(val OptString) {
+func (s *PostalAddress) SetStreetAddress(val OptNilString) {
 	s.StreetAddress = val
 }
 
 // Ref: #/components/schemas/SecondaryLocation
 type SecondaryLocation struct {
 	// Location display name.
-	Location OptString `json:"location"`
+	Location OptNilString `json:"location"`
 	// Secondary location's postal address. Observed as null on some boards (alchemy, cohere).
 	Address OptNilAddress `json:"address"`
 }
 
 // GetLocation returns the value of Location.
-func (s *SecondaryLocation) GetLocation() OptString {
+func (s *SecondaryLocation) GetLocation() OptNilString {
 	return s.Location
 }
 
@@ -1185,7 +1388,7 @@ func (s *SecondaryLocation) GetAddress() OptNilAddress {
 }
 
 // SetLocation sets the value of Location.
-func (s *SecondaryLocation) SetLocation(val OptString) {
+func (s *SecondaryLocation) SetLocation(val OptNilString) {
 	s.Location = val
 }
 
