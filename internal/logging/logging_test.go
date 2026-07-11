@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"log/slog"
+	"regexp"
 	"testing"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -34,6 +35,7 @@ func TestLoggingMiddleware(t *testing.T) {
 	assert.Contains(t, logOutput, "error=\"api lookup failed\"")
 	assert.Contains(t, logOutput, "MCP protocol handler error")
 	assert.Contains(t, logOutput, "error=\"handler level failure\"")
+	assert.Contains(t, logOutput, "req_id=")
 }
 
 func TestLoggingMiddlewareSuccessLogsNothing(t *testing.T) {
@@ -69,4 +71,15 @@ func TestLoggingMiddlewareDebugLogsRequests(t *testing.T) {
 	assert.Contains(t, logOutput, "request completed")
 	assert.Contains(t, logOutput, "method=test_method")
 	assert.Contains(t, logOutput, "duration=")
+
+	// Both entries of one request carry the same req_id.
+	ids := regexp.MustCompile(`req_id=(\S+)`).FindAllStringSubmatch(logOutput, -1)
+	require.Len(t, ids, 2)
+	assert.Equal(t, ids[0][1], ids[1][1])
+
+	// A second request gets a different req_id.
+	buf.Reset()
+	_, err = wrapped(t.Context(), "test_method", nil)
+	require.NoError(t, err)
+	assert.NotContains(t, buf.String(), "req_id="+ids[0][1])
 }
