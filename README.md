@@ -1,11 +1,7 @@
 <h1 align="center">openings-mcp</h1>
 
 <p align="center">
-  <strong>Search job listings from any MCP client: job boards and company career sites, one server.</strong>
-</p>
-
-<p align="center">
-  <img src="assets/openings_demo.gif" alt="Demo of openings-mcp searching job listings from Claude Code" width="800">
+  <strong>One MCP server to search job boards and company career sites.</strong>
 </p>
 
 **openings-mcp** searches job listings across job boards and company career
@@ -24,6 +20,10 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 
 ⚠️ Token use adds up fast when your client explores multiple postings or
 fetches full job details, so consider a cheaper model.
+
+<p align="center">
+  <img src="assets/openings_demo.gif" alt="Demo of openings-mcp searching job listings from Claude Code" width="800">
+</p>
 
 > **Disclaimer:** This is an unofficial, personal-use tool. It is not affiliated
 > with, endorsed by, or sponsored by 104 Corporation, TSMC, or any other job
