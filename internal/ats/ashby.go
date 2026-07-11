@@ -79,7 +79,7 @@ func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 			Title:       j.Title.Value,
 			Company:     cmp.Or(ashby.CompaniesByBoard[slug].Name, slug),
 			Location:    ashbyLocations(j),
-			PostedAt:    isoDate(j.PublishedAt.Value),
+			PostedAt:    ashbyPostedAt(j.PublishedAt),
 			URL:         j.JobUrl.Value,
 			Description: j.DescriptionPlain.Value,
 		}, nil
@@ -133,7 +133,7 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 				JobID:    j.ID.Value,
 				Title:    j.Title.Value,
 				Location: j.Location.Value,
-				PostedAt: isoDate(j.PublishedAt.Value),
+				PostedAt: ashbyPostedAt(j.PublishedAt),
 				URL:      j.JobUrl.Value,
 			},
 			sortKey:     j.PublishedAt.Value,
@@ -145,6 +145,17 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 		})
 	}
 	return jobs, nil
+}
+
+// ashbyPostedAt guards against a present-but-null publishedAt: NilDateTime's
+// zero Value would otherwise format as a fake date instead of the true
+// "unknown" state.
+func ashbyPostedAt(t ashby.NilDateTime) string {
+	v, ok := t.Get()
+	if !ok {
+		return ""
+	}
+	return isoDate(v)
 }
 
 func ashbyLocations(j ashby.JobPosting) string {

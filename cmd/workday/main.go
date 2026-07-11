@@ -220,10 +220,10 @@ func runFacets(
 // mis-rendered as a leaf.
 func printFacetNode(node workday.FacetNode, depth int) {
 	indent := strings.Repeat("  ", depth)
-	if node.FacetParameter.Set {
-		label := node.FacetParameter.Value
-		if node.Descriptor.Set {
-			label = fmt.Sprintf("%s (%s)", label, node.Descriptor.Value)
+	if param, ok := node.FacetParameter.Get(); ok {
+		label := param
+		if descriptor, ok := node.Descriptor.Get(); ok {
+			label = fmt.Sprintf("%s (%s)", label, descriptor)
 		}
 		fmt.Println(indent + label)
 		for _, child := range node.Values {
@@ -231,7 +231,9 @@ func printFacetNode(node workday.FacetNode, depth int) {
 		}
 		return
 	}
-	fmt.Printf("%s%s  id=%s  count=%d\n", indent, node.Descriptor.Value, node.ID.Value, node.Count.Value)
+	descriptor, _ := node.Descriptor.Get()
+	count, _ := node.Count.Get()
+	fmt.Printf("%s%s  id=%s  count=%d\n", indent, descriptor, node.ID.Value, count)
 }
 
 // jobResultJSON is the --format json shape for one search result: the

@@ -353,8 +353,12 @@ func TestJob104ExperienceLabel(t *testing.T) {
 		{12, "Over10Years"},
 	}
 	for _, tc := range cases {
-		assert.Equal(t, tc.want, job104ExperienceLabel(tc.period), "period=%d", tc.period)
+		assert.Equal(t, tc.want, job104ExperienceLabel(job104.NewNilInt(tc.period)), "period=%d", tc.period)
 	}
+
+	// A null period is distinct from a real 0 (no requirement) and must not
+	// be fabricated into "Under1Year".
+	assert.Equal(t, "", job104ExperienceLabel(job104.NilInt{Null: true}))
 }
 
 func TestJob104SalaryTypeLabels(t *testing.T) {

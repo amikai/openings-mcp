@@ -249,3 +249,39 @@ func TestWorkdayUnknownSlugTeaches(t *testing.T) {
 	_, err := a.Search(t.Context(), "not-a-tenant", SearchParams{})
 	require.ErrorContains(t, err, "careers URL", "error should teach the URL alternative")
 }
+
+// TestFlattenFacetsNullFacetParameter guards a present-but-explicitly-null
+// facetParameter on a leaf's group ancestor: it must not overwrite the
+// param inherited from a real parent, and a leaf with a null descriptor
+// must not produce a garbage empty-label entry.
+func TestFlattenFacetsNullFacetParameter(t *testing.T) {
+	nodes := []workday.FacetNode{
+		{
+			FacetParameter: workday.NewOptNilString("jobFamilyGroup"),
+			Values: []workday.FacetNode{
+				{
+					// A group node with an explicitly null facetParameter
+					// must not blank out "jobFamilyGroup" for its children.
+					FacetParameter: workday.OptNilString{Set: true, Null: true},
+					Values: []workday.FacetNode{
+						{
+							Descriptor: workday.NewOptNilString("Engineering"),
+							ID:         workday.NewOptString("guid-1"),
+						},
+						{
+							// Null descriptor: must be dropped, not emitted
+							// with an empty label.
+							Descriptor: workday.OptNilString{Set: true, Null: true},
+							ID:         workday.NewOptString("guid-2"),
+						},
+					},
+				},
+			},
+		},
+	}
+	flat := flattenFacets(nodes)
+	require.Len(t, flat, 1)
+	assert.Equal(t, "jobFamilyGroup", flat[0].param)
+	assert.Equal(t, "Engineering", flat[0].label)
+	assert.Equal(t, "guid-1", flat[0].id)
+}

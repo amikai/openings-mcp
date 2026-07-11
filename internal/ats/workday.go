@@ -262,12 +262,12 @@ func flattenFacets(nodes []workday.FacetNode) []flatFacet {
 	var out []flatFacet
 	var walk func(n workday.FacetNode, param string)
 	walk = func(n workday.FacetNode, param string) {
-		if n.FacetParameter.Set {
-			param = n.FacetParameter.Value
+		if v, ok := n.FacetParameter.Get(); ok {
+			param = v
 		}
 		if len(n.Values) == 0 {
-			if param != "" && n.ID.Set && n.Descriptor.Set {
-				out = append(out, flatFacet{param: param, label: n.Descriptor.Value, id: n.ID.Value})
+			if descriptor, ok := n.Descriptor.Get(); param != "" && n.ID.Set && ok {
+				out = append(out, flatFacet{param: param, label: descriptor, id: n.ID.Value})
 			}
 			return
 		}

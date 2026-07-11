@@ -169,8 +169,9 @@ func leverLocations(p *lever.Posting) string {
 }
 
 func leverPostedAt(p *lever.Posting) string {
-	if !p.CreatedAt.Set {
+	v, ok := p.CreatedAt.Get()
+	if !ok {
 		return ""
 	}
-	return isoDate(time.UnixMilli(p.CreatedAt.Value))
+	return isoDate(time.UnixMilli(v))
 }

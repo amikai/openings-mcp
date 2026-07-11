@@ -191,8 +191,9 @@ func greenhouseDescription(content string) string {
 }
 
 func greenhousePostedAt(t greenhouse.OptNilDateTime) string {
-	if !t.Set {
+	v, ok := t.Get()
+	if !ok {
 		return ""
 	}
-	return isoDate(t.Value)
+	return isoDate(v)
 }

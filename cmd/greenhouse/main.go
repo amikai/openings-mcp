@@ -121,14 +121,14 @@ func summarize(j greenhouse.JobSummary) jobSummaryJSON {
 		Title:    j.Title.Value,
 		Location: j.Location.Value.Name.Value,
 	}
-	if j.AbsoluteURL.Set {
-		s.URL = j.AbsoluteURL.Value.String()
+	if v, ok := j.AbsoluteURL.Get(); ok {
+		s.URL = v.String()
 	}
-	if j.FirstPublished.Set {
-		s.PostedAt = j.FirstPublished.Value.Format("2006-01-02")
+	if v, ok := j.FirstPublished.Get(); ok {
+		s.PostedAt = v.Format("2006-01-02")
 	}
-	if j.UpdatedAt.Set {
-		s.UpdatedAt = j.UpdatedAt.Value.Format("2006-01-02")
+	if v, ok := j.UpdatedAt.Get(); ok {
+		s.UpdatedAt = v.Format("2006-01-02")
 	}
 	return s
 }
@@ -336,11 +336,11 @@ func printDetail(d *greenhouse.JobDetail, format string) error {
 	if name := d.Location.Value.Name.Value; name != "" {
 		fmt.Printf("Location: %s\n", name)
 	}
-	if d.FirstPublished.Set {
-		fmt.Printf("Posted: %s\n", d.FirstPublished.Value.Format("2006-01-02"))
+	if v, ok := d.FirstPublished.Get(); ok {
+		fmt.Printf("Posted: %s\n", v.Format("2006-01-02"))
 	}
-	if d.AbsoluteURL.Set {
-		fmt.Printf("URL: %s\n", d.AbsoluteURL.Value.String())
+	if v, ok := d.AbsoluteURL.Get(); ok {
+		fmt.Printf("URL: %s\n", v.String())
 	}
 	if len(d.PayInputRanges) > 0 {
 		fmt.Println("Pay ranges:")

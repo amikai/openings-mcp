@@ -173,13 +173,15 @@ type searchResultJSON struct {
 
 func summarize(j ashby.JobPosting) jobSummaryJSON {
 	s := jobSummaryJSON{
-		ID:          j.ID.Value,
-		Title:       j.Title.Value,
-		Department:  j.Department.Value,
-		Team:        j.Team.Value,
-		Location:    j.Location.Value,
-		PublishedAt: j.PublishedAt.Value.Format("2006-01-02"),
-		URL:         j.JobUrl.Value,
+		ID:         j.ID.Value,
+		Title:      j.Title.Value,
+		Department: j.Department.Value,
+		Team:       j.Team.Value,
+		Location:   j.Location.Value,
+		URL:        j.JobUrl.Value,
+	}
+	if v, ok := j.PublishedAt.Get(); ok {
+		s.PublishedAt = v.Format("2006-01-02")
 	}
 	// Both fields are documented as always present but observed as null on
 	// many boards; a null stays empty/omitted rather than defaulting to

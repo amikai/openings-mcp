@@ -21,11 +21,11 @@ func mustURL(t *testing.T, s string) url.URL {
 func TestSummarize(t *testing.T) {
 	j := greenhouse.JobSummary{
 		ID:             greenhouse.NewOptInt(4425455),
-		Title:          greenhouse.NewOptString("Staff Engineer"),
-		FirstPublished: greenhouse.NewOptDateTime(time.Date(2026, 5, 1, 9, 0, 0, 0, time.UTC)),
-		UpdatedAt:      greenhouse.NewOptDateTime(time.Date(2026, 6, 20, 9, 0, 0, 0, time.UTC)),
-		Location:       greenhouse.NewOptLocation(greenhouse.Location{Name: greenhouse.NewOptString("Taipei, Taiwan")}),
-		AbsoluteURL:    greenhouse.NewOptURI(mustURL(t, "https://boards.greenhouse.io/acme/jobs/4425455")),
+		Title:          greenhouse.NewOptNilString("Staff Engineer"),
+		FirstPublished: greenhouse.NewOptNilDateTime(time.Date(2026, 5, 1, 9, 0, 0, 0, time.UTC)),
+		UpdatedAt:      greenhouse.NewOptNilDateTime(time.Date(2026, 6, 20, 9, 0, 0, 0, time.UTC)),
+		Location:       greenhouse.NewOptLocation(greenhouse.Location{Name: greenhouse.NewOptNilString("Taipei, Taiwan")}),
+		AbsoluteURL:    greenhouse.NewOptNilURI(mustURL(t, "https://boards.greenhouse.io/acme/jobs/4425455")),
 	}
 	assert.Equal(t, jobSummaryJSON{
 		ID:        4425455,
@@ -38,8 +38,25 @@ func TestSummarize(t *testing.T) {
 }
 
 func TestSummarizeEmptyOptionals(t *testing.T) {
-	s := summarize(greenhouse.JobSummary{ID: greenhouse.NewOptInt(1), Title: greenhouse.NewOptString("X")})
+	s := summarize(greenhouse.JobSummary{ID: greenhouse.NewOptInt(1), Title: greenhouse.NewOptNilString("X")})
 	assert.Equal(t, jobSummaryJSON{ID: 1, Title: "X"}, s)
+}
+
+// TestSummarizeNullDates guards a present-but-explicitly-null
+// firstPublished/updatedAt/absoluteUrl: these must stay empty, not format
+// the zero time/URL as if it were real data.
+func TestSummarizeNullDates(t *testing.T) {
+	j := greenhouse.JobSummary{
+		ID:             greenhouse.NewOptInt(1),
+		Title:          greenhouse.NewOptNilString("X"),
+		FirstPublished: greenhouse.OptNilDateTime{Set: true, Null: true},
+		UpdatedAt:      greenhouse.OptNilDateTime{Set: true, Null: true},
+		AbsoluteURL:    greenhouse.OptNilURI{Set: true, Null: true},
+	}
+	s := summarize(j)
+	assert.Empty(t, s.PostedAt)
+	assert.Empty(t, s.UpdatedAt)
+	assert.Empty(t, s.URL)
 }
 
 func TestMatches(t *testing.T) {

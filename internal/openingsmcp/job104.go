@@ -269,8 +269,13 @@ var job104SalaryTypeLabels = map[int]string{
 // job104ExperienceLabel buckets a JobSummary's raw period value into the
 // same labels as the experience input, mirroring the jobexp/period mapping
 // documented on JobSummary.period in openapi.yaml (jobexp 1 → period 0-1,
-// 3 → 2-3, 5 → 4-5, 10 → 6-10, 99 → 11+).
-func job104ExperienceLabel(period int) string {
+// 3 → 2-3, 5 → 4-5, 10 → 6-10, 99 → 11+). A null period is distinct from
+// a real 0 (no requirement) and returns "" rather than a fabricated bucket.
+func job104ExperienceLabel(nilPeriod job104.NilInt) string {
+	period, ok := nilPeriod.Get()
+	if !ok {
+		return ""
+	}
 	switch {
 	case period <= 1:
 		return "Under1Year"
@@ -311,7 +316,7 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 			ApplyCnt:      j.ApplyCnt.Value,
 			Remote:        job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType.Value)],
 			JobType:       job104RoLabels[job104.SearchJobsRo(j.JobRo.Value)],
-			Experience:    job104ExperienceLabel(j.Period.Value),
+			Experience:    job104ExperienceLabel(j.Period),
 		})
 	}
 	return out
