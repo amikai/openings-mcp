@@ -81,6 +81,7 @@ components:
       properties:
         apiVersion:
           type: string
+          nullable: true
           description: API version. Observed as the JSON string "1".
           example: "1"
         jobs:
@@ -112,22 +113,27 @@ components:
           example: 7458d4e9-da2e-47bd-98cb-adfda43d42b2
         title:
           type: string
+          nullable: true
           description: Job title.
           example: Engineering Manager, EU
         department:
           type: string
+          nullable: true
           description: Department the job belongs to.
           example: Engineering
         team:
           type: string
+          nullable: true
           description: Immediate team the job belongs to.
           example: EMEA Engineering
         employmentType:
           type: string
+          nullable: true
           enum: [FullTime, PartTime, Intern, Contract, Temporary]
           description: Employment type. The docs enumerate this set exhaustively.
         location:
           type: string
+          nullable: true
           description: Primary location display name.
           example: Remote - European Union
         secondaryLocations:
@@ -138,10 +144,12 @@ components:
         publishedAt:
           type: string
           format: date-time
+          nullable: true
           description: When the job was (last) published.
           example: "2024-03-04T14:29:08.532+00:00"
         isListed:
           type: boolean
+          nullable: true
           description: Whether the job appears on the public job board listing.
         isRemote:
           type: boolean
@@ -166,20 +174,25 @@ components:
             omitted) on some boards (clickhouse, eightsleep, zapier, ...).
         jobUrl:
           type: string
+          nullable: true
           description: URL of the Ashby-hosted job posting page.
           example: https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2
         applyUrl:
           type: string
+          nullable: true
           description: URL of the Ashby-hosted application page.
           example: https://jobs.ashbyhq.com/ashby/7458d4e9-da2e-47bd-98cb-adfda43d42b2/application
         descriptionHtml:
           type: string
+          nullable: true
           description: Full job description as HTML.
         descriptionPlain:
           type: string
+          nullable: true
           description: Full job description as plain text.
         shouldDisplayCompensationOnJobPostings:
           type: boolean
+          nullable: true
           description: >
             Not listed in the official field reference; observed on every
             job when `includeCompensation=true` is requested.
@@ -195,6 +208,7 @@ components:
       properties:
         location:
           type: string
+          nullable: true
           description: Location display name.
           example: Spain
         address:
@@ -220,18 +234,23 @@ components:
       properties:
         addressLocality:
           type: string
+          nullable: true
           description: City.
         addressRegion:
           type: string
+          nullable: true
           description: State / province.
         addressCountry:
           type: string
+          nullable: true
           description: Country.
         postalCode:
           type: string
+          nullable: true
           description: Postal code.
         streetAddress:
           type: string
+          nullable: true
           description: >
             Street address. Not listed in the official field reference;
             observed on boards that publish full office addresses.
@@ -274,6 +293,7 @@ components:
       properties:
         id:
           type: string
+          nullable: true
           description: Tier identifier (UUID).
         title:
           type: string
@@ -282,6 +302,7 @@ components:
           example: EU
         tierSummary:
           type: string
+          nullable: true
           description: Human-readable summary of this tier.
           example: "€76K – €185K • Offers Equity • Offers Bonus"
         additionalInformation:
@@ -301,19 +322,23 @@ components:
       properties:
         id:
           type: string
+          nullable: true
           description: Component identifier (UUID).
         summary:
           type: string
+          nullable: true
           description: Human-readable summary of this component.
           example: "€76K – €185K"
         compensationType:
           type: string
+          nullable: true
           description: >
             Component kind. Known values include Salary, EquityPercentage,
             and Bonus, but the official docs mark the list as open ("and
             others"), so this is deliberately not an enum.
         interval:
           type: string
+          nullable: true
           description: >
             Payout interval. Known values include "1 YEAR" and "NONE", but
             the official docs mark the list as open ("and others"), so this

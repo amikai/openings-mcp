@@ -174,12 +174,12 @@ type searchResultJSON struct {
 func summarize(j ashby.JobPosting) jobSummaryJSON {
 	s := jobSummaryJSON{
 		ID:          j.ID.Value,
-		Title:       j.Title,
+		Title:       j.Title.Value,
 		Department:  j.Department.Value,
 		Team:        j.Team.Value,
 		Location:    j.Location.Value,
-		PublishedAt: j.PublishedAt.Format("2006-01-02"),
-		URL:         j.JobUrl,
+		PublishedAt: j.PublishedAt.Value.Format("2006-01-02"),
+		URL:         j.JobUrl.Value,
 	}
 	// Both fields are documented as always present but observed as null on
 	// many boards; a null stays empty/omitted rather than defaulting to
@@ -217,7 +217,7 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 
 	matched := make([]jobSummaryJSON, 0, len(resp.Jobs))
 	for _, j := range resp.Jobs {
-		if keyword != "" && !strings.Contains(strings.ToLower(j.Title), strings.ToLower(keyword)) {
+		if keyword != "" && !strings.Contains(strings.ToLower(j.Title.Value), strings.ToLower(keyword)) {
 			continue
 		}
 		matched = append(matched, summarize(j))
@@ -311,8 +311,8 @@ func printJob(j ashby.JobPosting, format string) error {
 	s := summarize(j)
 	fmt.Println(s.Title)
 	printSummary(s)
-	fmt.Printf("Employment: %s\n", j.EmploymentType)
-	fmt.Printf("Apply: %s\n", j.ApplyUrl)
+	fmt.Printf("Employment: %s\n", j.EmploymentType.Value)
+	fmt.Printf("Apply: %s\n", j.ApplyUrl.Value)
 	if j.Compensation.Set {
 		printCompensation(j.Compensation.Value)
 	}

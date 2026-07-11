@@ -43,34 +43,34 @@ func TestGetJobBoard(t *testing.T) {
 	board, ok := res.(*JobBoardResponse)
 	require.True(t, ok, "expected *JobBoardResponse, got %T", res)
 
-	assert.Equal(t, "1", board.ApiVersion)
+	assert.Equal(t, "1", board.ApiVersion.Value)
 	require.Len(t, board.Jobs, 5)
 
 	job := board.Jobs[0]
 	assert.Equal(t, NewOptString("7724fbe3-6a27-4418-9705-2dcc40751a16"), job.ID)
-	assert.Equal(t, "Software Engineer (Agent Platform)", job.Title)
-	assert.Equal(t, NewOptString("Engineering"), job.Department)
-	assert.Equal(t, NewOptString("Engineering"), job.Team)
-	assert.Equal(t, JobPostingEmploymentTypeFullTime, job.EmploymentType)
+	assert.Equal(t, "Software Engineer (Agent Platform)", job.Title.Value)
+	assert.Equal(t, NewOptNilString("Engineering"), job.Department)
+	assert.Equal(t, NewOptNilString("Engineering"), job.Team)
+	assert.Equal(t, NilJobPostingEmploymentType{Value: JobPostingEmploymentTypeFullTime}, job.EmploymentType)
 	assert.Equal(t, NilJobPostingWorkplaceType{Value: JobPostingWorkplaceTypeOnSite}, job.WorkplaceType)
-	assert.Equal(t, NewOptString("San Francisco"), job.Location)
+	assert.Equal(t, NewOptNilString("San Francisco"), job.Location)
 	assert.Equal(t, NilBool{Value: false}, job.IsRemote)
-	assert.True(t, job.IsListed)
-	assert.True(t, job.PublishedAt.Equal(time.Date(2025, 8, 25, 20, 13, 34, 942_000_000, time.UTC)))
-	assert.Equal(t, "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16", job.JobUrl)
-	assert.Equal(t, "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16/application", job.ApplyUrl)
+	assert.True(t, job.IsListed.Value)
+	assert.True(t, job.PublishedAt.Value.Equal(time.Date(2025, 8, 25, 20, 13, 34, 942_000_000, time.UTC)))
+	assert.Equal(t, "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16", job.JobUrl.Value)
+	assert.Equal(t, "https://jobs.ashbyhq.com/browserbase/7724fbe3-6a27-4418-9705-2dcc40751a16/application", job.ApplyUrl.Value)
 	assert.True(t, job.DescriptionHtml.Set)
 	assert.True(t, job.DescriptionPlain.Set)
 
 	addr := job.Address.Value.PostalAddress.Value
-	assert.Equal(t, NewOptString("San Francisco"), addr.AddressLocality)
-	assert.Equal(t, NewOptString("CA"), addr.AddressRegion)
-	assert.Equal(t, NewOptString("United States"), addr.AddressCountry)
-	assert.Equal(t, NewOptString("94104"), addr.PostalCode)
-	assert.Equal(t, NewOptString("1 Post Street, Floor 15"), addr.StreetAddress)
+	assert.Equal(t, NewOptNilString("San Francisco"), addr.AddressLocality)
+	assert.Equal(t, NewOptNilString("CA"), addr.AddressRegion)
+	assert.Equal(t, NewOptNilString("United States"), addr.AddressCountry)
+	assert.Equal(t, NewOptNilString("94104"), addr.PostalCode)
+	assert.Equal(t, NewOptNilString("1 Post Street, Floor 15"), addr.StreetAddress)
 
 	require.Len(t, job.SecondaryLocations, 1)
-	assert.Equal(t, NewOptString("New York"), job.SecondaryLocations[0].Location)
+	assert.Equal(t, NewOptNilString("New York"), job.SecondaryLocations[0].Location)
 
 	for _, j := range board.Jobs {
 		assert.False(t, j.Compensation.Set, "compensation must be absent without includeCompensation")
@@ -96,7 +96,7 @@ func TestGetJobBoardWithCompensation(t *testing.T) {
 	require.Len(t, board.Jobs, 5)
 
 	job := board.Jobs[0]
-	assert.Equal(t, NewOptBool(true), job.ShouldDisplayCompensationOnJobPostings)
+	assert.Equal(t, NewOptNilBool(true), job.ShouldDisplayCompensationOnJobPostings)
 	require.True(t, job.Compensation.Set)
 
 	comp := job.Compensation.Value
@@ -113,18 +113,18 @@ func TestGetJobBoardWithCompensation(t *testing.T) {
 	require.Len(t, comp.CompensationTiers, 1)
 	tier := comp.CompensationTiers[0]
 	assert.Equal(t, OptNilString{Set: true, Null: true}, tier.Title, "unnamed tier decodes as null title")
-	assert.Equal(t, NewOptString("Estimated base salary $132K – $330K • Offers Equity"), tier.TierSummary)
+	assert.Equal(t, NewOptNilString("Estimated base salary $132K – $330K • Offers Equity"), tier.TierSummary)
 
 	require.Len(t, tier.Components, 2)
 	salary := tier.Components[0]
-	assert.Equal(t, NewOptString("Salary"), salary.CompensationType)
-	assert.Equal(t, NewOptString("1 YEAR"), salary.Interval)
+	assert.Equal(t, NewOptNilString("Salary"), salary.CompensationType)
+	assert.Equal(t, NewOptNilString("1 YEAR"), salary.Interval)
 	assert.Equal(t, OptNilString{Value: "USD", Set: true}, salary.CurrencyCode)
 	assert.Equal(t, OptNilFloat64{Value: 132000, Set: true}, salary.MinValue)
 	assert.Equal(t, OptNilFloat64{Value: 330000, Set: true}, salary.MaxValue)
 
 	equity := tier.Components[1]
-	assert.Equal(t, NewOptString("EquityPercentage"), equity.CompensationType)
+	assert.Equal(t, NewOptNilString("EquityPercentage"), equity.CompensationType)
 	assert.Equal(t, OptNilString{Set: true, Null: true}, equity.CurrencyCode)
 	assert.Equal(t, OptNilFloat64{Set: true, Null: true}, equity.MinValue)
 	assert.Equal(t, OptNilFloat64{Set: true, Null: true}, equity.MaxValue)
