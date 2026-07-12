@@ -22,7 +22,7 @@ func TestListJobs(t *testing.T) {
 	got, ok := res.(*JobListResponse)
 	require.True(t, ok, "want *JobListResponse, got %T", res)
 
-	want := &JobListResponse{
+	assert.Equal(t, &JobListResponse{
 		Meta: NewOptJobListResponseMeta(JobListResponseMeta{Total: NewOptInt(7)}),
 		Jobs: []JobSummary{
 			{
@@ -148,8 +148,7 @@ func TestListJobs(t *testing.T) {
 				},
 			},
 		},
-	}
-	assert.Equal(t, want, got)
+	}, got)
 }
 
 func TestListJobsUnknownBoardToken(t *testing.T) {
@@ -179,7 +178,7 @@ func TestGetJob(t *testing.T) {
 	got, ok := res.(*JobDetail)
 	require.True(t, ok, "want *JobDetail, got %T", res)
 
-	want := &JobDetail{
+	assert.Equal(t, &JobDetail{
 		ID:                  NewOptInt(4461450008),
 		Title:               NewOptNilString("Account Executive, AI Native "),
 		CompanyName:         NewOptNilString("Anthropic"),
@@ -236,7 +235,7 @@ func TestGetJob(t *testing.T) {
 		IncludeAiDisclaimer: OptNilBool{Set: true, Null: true},
 		AiDisclaimer:        OptNilString{Set: true, Null: true},
 		AiOptOutRequestURL:  OptNilURI{Set: true, Null: true},
-		Metadata: NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{{}}),
+		Metadata:            NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{{}}),
 		DataCompliance: []DataCompliance{
 			{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
 		},
@@ -247,8 +246,7 @@ func TestGetJob(t *testing.T) {
 			{ID: NewOptInt(4001219008), Name: NewOptNilString("New York City, NY"), Location: NewOptNilString("New York, New York, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
 			{ID: NewOptInt(4001218008), Name: NewOptNilString("San Francisco, CA"), Location: NewOptNilString("San Francisco, California, United States"), ParentID: OptNilInt{Set: true, Null: true}, ChildIds: []int{}},
 		},
-	}
-	assert.Equal(t, want, got)
+	}, got)
 }
 
 // TestGetJobWithQuestionsAndPayTransparency guards the nullable optional

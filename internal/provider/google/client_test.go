@@ -21,8 +21,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &JobsResponse{Jobs: wantJobs}
-	assert.Equal(t, want, got)
+	assert.Equal(t, &JobsResponse{Jobs: wantJobs}, got)
 }
 
 func TestJobDetail(t *testing.T) {

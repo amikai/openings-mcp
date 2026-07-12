@@ -43,7 +43,7 @@ func TestJobs(t *testing.T) {
 	got, err := c.Jobs(t.Context(), &JobsRequest{Keywords: "software engineer"})
 	require.NoError(t, err)
 
-	want := &JobsResponse{
+	assert.Equal(t, &JobsResponse{
 		TotalResults: 604,
 		TotalPages:   300,
 		CurrentPage:  1,
@@ -53,8 +53,7 @@ func TestJobs(t *testing.T) {
 			{Title: "Staff Software Engineer", Location: "Bengaluru, India", Category: "Engineering", Posted: "03/31/2026", DisplayID: "16567", JobID: "93498496944", City: "bengaluru", Slug: "staff-software-engineer"},
 			{Title: "Staff Software Engineer", Location: "Bengaluru, India", Category: "Engineering", Posted: "03/31/2026", DisplayID: "16566", JobID: "93498496928", City: "bengaluru", Slug: "staff-software-engineer"},
 		},
-	}
-	assert.Equal(t, want, got)
+	}, got)
 }
 
 // hasJobs=true with zero parseable cards means the results markup changed

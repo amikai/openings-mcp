@@ -43,7 +43,7 @@ func TestSearchJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &JobsResponse{
+	assert.Equal(t, &JobsResponse{
 		Data: []JobSummary{
 			{JobNo: NewNilString("10177057"), JobName: NewNilString("GoLang Developer"), CustName: NewNilString("曜驊智能股份有限公司"), CustNo: NewNilString("130000000042972"), Link: JobSummaryLink{Job: "https://www.104.com.tw/job/624o1", Cust: NewNilString("https://www.104.com.tw/company/1a2x6biwgs")}, SalaryHigh: NewNilInt(0), SalaryLow: NewNilInt(0), S10: NewNilInt(10), JobAddrNoDesc: NewNilString("台北市內湖區"), AppearDate: NewNilString("20260515"), ApplyCnt: NewNilInt(3), RemoteWorkType: NewNilInt(0), JobRo: NewNilInt(1), Period: NewNilInt(0)},
 			{JobNo: NewNilString("15015281"), JobName: NewNilString("Golang 後端工程師"), CustName: NewNilString("富一代資訊有限公司"), CustNo: NewNilString("130000000264142"), Link: JobSummaryLink{Job: "https://www.104.com.tw/job/8xtv5", Cust: NewNilString("https://www.104.com.tw/company/1a2x6bnn4e")}, SalaryHigh: NewNilInt(120000), SalaryLow: NewNilInt(60000), S10: NewNilInt(50), JobAddrNoDesc: NewNilString("台北市松山區"), AppearDate: NewNilString("20260609"), ApplyCnt: NewNilInt(8), RemoteWorkType: NewNilInt(0), JobRo: NewNilInt(1), Period: NewNilInt(0)},
@@ -79,8 +79,7 @@ func TestSearchJobs(t *testing.T) {
 		Metadata: JobsResponseMetadata{
 			Pagination: JobsResponseMetadataPagination{CurrentPage: NewNilInt(1), LastPage: NewNilInt(7), Total: NewNilInt(189)},
 		},
-	}
-	assert.Equal(t, want, got)
+	}, got)
 }
 
 func TestGetJobDetail(t *testing.T) {
@@ -93,7 +92,7 @@ func TestGetJobDetail(t *testing.T) {
 	got, err := c.GetJobDetail(t.Context(), GetJobDetailParams{JobCode: "624o1"})
 	require.NoError(t, err)
 
-	want := &JobDetailResponse{
+	assert.Equal(t, &JobDetailResponse{
 		Data: JobDetail{
 			Header: JobDetailHeader{
 				JobName:    NewNilString("軟體工程師 (數位工程發展部)"),
@@ -144,8 +143,7 @@ func TestGetJobDetail(t *testing.T) {
 			Employees: NewNilString("1200人"),
 			CustNo:    NewNilString("264c9zc"),
 		},
-	}
-	assert.Equal(t, want, got)
+	}, got)
 }
 
 func TestSearchJobsUpstreamError(t *testing.T) {
@@ -163,11 +161,10 @@ func TestSearchJobsUpstreamError(t *testing.T) {
 
 	ue, ok := errors.AsType[*ErrorResponseStatusCode](err)
 	require.True(t, ok, "expected *ErrorResponseStatusCode in %v", err)
-	want := &ErrorResponseStatusCode{
+	assert.Equal(t, &ErrorResponseStatusCode{
 		StatusCode: 500,
 		Response:   ErrorResponse{Message: NewOptNilString("internal error"), AdditionalProps: ErrorResponseAdditional{}},
-	}
-	assert.Equal(t, want, ue)
+	}, ue)
 }
 
 func TestGetJobDetailUpstreamError(t *testing.T) {
@@ -182,9 +179,8 @@ func TestGetJobDetailUpstreamError(t *testing.T) {
 
 	ue, ok := errors.AsType[*ErrorResponseStatusCode](err)
 	require.True(t, ok, "expected *ErrorResponseStatusCode in %v", err)
-	want := &ErrorResponseStatusCode{
+	assert.Equal(t, &ErrorResponseStatusCode{
 		StatusCode: 404,
 		Response:   ErrorResponse{Message: NewOptNilString("job not found"), AdditionalProps: ErrorResponseAdditional{}},
-	}
-	assert.Equal(t, want, ue)
+	}, ue)
 }

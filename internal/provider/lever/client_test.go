@@ -121,11 +121,10 @@ func TestListPostingsNotFound(t *testing.T) {
 
 	ue, ok := errors.AsType[*ErrorResponseStatusCode](err)
 	require.True(t, ok, "expected *ErrorResponseStatusCode in %v", err)
-	want := &ErrorResponseStatusCode{
+	assert.Equal(t, &ErrorResponseStatusCode{
 		StatusCode: 404,
 		Response:   ErrorResponse{Ok: NewNilBool(false), Error: NewNilString("Document not found")},
-	}
-	assert.Equal(t, want, ue)
+	}, ue)
 }
 
 func TestGetPostingNotFound(t *testing.T) {
@@ -143,9 +142,8 @@ func TestGetPostingNotFound(t *testing.T) {
 
 	ue, ok := errors.AsType[*ErrorResponseStatusCode](err)
 	require.True(t, ok, "expected *ErrorResponseStatusCode in %v", err)
-	want := &ErrorResponseStatusCode{
+	assert.Equal(t, &ErrorResponseStatusCode{
 		StatusCode: 404,
 		Response:   ErrorResponse{Ok: NewNilBool(false), Error: NewNilString("Document not found")},
-	}
-	assert.Equal(t, want, ue)
+	}, ue)
 }

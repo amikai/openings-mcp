@@ -22,8 +22,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &JobsResponse{Total: 22, Jobs: wantJobs}
-	assert.Equal(t, want, got)
+	assert.Equal(t, &JobsResponse{Total: 22, Jobs: wantJobs}, got)
 }
 
 func TestJobDetail(t *testing.T) {
