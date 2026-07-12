@@ -15,6 +15,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[Teamtailor](https://www.teamtailor.com)**, **[Recruitee](https://recruitee.com)**,
   **[Eightfold](https://eightfold.ai)**,
   **[SAP SuccessFactors](https://www.sap.com/products/hcm/recruiting-software.html)**,
+  **[SmartRecruiters](https://www.smartrecruiters.com)**,
   and **[iCIMS](https://www.icims.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms

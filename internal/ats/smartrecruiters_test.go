@@ -256,3 +256,27 @@ func TestSmartRecruitersDetailNotFound(t *testing.T) {
 	_, err := a.Detail(t.Context(), "equinox", "000000000000")
 	require.ErrorContains(t, err, "pass a job_id exactly as returned by the job search")
 }
+
+func TestSmartRecruitersCareersHostPatternRegistered(t *testing.T) {
+	// The registry only advertises careers-URL shapes for adapters listed
+	// in careersHostPatternsByAdapter; a missing entry silently degrades
+	// the "unrecognized careers URL" teaching error.
+	assert.Contains(t, careersHostPatternsByAdapter, "smartrecruiters")
+}
+
+func TestSmartRecruitersResolvesThroughRegistry(t *testing.T) {
+	a, err := NewSmartRecruitersAdapter("https://api.smartrecruiters.com", http.DefaultClient)
+	require.NoError(t, err)
+	r, err := NewRegistry(a)
+	require.NoError(t, err)
+
+	got, slug, err := r.Resolve("Equinox")
+	require.NoError(t, err)
+	assert.Equal(t, "smartrecruiters", got.Name())
+	assert.Equal(t, "equinox", slug)
+
+	got, slug, err = r.Resolve("https://jobs.smartrecruiters.com/SomeUnknownCo")
+	require.NoError(t, err)
+	assert.Equal(t, "smartrecruiters", got.Name())
+	assert.Equal(t, "someunknownco", slug)
+}
