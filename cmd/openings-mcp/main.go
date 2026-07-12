@@ -181,12 +181,17 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create Greenhouse ATS adapter: %w", err)
 	}
+	smartRecruitersAdapter, err := ats.NewSmartRecruitersAdapter("https://api.smartrecruiters.com/v1", hc)
+	if err != nil {
+		return nil, fmt.Errorf("create SmartRecruiters ATS adapter: %w", err)
+	}
 
 	return ats.NewRegistry(
 		ats.NewWorkdayAdapter(hc),
 		leverAdapter,
 		ashbyAdapter,
 		greenhouseAdapter,
+		smartRecruitersAdapter,
 	)
 }
 
