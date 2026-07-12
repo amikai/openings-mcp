@@ -408,6 +408,8 @@
   board: "causaly"
 - company: "Centivo"
   board: "centivo"
+- company: "Cerebras"
+  board: "cerebras"
 - company: "Chainalysis"
   board: "chainalysis-careers"
 - company: "Chalkboard"
