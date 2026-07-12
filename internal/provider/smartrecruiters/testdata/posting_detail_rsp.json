@@ -1,0 +1,110 @@
+{
+  "id": "744000137225639",
+  "name": "Female Locker Room Associate, Houston",
+  "uuid": "38d71eff-cbfa-4681-ba34-cea9c1450c99",
+  "jobId": "a078aa7c-c7d5-459e-a134-e80070c8ac5e",
+  "jobAdId": "2771f04c-f5bf-4437-b091-5742e18eb18e",
+  "defaultJobAd": true,
+  "refNumber": "REF3410P",
+  "company": {
+    "name": "Equinox",
+    "identifier": "Equinox"
+  },
+  "location": {
+    "city": "Houston",
+    "region": "TX",
+    "country": "us",
+    "remote": false,
+    "hybrid": false,
+    "latitude": "29.7604267",
+    "longitude": "-95.3698028",
+    "fullLocation": "Houston, TX, United States"
+  },
+  "customField": [
+    {
+      "fieldId": "5d9f91b45d95674b7eff50f4",
+      "fieldLabel": "Location - Region",
+      "valueId": "68fd9b74-37ce-4e49-be75-2d1ec12dda69",
+      "valueLabel": "Central"
+    },
+    {
+      "fieldId": "558d7f79e4b06067bdf6900e",
+      "fieldLabel": "Location",
+      "valueId": "d04fd588-40b3-457c-8142-b9f7afdc5e75",
+      "valueLabel": "454 - River Oaks"
+    },
+    {
+      "fieldId": "COUNTRY",
+      "fieldLabel": "Country/Region",
+      "valueId": "us",
+      "valueLabel": "United States"
+    },
+    {
+      "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+      "fieldLabel": "Department",
+      "valueId": "660916",
+      "valueLabel": "Club - Staff"
+    },
+    {
+      "fieldId": "57476804e4b056dd66cc2bf8",
+      "fieldLabel": "Brands",
+      "valueId": "default",
+      "valueLabel": "Equinox"
+    }
+  ],
+  "releasedDate": "2026-07-10T23:49:03.072Z",
+  "creator": {
+    "name": "",
+    "avatarUrl": ""
+  },
+  "postingUrl": "https://jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston",
+  "applyUrl": "https://jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston?oga=true",
+  "referralUrl": "https://jobs.smartrecruiters.com/external-referrals/company/Equinox/publication/38d71eff-cbfa-4681-ba34-cea9c1450c99?dcr_ci=Equinox",
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "title": "Company Description",
+        "text": "<p><strong><u>OUR&#xa0;STORY:</u></strong></p><p>Equinox Group is a high growth collective of the world's most influential, experiential, and differentiated lifestyle brands. We restlessly seek what is next for maximizing life - and boldly grow the lifestyle brands and experiences that define it. In addition to Equinox,&#xa0;our&#xa0;other brands,&#xa0;<strong>SoulCycle and Equinox Hotels&#xa0;</strong>are all recognized for inspiring and motivating members and employees to maximize life.&#xa0;Our&#xa0;portfolio of brands is recognized globally with locations within every major city across the United States in addition to London, Toronto, and Vancouver.&#xa0;</p><p><strong><u>OUR&#xa0;CODE:</u></strong></p><p>We are passionate about <strong>high performance living</strong> and we practice what we preach – investing time in&#xa0;our&#xa0;own health and fitness. We believe that everyone has untapped potential within them and it takes a <strong>disruptive approach</strong> to unleash it. We <strong>dream big</strong> and don’t settle for the status quo. We <strong>sweat the details</strong>. We never accept less than <strong>110%</strong> to <strong>help each other</strong> deliver the Equinox experience and enable&#xa0;our&#xa0;members to get great results. &#xa0;We are obsessed with what’s new, what’s now, <strong>what’s next</strong>. Never following, always leading, and living ahead of the moment in fashion, culture, and consumer behavior. We aren’t just a company; we’re a community vested in each other’s success. We value <strong>humility</strong> and a <strong>team approach</strong> at every level of the company.</p><p>If you are a high performing individual who is passionate about winning and inspiring others then we are excited to discuss career opportunities with you.</p>"
+      },
+      "jobDescription": {
+        "title": "Job Description",
+        "text": "<p>We are looking for energetic, creative, and enthusiastic <strong>Female Locker Room Associates</strong> to join the Equinox Houston&#xa0;team.</p><p>Job responsibilities include but are not limited to the following:</p><ul><li>Ensure that the Female locker rooms are clean, stocked and well maintained while providing all members, prospective members, and guests with excellent customer service&#xa0;</li><li>Clean and organize storage, laundry, exercise, and coat rooms&#xa0;</li><li>Maintain an adequate supply of towels in the locker room&#xa0;</li><li>Assist with special events&#xa0;</li><li>Notify the Maintenance Manager when any rooms need immediate attention&#xa0;</li></ul>"
+      },
+      "qualifications": {
+        "title": "Qualifications",
+        "text": "<p>The successful candidate must have the following experience, skills, and education:&#xa0;</p><ul><li>Must possess a clear understanding of what constitutes a clean and sanitary environment&#xa0;</li><li>Ability to service athletic equipment along with previous experience working with cleaning products and hand tools&#xa0;</li><li>Strong customer service, organizational, communication, and multi-tasking abilities&#xa0;</li></ul>"
+      },
+      "additionalInformation": {
+        "title": "Additional Information",
+        "text": "<p><strong><u>AS A MEMBER OF THE EQUINOX TEAM YOU WILL RECEIVE:</u></strong></p><ul><li>We offer competitive salary, benefits, and industry leading commission opportunities for club employees</li><li>Complimentary Club membership</li><li>Perks and incentives with our products and services including Personal Training, Pilates, Spa and Shop</li></ul><p>This job description is intended to describe the general requirements for the position. It is not a complete statement of duties, responsibilities, or requirements. Other duties not listed here may be assigned as necessary to ensure the proper operations of the department.</p><p><strong>Equinox is an equal opportunity employer. For more information regarding our career opportunities, please visit one of our clubs or our website at&#xa0;<em><a href=\"https://careers.equinox.com/\" rel=\"noopener noreferrer\">https://careers.equinox.com/</a></em></strong></p><p>All your information will be kept confidential according to EEO guidelines. Must have a legal right to work in the United States.&#xa0;</p>"
+      }
+    }
+  },
+  "active": true,
+  "visibility": "PUBLIC",
+  "industry": {
+    "id": "health_wellness_fitness",
+    "label": "Health, Wellness And Fitness"
+  },
+  "function": {
+    "id": "other",
+    "label": "Other"
+  },
+  "department": {
+    "id": 660916,
+    "label": "Club - Staff"
+  },
+  "experienceLevel": {
+    "id": "not_applicable",
+    "label": "Not Applicable"
+  },
+  "typeOfEmployment": {
+    "id": "part-time",
+    "label": "Part-time"
+  },
+  "language": {
+    "code": "en",
+    "label": "English",
+    "labelNative": "English (US)"
+  }
+}

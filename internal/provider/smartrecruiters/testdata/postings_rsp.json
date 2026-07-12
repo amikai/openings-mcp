@@ -1,0 +1,403 @@
+{
+  "offset": 0,
+  "limit": 5,
+  "totalFound": 662,
+  "content": [
+    {
+      "id": "744000137225639",
+      "name": "Female Locker Room Associate, Houston",
+      "uuid": "38d71eff-cbfa-4681-ba34-cea9c1450c99",
+      "jobAdId": "2771f04c-f5bf-4437-b091-5742e18eb18e",
+      "defaultJobAd": true,
+      "refNumber": "REF3410P",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T23:49:03.072Z",
+      "location": {
+        "city": "Houston",
+        "region": "TX",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "latitude": "29.7604267",
+        "longitude": "-95.3698028",
+        "fullLocation": "Houston, TX, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660916",
+        "label": "Club - Staff"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "part-time",
+        "label": "Part-time"
+      },
+      "experienceLevel": {
+        "id": "not_applicable",
+        "label": "Not Applicable"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "68fd9b74-37ce-4e49-be75-2d1ec12dda69",
+          "valueLabel": "Central"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "d04fd588-40b3-457c-8142-b9f7afdc5e75",
+          "valueLabel": "454 - River Oaks"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660916",
+          "valueLabel": "Club - Staff"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137225639",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137225559",
+      "name": "Front Desk Associates, Houston",
+      "uuid": "1ccce118-7dd7-402b-846b-17a5025bf139",
+      "jobAdId": "77fb37cc-e936-4b0d-b66e-2aa84374b59a",
+      "defaultJobAd": true,
+      "refNumber": "REF424O",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T23:46:06.157Z",
+      "location": {
+        "city": "Houston",
+        "region": "TX",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Houston, TX, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660916",
+        "label": "Club - Staff"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "part-time",
+        "label": "Part-time"
+      },
+      "experienceLevel": {
+        "id": "not_applicable",
+        "label": "Not Applicable"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "68fd9b74-37ce-4e49-be75-2d1ec12dda69",
+          "valueLabel": "Central"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "d04fd588-40b3-457c-8142-b9f7afdc5e75",
+          "valueLabel": "454 - River Oaks"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660916",
+          "valueLabel": "Club - Staff"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137225559",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137204752",
+      "name": "Membership Sales Advisor, Chicago",
+      "uuid": "061b6529-c4a5-4da9-865b-01bb531747c9",
+      "jobAdId": "2573d93f-fb52-412a-b00a-ebd7381f3876",
+      "defaultJobAd": true,
+      "refNumber": "REF338D",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:36:46.046Z",
+      "location": {
+        "city": "Chicago",
+        "region": "IL",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Chicago, IL, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660882",
+        "label": "Club - Sales"
+      },
+      "function": {
+        "id": "sales",
+        "label": "Sales"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "associate",
+        "label": "Associate"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "345797b0-429f-464c-bb97-5926bfdb5cde",
+          "valueLabel": "NORTH"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660882",
+          "valueLabel": "Club - Sales"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137204752",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137202099",
+      "name": "Personal Trainer, Downtown LA",
+      "uuid": "2e84ad4b-13da-4c1e-a413-77342952dbc4",
+      "jobAdId": "5d0f5359-a39d-4973-8996-ac764928adb5",
+      "defaultJobAd": true,
+      "refNumber": "REF637E",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:13:31.983Z",
+      "location": {
+        "city": "Los Angeles",
+        "region": "CA",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Los Angeles, CA, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660899",
+        "label": "Club - Personal Training"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "part-time",
+        "label": "Part-time"
+      },
+      "experienceLevel": {
+        "id": "associate",
+        "label": "Associate"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "9f5b2f1d-889d-4910-ab6a-cbf5e2dc2c66",
+          "valueLabel": "So Cal - LA"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "c083b00c-5ed0-4478-9418-fd338c0994ba",
+          "valueLabel": "715 - Downtown LA"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660899",
+          "valueLabel": "Club - Personal Training"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137202099",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137201650",
+      "name": "Personal Trainer, West Hollywood",
+      "uuid": "47a61bcf-880f-4642-9045-0961c00a49bf",
+      "jobAdId": "9c634724-dfea-4dea-b55c-7623bbcc4bf3",
+      "defaultJobAd": true,
+      "refNumber": "REF636K",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:09:44.393Z",
+      "location": {
+        "city": "West Hollywood",
+        "region": "CA",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "West Hollywood, CA, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660899",
+        "label": "Club - Personal Training"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "not_applicable",
+        "label": "Not Applicable"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "bb5dce4c-87f4-441e-8bf5-1b693cc5b8f2",
+          "valueLabel": "West"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "f493bd72-fa62-40a8-a34b-dee9b5eaed12",
+          "valueLabel": "West - Sponsor"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660899",
+          "valueLabel": "Club - Personal Training"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137201650",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    }
+  ]
+}

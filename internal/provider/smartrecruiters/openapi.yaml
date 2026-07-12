@@ -1,0 +1,440 @@
+openapi: 3.0.3
+info:
+  title: SmartRecruiters Posting API
+  description: >
+    Public, unauthenticated read-only API for SmartRecruiters-hosted career
+    sites. Docs: https://developers.smartrecruiters.com/docs/posting-api and
+    https://developers.smartrecruiters.com/docs/endpoints — both light on
+    exact schema, so field shapes and quirks below are grounded in live
+    responses (Visa, Equinox) captured 2026-07-12.
+
+    ## No auth, but no 404 either
+
+    Unlike Greenhouse, listing postings for an unknown `companyIdentifier`
+    returns HTTP 200 with `totalFound: 0` and empty `content`, not a 404 —
+    the same shape as a real company with zero open postings. The registry
+    cannot use this endpoint to validate a roster identifier; only the
+    per-posting detail endpoint 404s (`RESOURCE_NOT_FOUND`) for an unknown
+    company or posting id.
+
+    ## department.id changes JSON type between list and detail
+
+    `department.id` is a quoted string in the list response (e.g.
+    `"660916"`) but an unquoted integer in the same field on the detail
+    response (`660916`) for the same posting, reproduced across two
+    companies. Modeled as `oneOf: [string, integer]` on both to decode
+    either shape.
+
+    ## Filters are real server-side filters
+
+    `q`, `country`, `region`, `city`, `department`, and
+    `custom_field.{fieldId}` all narrow `totalFound` (verified against
+    Equinox's ~662-posting board): `q` keyword-matches titles,
+    `department`/`custom_field.{fieldId}=<valueId>` are equivalent ways to
+    filter by the same dimension (a `department` query value is the
+    `department.id` from a posting, not a display label).
+  version: "1.0"
+
+servers:
+  - url: https://api.smartrecruiters.com/v1
+
+paths:
+  /companies/{companyIdentifier}/postings:
+    get:
+      summary: Search/list postings for a company
+      operationId: listPostings
+      parameters:
+        - name: companyIdentifier
+          in: path
+          required: true
+          schema:
+            type: string
+          description: >
+            The company slug from its career site URL, e.g. "Equinox" in
+            jobs.smartrecruiters.com/Equinox. Case-insensitive in practice.
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Free-text keyword search across posting titles (verified server-side).
+        - name: country
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Lowercase ISO country code, e.g. "us". Matches `location.country`.
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+          description: State/region code, e.g. "TX". Matches `location.region`.
+        - name: city
+          in: query
+          required: false
+          schema:
+            type: string
+          description: City name. Matches `location.city`.
+        - name: department
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            A `department.id` value (not the display label), e.g. "660916".
+            Equivalent to `custom_field.{department-fieldId}=<same id>`.
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          description: >
+            Page size. Default and observed maximum both 100; the upstream
+            silently clamps a value above 100 rather than erroring, but the
+            schema enforces the cap client-side so callers don't rely on
+            requesting more than they'll actually get.
+          example: 100
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+          description: Zero-based result offset for pagination.
+        - name: language
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Language filter, e.g. "en". Not empirically verified.
+      responses:
+        "200":
+          description: >
+            Search results. Returned even for an unknown companyIdentifier
+            (empty content, totalFound 0) — see the no-404 quirk above.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingListResponse"
+
+  /companies/{companyIdentifier}/postings/{postingId}:
+    get:
+      summary: Get a single posting's full detail
+      operationId: getPosting
+      parameters:
+        - name: companyIdentifier
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: postingId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The posting `id` from a search result (e.g. "744000137225639").
+      responses:
+        "200":
+          description: Posting detail.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingDetail"
+        "404":
+          description: Unknown companyIdentifier or postingId.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingErrorResponse"
+
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        city:
+          type: string
+          nullable: true
+        region:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        remote:
+          type: boolean
+        hybrid:
+          type: boolean
+        latitude:
+          type: string
+          nullable: true
+        longitude:
+          type: string
+          nullable: true
+        fullLocation:
+          type: string
+          nullable: true
+          description: Human-readable combined location, e.g. "Austin, TX, United States".
+
+    IdLabel:
+      type: object
+      description: Shared shape for industry, function, experienceLevel, and typeOfEmployment.
+      properties:
+        id:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+
+    DepartmentId:
+      description: >
+        String in list responses, unquoted integer in detail responses for
+        the same posting — see the package doc's department.id note.
+      oneOf:
+        - type: string
+        - type: integer
+
+    Department:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/DepartmentId"
+        label:
+          type: string
+          nullable: true
+
+    Company:
+      type: object
+      properties:
+        identifier:
+          type: string
+          nullable: true
+        name:
+          type: string
+          nullable: true
+
+    Language:
+      type: object
+      properties:
+        code:
+          type: string
+          nullable: true
+        label:
+          type: string
+          nullable: true
+        labelNative:
+          type: string
+          nullable: true
+
+    CustomField:
+      type: object
+      properties:
+        fieldId:
+          type: string
+          nullable: true
+        fieldLabel:
+          type: string
+          nullable: true
+        valueId:
+          type: string
+          nullable: true
+        valueLabel:
+          type: string
+          nullable: true
+
+    Creator:
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        avatarUrl:
+          type: string
+          nullable: true
+
+    PostingSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Posting id, always a string here (unlike department.id).
+        name:
+          type: string
+          nullable: true
+        uuid:
+          type: string
+          nullable: true
+        jobAdId:
+          type: string
+          nullable: true
+        defaultJobAd:
+          type: boolean
+        refNumber:
+          type: string
+          nullable: true
+        company:
+          $ref: "#/components/schemas/Company"
+        releasedDate:
+          type: string
+          format: date-time
+          nullable: true
+        location:
+          $ref: "#/components/schemas/Location"
+        industry:
+          $ref: "#/components/schemas/IdLabel"
+        department:
+          $ref: "#/components/schemas/Department"
+        function:
+          $ref: "#/components/schemas/IdLabel"
+        typeOfEmployment:
+          $ref: "#/components/schemas/IdLabel"
+        experienceLevel:
+          $ref: "#/components/schemas/IdLabel"
+        customField:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomField"
+        visibility:
+          type: string
+          nullable: true
+        ref:
+          type: string
+          nullable: true
+          description: >
+            The Posting API's own detail URL for this posting (not the
+            public jobs.smartrecruiters.com page — that only appears as
+            `postingUrl` on the detail response).
+        language:
+          $ref: "#/components/schemas/Language"
+
+    PostingListResponse:
+      type: object
+      required: [offset, limit, totalFound, content]
+      properties:
+        offset:
+          type: integer
+        limit:
+          type: integer
+        totalFound:
+          type: integer
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostingSummary"
+
+    JobAdSection:
+      type: object
+      properties:
+        title:
+          type: string
+          nullable: true
+        text:
+          type: string
+          nullable: true
+          description: HTML, entity-encoded (e.g. `&#xa0;` for nbsp).
+
+    JobAdSections:
+      type: object
+      properties:
+        companyDescription:
+          $ref: "#/components/schemas/JobAdSection"
+        jobDescription:
+          $ref: "#/components/schemas/JobAdSection"
+        qualifications:
+          $ref: "#/components/schemas/JobAdSection"
+        additionalInformation:
+          $ref: "#/components/schemas/JobAdSection"
+
+    JobAd:
+      type: object
+      properties:
+        sections:
+          $ref: "#/components/schemas/JobAdSections"
+
+    PostingDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          nullable: true
+        uuid:
+          type: string
+          nullable: true
+        jobId:
+          type: string
+          nullable: true
+        jobAdId:
+          type: string
+          nullable: true
+        defaultJobAd:
+          type: boolean
+        refNumber:
+          type: string
+          nullable: true
+        company:
+          $ref: "#/components/schemas/Company"
+        location:
+          $ref: "#/components/schemas/Location"
+        customField:
+          type: array
+          items:
+            $ref: "#/components/schemas/CustomField"
+        releasedDate:
+          type: string
+          format: date-time
+          nullable: true
+        creator:
+          $ref: "#/components/schemas/Creator"
+        postingUrl:
+          type: string
+          nullable: true
+          description: Public, human-clickable posting page on jobs.smartrecruiters.com.
+        applyUrl:
+          type: string
+          nullable: true
+        referralUrl:
+          type: string
+          nullable: true
+        jobAd:
+          $ref: "#/components/schemas/JobAd"
+        active:
+          type: boolean
+        visibility:
+          type: string
+          nullable: true
+        industry:
+          $ref: "#/components/schemas/IdLabel"
+        function:
+          $ref: "#/components/schemas/IdLabel"
+        department:
+          $ref: "#/components/schemas/Department"
+        experienceLevel:
+          $ref: "#/components/schemas/IdLabel"
+        typeOfEmployment:
+          $ref: "#/components/schemas/IdLabel"
+        language:
+          $ref: "#/components/schemas/Language"
+
+    PostingErrorResponse:
+      type: object
+      description: Observed for 404s (unknown company or posting id).
+      properties:
+        id:
+          type: string
+          nullable: true
+        httpCode:
+          type: integer
+          nullable: true
+        code:
+          type: string
+          nullable: true
+          example: RESOURCE_NOT_FOUND
+        message:
+          type: string
+          nullable: true

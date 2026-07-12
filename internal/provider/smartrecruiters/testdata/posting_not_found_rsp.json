@@ -1,0 +1,6 @@
+{
+  "id": "2e8d3ecb-939d-41f6-a914-ce52a26ede31",
+  "httpCode": 404,
+  "code": "RESOURCE_NOT_FOUND",
+  "message": "[MDC: ppa-99730a1f-f501-467a-a665-19fd392370b8] Response code: 404. Reason: Resource not found"
+}

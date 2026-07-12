@@ -1,0 +1,247 @@
+{
+  "offset": 0,
+  "limit": 3,
+  "totalFound": 138,
+  "content": [
+    {
+      "id": "744000137202099",
+      "name": "Personal Trainer, Downtown LA",
+      "uuid": "2e84ad4b-13da-4c1e-a413-77342952dbc4",
+      "jobAdId": "5d0f5359-a39d-4973-8996-ac764928adb5",
+      "defaultJobAd": true,
+      "refNumber": "REF637E",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:13:31.983Z",
+      "location": {
+        "city": "Los Angeles",
+        "region": "CA",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Los Angeles, CA, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660899",
+        "label": "Club - Personal Training"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "part-time",
+        "label": "Part-time"
+      },
+      "experienceLevel": {
+        "id": "associate",
+        "label": "Associate"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "9f5b2f1d-889d-4910-ab6a-cbf5e2dc2c66",
+          "valueLabel": "So Cal - LA"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "c083b00c-5ed0-4478-9418-fd338c0994ba",
+          "valueLabel": "715 - Downtown LA"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660899",
+          "valueLabel": "Club - Personal Training"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137202099",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137201650",
+      "name": "Personal Trainer, West Hollywood",
+      "uuid": "47a61bcf-880f-4642-9045-0961c00a49bf",
+      "jobAdId": "9c634724-dfea-4dea-b55c-7623bbcc4bf3",
+      "defaultJobAd": true,
+      "refNumber": "REF636K",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:09:44.393Z",
+      "location": {
+        "city": "West Hollywood",
+        "region": "CA",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "West Hollywood, CA, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660899",
+        "label": "Club - Personal Training"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "not_applicable",
+        "label": "Not Applicable"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "bb5dce4c-87f4-441e-8bf5-1b693cc5b8f2",
+          "valueLabel": "West"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "f493bd72-fa62-40a8-a34b-dee9b5eaed12",
+          "valueLabel": "West - Sponsor"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660899",
+          "valueLabel": "Club - Personal Training"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137201650",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000137198922",
+      "name": "Personal Trainer, Beverly Hills",
+      "uuid": "da257cfc-9a36-4f75-97d6-260c7a7ed7ae",
+      "jobAdId": "37965fa5-4249-48c7-8443-59b637fad44a",
+      "defaultJobAd": true,
+      "refNumber": "REF757M",
+      "company": {
+        "identifier": "Equinox",
+        "name": "Equinox"
+      },
+      "releasedDate": "2026-07-10T19:01:36.684Z",
+      "location": {
+        "city": "Beverly Hills",
+        "region": "CA",
+        "country": "us",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Beverly Hills, CA, United States"
+      },
+      "industry": {
+        "id": "health_wellness_fitness",
+        "label": "Health, Wellness And Fitness"
+      },
+      "department": {
+        "id": "660899",
+        "label": "Club - Personal Training"
+      },
+      "function": {
+        "id": "other",
+        "label": "Other"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "associate",
+        "label": "Associate"
+      },
+      "customField": [
+        {
+          "fieldId": "5d9f91b45d95674b7eff50f4",
+          "fieldLabel": "Location - Region",
+          "valueId": "bb5dce4c-87f4-441e-8bf5-1b693cc5b8f2",
+          "valueLabel": "West"
+        },
+        {
+          "fieldId": "558d7f79e4b06067bdf6900e",
+          "fieldLabel": "Location",
+          "valueId": "f493bd72-fa62-40a8-a34b-dee9b5eaed12",
+          "valueLabel": "West - Sponsor"
+        },
+        {
+          "fieldId": "COUNTRY",
+          "fieldLabel": "Country/Region",
+          "valueId": "us",
+          "valueLabel": "United States"
+        },
+        {
+          "fieldId": "58b7e4d3e4b09a6d37a0cdc3",
+          "fieldLabel": "Department",
+          "valueId": "660899",
+          "valueLabel": "Club - Personal Training"
+        },
+        {
+          "fieldId": "57476804e4b056dd66cc2bf8",
+          "fieldLabel": "Brands",
+          "valueId": "default",
+          "valueLabel": "Equinox"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137198922",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    }
+  ]
+}
