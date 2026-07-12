@@ -9,7 +9,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 
 - **Job boards**: **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**,
   and **[LinkedIn](https://www.linkedin.com)** (public search).
-- **Company career sites**: 350+ companies hosted on the
+- **Company career sites**: 2,000+ companies hosted on the
   **[Workday](https://www.workday.com)**, **[Ashby](https://www.ashbyhq.com)**,
   **[Greenhouse](https://www.greenhouse.com)**, and **[Lever](https://www.lever.co)**
   ATS platforms, all behind one company-search tool. A company outside the
@@ -113,6 +113,10 @@ Inspired by these MCP job-search servers:
 - [jobspy-mcp-server](https://github.com/borgius/jobspy-mcp-server)
 - [mcp-jobs](https://github.com/mergedao/mcp-jobs)
 - [104-mcp-server](https://github.com/bigbrainw/104-mcp-server)
+
+Company roster data cross-referenced from:
+
+- [OpenPostings](https://github.com/Masterjx9/OpenPostings) — company/ATS discovery data used to expand the curated roster
 
 ## License
 
