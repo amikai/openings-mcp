@@ -140,6 +140,8 @@
   board_token: "stripe"
 - company: "SumUp"
   board_token: "sumup"
+- company: "Tenstorrent"
+  board_token: "tenstorrent"
 - company: "Together AI"
   board_token: "togetherai"
 - company: "Trade Republic"
