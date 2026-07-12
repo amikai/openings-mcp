@@ -6,6 +6,7 @@ package smartrecruiters
 type OperationName = string
 
 const (
-	GetPostingOperation   OperationName = "GetPosting"
-	ListPostingsOperation OperationName = "ListPostings"
+	GetPostingOperation      OperationName = "GetPosting"
+	ListDepartmentsOperation OperationName = "ListDepartments"
+	ListPostingsOperation    OperationName = "ListPostings"
 )

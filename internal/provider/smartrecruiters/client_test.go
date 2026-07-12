@@ -24,25 +24,25 @@ func TestListPostings(t *testing.T) {
 
 	first := res.Content[0]
 	assert.Equal(t, NewOptString("744000137225639"), first.ID)
-	assert.Equal(t, NewOptNilString("Female Locker Room Associate, Houston"), first.Name)
-	assert.Equal(t, NewOptNilString("REF3410P"), first.RefNumber)
+	assert.Equal(t, NewOptString("Female Locker Room Associate, Houston"), first.Name)
+	assert.Equal(t, NewOptString("REF3410P"), first.RefNumber)
 	assert.Equal(t, NewOptCompany(Company{
-		Identifier: NewOptNilString("Equinox"),
-		Name:       NewOptNilString("Equinox"),
+		Identifier: NewOptString("Equinox"),
+		Name:       NewOptString("Equinox"),
 	}), first.Company)
-	assert.Equal(t, NewOptLocation(Location{
-		City:         NewOptNilString("Houston"),
-		Region:       NewOptNilString("TX"),
-		Country:      NewOptNilString("us"),
+	assert.Equal(t, NewOptPostingLocation(PostingLocation{
+		City:         NewOptString("Houston"),
+		Region:       NewOptString("TX"),
+		Country:      NewOptString("us"),
 		Remote:       NewOptBool(false),
 		Hybrid:       NewOptBool(false),
-		Latitude:     NewOptNilString("29.7604267"),
-		Longitude:    NewOptNilString("-95.3698028"),
-		FullLocation: NewOptNilString("Houston, TX, United States"),
+		Latitude:     NewOptString("29.7604267"),
+		Longitude:    NewOptString("-95.3698028"),
+		FullLocation: NewOptString("Houston, TX, United States"),
 	}), first.Location)
-	assert.Equal(t, NewOptIdLabel(IdLabel{
-		ID:    NewOptNilString("health_wellness_fitness"),
-		Label: NewOptNilString("Health, Wellness And Fitness"),
+	assert.Equal(t, NewOptIndustry(Industry{
+		ID:    NewOptString("health_wellness_fitness"),
+		Label: NewOptString("Health, Wellness And Fitness"),
 	}), first.Industry)
 
 	// department.id is a quoted string on the list endpoint — the opposite
@@ -54,24 +54,29 @@ func TestListPostings(t *testing.T) {
 	s, isStr := depID.GetString()
 	assert.True(t, isStr, "want department.id to decode as string on the list endpoint")
 	assert.Equal(t, "660916", s)
-	assert.Equal(t, NewOptNilString("Club - Staff"), dep.Label)
+	assert.Equal(t, NewOptString("Club - Staff"), dep.Label)
 
-	assert.Equal(t, NewOptIdLabel(IdLabel{ID: NewOptNilString("other"), Label: NewOptNilString("Other")}), first.Function)
-	assert.Equal(t, NewOptIdLabel(IdLabel{ID: NewOptNilString("part-time"), Label: NewOptNilString("Part-time")}), first.TypeOfEmployment)
-	assert.Equal(t, NewOptIdLabel(IdLabel{ID: NewOptNilString("not_applicable"), Label: NewOptNilString("Not Applicable")}), first.ExperienceLevel)
+	assert.Equal(t, NewOptFunction(Function{ID: NewOptString("other"), Label: NewOptString("Other")}), first.Function)
+	assert.Equal(t, NewOptTypeOfEmployment(TypeOfEmployment{ID: NewOptString("part-time"), Label: NewOptString("Part-time")}), first.TypeOfEmployment)
+	// The live API sends `label`, not the officially documented `name` —
+	// see the ExperienceLevel deviation note in openapi.yaml.
+	assert.Equal(t, NewOptExperienceLevel(ExperienceLevel{
+		ID:    NewOptExperienceLevelID(ExperienceLevelIDNotApplicable),
+		Label: NewOptString("Not Applicable"),
+	}), first.ExperienceLevel)
 	require.Len(t, first.CustomField, 5)
 	assert.Equal(t, CustomField{
-		FieldId:    NewOptNilString("58b7e4d3e4b09a6d37a0cdc3"),
-		FieldLabel: NewOptNilString("Department"),
-		ValueId:    NewOptNilString("660916"),
-		ValueLabel: NewOptNilString("Club - Staff"),
+		FieldId:    NewOptString("58b7e4d3e4b09a6d37a0cdc3"),
+		FieldLabel: NewOptString("Department"),
+		ValueId:    NewOptString("660916"),
+		ValueLabel: NewOptString("Club - Staff"),
 	}, first.CustomField[3])
-	assert.Equal(t, NewOptNilString("PUBLIC"), first.Visibility)
-	assert.Equal(t, NewOptNilString("https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137225639"), first.Ref)
+	assert.Equal(t, NewOptVisibility(VisibilityPUBLIC), first.Visibility)
+	assert.Equal(t, NewOptString("https://api.smartrecruiters.com/v1/companies/equinox/postings/744000137225639"), first.Ref)
 	assert.Equal(t, NewOptLanguage(Language{
-		Code:        NewOptNilString("en"),
-		Label:       NewOptNilString("English"),
-		LabelNative: NewOptNilString("English (US)"),
+		Code:        NewOptString("en"),
+		Label:       NewOptString("English"),
+		LabelNative: NewOptString("English (US)"),
 	}), first.Language)
 }
 
@@ -130,17 +135,17 @@ func TestGetPosting(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	got, ok := res.(*PostingDetail)
-	require.True(t, ok, "want *PostingDetail, got %T", res)
+	got, ok := res.(*Posting)
+	require.True(t, ok, "want *Posting, got %T", res)
 
 	assert.Equal(t, NewOptString("744000137225639"), got.ID)
-	assert.Equal(t, NewOptNilString("Female Locker Room Associate, Houston"), got.Name)
+	assert.Equal(t, NewOptString("Female Locker Room Associate, Houston"), got.Name)
 	assert.True(t, got.Active.Value)
-	assert.Equal(t, NewOptNilString("PUBLIC"), got.Visibility)
-	assert.Equal(t, NewOptNilString(
+	assert.Equal(t, NewOptVisibility(VisibilityPUBLIC), got.Visibility)
+	assert.Equal(t, NewOptString(
 		"https://jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston",
 	), got.PostingUrl)
-	assert.Equal(t, NewOptNilString(
+	assert.Equal(t, NewOptString(
 		"https://jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston?oga=true",
 	), got.ApplyUrl)
 	require.Len(t, got.CustomField, 5)
@@ -154,14 +159,14 @@ func TestGetPosting(t *testing.T) {
 	i, isInt := depID.GetInt()
 	assert.True(t, isInt, "want department.id to decode as int on the detail endpoint")
 	assert.Equal(t, 660916, i)
-	assert.Equal(t, NewOptNilString("Club - Staff"), dep.Label)
+	assert.Equal(t, NewOptString("Club - Staff"), dep.Label)
 
 	sections, ok := got.JobAd.Value.Sections.Get()
 	require.True(t, ok)
 
 	companyDesc, ok := sections.CompanyDescription.Get()
 	require.True(t, ok)
-	assert.Equal(t, NewOptNilString("Company Description"), companyDesc.Title)
+	assert.Equal(t, NewOptString("Company Description"), companyDesc.Title)
 	assert.Contains(t, companyDesc.Text.Value, "Equinox Group is a high growth collective")
 
 	jobDesc, ok := sections.JobDescription.Get()
@@ -193,6 +198,36 @@ func TestGetPostingNotFound(t *testing.T) {
 	got, ok := res.(*PostingErrorResponse)
 	require.True(t, ok, "want *PostingErrorResponse, got %T", res)
 
-	assert.Equal(t, NewOptNilInt(404), got.HttpCode)
-	assert.Equal(t, NewOptNilString("RESOURCE_NOT_FOUND"), got.Code)
+	assert.Equal(t, NewOptInt(404), got.HttpCode)
+	assert.Equal(t, NewOptString("RESOURCE_NOT_FOUND"), got.Code)
+}
+
+func TestListDepartments(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+
+	res, err := client.ListDepartments(t.Context(), ListDepartmentsParams{CompanyIdentifier: "equinox"})
+	require.NoError(t, err)
+
+	assert.Equal(t, 58, res.TotalFound)
+	require.Len(t, res.Content, 58)
+
+	// department.id is an unquoted integer here, like the posting detail
+	// endpoint and unlike the posting list endpoint.
+	first := res.Content[0]
+	depID, ok := first.ID.Get()
+	require.True(t, ok)
+	i, isInt := depID.GetInt()
+	assert.True(t, isInt, "want department.id to decode as int on the departments endpoint")
+	assert.Equal(t, 899902, i)
+	assert.Equal(t, NewOptString("Club - Accelerator Program"), first.Label)
+	assert.Equal(t, NewOptBool(false), first.Archived)
+
+	// The third entry carries the optional description field.
+	third := res.Content[2]
+	assert.Equal(t, NewOptString("Club - Ancillary"), third.Label)
+	assert.Equal(t, NewOptString("spa, pilates, kids' club"), third.Description)
 }

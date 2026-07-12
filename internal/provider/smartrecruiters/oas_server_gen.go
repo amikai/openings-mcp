@@ -10,16 +10,23 @@ import (
 type Handler interface {
 	// GetPosting implements getPosting operation.
 	//
-	// Get a single posting's full detail.
+	// Note: In order to update content of a job posting available via the Posting API, you need to re-post
+	// the job in SmartRecruiters application.
 	//
-	// GET /companies/{companyIdentifier}/postings/{postingId}
+	// GET /v1/companies/{companyIdentifier}/postings/{postingId}
 	GetPosting(ctx context.Context, params GetPostingParams) (GetPostingRes, error)
+	// ListDepartments implements listDepartments operation.
+	//
+	// List departments for given company.
+	//
+	// GET /v1/companies/{companyIdentifier}/departments
+	ListDepartments(ctx context.Context, params ListDepartmentsParams) (*Departments, error)
 	// ListPostings implements listPostings operation.
 	//
-	// Search/list postings for a company.
+	// Lists active postings published by given company. Return PostingList.
 	//
-	// GET /companies/{companyIdentifier}/postings
-	ListPostings(ctx context.Context, params ListPostingsParams) (*PostingListResponse, error)
+	// GET /v1/companies/{companyIdentifier}/postings
+	ListPostings(ctx context.Context, params ListPostingsParams) (*PostingList, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

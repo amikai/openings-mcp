@@ -15,18 +15,28 @@ var _ Handler = UnimplementedHandler{}
 
 // GetPosting implements getPosting operation.
 //
-// Get a single posting's full detail.
+// Note: In order to update content of a job posting available via the Posting API, you need to re-post
+// the job in SmartRecruiters application.
 //
-// GET /companies/{companyIdentifier}/postings/{postingId}
+// GET /v1/companies/{companyIdentifier}/postings/{postingId}
 func (UnimplementedHandler) GetPosting(ctx context.Context, params GetPostingParams) (r GetPostingRes, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListDepartments implements listDepartments operation.
+//
+// List departments for given company.
+//
+// GET /v1/companies/{companyIdentifier}/departments
+func (UnimplementedHandler) ListDepartments(ctx context.Context, params ListDepartmentsParams) (r *Departments, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
 // ListPostings implements listPostings operation.
 //
-// Search/list postings for a company.
+// Lists active postings published by given company. Return PostingList.
 //
-// GET /companies/{companyIdentifier}/postings
-func (UnimplementedHandler) ListPostings(ctx context.Context, params ListPostingsParams) (r *PostingListResponse, _ error) {
+// GET /v1/companies/{companyIdentifier}/postings
+func (UnimplementedHandler) ListPostings(ctx context.Context, params ListPostingsParams) (r *PostingList, _ error) {
 	return r, ht.ErrNotImplemented
 }

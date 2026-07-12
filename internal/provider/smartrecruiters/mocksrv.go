@@ -21,6 +21,9 @@ var mockPostingDetailRsp []byte
 //go:embed testdata/posting_not_found_rsp.json
 var mockPostingNotFoundRsp []byte
 
+//go:embed testdata/departments_rsp.json
+var mockDepartmentsRsp []byte
+
 // MockUnknownCompany is a companyIdentifier deliberately absent from any
 // roster, matching the quirk captured in testdata/postings_unknown_company_rsp.json:
 // SmartRecruiters answers HTTP 200 with empty content rather than a 404.
@@ -33,7 +36,7 @@ const MockUnknownCompany = "this-company-does-not-exist-xyz"
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/companies/equinox/postings", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/companies/equinox/postings", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("q") == "trainer" {
 			serveMockJSON(mockPostingsFilteredRsp)(w, r)
 			return
@@ -41,22 +44,26 @@ func NewMockServer() *httptest.Server {
 		serveMockJSON(mockPostingsRsp)(w, r)
 	})
 
-	mux.HandleFunc("/companies/"+MockUnknownCompany+"/postings", serveMockJSON(mockPostingsUnknownCompanyRsp))
+	mux.HandleFunc("/v1/companies/"+MockUnknownCompany+"/postings", serveMockJSON(mockPostingsUnknownCompanyRsp))
 
-	mux.HandleFunc("/companies/equinox/postings/744000137225639", serveMockJSON(mockPostingDetailRsp))
+	mux.HandleFunc("/v1/companies/equinox/postings/744000137225639", serveMockJSON(mockPostingDetailRsp))
 
-	mux.HandleFunc("/companies/equinox/postings/000000000000", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v1/companies/equinox/postings/000000000000", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(mockPostingNotFoundRsp)
 	})
+
+	mux.HandleFunc("/v1/companies/equinox/departments", serveMockJSON(mockDepartmentsRsp))
 
 	return httptest.NewServer(mux)
 }
 
 func serveMockJSON(data []byte) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		// Matches the live API's header; the generated decoder strips the
+		// charset parameter before matching against the spec.
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.Write(data)
 	}
 }

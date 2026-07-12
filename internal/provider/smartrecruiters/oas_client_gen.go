@@ -30,16 +30,23 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// GetPosting invokes getPosting operation.
 	//
-	// Get a single posting's full detail.
+	// Note: In order to update content of a job posting available via the Posting API, you need to re-post
+	// the job in SmartRecruiters application.
 	//
-	// GET /companies/{companyIdentifier}/postings/{postingId}
+	// GET /v1/companies/{companyIdentifier}/postings/{postingId}
 	GetPosting(ctx context.Context, params GetPostingParams) (GetPostingRes, error)
+	// ListDepartments invokes listDepartments operation.
+	//
+	// List departments for given company.
+	//
+	// GET /v1/companies/{companyIdentifier}/departments
+	ListDepartments(ctx context.Context, params ListDepartmentsParams) (*Departments, error)
 	// ListPostings invokes listPostings operation.
 	//
-	// Search/list postings for a company.
+	// Lists active postings published by given company. Return PostingList.
 	//
-	// GET /companies/{companyIdentifier}/postings
-	ListPostings(ctx context.Context, params ListPostingsParams) (*PostingListResponse, error)
+	// GET /v1/companies/{companyIdentifier}/postings
+	ListPostings(ctx context.Context, params ListPostingsParams) (*PostingList, error)
 }
 
 // Client implements OAS client.
@@ -83,9 +90,10 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // GetPosting invokes getPosting operation.
 //
-// Get a single posting's full detail.
+// Note: In order to update content of a job posting available via the Posting API, you need to re-post
+// the job in SmartRecruiters application.
 //
-// GET /companies/{companyIdentifier}/postings/{postingId}
+// GET /v1/companies/{companyIdentifier}/postings/{postingId}
 func (c *Client) GetPosting(ctx context.Context, params GetPostingParams) (GetPostingRes, error) {
 	res, err := c.sendGetPosting(ctx, params)
 	return res, err
@@ -95,7 +103,7 @@ func (c *Client) sendGetPosting(ctx context.Context, params GetPostingParams) (r
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getPosting"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/companies/{companyIdentifier}/postings/{postingId}"),
+		semconv.URLTemplateKey.String("/v1/companies/{companyIdentifier}/postings/{postingId}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -129,7 +137,7 @@ func (c *Client) sendGetPosting(ctx context.Context, params GetPostingParams) (r
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [4]string
-	pathParts[0] = "/companies/"
+	pathParts[0] = "/v1/companies/"
 	{
 		// Encode "companyIdentifier" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -169,10 +177,82 @@ func (c *Client) sendGetPosting(ctx context.Context, params GetPostingParams) (r
 	}
 	uri.AddPathParts(u, pathParts[:]...)
 
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "sourceTypeId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sourceTypeId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SourceTypeId.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sourceSubTypeId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sourceSubTypeId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SourceSubTypeId.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sourceId" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sourceId",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SourceId.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
 	stage = "EncodeRequest"
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "EncodeHeaderParams"
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "accept-language",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.AcceptLanguage.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
 	}
 
 	stage = "SendRequest"
@@ -198,21 +278,137 @@ func (c *Client) sendGetPosting(ctx context.Context, params GetPostingParams) (r
 	return result, nil
 }
 
+// ListDepartments invokes listDepartments operation.
+//
+// List departments for given company.
+//
+// GET /v1/companies/{companyIdentifier}/departments
+func (c *Client) ListDepartments(ctx context.Context, params ListDepartmentsParams) (*Departments, error) {
+	res, err := c.sendListDepartments(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendListDepartments(ctx context.Context, params ListDepartmentsParams) (res *Departments, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("listDepartments"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/v1/companies/{companyIdentifier}/departments"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListDepartmentsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [3]string
+	pathParts[0] = "/v1/companies/"
+	{
+		// Encode "companyIdentifier" parameter.
+		e := uri.NewPathEncoder(uri.PathEncoderConfig{
+			Param:   "companyIdentifier",
+			Style:   uri.PathStyleSimple,
+			Explode: false,
+		})
+		if err := func() error {
+			return e.EncodeValue(conv.StringToString(params.CompanyIdentifier))
+		}(); err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		encoded, err := e.Result()
+		if err != nil {
+			return res, errors.Wrap(err, "encode path")
+		}
+		pathParts[1] = encoded
+	}
+	pathParts[2] = "/departments"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "EncodeHeaderParams"
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "accept-language",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.AcceptLanguage.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListDepartmentsResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // ListPostings invokes listPostings operation.
 //
-// Search/list postings for a company.
+// Lists active postings published by given company. Return PostingList.
 //
-// GET /companies/{companyIdentifier}/postings
-func (c *Client) ListPostings(ctx context.Context, params ListPostingsParams) (*PostingListResponse, error) {
+// GET /v1/companies/{companyIdentifier}/postings
+func (c *Client) ListPostings(ctx context.Context, params ListPostingsParams) (*PostingList, error) {
 	res, err := c.sendListPostings(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams) (res *PostingListResponse, err error) {
+func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams) (res *PostingList, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listPostings"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/companies/{companyIdentifier}/postings"),
+		semconv.URLTemplateKey.String("/v1/companies/{companyIdentifier}/postings"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -246,7 +442,7 @@ func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams
 	stage = "BuildURL"
 	u := uri.Clone(c.requestURL(ctx))
 	var pathParts [3]string
-	pathParts[0] = "/companies/"
+	pathParts[0] = "/v1/companies/"
 	{
 		// Encode "companyIdentifier" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
@@ -281,6 +477,83 @@ func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Q.Get(); ok {
 				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "destination" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "destination",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Destination.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "locationType" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "locationType",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.LocationType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.LocationType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
 			}
 			return nil
 		}); err != nil {
@@ -356,33 +629,16 @@ func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams
 		}
 	}
 	{
-		// Encode "limit" parameter.
+		// Encode "jobAdId" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "limit",
+			Name:    "jobAdId",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Limit.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
-			}
-			return nil
-		}); err != nil {
-			return res, errors.Wrap(err, "encode query")
-		}
-	}
-	{
-		// Encode "offset" parameter.
-		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "offset",
-			Style:   uri.QueryStyleForm,
-			Explode: true,
-		}
-
-		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Offset.Get(); ok {
-				return e.EncodeValue(conv.IntToString(val))
+			if val, ok := params.JobAdId.Get(); ok {
+				return e.EncodeValue(conv.UUIDToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -398,8 +654,51 @@ func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Language.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+			if params.Language != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Language {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "releasedAfter" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "releasedAfter",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ReleasedAfter.Get(); ok {
+				return e.EncodeValue(conv.DateTimeToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "customField" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "customField",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.CustomField.Get(); ok {
+				return val.EncodeURI(e)
 			}
 			return nil
 		}); err != nil {
@@ -412,6 +711,23 @@ func (c *Client) sendListPostings(ctx context.Context, params ListPostingsParams
 	r, err := ht.NewRequest(ctx, "GET", u)
 	if err != nil {
 		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "EncodeHeaderParams"
+	h := uri.NewHeaderEncoder(r.Header)
+	{
+		cfg := uri.HeaderParameterEncodingConfig{
+			Name:    "accept-language",
+			Explode: false,
+		}
+		if err := h.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.AcceptLanguage.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode header")
+		}
 	}
 
 	stage = "SendRequest"

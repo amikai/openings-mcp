@@ -94,6 +94,166 @@ func (s *Company) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
+func (s *Compensation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *Compensation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Min.Set {
+			e.FieldStart("min")
+			s.Min.Encode(e)
+		}
+	}
+	{
+		if s.Max.Set {
+			e.FieldStart("max")
+			s.Max.Encode(e)
+		}
+	}
+	{
+		if s.Currency.Set {
+			e.FieldStart("currency")
+			s.Currency.Encode(e)
+		}
+	}
+	{
+		if s.Period.Set {
+			e.FieldStart("period")
+			s.Period.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfCompensation = [4]string{
+	0: "min",
+	1: "max",
+	2: "currency",
+	3: "period",
+}
+
+// Decode decodes Compensation from json.
+func (s *Compensation) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Compensation to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "min":
+			if err := func() error {
+				s.Min.Reset()
+				if err := s.Min.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"min\"")
+			}
+		case "max":
+			if err := func() error {
+				s.Max.Reset()
+				if err := s.Max.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"max\"")
+			}
+		case "currency":
+			if err := func() error {
+				s.Currency.Reset()
+				if err := s.Currency.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"currency\"")
+			}
+		case "period":
+			if err := func() error {
+				s.Period.Reset()
+				if err := s.Period.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"period\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode Compensation")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *Compensation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Compensation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes CompensationPeriod as json.
+func (s CompensationPeriod) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes CompensationPeriod from json.
+func (s *CompensationPeriod) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode CompensationPeriod to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch CompensationPeriod(v) {
+	case CompensationPeriodHOURLY:
+		*s = CompensationPeriodHOURLY
+	case CompensationPeriodDAILY:
+		*s = CompensationPeriodDAILY
+	case CompensationPeriodWEEKLY:
+		*s = CompensationPeriodWEEKLY
+	case CompensationPeriodMONTHLY:
+		*s = CompensationPeriodMONTHLY
+	case CompensationPeriodYEARLY:
+		*s = CompensationPeriodYEARLY
+	default:
+		*s = CompensationPeriod(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s CompensationPeriod) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *CompensationPeriod) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
 func (s *Creator) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
@@ -308,11 +468,25 @@ func (s *Department) encodeFields(e *jx.Encoder) {
 			s.Label.Encode(e)
 		}
 	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+	{
+		if s.Archived.Set {
+			e.FieldStart("archived")
+			s.Archived.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfDepartment = [2]string{
+var jsonFieldsNameOfDepartment = [4]string{
 	0: "id",
 	1: "label",
+	2: "description",
+	3: "archived",
 }
 
 // Decode decodes Department from json.
@@ -342,6 +516,26 @@ func (s *Department) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"label\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		case "archived":
+			if err := func() error {
+				s.Archived.Reset()
+				if err := s.Archived.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"archived\"")
 			}
 		default:
 			return d.Skip()
@@ -418,14 +612,284 @@ func (s *DepartmentId) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *IdLabel) Encode(e *jx.Encoder) {
+func (s *Departments) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *IdLabel) encodeFields(e *jx.Encoder) {
+func (s *Departments) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("totalFound")
+		e.Int(s.TotalFound)
+	}
+	{
+		e.FieldStart("content")
+		e.ArrStart()
+		for _, elem := range s.Content {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfDepartments = [2]string{
+	0: "totalFound",
+	1: "content",
+}
+
+// Decode decodes Departments from json.
+func (s *Departments) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Departments to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "totalFound":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.TotalFound = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"totalFound\"")
+			}
+		case "content":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				s.Content = make([]Department, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem Department
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Content = append(s.Content, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"content\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode Departments")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000011,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfDepartments) {
+					name = jsonFieldsNameOfDepartments[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *Departments) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Departments) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *ExperienceLevel) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *ExperienceLevel) encodeFields(e *jx.Encoder) {
+	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+	{
+		if s.Label.Set {
+			e.FieldStart("label")
+			s.Label.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfExperienceLevel = [3]string{
+	0: "id",
+	1: "name",
+	2: "label",
+}
+
+// Decode decodes ExperienceLevel from json.
+func (s *ExperienceLevel) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ExperienceLevel to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		case "label":
+			if err := func() error {
+				s.Label.Reset()
+				if err := s.Label.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"label\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode ExperienceLevel")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *ExperienceLevel) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ExperienceLevel) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes ExperienceLevelID as json.
+func (s ExperienceLevelID) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes ExperienceLevelID from json.
+func (s *ExperienceLevelID) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode ExperienceLevelID to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch ExperienceLevelID(v) {
+	case ExperienceLevelIDAssociate:
+		*s = ExperienceLevelIDAssociate
+	case ExperienceLevelIDDirector:
+		*s = ExperienceLevelIDDirector
+	case ExperienceLevelIDEntryLevel:
+		*s = ExperienceLevelIDEntryLevel
+	case ExperienceLevelIDExecutive:
+		*s = ExperienceLevelIDExecutive
+	case ExperienceLevelIDInternship:
+		*s = ExperienceLevelIDInternship
+	case ExperienceLevelIDMidSeniorLevel:
+		*s = ExperienceLevelIDMidSeniorLevel
+	case ExperienceLevelIDNotApplicable:
+		*s = ExperienceLevelIDNotApplicable
+	default:
+		*s = ExperienceLevelID(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s ExperienceLevelID) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *ExperienceLevelID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *Function) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *Function) encodeFields(e *jx.Encoder) {
 	{
 		if s.ID.Set {
 			e.FieldStart("id")
@@ -440,15 +904,15 @@ func (s *IdLabel) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfIdLabel = [2]string{
+var jsonFieldsNameOfFunction = [2]string{
 	0: "id",
 	1: "label",
 }
 
-// Decode decodes IdLabel from json.
-func (s *IdLabel) Decode(d *jx.Decoder) error {
+// Decode decodes Function from json.
+func (s *Function) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode IdLabel to nil")
+		return errors.New("invalid: unable to decode Function to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -478,84 +942,101 @@ func (s *IdLabel) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode IdLabel")
+		return errors.Wrap(err, "decode Function")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *IdLabel) MarshalJSON() ([]byte, error) {
+func (s *Function) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *IdLabel) UnmarshalJSON(data []byte) error {
+func (s *Function) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
 // Encode implements json.Marshaler.
-func (s *JobAd) Encode(e *jx.Encoder) {
+func (s *Industry) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *JobAd) encodeFields(e *jx.Encoder) {
+func (s *Industry) encodeFields(e *jx.Encoder) {
 	{
-		if s.Sections.Set {
-			e.FieldStart("sections")
-			s.Sections.Encode(e)
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Label.Set {
+			e.FieldStart("label")
+			s.Label.Encode(e)
 		}
 	}
 }
 
-var jsonFieldsNameOfJobAd = [1]string{
-	0: "sections",
+var jsonFieldsNameOfIndustry = [2]string{
+	0: "id",
+	1: "label",
 }
 
-// Decode decodes JobAd from json.
-func (s *JobAd) Decode(d *jx.Decoder) error {
+// Decode decodes Industry from json.
+func (s *Industry) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JobAd to nil")
+		return errors.New("invalid: unable to decode Industry to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "sections":
+		case "id":
 			if err := func() error {
-				s.Sections.Reset()
-				if err := s.Sections.Decode(d); err != nil {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"sections\"")
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "label":
+			if err := func() error {
+				s.Label.Reset()
+				if err := s.Label.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"label\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode JobAd")
+		return errors.Wrap(err, "decode Industry")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JobAd) MarshalJSON() ([]byte, error) {
+func (s *Industry) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobAd) UnmarshalJSON(data []byte) error {
+func (s *Industry) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -650,6 +1131,69 @@ func (s *JobAdSections) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *JobAdSections) encodeFields(e *jx.Encoder) {
 	{
+		if s.Sections.Set {
+			e.FieldStart("sections")
+			s.Sections.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobAdSections = [1]string{
+	0: "sections",
+}
+
+// Decode decodes JobAdSections from json.
+func (s *JobAdSections) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobAdSections to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "sections":
+			if err := func() error {
+				s.Sections.Reset()
+				if err := s.Sections.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"sections\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobAdSections")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobAdSections) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobAdSections) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobAdSectionsSections) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobAdSectionsSections) encodeFields(e *jx.Encoder) {
+	{
 		if s.CompanyDescription.Set {
 			e.FieldStart("companyDescription")
 			s.CompanyDescription.Encode(e)
@@ -673,19 +1217,26 @@ func (s *JobAdSections) encodeFields(e *jx.Encoder) {
 			s.AdditionalInformation.Encode(e)
 		}
 	}
+	{
+		if s.Videos.Set {
+			e.FieldStart("videos")
+			s.Videos.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfJobAdSections = [4]string{
+var jsonFieldsNameOfJobAdSectionsSections = [5]string{
 	0: "companyDescription",
 	1: "jobDescription",
 	2: "qualifications",
 	3: "additionalInformation",
+	4: "videos",
 }
 
-// Decode decodes JobAdSections from json.
-func (s *JobAdSections) Decode(d *jx.Decoder) error {
+// Decode decodes JobAdSectionsSections from json.
+func (s *JobAdSectionsSections) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode JobAdSections to nil")
+		return errors.New("invalid: unable to decode JobAdSectionsSections to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -730,26 +1281,129 @@ func (s *JobAdSections) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"additionalInformation\"")
 			}
+		case "videos":
+			if err := func() error {
+				s.Videos.Reset()
+				if err := s.Videos.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"videos\"")
+			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode JobAdSections")
+		return errors.Wrap(err, "decode JobAdSectionsSections")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *JobAdSections) MarshalJSON() ([]byte, error) {
+func (s *JobAdSectionsSections) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *JobAdSections) UnmarshalJSON(data []byte) error {
+func (s *JobAdSectionsSections) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobAdVideosSection) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobAdVideosSection) encodeFields(e *jx.Encoder) {
+	{
+		if s.Title.Set {
+			e.FieldStart("title")
+			s.Title.Encode(e)
+		}
+	}
+	{
+		if s.Urls != nil {
+			e.FieldStart("urls")
+			e.ArrStart()
+			for _, elem := range s.Urls {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+}
+
+var jsonFieldsNameOfJobAdVideosSection = [2]string{
+	0: "title",
+	1: "urls",
+}
+
+// Decode decodes JobAdVideosSection from json.
+func (s *JobAdVideosSection) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobAdVideosSection to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "title":
+			if err := func() error {
+				s.Title.Reset()
+				if err := s.Title.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"title\"")
+			}
+		case "urls":
+			if err := func() error {
+				s.Urls = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.Urls = append(s.Urls, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"urls\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobAdVideosSection")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobAdVideosSection) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobAdVideosSection) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -851,188 +1505,6 @@ func (s *Language) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode implements json.Marshaler.
-func (s *Location) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *Location) encodeFields(e *jx.Encoder) {
-	{
-		if s.City.Set {
-			e.FieldStart("city")
-			s.City.Encode(e)
-		}
-	}
-	{
-		if s.Region.Set {
-			e.FieldStart("region")
-			s.Region.Encode(e)
-		}
-	}
-	{
-		if s.Country.Set {
-			e.FieldStart("country")
-			s.Country.Encode(e)
-		}
-	}
-	{
-		if s.Remote.Set {
-			e.FieldStart("remote")
-			s.Remote.Encode(e)
-		}
-	}
-	{
-		if s.Hybrid.Set {
-			e.FieldStart("hybrid")
-			s.Hybrid.Encode(e)
-		}
-	}
-	{
-		if s.Latitude.Set {
-			e.FieldStart("latitude")
-			s.Latitude.Encode(e)
-		}
-	}
-	{
-		if s.Longitude.Set {
-			e.FieldStart("longitude")
-			s.Longitude.Encode(e)
-		}
-	}
-	{
-		if s.FullLocation.Set {
-			e.FieldStart("fullLocation")
-			s.FullLocation.Encode(e)
-		}
-	}
-}
-
-var jsonFieldsNameOfLocation = [8]string{
-	0: "city",
-	1: "region",
-	2: "country",
-	3: "remote",
-	4: "hybrid",
-	5: "latitude",
-	6: "longitude",
-	7: "fullLocation",
-}
-
-// Decode decodes Location from json.
-func (s *Location) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode Location to nil")
-	}
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "city":
-			if err := func() error {
-				s.City.Reset()
-				if err := s.City.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"city\"")
-			}
-		case "region":
-			if err := func() error {
-				s.Region.Reset()
-				if err := s.Region.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"region\"")
-			}
-		case "country":
-			if err := func() error {
-				s.Country.Reset()
-				if err := s.Country.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"country\"")
-			}
-		case "remote":
-			if err := func() error {
-				s.Remote.Reset()
-				if err := s.Remote.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"remote\"")
-			}
-		case "hybrid":
-			if err := func() error {
-				s.Hybrid.Reset()
-				if err := s.Hybrid.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"hybrid\"")
-			}
-		case "latitude":
-			if err := func() error {
-				s.Latitude.Reset()
-				if err := s.Latitude.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"latitude\"")
-			}
-		case "longitude":
-			if err := func() error {
-				s.Longitude.Reset()
-				if err := s.Longitude.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"longitude\"")
-			}
-		case "fullLocation":
-			if err := func() error {
-				s.FullLocation.Reset()
-				if err := s.FullLocation.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"fullLocation\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode Location")
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *Location) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *Location) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
 // Encode encodes bool as json.
 func (o OptBool) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1101,6 +1573,39 @@ func (s *OptCompany) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes Compensation as json.
+func (o OptCompensation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes Compensation from json.
+func (o *OptCompensation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptCompensation to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptCompensation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptCompensation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes Creator as json.
 func (o OptCreator) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1132,6 +1637,41 @@ func (s OptCreator) MarshalJSON() ([]byte, error) {
 func (s *OptCreator) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
+}
+
+// Encode encodes time.Time as json.
+func (o OptDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
+	if !o.Set {
+		return
+	}
+	format(e, o.Value)
+}
+
+// Decode decodes time.Time from json.
+func (o *OptDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptDateTime to nil")
+	}
+	o.Set = true
+	v, err := format(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptDateTime) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e, json.EncodeDateTime)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptDateTime) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d, json.DecodeDateTime)
 }
 
 // Encode encodes Department as json.
@@ -1200,18 +1740,18 @@ func (s *OptDepartmentId) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes IdLabel as json.
-func (o OptIdLabel) Encode(e *jx.Encoder) {
+// Encode encodes ExperienceLevel as json.
+func (o OptExperienceLevel) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
 	o.Value.Encode(e)
 }
 
-// Decode decodes IdLabel from json.
-func (o *OptIdLabel) Decode(d *jx.Decoder) error {
+// Decode decodes ExperienceLevel from json.
+func (o *OptExperienceLevel) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptIdLabel to nil")
+		return errors.New("invalid: unable to decode OptExperienceLevel to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -1221,30 +1761,30 @@ func (o *OptIdLabel) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptIdLabel) MarshalJSON() ([]byte, error) {
+func (s OptExperienceLevel) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptIdLabel) UnmarshalJSON(data []byte) error {
+func (s *OptExperienceLevel) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes JobAd as json.
-func (o OptJobAd) Encode(e *jx.Encoder) {
+// Encode encodes ExperienceLevelID as json.
+func (o OptExperienceLevelID) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	o.Value.Encode(e)
+	e.Str(string(o.Value))
 }
 
-// Decode decodes JobAd from json.
-func (o *OptJobAd) Decode(d *jx.Decoder) error {
+// Decode decodes ExperienceLevelID from json.
+func (o *OptExperienceLevelID) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptJobAd to nil")
+		return errors.New("invalid: unable to decode OptExperienceLevelID to nil")
 	}
 	o.Set = true
 	if err := o.Value.Decode(d); err != nil {
@@ -1254,14 +1794,115 @@ func (o *OptJobAd) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptJobAd) MarshalJSON() ([]byte, error) {
+func (s OptExperienceLevelID) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptJobAd) UnmarshalJSON(data []byte) error {
+func (s *OptExperienceLevelID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Function as json.
+func (o OptFunction) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes Function from json.
+func (o *OptFunction) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptFunction to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptFunction) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptFunction) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Industry as json.
+func (o OptIndustry) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes Industry from json.
+func (o *OptIndustry) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptIndustry to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptIndustry) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptIndustry) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes int as json.
+func (o OptInt) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Int(int(o.Value))
+}
+
+// Decode decodes int from json.
+func (o *OptInt) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptInt to nil")
+	}
+	o.Set = true
+	v, err := d.Int()
+	if err != nil {
+		return err
+	}
+	o.Value = int(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptInt) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptInt) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1332,6 +1973,72 @@ func (s *OptJobAdSections) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes JobAdSectionsSections as json.
+func (o OptJobAdSectionsSections) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobAdSectionsSections from json.
+func (o *OptJobAdSectionsSections) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJobAdSectionsSections to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJobAdSectionsSections) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJobAdSectionsSections) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobAdVideosSection as json.
+func (o OptJobAdVideosSection) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobAdVideosSection from json.
+func (o *OptJobAdVideosSection) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJobAdVideosSection to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJobAdVideosSection) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJobAdVideosSection) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes Language as json.
 func (o OptLanguage) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1365,20 +2072,36 @@ func (s *OptLanguage) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
-// Encode encodes Location as json.
-func (o OptLocation) Encode(e *jx.Encoder) {
+// Encode encodes CompensationPeriod as json.
+func (o OptNilCompensationPeriod) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
-	o.Value.Encode(e)
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Str(string(o.Value))
 }
 
-// Decode decodes Location from json.
-func (o *OptLocation) Decode(d *jx.Decoder) error {
+// Decode decodes CompensationPeriod from json.
+func (o *OptNilCompensationPeriod) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptLocation to nil")
+		return errors.New("invalid: unable to decode OptNilCompensationPeriod to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v CompensationPeriod
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
 	}
 	o.Set = true
+	o.Null = false
 	if err := o.Value.Decode(d); err != nil {
 		return err
 	}
@@ -1386,20 +2109,20 @@ func (o *OptLocation) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptLocation) MarshalJSON() ([]byte, error) {
+func (s OptNilCompensationPeriod) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptLocation) UnmarshalJSON(data []byte) error {
+func (s *OptNilCompensationPeriod) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes time.Time as json.
-func (o OptNilDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time)) {
+// Encode encodes float64 as json.
+func (o OptNilFloat64) Encode(e *jx.Encoder) {
 	if !o.Set {
 		return
 	}
@@ -1407,20 +2130,20 @@ func (o OptNilDateTime) Encode(e *jx.Encoder, format func(*jx.Encoder, time.Time
 		e.Null()
 		return
 	}
-	format(e, o.Value)
+	e.Float64(float64(o.Value))
 }
 
-// Decode decodes time.Time from json.
-func (o *OptNilDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Time, error)) error {
+// Decode decodes float64 from json.
+func (o *OptNilFloat64) Decode(d *jx.Decoder) error {
 	if o == nil {
-		return errors.New("invalid: unable to decode OptNilDateTime to nil")
+		return errors.New("invalid: unable to decode OptNilFloat64 to nil")
 	}
 	if d.Next() == jx.Null {
 		if err := d.Null(); err != nil {
 			return err
 		}
 
-		var v time.Time
+		var v float64
 		o.Value = v
 		o.Set = true
 		o.Null = true
@@ -1428,74 +2151,23 @@ func (o *OptNilDateTime) Decode(d *jx.Decoder, format func(*jx.Decoder) (time.Ti
 	}
 	o.Set = true
 	o.Null = false
-	v, err := format(d)
+	v, err := d.Float64()
 	if err != nil {
 		return err
 	}
-	o.Value = v
+	o.Value = float64(v)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s OptNilDateTime) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e, json.EncodeDateTime)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilDateTime) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d, json.DecodeDateTime)
-}
-
-// Encode encodes int as json.
-func (o OptNilInt) Encode(e *jx.Encoder) {
-	if !o.Set {
-		return
-	}
-	if o.Null {
-		e.Null()
-		return
-	}
-	e.Int(int(o.Value))
-}
-
-// Decode decodes int from json.
-func (o *OptNilInt) Decode(d *jx.Decoder) error {
-	if o == nil {
-		return errors.New("invalid: unable to decode OptNilInt to nil")
-	}
-	if d.Next() == jx.Null {
-		if err := d.Null(); err != nil {
-			return err
-		}
-
-		var v int
-		o.Value = v
-		o.Set = true
-		o.Null = true
-		return nil
-	}
-	o.Set = true
-	o.Null = false
-	v, err := d.Int()
-	if err != nil {
-		return err
-	}
-	o.Value = int(v)
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s OptNilInt) MarshalJSON() ([]byte, error) {
+func (s OptNilFloat64) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *OptNilInt) UnmarshalJSON(data []byte) error {
+func (s *OptNilFloat64) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -1551,6 +2223,39 @@ func (s *OptNilString) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes PostingLocation as json.
+func (o OptPostingLocation) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes PostingLocation from json.
+func (o *OptPostingLocation) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptPostingLocation to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptPostingLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptPostingLocation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode encodes string as json.
 func (o OptString) Encode(e *jx.Encoder) {
 	if !o.Set {
@@ -1586,15 +2291,116 @@ func (s *OptString) UnmarshalJSON(data []byte) error {
 	return s.Decode(d)
 }
 
+// Encode encodes TypeOfEmployment as json.
+func (o OptTypeOfEmployment) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes TypeOfEmployment from json.
+func (o *OptTypeOfEmployment) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptTypeOfEmployment to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptTypeOfEmployment) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptTypeOfEmployment) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes uuid.UUID as json.
+func (o OptUUID) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	json.EncodeUUID(e, o.Value)
+}
+
+// Decode decodes uuid.UUID from json.
+func (o *OptUUID) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptUUID to nil")
+	}
+	o.Set = true
+	v, err := json.DecodeUUID(d)
+	if err != nil {
+		return err
+	}
+	o.Value = v
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptUUID) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptUUID) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Visibility as json.
+func (o OptVisibility) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	e.Str(string(o.Value))
+}
+
+// Decode decodes Visibility from json.
+func (o *OptVisibility) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptVisibility to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptVisibility) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptVisibility) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
 // Encode implements json.Marshaler.
-func (s *PostingDetail) Encode(e *jx.Encoder) {
+func (s *Posting) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *PostingDetail) encodeFields(e *jx.Encoder) {
+func (s *Posting) encodeFields(e *jx.Encoder) {
 	{
 		if s.ID.Set {
 			e.FieldStart("id")
@@ -1602,15 +2408,15 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
 		if s.UUID.Set {
 			e.FieldStart("uuid")
 			s.UUID.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
 		}
 	}
 	{
@@ -1632,6 +2438,24 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.ApplyUrl.Set {
+			e.FieldStart("applyUrl")
+			s.ApplyUrl.Encode(e)
+		}
+	}
+	{
+		if s.PostingUrl.Set {
+			e.FieldStart("postingUrl")
+			s.PostingUrl.Encode(e)
+		}
+	}
+	{
+		if s.ReferralUrl.Set {
+			e.FieldStart("referralUrl")
+			s.ReferralUrl.Encode(e)
+		}
+	}
+	{
 		if s.RefNumber.Set {
 			e.FieldStart("refNumber")
 			s.RefNumber.Encode(e)
@@ -1644,9 +2468,45 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
+		if s.ReleasedDate.Set {
+			e.FieldStart("releasedDate")
+			s.ReleasedDate.Encode(e, json.EncodeDateTime)
+		}
+	}
+	{
 		if s.Location.Set {
 			e.FieldStart("location")
 			s.Location.Encode(e)
+		}
+	}
+	{
+		if s.Industry.Set {
+			e.FieldStart("industry")
+			s.Industry.Encode(e)
+		}
+	}
+	{
+		if s.Department.Set {
+			e.FieldStart("department")
+			s.Department.Encode(e)
+		}
+	}
+	{
+		if s.Function.Set {
+			e.FieldStart("function")
+			s.Function.Encode(e)
+		}
+	}
+	{
+		if s.TypeOfEmployment.Set {
+			e.FieldStart("typeOfEmployment")
+			s.TypeOfEmployment.Encode(e)
+		}
+	}
+	{
+		if s.ExperienceLevel.Set {
+			e.FieldStart("experienceLevel")
+			s.ExperienceLevel.Encode(e)
 		}
 	}
 	{
@@ -1660,33 +2520,15 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.ReleasedDate.Set {
-			e.FieldStart("releasedDate")
-			s.ReleasedDate.Encode(e, json.EncodeDateTime)
+		if s.Ref.Set {
+			e.FieldStart("ref")
+			s.Ref.Encode(e)
 		}
 	}
 	{
 		if s.Creator.Set {
 			e.FieldStart("creator")
 			s.Creator.Encode(e)
-		}
-	}
-	{
-		if s.PostingUrl.Set {
-			e.FieldStart("postingUrl")
-			s.PostingUrl.Encode(e)
-		}
-	}
-	{
-		if s.ApplyUrl.Set {
-			e.FieldStart("applyUrl")
-			s.ApplyUrl.Encode(e)
-		}
-	}
-	{
-		if s.ReferralUrl.Set {
-			e.FieldStart("referralUrl")
-			s.ReferralUrl.Encode(e)
 		}
 	}
 	{
@@ -1708,33 +2550,9 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Industry.Set {
-			e.FieldStart("industry")
-			s.Industry.Encode(e)
-		}
-	}
-	{
-		if s.Function.Set {
-			e.FieldStart("function")
-			s.Function.Encode(e)
-		}
-	}
-	{
-		if s.Department.Set {
-			e.FieldStart("department")
-			s.Department.Encode(e)
-		}
-	}
-	{
-		if s.ExperienceLevel.Set {
-			e.FieldStart("experienceLevel")
-			s.ExperienceLevel.Encode(e)
-		}
-	}
-	{
-		if s.TypeOfEmployment.Set {
-			e.FieldStart("typeOfEmployment")
-			s.TypeOfEmployment.Encode(e)
+		if s.Compensation.Set {
+			e.FieldStart("compensation")
+			s.Compensation.Encode(e)
 		}
 	}
 	{
@@ -1745,37 +2563,39 @@ func (s *PostingDetail) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfPostingDetail = [24]string{
+var jsonFieldsNameOfPosting = [26]string{
 	0:  "id",
-	1:  "name",
-	2:  "uuid",
+	1:  "uuid",
+	2:  "name",
 	3:  "jobId",
 	4:  "jobAdId",
 	5:  "defaultJobAd",
-	6:  "refNumber",
-	7:  "company",
-	8:  "location",
-	9:  "customField",
-	10: "releasedDate",
-	11: "creator",
-	12: "postingUrl",
-	13: "applyUrl",
-	14: "referralUrl",
-	15: "jobAd",
-	16: "active",
-	17: "visibility",
-	18: "industry",
-	19: "function",
-	20: "department",
-	21: "experienceLevel",
-	22: "typeOfEmployment",
-	23: "language",
+	6:  "applyUrl",
+	7:  "postingUrl",
+	8:  "referralUrl",
+	9:  "refNumber",
+	10: "company",
+	11: "releasedDate",
+	12: "location",
+	13: "industry",
+	14: "department",
+	15: "function",
+	16: "typeOfEmployment",
+	17: "experienceLevel",
+	18: "customField",
+	19: "ref",
+	20: "creator",
+	21: "jobAd",
+	22: "active",
+	23: "visibility",
+	24: "compensation",
+	25: "language",
 }
 
-// Decode decodes PostingDetail from json.
-func (s *PostingDetail) Decode(d *jx.Decoder) error {
+// Decode decodes Posting from json.
+func (s *Posting) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PostingDetail to nil")
+		return errors.New("invalid: unable to decode Posting to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -1790,16 +2610,6 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
 		case "uuid":
 			if err := func() error {
 				s.UUID.Reset()
@@ -1809,6 +2619,16 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "jobId":
 			if err := func() error {
@@ -1840,6 +2660,36 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"defaultJobAd\"")
 			}
+		case "applyUrl":
+			if err := func() error {
+				s.ApplyUrl.Reset()
+				if err := s.ApplyUrl.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"applyUrl\"")
+			}
+		case "postingUrl":
+			if err := func() error {
+				s.PostingUrl.Reset()
+				if err := s.PostingUrl.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"postingUrl\"")
+			}
+		case "referralUrl":
+			if err := func() error {
+				s.ReferralUrl.Reset()
+				if err := s.ReferralUrl.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"referralUrl\"")
+			}
 		case "refNumber":
 			if err := func() error {
 				s.RefNumber.Reset()
@@ -1860,6 +2710,16 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"company\"")
 			}
+		case "releasedDate":
+			if err := func() error {
+				s.ReleasedDate.Reset()
+				if err := s.ReleasedDate.Decode(d, json.DecodeDateTime); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"releasedDate\"")
+			}
 		case "location":
 			if err := func() error {
 				s.Location.Reset()
@@ -1869,6 +2729,56 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"location\"")
+			}
+		case "industry":
+			if err := func() error {
+				s.Industry.Reset()
+				if err := s.Industry.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"industry\"")
+			}
+		case "department":
+			if err := func() error {
+				s.Department.Reset()
+				if err := s.Department.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"department\"")
+			}
+		case "function":
+			if err := func() error {
+				s.Function.Reset()
+				if err := s.Function.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"function\"")
+			}
+		case "typeOfEmployment":
+			if err := func() error {
+				s.TypeOfEmployment.Reset()
+				if err := s.TypeOfEmployment.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"typeOfEmployment\"")
+			}
+		case "experienceLevel":
+			if err := func() error {
+				s.ExperienceLevel.Reset()
+				if err := s.ExperienceLevel.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"experienceLevel\"")
 			}
 		case "customField":
 			if err := func() error {
@@ -1887,15 +2797,15 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"customField\"")
 			}
-		case "releasedDate":
+		case "ref":
 			if err := func() error {
-				s.ReleasedDate.Reset()
-				if err := s.ReleasedDate.Decode(d, json.DecodeDateTime); err != nil {
+				s.Ref.Reset()
+				if err := s.Ref.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"releasedDate\"")
+				return errors.Wrap(err, "decode field \"ref\"")
 			}
 		case "creator":
 			if err := func() error {
@@ -1906,36 +2816,6 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"creator\"")
-			}
-		case "postingUrl":
-			if err := func() error {
-				s.PostingUrl.Reset()
-				if err := s.PostingUrl.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"postingUrl\"")
-			}
-		case "applyUrl":
-			if err := func() error {
-				s.ApplyUrl.Reset()
-				if err := s.ApplyUrl.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"applyUrl\"")
-			}
-		case "referralUrl":
-			if err := func() error {
-				s.ReferralUrl.Reset()
-				if err := s.ReferralUrl.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"referralUrl\"")
 			}
 		case "jobAd":
 			if err := func() error {
@@ -1967,55 +2847,15 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"visibility\"")
 			}
-		case "industry":
+		case "compensation":
 			if err := func() error {
-				s.Industry.Reset()
-				if err := s.Industry.Decode(d); err != nil {
+				s.Compensation.Reset()
+				if err := s.Compensation.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"industry\"")
-			}
-		case "function":
-			if err := func() error {
-				s.Function.Reset()
-				if err := s.Function.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"function\"")
-			}
-		case "department":
-			if err := func() error {
-				s.Department.Reset()
-				if err := s.Department.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"department\"")
-			}
-		case "experienceLevel":
-			if err := func() error {
-				s.ExperienceLevel.Reset()
-				if err := s.ExperienceLevel.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"experienceLevel\"")
-			}
-		case "typeOfEmployment":
-			if err := func() error {
-				s.TypeOfEmployment.Reset()
-				if err := s.TypeOfEmployment.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"typeOfEmployment\"")
+				return errors.Wrap(err, "decode field \"compensation\"")
 			}
 		case "language":
 			if err := func() error {
@@ -2032,21 +2872,21 @@ func (s *PostingDetail) Decode(d *jx.Decoder) error {
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode PostingDetail")
+		return errors.Wrap(err, "decode Posting")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *PostingDetail) MarshalJSON() ([]byte, error) {
+func (s *Posting) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PostingDetail) UnmarshalJSON(data []byte) error {
+func (s *Posting) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2166,171 +3006,14 @@ func (s *PostingErrorResponse) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *PostingListResponse) Encode(e *jx.Encoder) {
+func (s *PostingItem) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *PostingListResponse) encodeFields(e *jx.Encoder) {
-	{
-		e.FieldStart("offset")
-		e.Int(s.Offset)
-	}
-	{
-		e.FieldStart("limit")
-		e.Int(s.Limit)
-	}
-	{
-		e.FieldStart("totalFound")
-		e.Int(s.TotalFound)
-	}
-	{
-		e.FieldStart("content")
-		e.ArrStart()
-		for _, elem := range s.Content {
-			elem.Encode(e)
-		}
-		e.ArrEnd()
-	}
-}
-
-var jsonFieldsNameOfPostingListResponse = [4]string{
-	0: "offset",
-	1: "limit",
-	2: "totalFound",
-	3: "content",
-}
-
-// Decode decodes PostingListResponse from json.
-func (s *PostingListResponse) Decode(d *jx.Decoder) error {
-	if s == nil {
-		return errors.New("invalid: unable to decode PostingListResponse to nil")
-	}
-	var requiredBitSet [1]uint8
-
-	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
-		switch string(k) {
-		case "offset":
-			requiredBitSet[0] |= 1 << 0
-			if err := func() error {
-				v, err := d.Int()
-				s.Offset = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"offset\"")
-			}
-		case "limit":
-			requiredBitSet[0] |= 1 << 1
-			if err := func() error {
-				v, err := d.Int()
-				s.Limit = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"limit\"")
-			}
-		case "totalFound":
-			requiredBitSet[0] |= 1 << 2
-			if err := func() error {
-				v, err := d.Int()
-				s.TotalFound = int(v)
-				if err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"totalFound\"")
-			}
-		case "content":
-			requiredBitSet[0] |= 1 << 3
-			if err := func() error {
-				s.Content = make([]PostingSummary, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem PostingSummary
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Content = append(s.Content, elem)
-					return nil
-				}); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"content\"")
-			}
-		default:
-			return d.Skip()
-		}
-		return nil
-	}); err != nil {
-		return errors.Wrap(err, "decode PostingListResponse")
-	}
-	// Validate required fields.
-	var failures []validate.FieldError
-	for i, mask := range [1]uint8{
-		0b00001111,
-	} {
-		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
-			// Mask only required fields and check equality to mask using XOR.
-			//
-			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
-			// Bits of fields which would be set are actually bits of missed fields.
-			missed := bits.OnesCount8(result)
-			for bitN := 0; bitN < missed; bitN++ {
-				bitIdx := bits.TrailingZeros8(result)
-				fieldIdx := i*8 + bitIdx
-				var name string
-				if fieldIdx < len(jsonFieldsNameOfPostingListResponse) {
-					name = jsonFieldsNameOfPostingListResponse[fieldIdx]
-				} else {
-					name = strconv.Itoa(fieldIdx)
-				}
-				failures = append(failures, validate.FieldError{
-					Name:  name,
-					Error: validate.ErrFieldRequired,
-				})
-				// Reset bit.
-				result &^= 1 << bitIdx
-			}
-		}
-	}
-	if len(failures) > 0 {
-		return &validate.Error{Fields: failures}
-	}
-
-	return nil
-}
-
-// MarshalJSON implements stdjson.Marshaler.
-func (s *PostingListResponse) MarshalJSON() ([]byte, error) {
-	e := jx.Encoder{}
-	s.Encode(&e)
-	return e.Bytes(), nil
-}
-
-// UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PostingListResponse) UnmarshalJSON(data []byte) error {
-	d := jx.DecodeBytes(data)
-	return s.Decode(d)
-}
-
-// Encode implements json.Marshaler.
-func (s *PostingSummary) Encode(e *jx.Encoder) {
-	e.ObjStart()
-	s.encodeFields(e)
-	e.ObjEnd()
-}
-
-// encodeFields encodes fields.
-func (s *PostingSummary) encodeFields(e *jx.Encoder) {
+func (s *PostingItem) encodeFields(e *jx.Encoder) {
 	{
 		if s.ID.Set {
 			e.FieldStart("id")
@@ -2338,15 +3021,15 @@ func (s *PostingSummary) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Name.Set {
-			e.FieldStart("name")
-			s.Name.Encode(e)
-		}
-	}
-	{
 		if s.UUID.Set {
 			e.FieldStart("uuid")
 			s.UUID.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
 		}
 	}
 	{
@@ -2426,15 +3109,15 @@ func (s *PostingSummary) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Visibility.Set {
-			e.FieldStart("visibility")
-			s.Visibility.Encode(e)
-		}
-	}
-	{
 		if s.Ref.Set {
 			e.FieldStart("ref")
 			s.Ref.Encode(e)
+		}
+	}
+	{
+		if s.Creator.Set {
+			e.FieldStart("creator")
+			s.Creator.Encode(e)
 		}
 	}
 	{
@@ -2443,12 +3126,18 @@ func (s *PostingSummary) encodeFields(e *jx.Encoder) {
 			s.Language.Encode(e)
 		}
 	}
+	{
+		if s.Visibility.Set {
+			e.FieldStart("visibility")
+			s.Visibility.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfPostingSummary = [18]string{
+var jsonFieldsNameOfPostingItem = [19]string{
 	0:  "id",
-	1:  "name",
-	2:  "uuid",
+	1:  "uuid",
+	2:  "name",
 	3:  "jobAdId",
 	4:  "defaultJobAd",
 	5:  "refNumber",
@@ -2461,15 +3150,16 @@ var jsonFieldsNameOfPostingSummary = [18]string{
 	12: "typeOfEmployment",
 	13: "experienceLevel",
 	14: "customField",
-	15: "visibility",
-	16: "ref",
+	15: "ref",
+	16: "creator",
 	17: "language",
+	18: "visibility",
 }
 
-// Decode decodes PostingSummary from json.
-func (s *PostingSummary) Decode(d *jx.Decoder) error {
+// Decode decodes PostingItem from json.
+func (s *PostingItem) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode PostingSummary to nil")
+		return errors.New("invalid: unable to decode PostingItem to nil")
 	}
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
@@ -2484,16 +3174,6 @@ func (s *PostingSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
-		case "name":
-			if err := func() error {
-				s.Name.Reset()
-				if err := s.Name.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"name\"")
-			}
 		case "uuid":
 			if err := func() error {
 				s.UUID.Reset()
@@ -2503,6 +3183,16 @@ func (s *PostingSummary) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"uuid\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
 			}
 		case "jobAdId":
 			if err := func() error {
@@ -2631,16 +3321,6 @@ func (s *PostingSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"customField\"")
 			}
-		case "visibility":
-			if err := func() error {
-				s.Visibility.Reset()
-				if err := s.Visibility.Decode(d); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return errors.Wrap(err, "decode field \"visibility\"")
-			}
 		case "ref":
 			if err := func() error {
 				s.Ref.Reset()
@@ -2650,6 +3330,16 @@ func (s *PostingSummary) Decode(d *jx.Decoder) error {
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"ref\"")
+			}
+		case "creator":
+			if err := func() error {
+				s.Creator.Reset()
+				if err := s.Creator.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"creator\"")
 			}
 		case "language":
 			if err := func() error {
@@ -2661,26 +3351,495 @@ func (s *PostingSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"language\"")
 			}
+		case "visibility":
+			if err := func() error {
+				s.Visibility.Reset()
+				if err := s.Visibility.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"visibility\"")
+			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode PostingSummary")
+		return errors.Wrap(err, "decode PostingItem")
 	}
 
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *PostingSummary) MarshalJSON() ([]byte, error) {
+func (s *PostingItem) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *PostingSummary) UnmarshalJSON(data []byte) error {
+func (s *PostingItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostingList) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostingList) encodeFields(e *jx.Encoder) {
+	{
+		e.FieldStart("totalFound")
+		e.Int(s.TotalFound)
+	}
+	{
+		e.FieldStart("limit")
+		e.Int(s.Limit)
+	}
+	{
+		e.FieldStart("offset")
+		e.Int(s.Offset)
+	}
+	{
+		e.FieldStart("content")
+		e.ArrStart()
+		for _, elem := range s.Content {
+			elem.Encode(e)
+		}
+		e.ArrEnd()
+	}
+}
+
+var jsonFieldsNameOfPostingList = [4]string{
+	0: "totalFound",
+	1: "limit",
+	2: "offset",
+	3: "content",
+}
+
+// Decode decodes PostingList from json.
+func (s *PostingList) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostingList to nil")
+	}
+	var requiredBitSet [1]uint8
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "totalFound":
+			requiredBitSet[0] |= 1 << 0
+			if err := func() error {
+				v, err := d.Int()
+				s.TotalFound = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"totalFound\"")
+			}
+		case "limit":
+			requiredBitSet[0] |= 1 << 1
+			if err := func() error {
+				v, err := d.Int()
+				s.Limit = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"limit\"")
+			}
+		case "offset":
+			requiredBitSet[0] |= 1 << 2
+			if err := func() error {
+				v, err := d.Int()
+				s.Offset = int(v)
+				if err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"offset\"")
+			}
+		case "content":
+			requiredBitSet[0] |= 1 << 3
+			if err := func() error {
+				s.Content = make([]PostingItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem PostingItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Content = append(s.Content, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"content\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostingList")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfPostingList) {
+					name = jsonFieldsNameOfPostingList[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostingList) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostingList) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *PostingLocation) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *PostingLocation) encodeFields(e *jx.Encoder) {
+	{
+		if s.Country.Set {
+			e.FieldStart("country")
+			s.Country.Encode(e)
+		}
+	}
+	{
+		if s.Region.Set {
+			e.FieldStart("region")
+			s.Region.Encode(e)
+		}
+	}
+	{
+		if s.City.Set {
+			e.FieldStart("city")
+			s.City.Encode(e)
+		}
+	}
+	{
+		if s.Remote.Set {
+			e.FieldStart("remote")
+			s.Remote.Encode(e)
+		}
+	}
+	{
+		if s.Hybrid.Set {
+			e.FieldStart("hybrid")
+			s.Hybrid.Encode(e)
+		}
+	}
+	{
+		if s.Latitude.Set {
+			e.FieldStart("latitude")
+			s.Latitude.Encode(e)
+		}
+	}
+	{
+		if s.Longitude.Set {
+			e.FieldStart("longitude")
+			s.Longitude.Encode(e)
+		}
+	}
+	{
+		if s.FullLocation.Set {
+			e.FieldStart("fullLocation")
+			s.FullLocation.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfPostingLocation = [8]string{
+	0: "country",
+	1: "region",
+	2: "city",
+	3: "remote",
+	4: "hybrid",
+	5: "latitude",
+	6: "longitude",
+	7: "fullLocation",
+}
+
+// Decode decodes PostingLocation from json.
+func (s *PostingLocation) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode PostingLocation to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "country":
+			if err := func() error {
+				s.Country.Reset()
+				if err := s.Country.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"country\"")
+			}
+		case "region":
+			if err := func() error {
+				s.Region.Reset()
+				if err := s.Region.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"region\"")
+			}
+		case "city":
+			if err := func() error {
+				s.City.Reset()
+				if err := s.City.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"city\"")
+			}
+		case "remote":
+			if err := func() error {
+				s.Remote.Reset()
+				if err := s.Remote.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"remote\"")
+			}
+		case "hybrid":
+			if err := func() error {
+				s.Hybrid.Reset()
+				if err := s.Hybrid.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"hybrid\"")
+			}
+		case "latitude":
+			if err := func() error {
+				s.Latitude.Reset()
+				if err := s.Latitude.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"latitude\"")
+			}
+		case "longitude":
+			if err := func() error {
+				s.Longitude.Reset()
+				if err := s.Longitude.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"longitude\"")
+			}
+		case "fullLocation":
+			if err := func() error {
+				s.FullLocation.Reset()
+				if err := s.FullLocation.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"fullLocation\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode PostingLocation")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *PostingLocation) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *PostingLocation) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *TypeOfEmployment) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *TypeOfEmployment) encodeFields(e *jx.Encoder) {
+	{
+		if s.ID.Set {
+			e.FieldStart("id")
+			s.ID.Encode(e)
+		}
+	}
+	{
+		if s.Label.Set {
+			e.FieldStart("label")
+			s.Label.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfTypeOfEmployment = [2]string{
+	0: "id",
+	1: "label",
+}
+
+// Decode decodes TypeOfEmployment from json.
+func (s *TypeOfEmployment) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode TypeOfEmployment to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "id":
+			if err := func() error {
+				s.ID.Reset()
+				if err := s.ID.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"id\"")
+			}
+		case "label":
+			if err := func() error {
+				s.Label.Reset()
+				if err := s.Label.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"label\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode TypeOfEmployment")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *TypeOfEmployment) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *TypeOfEmployment) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes Visibility as json.
+func (s Visibility) Encode(e *jx.Encoder) {
+	e.Str(string(s))
+}
+
+// Decode decodes Visibility from json.
+func (s *Visibility) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode Visibility to nil")
+	}
+	v, err := d.StrBytes()
+	if err != nil {
+		return err
+	}
+	// Try to use constant string.
+	switch Visibility(v) {
+	case VisibilityPUBLIC:
+		*s = VisibilityPUBLIC
+	case VisibilityINTERNAL:
+		*s = VisibilityINTERNAL
+	default:
+		*s = Visibility(v)
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s Visibility) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *Visibility) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

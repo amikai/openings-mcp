@@ -10,6 +10,18 @@ import (
 	"github.com/ogen-go/ogen/uri"
 )
 
+var (
+	rn6AllowedHeaders = map[string]string{
+		"GET": "Accept-Language",
+	}
+	rn7AllowedHeaders = map[string]string{
+		"GET": "Accept-Language",
+	}
+	rn4AllowedHeaders = map[string]string{
+		"GET": "Accept-Language",
+	}
+)
+
 func (s *Server) cutPrefix(path string) (string, bool) {
 	prefix := s.cfg.Prefix
 	if prefix == "" {
@@ -49,9 +61,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/companies/"
+		case '/': // Prefix: "/v1/companies/"
 
-			if l := len("/companies/"); len(elem) >= l && elem[0:l] == "/companies/" {
+			if l := len("/v1/companies/"); len(elem) >= l && elem[0:l] == "/v1/companies/" {
 				elem = elem[l:]
 			} else {
 				break
@@ -70,67 +82,108 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/postings"
+			case '/': // Prefix: "/"
 
-				if l := len("/postings"); len(elem) >= l && elem[0:l] == "/postings" {
+				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					switch r.Method {
-					case "GET":
-						s.handleListPostingsRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
-					default:
-						s.notAllowed(w, r, notAllowedParams{
-							allowedMethods: "GET",
-							allowedHeaders: nil,
-							acceptPost:     "",
-							acceptPatch:    "",
-						})
-					}
-
-					return
+					break
 				}
 				switch elem[0] {
-				case '/': // Prefix: "/"
+				case 'd': // Prefix: "departments"
 
-					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+					if l := len("departments"); len(elem) >= l && elem[0:l] == "departments" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
-					// Param: "postingId"
-					// Leaf parameter, slashes are prohibited
-					idx := strings.IndexByte(elem, '/')
-					if idx >= 0 {
-						break
-					}
-					args[1] = elem
-					elem = ""
-
 					if len(elem) == 0 {
 						// Leaf node.
 						switch r.Method {
 						case "GET":
-							s.handleGetPostingRequest([2]string{
+							s.handleListDepartmentsRequest([1]string{
 								args[0],
-								args[1],
 							}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, notAllowedParams{
 								allowedMethods: "GET",
-								allowedHeaders: nil,
+								allowedHeaders: rn6AllowedHeaders,
 								acceptPost:     "",
 								acceptPatch:    "",
 							})
 						}
 
 						return
+					}
+
+				case 'p': // Prefix: "postings"
+
+					if l := len("postings"); len(elem) >= l && elem[0:l] == "postings" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						switch r.Method {
+						case "GET":
+							s.handleListPostingsRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: rn7AllowedHeaders,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
+
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "postingId"
+						// Leaf parameter, slashes are prohibited
+						idx := strings.IndexByte(elem, '/')
+						if idx >= 0 {
+							break
+						}
+						args[1] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch r.Method {
+							case "GET":
+								s.handleGetPostingRequest([2]string{
+									args[0],
+									args[1],
+								}, elemIsEscaped, w, r)
+							default:
+								s.notAllowed(w, r, notAllowedParams{
+									allowedMethods: "GET",
+									allowedHeaders: rn4AllowedHeaders,
+									acceptPost:     "",
+									acceptPatch:    "",
+								})
+							}
+
+							return
+						}
+
 					}
 
 				}
@@ -223,9 +276,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/companies/"
+		case '/': // Prefix: "/v1/companies/"
 
-			if l := len("/companies/"); len(elem) >= l && elem[0:l] == "/companies/" {
+			if l := len("/v1/companies/"); len(elem) >= l && elem[0:l] == "/v1/companies/" {
 				elem = elem[l:]
 			} else {
 				break
@@ -244,62 +297,101 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/postings"
+			case '/': // Prefix: "/"
 
-				if l := len("/postings"); len(elem) >= l && elem[0:l] == "/postings" {
+				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
 				if len(elem) == 0 {
-					switch method {
-					case "GET":
-						r.name = ListPostingsOperation
-						r.summary = "Search/list postings for a company"
-						r.operationID = "listPostings"
-						r.operationGroup = ""
-						r.pathPattern = "/companies/{companyIdentifier}/postings"
-						r.args = args
-						r.count = 1
-						return r, true
-					default:
-						return
-					}
+					break
 				}
 				switch elem[0] {
-				case '/': // Prefix: "/"
+				case 'd': // Prefix: "departments"
 
-					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+					if l := len("departments"); len(elem) >= l && elem[0:l] == "departments" {
 						elem = elem[l:]
 					} else {
 						break
 					}
 
-					// Param: "postingId"
-					// Leaf parameter, slashes are prohibited
-					idx := strings.IndexByte(elem, '/')
-					if idx >= 0 {
-						break
-					}
-					args[1] = elem
-					elem = ""
-
 					if len(elem) == 0 {
 						// Leaf node.
 						switch method {
 						case "GET":
-							r.name = GetPostingOperation
-							r.summary = "Get a single posting's full detail"
-							r.operationID = "getPosting"
+							r.name = ListDepartmentsOperation
+							r.summary = "List departments for given company"
+							r.operationID = "listDepartments"
 							r.operationGroup = ""
-							r.pathPattern = "/companies/{companyIdentifier}/postings/{postingId}"
+							r.pathPattern = "/v1/companies/{companyIdentifier}/departments"
 							r.args = args
-							r.count = 2
+							r.count = 1
 							return r, true
 						default:
 							return
 						}
+					}
+
+				case 'p': // Prefix: "postings"
+
+					if l := len("postings"); len(elem) >= l && elem[0:l] == "postings" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						switch method {
+						case "GET":
+							r.name = ListPostingsOperation
+							r.summary = "Lists active postings published by given company"
+							r.operationID = "listPostings"
+							r.operationGroup = ""
+							r.pathPattern = "/v1/companies/{companyIdentifier}/postings"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+					switch elem[0] {
+					case '/': // Prefix: "/"
+
+						if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+							elem = elem[l:]
+						} else {
+							break
+						}
+
+						// Param: "postingId"
+						// Leaf parameter, slashes are prohibited
+						idx := strings.IndexByte(elem, '/')
+						if idx >= 0 {
+							break
+						}
+						args[1] = elem
+						elem = ""
+
+						if len(elem) == 0 {
+							// Leaf node.
+							switch method {
+							case "GET":
+								r.name = GetPostingOperation
+								r.summary = "Get posting by posting id or uuid for given company"
+								r.operationID = "getPosting"
+								r.operationGroup = ""
+								r.pathPattern = "/v1/companies/{companyIdentifier}/postings/{postingId}"
+								r.args = args
+								r.count = 2
+								return r, true
+							default:
+								return
+							}
+						}
+
 					}
 
 				}

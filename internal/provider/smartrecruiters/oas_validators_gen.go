@@ -3,11 +3,96 @@
 package smartrecruiters
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s *PostingListResponse) Validate() error {
+func (s *Compensation) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Min.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "min",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Max.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "max",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Period.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "period",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s CompensationPeriod) Validate() error {
+	switch s {
+	case "HOURLY":
+		return nil
+	case "DAILY":
+		return nil
+	case "WEEKLY":
+		return nil
+	case "MONTHLY":
+		return nil
+	case "YEARLY":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *Departments) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -28,4 +113,393 @@ func (s *PostingListResponse) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s *ExperienceLevel) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.ID.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "id",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s ExperienceLevelID) Validate() error {
+	switch s {
+	case "associate":
+		return nil
+	case "director":
+		return nil
+	case "entry_level":
+		return nil
+	case "executive":
+		return nil
+	case "internship":
+		return nil
+	case "mid_senior_level":
+		return nil
+	case "not_applicable":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s JobAdLanguageCode) Validate() error {
+	switch s {
+	case "af":
+		return nil
+	case "am":
+		return nil
+	case "ar":
+		return nil
+	case "az":
+		return nil
+	case "bg":
+		return nil
+	case "bn":
+		return nil
+	case "ca":
+		return nil
+	case "cs":
+		return nil
+	case "cy":
+		return nil
+	case "da":
+		return nil
+	case "de":
+		return nil
+	case "el":
+		return nil
+	case "en":
+		return nil
+	case "en-GB":
+		return nil
+	case "es":
+		return nil
+	case "es-MX":
+		return nil
+	case "et":
+		return nil
+	case "eu":
+		return nil
+	case "fa":
+		return nil
+	case "fi":
+		return nil
+	case "fil":
+		return nil
+	case "fr":
+		return nil
+	case "fr-CA":
+		return nil
+	case "ga":
+		return nil
+	case "gl":
+		return nil
+	case "gu":
+		return nil
+	case "he":
+		return nil
+	case "hi":
+		return nil
+	case "hr":
+		return nil
+	case "hu":
+		return nil
+	case "hy":
+		return nil
+	case "id":
+		return nil
+	case "is":
+		return nil
+	case "it":
+		return nil
+	case "ja":
+		return nil
+	case "ka":
+		return nil
+	case "km":
+		return nil
+	case "kn":
+		return nil
+	case "ko":
+		return nil
+	case "lo":
+		return nil
+	case "lt":
+		return nil
+	case "lv":
+		return nil
+	case "ml":
+		return nil
+	case "mn":
+		return nil
+	case "mr":
+		return nil
+	case "ms":
+		return nil
+	case "ne":
+		return nil
+	case "nl":
+		return nil
+	case "no":
+		return nil
+	case "pl":
+		return nil
+	case "pt":
+		return nil
+	case "pt-BR":
+		return nil
+	case "ro":
+		return nil
+	case "ru":
+		return nil
+	case "si":
+		return nil
+	case "sk":
+		return nil
+	case "sl":
+		return nil
+	case "sr":
+		return nil
+	case "sv":
+		return nil
+	case "sw":
+		return nil
+	case "ta":
+		return nil
+	case "te":
+		return nil
+	case "tr":
+		return nil
+	case "uk":
+		return nil
+	case "ur":
+		return nil
+	case "vi":
+		return nil
+	case "zh-CN":
+		return nil
+	case "zh-TW":
+		return nil
+	case "zu":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s ListPostingsDestination) Validate() error {
+	switch s {
+	case "PUBLIC":
+		return nil
+	case "INTERNAL":
+		return nil
+	case "INTERNAL_OR_PUBLIC":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s ListPostingsLocationTypeItem) Validate() error {
+	switch s {
+	case "REMOTE":
+		return nil
+	case "HYBRID":
+		return nil
+	case "ONSITE":
+		return nil
+	case "ANY":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *Posting) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.ExperienceLevel.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "experienceLevel",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Visibility.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "visibility",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Compensation.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "compensation",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *PostingItem) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.ExperienceLevel.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "experienceLevel",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Visibility.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "visibility",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *PostingList) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Content == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Content {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "content",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s Visibility) Validate() error {
+	switch s {
+	case "PUBLIC":
+		return nil
+	case "INTERNAL":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }

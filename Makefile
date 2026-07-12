@@ -9,6 +9,7 @@ OPENAPI_SPECS := \
 	internal/provider/lever/openapi.yaml \
 	internal/provider/linkedin/openapi.yaml \
 	internal/provider/nvidia/openapi.yaml \
+	internal/provider/smartrecruiters/openapi.yaml \
 	internal/provider/synopsys/openapi.yaml \
 	internal/provider/tsmc/openapi.yaml \
 	internal/provider/workday/openapi.yaml

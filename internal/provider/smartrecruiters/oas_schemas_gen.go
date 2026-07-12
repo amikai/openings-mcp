@@ -4,112 +4,227 @@ package smartrecruiters
 
 import (
 	"time"
+
+	"github.com/go-faster/errors"
+	"github.com/google/uuid"
 )
 
 // Ref: #/components/schemas/Company
 type Company struct {
-	Identifier OptNilString `json:"identifier"`
-	Name       OptNilString `json:"name"`
+	Identifier OptString `json:"identifier"`
+	Name       OptString `json:"name"`
 }
 
 // GetIdentifier returns the value of Identifier.
-func (s *Company) GetIdentifier() OptNilString {
+func (s *Company) GetIdentifier() OptString {
 	return s.Identifier
 }
 
 // GetName returns the value of Name.
-func (s *Company) GetName() OptNilString {
+func (s *Company) GetName() OptString {
 	return s.Name
 }
 
 // SetIdentifier sets the value of Identifier.
-func (s *Company) SetIdentifier(val OptNilString) {
+func (s *Company) SetIdentifier(val OptString) {
 	s.Identifier = val
 }
 
 // SetName sets the value of Name.
-func (s *Company) SetName(val OptNilString) {
+func (s *Company) SetName(val OptString) {
 	s.Name = val
+}
+
+// Ref: #/components/schemas/Compensation
+type Compensation struct {
+	Min      OptNilFloat64            `json:"min"`
+	Max      OptNilFloat64            `json:"max"`
+	Currency OptNilString             `json:"currency"`
+	Period   OptNilCompensationPeriod `json:"period"`
+}
+
+// GetMin returns the value of Min.
+func (s *Compensation) GetMin() OptNilFloat64 {
+	return s.Min
+}
+
+// GetMax returns the value of Max.
+func (s *Compensation) GetMax() OptNilFloat64 {
+	return s.Max
+}
+
+// GetCurrency returns the value of Currency.
+func (s *Compensation) GetCurrency() OptNilString {
+	return s.Currency
+}
+
+// GetPeriod returns the value of Period.
+func (s *Compensation) GetPeriod() OptNilCompensationPeriod {
+	return s.Period
+}
+
+// SetMin sets the value of Min.
+func (s *Compensation) SetMin(val OptNilFloat64) {
+	s.Min = val
+}
+
+// SetMax sets the value of Max.
+func (s *Compensation) SetMax(val OptNilFloat64) {
+	s.Max = val
+}
+
+// SetCurrency sets the value of Currency.
+func (s *Compensation) SetCurrency(val OptNilString) {
+	s.Currency = val
+}
+
+// SetPeriod sets the value of Period.
+func (s *Compensation) SetPeriod(val OptNilCompensationPeriod) {
+	s.Period = val
+}
+
+type CompensationPeriod string
+
+const (
+	CompensationPeriodHOURLY  CompensationPeriod = "HOURLY"
+	CompensationPeriodDAILY   CompensationPeriod = "DAILY"
+	CompensationPeriodWEEKLY  CompensationPeriod = "WEEKLY"
+	CompensationPeriodMONTHLY CompensationPeriod = "MONTHLY"
+	CompensationPeriodYEARLY  CompensationPeriod = "YEARLY"
+)
+
+// AllValues returns all CompensationPeriod values.
+func (CompensationPeriod) AllValues() []CompensationPeriod {
+	return []CompensationPeriod{
+		CompensationPeriodHOURLY,
+		CompensationPeriodDAILY,
+		CompensationPeriodWEEKLY,
+		CompensationPeriodMONTHLY,
+		CompensationPeriodYEARLY,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s CompensationPeriod) MarshalText() ([]byte, error) {
+	switch s {
+	case CompensationPeriodHOURLY:
+		return []byte(s), nil
+	case CompensationPeriodDAILY:
+		return []byte(s), nil
+	case CompensationPeriodWEEKLY:
+		return []byte(s), nil
+	case CompensationPeriodMONTHLY:
+		return []byte(s), nil
+	case CompensationPeriodYEARLY:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *CompensationPeriod) UnmarshalText(data []byte) error {
+	switch CompensationPeriod(data) {
+	case CompensationPeriodHOURLY:
+		*s = CompensationPeriodHOURLY
+		return nil
+	case CompensationPeriodDAILY:
+		*s = CompensationPeriodDAILY
+		return nil
+	case CompensationPeriodWEEKLY:
+		*s = CompensationPeriodWEEKLY
+		return nil
+	case CompensationPeriodMONTHLY:
+		*s = CompensationPeriodMONTHLY
+		return nil
+	case CompensationPeriodYEARLY:
+		*s = CompensationPeriodYEARLY
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Ref: #/components/schemas/Creator
 type Creator struct {
-	Name      OptNilString `json:"name"`
-	AvatarUrl OptNilString `json:"avatarUrl"`
+	Name      OptString `json:"name"`
+	AvatarUrl OptString `json:"avatarUrl"`
 }
 
 // GetName returns the value of Name.
-func (s *Creator) GetName() OptNilString {
+func (s *Creator) GetName() OptString {
 	return s.Name
 }
 
 // GetAvatarUrl returns the value of AvatarUrl.
-func (s *Creator) GetAvatarUrl() OptNilString {
+func (s *Creator) GetAvatarUrl() OptString {
 	return s.AvatarUrl
 }
 
 // SetName sets the value of Name.
-func (s *Creator) SetName(val OptNilString) {
+func (s *Creator) SetName(val OptString) {
 	s.Name = val
 }
 
 // SetAvatarUrl sets the value of AvatarUrl.
-func (s *Creator) SetAvatarUrl(val OptNilString) {
+func (s *Creator) SetAvatarUrl(val OptString) {
 	s.AvatarUrl = val
 }
 
 // Ref: #/components/schemas/CustomField
 type CustomField struct {
-	FieldId    OptNilString `json:"fieldId"`
-	FieldLabel OptNilString `json:"fieldLabel"`
-	ValueId    OptNilString `json:"valueId"`
-	ValueLabel OptNilString `json:"valueLabel"`
+	FieldId    OptString `json:"fieldId"`
+	FieldLabel OptString `json:"fieldLabel"`
+	ValueId    OptString `json:"valueId"`
+	ValueLabel OptString `json:"valueLabel"`
 }
 
 // GetFieldId returns the value of FieldId.
-func (s *CustomField) GetFieldId() OptNilString {
+func (s *CustomField) GetFieldId() OptString {
 	return s.FieldId
 }
 
 // GetFieldLabel returns the value of FieldLabel.
-func (s *CustomField) GetFieldLabel() OptNilString {
+func (s *CustomField) GetFieldLabel() OptString {
 	return s.FieldLabel
 }
 
 // GetValueId returns the value of ValueId.
-func (s *CustomField) GetValueId() OptNilString {
+func (s *CustomField) GetValueId() OptString {
 	return s.ValueId
 }
 
 // GetValueLabel returns the value of ValueLabel.
-func (s *CustomField) GetValueLabel() OptNilString {
+func (s *CustomField) GetValueLabel() OptString {
 	return s.ValueLabel
 }
 
 // SetFieldId sets the value of FieldId.
-func (s *CustomField) SetFieldId(val OptNilString) {
+func (s *CustomField) SetFieldId(val OptString) {
 	s.FieldId = val
 }
 
 // SetFieldLabel sets the value of FieldLabel.
-func (s *CustomField) SetFieldLabel(val OptNilString) {
+func (s *CustomField) SetFieldLabel(val OptString) {
 	s.FieldLabel = val
 }
 
 // SetValueId sets the value of ValueId.
-func (s *CustomField) SetValueId(val OptNilString) {
+func (s *CustomField) SetValueId(val OptString) {
 	s.ValueId = val
 }
 
 // SetValueLabel sets the value of ValueLabel.
-func (s *CustomField) SetValueLabel(val OptNilString) {
+func (s *CustomField) SetValueLabel(val OptString) {
 	s.ValueLabel = val
 }
 
 // Ref: #/components/schemas/Department
 type Department struct {
-	ID    OptDepartmentId `json:"id"`
-	Label OptNilString    `json:"label"`
+	ID          OptDepartmentId `json:"id"`
+	Label       OptString       `json:"label"`
+	Description OptString       `json:"description"`
+	Archived    OptBool         `json:"archived"`
 }
 
 // GetID returns the value of ID.
@@ -118,8 +233,18 @@ func (s *Department) GetID() OptDepartmentId {
 }
 
 // GetLabel returns the value of Label.
-func (s *Department) GetLabel() OptNilString {
+func (s *Department) GetLabel() OptString {
 	return s.Label
+}
+
+// GetDescription returns the value of Description.
+func (s *Department) GetDescription() OptString {
+	return s.Description
+}
+
+// GetArchived returns the value of Archived.
+func (s *Department) GetArchived() OptBool {
+	return s.Archived
 }
 
 // SetID sets the value of ID.
@@ -128,12 +253,22 @@ func (s *Department) SetID(val OptDepartmentId) {
 }
 
 // SetLabel sets the value of Label.
-func (s *Department) SetLabel(val OptNilString) {
+func (s *Department) SetLabel(val OptString) {
 	s.Label = val
 }
 
-// String in list responses, unquoted integer in detail responses for the same posting — see the
-// package doc's department.id note.
+// SetDescription sets the value of Description.
+func (s *Department) SetDescription(val OptString) {
+	s.Description = val
+}
+
+// SetArchived sets the value of Archived.
+func (s *Department) SetArchived(val OptBool) {
+	s.Archived = val
+}
+
+// Published as a string, but observed as a quoted string on the list endpoint, an unquoted integer on
+// the detail endpoint for the same posting, and an unquoted integer on the departments endpoint.
 // Ref: #/components/schemas/DepartmentId
 // DepartmentId represents sum type.
 type DepartmentId struct {
@@ -200,251 +335,983 @@ func NewIntDepartmentId(v int) DepartmentId {
 	return s
 }
 
-// Shared shape for industry, function, experienceLevel, and typeOfEmployment.
-// Ref: #/components/schemas/IdLabel
-type IdLabel struct {
-	ID    OptNilString `json:"id"`
-	Label OptNilString `json:"label"`
+// Ref: #/components/schemas/Departments
+type Departments struct {
+	TotalFound int          `json:"totalFound"`
+	Content    []Department `json:"content"`
+}
+
+// GetTotalFound returns the value of TotalFound.
+func (s *Departments) GetTotalFound() int {
+	return s.TotalFound
+}
+
+// GetContent returns the value of Content.
+func (s *Departments) GetContent() []Department {
+	return s.Content
+}
+
+// SetTotalFound sets the value of TotalFound.
+func (s *Departments) SetTotalFound(val int) {
+	s.TotalFound = val
+}
+
+// SetContent sets the value of Content.
+func (s *Departments) SetContent(val []Department) {
+	s.Content = val
+}
+
+// Ref: #/components/schemas/ExperienceLevel
+type ExperienceLevel struct {
+	ID    OptExperienceLevelID `json:"id"`
+	Name  OptString            `json:"name"`
+	Label OptString            `json:"label"`
 }
 
 // GetID returns the value of ID.
-func (s *IdLabel) GetID() OptNilString {
+func (s *ExperienceLevel) GetID() OptExperienceLevelID {
 	return s.ID
 }
 
+// GetName returns the value of Name.
+func (s *ExperienceLevel) GetName() OptString {
+	return s.Name
+}
+
 // GetLabel returns the value of Label.
-func (s *IdLabel) GetLabel() OptNilString {
+func (s *ExperienceLevel) GetLabel() OptString {
 	return s.Label
 }
 
 // SetID sets the value of ID.
-func (s *IdLabel) SetID(val OptNilString) {
+func (s *ExperienceLevel) SetID(val OptExperienceLevelID) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *ExperienceLevel) SetName(val OptString) {
+	s.Name = val
+}
+
+// SetLabel sets the value of Label.
+func (s *ExperienceLevel) SetLabel(val OptString) {
+	s.Label = val
+}
+
+type ExperienceLevelID string
+
+const (
+	ExperienceLevelIDAssociate      ExperienceLevelID = "associate"
+	ExperienceLevelIDDirector       ExperienceLevelID = "director"
+	ExperienceLevelIDEntryLevel     ExperienceLevelID = "entry_level"
+	ExperienceLevelIDExecutive      ExperienceLevelID = "executive"
+	ExperienceLevelIDInternship     ExperienceLevelID = "internship"
+	ExperienceLevelIDMidSeniorLevel ExperienceLevelID = "mid_senior_level"
+	ExperienceLevelIDNotApplicable  ExperienceLevelID = "not_applicable"
+)
+
+// AllValues returns all ExperienceLevelID values.
+func (ExperienceLevelID) AllValues() []ExperienceLevelID {
+	return []ExperienceLevelID{
+		ExperienceLevelIDAssociate,
+		ExperienceLevelIDDirector,
+		ExperienceLevelIDEntryLevel,
+		ExperienceLevelIDExecutive,
+		ExperienceLevelIDInternship,
+		ExperienceLevelIDMidSeniorLevel,
+		ExperienceLevelIDNotApplicable,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s ExperienceLevelID) MarshalText() ([]byte, error) {
+	switch s {
+	case ExperienceLevelIDAssociate:
+		return []byte(s), nil
+	case ExperienceLevelIDDirector:
+		return []byte(s), nil
+	case ExperienceLevelIDEntryLevel:
+		return []byte(s), nil
+	case ExperienceLevelIDExecutive:
+		return []byte(s), nil
+	case ExperienceLevelIDInternship:
+		return []byte(s), nil
+	case ExperienceLevelIDMidSeniorLevel:
+		return []byte(s), nil
+	case ExperienceLevelIDNotApplicable:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ExperienceLevelID) UnmarshalText(data []byte) error {
+	switch ExperienceLevelID(data) {
+	case ExperienceLevelIDAssociate:
+		*s = ExperienceLevelIDAssociate
+		return nil
+	case ExperienceLevelIDDirector:
+		*s = ExperienceLevelIDDirector
+		return nil
+	case ExperienceLevelIDEntryLevel:
+		*s = ExperienceLevelIDEntryLevel
+		return nil
+	case ExperienceLevelIDExecutive:
+		*s = ExperienceLevelIDExecutive
+		return nil
+	case ExperienceLevelIDInternship:
+		*s = ExperienceLevelIDInternship
+		return nil
+	case ExperienceLevelIDMidSeniorLevel:
+		*s = ExperienceLevelIDMidSeniorLevel
+		return nil
+	case ExperienceLevelIDNotApplicable:
+		*s = ExperienceLevelIDNotApplicable
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/Function
+type Function struct {
+	ID    OptString `json:"id"`
+	Label OptString `json:"label"`
+}
+
+// GetID returns the value of ID.
+func (s *Function) GetID() OptString {
+	return s.ID
+}
+
+// GetLabel returns the value of Label.
+func (s *Function) GetLabel() OptString {
+	return s.Label
+}
+
+// SetID sets the value of ID.
+func (s *Function) SetID(val OptString) {
 	s.ID = val
 }
 
 // SetLabel sets the value of Label.
-func (s *IdLabel) SetLabel(val OptNilString) {
+func (s *Function) SetLabel(val OptString) {
 	s.Label = val
 }
 
-// Ref: #/components/schemas/JobAd
-type JobAd struct {
-	Sections OptJobAdSections `json:"sections"`
+// Ref: #/components/schemas/Industry
+type Industry struct {
+	ID    OptString `json:"id"`
+	Label OptString `json:"label"`
 }
 
-// GetSections returns the value of Sections.
-func (s *JobAd) GetSections() OptJobAdSections {
-	return s.Sections
+// GetID returns the value of ID.
+func (s *Industry) GetID() OptString {
+	return s.ID
 }
 
-// SetSections sets the value of Sections.
-func (s *JobAd) SetSections(val OptJobAdSections) {
-	s.Sections = val
+// GetLabel returns the value of Label.
+func (s *Industry) GetLabel() OptString {
+	return s.Label
+}
+
+// SetID sets the value of ID.
+func (s *Industry) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetLabel sets the value of Label.
+func (s *Industry) SetLabel(val OptString) {
+	s.Label = val
+}
+
+// Ref: #/components/schemas/JobAdLanguageCode
+type JobAdLanguageCode string
+
+const (
+	JobAdLanguageCodeAf   JobAdLanguageCode = "af"
+	JobAdLanguageCodeAm   JobAdLanguageCode = "am"
+	JobAdLanguageCodeAr   JobAdLanguageCode = "ar"
+	JobAdLanguageCodeAz   JobAdLanguageCode = "az"
+	JobAdLanguageCodeBg   JobAdLanguageCode = "bg"
+	JobAdLanguageCodeBn   JobAdLanguageCode = "bn"
+	JobAdLanguageCodeCa   JobAdLanguageCode = "ca"
+	JobAdLanguageCodeCs   JobAdLanguageCode = "cs"
+	JobAdLanguageCodeCy   JobAdLanguageCode = "cy"
+	JobAdLanguageCodeDa   JobAdLanguageCode = "da"
+	JobAdLanguageCodeDe   JobAdLanguageCode = "de"
+	JobAdLanguageCodeEl   JobAdLanguageCode = "el"
+	JobAdLanguageCodeEn   JobAdLanguageCode = "en"
+	JobAdLanguageCodeEnGB JobAdLanguageCode = "en-GB"
+	JobAdLanguageCodeEs   JobAdLanguageCode = "es"
+	JobAdLanguageCodeEsMX JobAdLanguageCode = "es-MX"
+	JobAdLanguageCodeEt   JobAdLanguageCode = "et"
+	JobAdLanguageCodeEu   JobAdLanguageCode = "eu"
+	JobAdLanguageCodeFa   JobAdLanguageCode = "fa"
+	JobAdLanguageCodeFi   JobAdLanguageCode = "fi"
+	JobAdLanguageCodeFil  JobAdLanguageCode = "fil"
+	JobAdLanguageCodeFr   JobAdLanguageCode = "fr"
+	JobAdLanguageCodeFrCA JobAdLanguageCode = "fr-CA"
+	JobAdLanguageCodeGa   JobAdLanguageCode = "ga"
+	JobAdLanguageCodeGl   JobAdLanguageCode = "gl"
+	JobAdLanguageCodeGu   JobAdLanguageCode = "gu"
+	JobAdLanguageCodeHe   JobAdLanguageCode = "he"
+	JobAdLanguageCodeHi   JobAdLanguageCode = "hi"
+	JobAdLanguageCodeHr   JobAdLanguageCode = "hr"
+	JobAdLanguageCodeHu   JobAdLanguageCode = "hu"
+	JobAdLanguageCodeHy   JobAdLanguageCode = "hy"
+	JobAdLanguageCodeID   JobAdLanguageCode = "id"
+	JobAdLanguageCodeIs   JobAdLanguageCode = "is"
+	JobAdLanguageCodeIt   JobAdLanguageCode = "it"
+	JobAdLanguageCodeJa   JobAdLanguageCode = "ja"
+	JobAdLanguageCodeKa   JobAdLanguageCode = "ka"
+	JobAdLanguageCodeKm   JobAdLanguageCode = "km"
+	JobAdLanguageCodeKn   JobAdLanguageCode = "kn"
+	JobAdLanguageCodeKo   JobAdLanguageCode = "ko"
+	JobAdLanguageCodeLo   JobAdLanguageCode = "lo"
+	JobAdLanguageCodeLt   JobAdLanguageCode = "lt"
+	JobAdLanguageCodeLv   JobAdLanguageCode = "lv"
+	JobAdLanguageCodeMl   JobAdLanguageCode = "ml"
+	JobAdLanguageCodeMn   JobAdLanguageCode = "mn"
+	JobAdLanguageCodeMr   JobAdLanguageCode = "mr"
+	JobAdLanguageCodeMs   JobAdLanguageCode = "ms"
+	JobAdLanguageCodeNe   JobAdLanguageCode = "ne"
+	JobAdLanguageCodeNl   JobAdLanguageCode = "nl"
+	JobAdLanguageCodeNo   JobAdLanguageCode = "no"
+	JobAdLanguageCodePl   JobAdLanguageCode = "pl"
+	JobAdLanguageCodePt   JobAdLanguageCode = "pt"
+	JobAdLanguageCodePtBR JobAdLanguageCode = "pt-BR"
+	JobAdLanguageCodeRo   JobAdLanguageCode = "ro"
+	JobAdLanguageCodeRu   JobAdLanguageCode = "ru"
+	JobAdLanguageCodeSi   JobAdLanguageCode = "si"
+	JobAdLanguageCodeSk   JobAdLanguageCode = "sk"
+	JobAdLanguageCodeSl   JobAdLanguageCode = "sl"
+	JobAdLanguageCodeSr   JobAdLanguageCode = "sr"
+	JobAdLanguageCodeSv   JobAdLanguageCode = "sv"
+	JobAdLanguageCodeSw   JobAdLanguageCode = "sw"
+	JobAdLanguageCodeTa   JobAdLanguageCode = "ta"
+	JobAdLanguageCodeTe   JobAdLanguageCode = "te"
+	JobAdLanguageCodeTr   JobAdLanguageCode = "tr"
+	JobAdLanguageCodeUk   JobAdLanguageCode = "uk"
+	JobAdLanguageCodeUr   JobAdLanguageCode = "ur"
+	JobAdLanguageCodeVi   JobAdLanguageCode = "vi"
+	JobAdLanguageCodeZhCN JobAdLanguageCode = "zh-CN"
+	JobAdLanguageCodeZhTW JobAdLanguageCode = "zh-TW"
+	JobAdLanguageCodeZu   JobAdLanguageCode = "zu"
+)
+
+// AllValues returns all JobAdLanguageCode values.
+func (JobAdLanguageCode) AllValues() []JobAdLanguageCode {
+	return []JobAdLanguageCode{
+		JobAdLanguageCodeAf,
+		JobAdLanguageCodeAm,
+		JobAdLanguageCodeAr,
+		JobAdLanguageCodeAz,
+		JobAdLanguageCodeBg,
+		JobAdLanguageCodeBn,
+		JobAdLanguageCodeCa,
+		JobAdLanguageCodeCs,
+		JobAdLanguageCodeCy,
+		JobAdLanguageCodeDa,
+		JobAdLanguageCodeDe,
+		JobAdLanguageCodeEl,
+		JobAdLanguageCodeEn,
+		JobAdLanguageCodeEnGB,
+		JobAdLanguageCodeEs,
+		JobAdLanguageCodeEsMX,
+		JobAdLanguageCodeEt,
+		JobAdLanguageCodeEu,
+		JobAdLanguageCodeFa,
+		JobAdLanguageCodeFi,
+		JobAdLanguageCodeFil,
+		JobAdLanguageCodeFr,
+		JobAdLanguageCodeFrCA,
+		JobAdLanguageCodeGa,
+		JobAdLanguageCodeGl,
+		JobAdLanguageCodeGu,
+		JobAdLanguageCodeHe,
+		JobAdLanguageCodeHi,
+		JobAdLanguageCodeHr,
+		JobAdLanguageCodeHu,
+		JobAdLanguageCodeHy,
+		JobAdLanguageCodeID,
+		JobAdLanguageCodeIs,
+		JobAdLanguageCodeIt,
+		JobAdLanguageCodeJa,
+		JobAdLanguageCodeKa,
+		JobAdLanguageCodeKm,
+		JobAdLanguageCodeKn,
+		JobAdLanguageCodeKo,
+		JobAdLanguageCodeLo,
+		JobAdLanguageCodeLt,
+		JobAdLanguageCodeLv,
+		JobAdLanguageCodeMl,
+		JobAdLanguageCodeMn,
+		JobAdLanguageCodeMr,
+		JobAdLanguageCodeMs,
+		JobAdLanguageCodeNe,
+		JobAdLanguageCodeNl,
+		JobAdLanguageCodeNo,
+		JobAdLanguageCodePl,
+		JobAdLanguageCodePt,
+		JobAdLanguageCodePtBR,
+		JobAdLanguageCodeRo,
+		JobAdLanguageCodeRu,
+		JobAdLanguageCodeSi,
+		JobAdLanguageCodeSk,
+		JobAdLanguageCodeSl,
+		JobAdLanguageCodeSr,
+		JobAdLanguageCodeSv,
+		JobAdLanguageCodeSw,
+		JobAdLanguageCodeTa,
+		JobAdLanguageCodeTe,
+		JobAdLanguageCodeTr,
+		JobAdLanguageCodeUk,
+		JobAdLanguageCodeUr,
+		JobAdLanguageCodeVi,
+		JobAdLanguageCodeZhCN,
+		JobAdLanguageCodeZhTW,
+		JobAdLanguageCodeZu,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s JobAdLanguageCode) MarshalText() ([]byte, error) {
+	switch s {
+	case JobAdLanguageCodeAf:
+		return []byte(s), nil
+	case JobAdLanguageCodeAm:
+		return []byte(s), nil
+	case JobAdLanguageCodeAr:
+		return []byte(s), nil
+	case JobAdLanguageCodeAz:
+		return []byte(s), nil
+	case JobAdLanguageCodeBg:
+		return []byte(s), nil
+	case JobAdLanguageCodeBn:
+		return []byte(s), nil
+	case JobAdLanguageCodeCa:
+		return []byte(s), nil
+	case JobAdLanguageCodeCs:
+		return []byte(s), nil
+	case JobAdLanguageCodeCy:
+		return []byte(s), nil
+	case JobAdLanguageCodeDa:
+		return []byte(s), nil
+	case JobAdLanguageCodeDe:
+		return []byte(s), nil
+	case JobAdLanguageCodeEl:
+		return []byte(s), nil
+	case JobAdLanguageCodeEn:
+		return []byte(s), nil
+	case JobAdLanguageCodeEnGB:
+		return []byte(s), nil
+	case JobAdLanguageCodeEs:
+		return []byte(s), nil
+	case JobAdLanguageCodeEsMX:
+		return []byte(s), nil
+	case JobAdLanguageCodeEt:
+		return []byte(s), nil
+	case JobAdLanguageCodeEu:
+		return []byte(s), nil
+	case JobAdLanguageCodeFa:
+		return []byte(s), nil
+	case JobAdLanguageCodeFi:
+		return []byte(s), nil
+	case JobAdLanguageCodeFil:
+		return []byte(s), nil
+	case JobAdLanguageCodeFr:
+		return []byte(s), nil
+	case JobAdLanguageCodeFrCA:
+		return []byte(s), nil
+	case JobAdLanguageCodeGa:
+		return []byte(s), nil
+	case JobAdLanguageCodeGl:
+		return []byte(s), nil
+	case JobAdLanguageCodeGu:
+		return []byte(s), nil
+	case JobAdLanguageCodeHe:
+		return []byte(s), nil
+	case JobAdLanguageCodeHi:
+		return []byte(s), nil
+	case JobAdLanguageCodeHr:
+		return []byte(s), nil
+	case JobAdLanguageCodeHu:
+		return []byte(s), nil
+	case JobAdLanguageCodeHy:
+		return []byte(s), nil
+	case JobAdLanguageCodeID:
+		return []byte(s), nil
+	case JobAdLanguageCodeIs:
+		return []byte(s), nil
+	case JobAdLanguageCodeIt:
+		return []byte(s), nil
+	case JobAdLanguageCodeJa:
+		return []byte(s), nil
+	case JobAdLanguageCodeKa:
+		return []byte(s), nil
+	case JobAdLanguageCodeKm:
+		return []byte(s), nil
+	case JobAdLanguageCodeKn:
+		return []byte(s), nil
+	case JobAdLanguageCodeKo:
+		return []byte(s), nil
+	case JobAdLanguageCodeLo:
+		return []byte(s), nil
+	case JobAdLanguageCodeLt:
+		return []byte(s), nil
+	case JobAdLanguageCodeLv:
+		return []byte(s), nil
+	case JobAdLanguageCodeMl:
+		return []byte(s), nil
+	case JobAdLanguageCodeMn:
+		return []byte(s), nil
+	case JobAdLanguageCodeMr:
+		return []byte(s), nil
+	case JobAdLanguageCodeMs:
+		return []byte(s), nil
+	case JobAdLanguageCodeNe:
+		return []byte(s), nil
+	case JobAdLanguageCodeNl:
+		return []byte(s), nil
+	case JobAdLanguageCodeNo:
+		return []byte(s), nil
+	case JobAdLanguageCodePl:
+		return []byte(s), nil
+	case JobAdLanguageCodePt:
+		return []byte(s), nil
+	case JobAdLanguageCodePtBR:
+		return []byte(s), nil
+	case JobAdLanguageCodeRo:
+		return []byte(s), nil
+	case JobAdLanguageCodeRu:
+		return []byte(s), nil
+	case JobAdLanguageCodeSi:
+		return []byte(s), nil
+	case JobAdLanguageCodeSk:
+		return []byte(s), nil
+	case JobAdLanguageCodeSl:
+		return []byte(s), nil
+	case JobAdLanguageCodeSr:
+		return []byte(s), nil
+	case JobAdLanguageCodeSv:
+		return []byte(s), nil
+	case JobAdLanguageCodeSw:
+		return []byte(s), nil
+	case JobAdLanguageCodeTa:
+		return []byte(s), nil
+	case JobAdLanguageCodeTe:
+		return []byte(s), nil
+	case JobAdLanguageCodeTr:
+		return []byte(s), nil
+	case JobAdLanguageCodeUk:
+		return []byte(s), nil
+	case JobAdLanguageCodeUr:
+		return []byte(s), nil
+	case JobAdLanguageCodeVi:
+		return []byte(s), nil
+	case JobAdLanguageCodeZhCN:
+		return []byte(s), nil
+	case JobAdLanguageCodeZhTW:
+		return []byte(s), nil
+	case JobAdLanguageCodeZu:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *JobAdLanguageCode) UnmarshalText(data []byte) error {
+	switch JobAdLanguageCode(data) {
+	case JobAdLanguageCodeAf:
+		*s = JobAdLanguageCodeAf
+		return nil
+	case JobAdLanguageCodeAm:
+		*s = JobAdLanguageCodeAm
+		return nil
+	case JobAdLanguageCodeAr:
+		*s = JobAdLanguageCodeAr
+		return nil
+	case JobAdLanguageCodeAz:
+		*s = JobAdLanguageCodeAz
+		return nil
+	case JobAdLanguageCodeBg:
+		*s = JobAdLanguageCodeBg
+		return nil
+	case JobAdLanguageCodeBn:
+		*s = JobAdLanguageCodeBn
+		return nil
+	case JobAdLanguageCodeCa:
+		*s = JobAdLanguageCodeCa
+		return nil
+	case JobAdLanguageCodeCs:
+		*s = JobAdLanguageCodeCs
+		return nil
+	case JobAdLanguageCodeCy:
+		*s = JobAdLanguageCodeCy
+		return nil
+	case JobAdLanguageCodeDa:
+		*s = JobAdLanguageCodeDa
+		return nil
+	case JobAdLanguageCodeDe:
+		*s = JobAdLanguageCodeDe
+		return nil
+	case JobAdLanguageCodeEl:
+		*s = JobAdLanguageCodeEl
+		return nil
+	case JobAdLanguageCodeEn:
+		*s = JobAdLanguageCodeEn
+		return nil
+	case JobAdLanguageCodeEnGB:
+		*s = JobAdLanguageCodeEnGB
+		return nil
+	case JobAdLanguageCodeEs:
+		*s = JobAdLanguageCodeEs
+		return nil
+	case JobAdLanguageCodeEsMX:
+		*s = JobAdLanguageCodeEsMX
+		return nil
+	case JobAdLanguageCodeEt:
+		*s = JobAdLanguageCodeEt
+		return nil
+	case JobAdLanguageCodeEu:
+		*s = JobAdLanguageCodeEu
+		return nil
+	case JobAdLanguageCodeFa:
+		*s = JobAdLanguageCodeFa
+		return nil
+	case JobAdLanguageCodeFi:
+		*s = JobAdLanguageCodeFi
+		return nil
+	case JobAdLanguageCodeFil:
+		*s = JobAdLanguageCodeFil
+		return nil
+	case JobAdLanguageCodeFr:
+		*s = JobAdLanguageCodeFr
+		return nil
+	case JobAdLanguageCodeFrCA:
+		*s = JobAdLanguageCodeFrCA
+		return nil
+	case JobAdLanguageCodeGa:
+		*s = JobAdLanguageCodeGa
+		return nil
+	case JobAdLanguageCodeGl:
+		*s = JobAdLanguageCodeGl
+		return nil
+	case JobAdLanguageCodeGu:
+		*s = JobAdLanguageCodeGu
+		return nil
+	case JobAdLanguageCodeHe:
+		*s = JobAdLanguageCodeHe
+		return nil
+	case JobAdLanguageCodeHi:
+		*s = JobAdLanguageCodeHi
+		return nil
+	case JobAdLanguageCodeHr:
+		*s = JobAdLanguageCodeHr
+		return nil
+	case JobAdLanguageCodeHu:
+		*s = JobAdLanguageCodeHu
+		return nil
+	case JobAdLanguageCodeHy:
+		*s = JobAdLanguageCodeHy
+		return nil
+	case JobAdLanguageCodeID:
+		*s = JobAdLanguageCodeID
+		return nil
+	case JobAdLanguageCodeIs:
+		*s = JobAdLanguageCodeIs
+		return nil
+	case JobAdLanguageCodeIt:
+		*s = JobAdLanguageCodeIt
+		return nil
+	case JobAdLanguageCodeJa:
+		*s = JobAdLanguageCodeJa
+		return nil
+	case JobAdLanguageCodeKa:
+		*s = JobAdLanguageCodeKa
+		return nil
+	case JobAdLanguageCodeKm:
+		*s = JobAdLanguageCodeKm
+		return nil
+	case JobAdLanguageCodeKn:
+		*s = JobAdLanguageCodeKn
+		return nil
+	case JobAdLanguageCodeKo:
+		*s = JobAdLanguageCodeKo
+		return nil
+	case JobAdLanguageCodeLo:
+		*s = JobAdLanguageCodeLo
+		return nil
+	case JobAdLanguageCodeLt:
+		*s = JobAdLanguageCodeLt
+		return nil
+	case JobAdLanguageCodeLv:
+		*s = JobAdLanguageCodeLv
+		return nil
+	case JobAdLanguageCodeMl:
+		*s = JobAdLanguageCodeMl
+		return nil
+	case JobAdLanguageCodeMn:
+		*s = JobAdLanguageCodeMn
+		return nil
+	case JobAdLanguageCodeMr:
+		*s = JobAdLanguageCodeMr
+		return nil
+	case JobAdLanguageCodeMs:
+		*s = JobAdLanguageCodeMs
+		return nil
+	case JobAdLanguageCodeNe:
+		*s = JobAdLanguageCodeNe
+		return nil
+	case JobAdLanguageCodeNl:
+		*s = JobAdLanguageCodeNl
+		return nil
+	case JobAdLanguageCodeNo:
+		*s = JobAdLanguageCodeNo
+		return nil
+	case JobAdLanguageCodePl:
+		*s = JobAdLanguageCodePl
+		return nil
+	case JobAdLanguageCodePt:
+		*s = JobAdLanguageCodePt
+		return nil
+	case JobAdLanguageCodePtBR:
+		*s = JobAdLanguageCodePtBR
+		return nil
+	case JobAdLanguageCodeRo:
+		*s = JobAdLanguageCodeRo
+		return nil
+	case JobAdLanguageCodeRu:
+		*s = JobAdLanguageCodeRu
+		return nil
+	case JobAdLanguageCodeSi:
+		*s = JobAdLanguageCodeSi
+		return nil
+	case JobAdLanguageCodeSk:
+		*s = JobAdLanguageCodeSk
+		return nil
+	case JobAdLanguageCodeSl:
+		*s = JobAdLanguageCodeSl
+		return nil
+	case JobAdLanguageCodeSr:
+		*s = JobAdLanguageCodeSr
+		return nil
+	case JobAdLanguageCodeSv:
+		*s = JobAdLanguageCodeSv
+		return nil
+	case JobAdLanguageCodeSw:
+		*s = JobAdLanguageCodeSw
+		return nil
+	case JobAdLanguageCodeTa:
+		*s = JobAdLanguageCodeTa
+		return nil
+	case JobAdLanguageCodeTe:
+		*s = JobAdLanguageCodeTe
+		return nil
+	case JobAdLanguageCodeTr:
+		*s = JobAdLanguageCodeTr
+		return nil
+	case JobAdLanguageCodeUk:
+		*s = JobAdLanguageCodeUk
+		return nil
+	case JobAdLanguageCodeUr:
+		*s = JobAdLanguageCodeUr
+		return nil
+	case JobAdLanguageCodeVi:
+		*s = JobAdLanguageCodeVi
+		return nil
+	case JobAdLanguageCodeZhCN:
+		*s = JobAdLanguageCodeZhCN
+		return nil
+	case JobAdLanguageCodeZhTW:
+		*s = JobAdLanguageCodeZhTW
+		return nil
+	case JobAdLanguageCodeZu:
+		*s = JobAdLanguageCodeZu
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // Ref: #/components/schemas/JobAdSection
 type JobAdSection struct {
-	Title OptNilString `json:"title"`
+	Title OptString `json:"title"`
 	// HTML, entity-encoded (e.g. `&#xa0;` for nbsp).
-	Text OptNilString `json:"text"`
+	Text OptString `json:"text"`
 }
 
 // GetTitle returns the value of Title.
-func (s *JobAdSection) GetTitle() OptNilString {
+func (s *JobAdSection) GetTitle() OptString {
 	return s.Title
 }
 
 // GetText returns the value of Text.
-func (s *JobAdSection) GetText() OptNilString {
+func (s *JobAdSection) GetText() OptString {
 	return s.Text
 }
 
 // SetTitle sets the value of Title.
-func (s *JobAdSection) SetTitle(val OptNilString) {
+func (s *JobAdSection) SetTitle(val OptString) {
 	s.Title = val
 }
 
 // SetText sets the value of Text.
-func (s *JobAdSection) SetText(val OptNilString) {
+func (s *JobAdSection) SetText(val OptString) {
 	s.Text = val
 }
 
 // Ref: #/components/schemas/JobAdSections
 type JobAdSections struct {
-	CompanyDescription    OptJobAdSection `json:"companyDescription"`
-	JobDescription        OptJobAdSection `json:"jobDescription"`
-	Qualifications        OptJobAdSection `json:"qualifications"`
-	AdditionalInformation OptJobAdSection `json:"additionalInformation"`
+	Sections OptJobAdSectionsSections `json:"sections"`
+}
+
+// GetSections returns the value of Sections.
+func (s *JobAdSections) GetSections() OptJobAdSectionsSections {
+	return s.Sections
+}
+
+// SetSections sets the value of Sections.
+func (s *JobAdSections) SetSections(val OptJobAdSectionsSections) {
+	s.Sections = val
+}
+
+type JobAdSectionsSections struct {
+	CompanyDescription    OptJobAdSection       `json:"companyDescription"`
+	JobDescription        OptJobAdSection       `json:"jobDescription"`
+	Qualifications        OptJobAdSection       `json:"qualifications"`
+	AdditionalInformation OptJobAdSection       `json:"additionalInformation"`
+	Videos                OptJobAdVideosSection `json:"videos"`
 }
 
 // GetCompanyDescription returns the value of CompanyDescription.
-func (s *JobAdSections) GetCompanyDescription() OptJobAdSection {
+func (s *JobAdSectionsSections) GetCompanyDescription() OptJobAdSection {
 	return s.CompanyDescription
 }
 
 // GetJobDescription returns the value of JobDescription.
-func (s *JobAdSections) GetJobDescription() OptJobAdSection {
+func (s *JobAdSectionsSections) GetJobDescription() OptJobAdSection {
 	return s.JobDescription
 }
 
 // GetQualifications returns the value of Qualifications.
-func (s *JobAdSections) GetQualifications() OptJobAdSection {
+func (s *JobAdSectionsSections) GetQualifications() OptJobAdSection {
 	return s.Qualifications
 }
 
 // GetAdditionalInformation returns the value of AdditionalInformation.
-func (s *JobAdSections) GetAdditionalInformation() OptJobAdSection {
+func (s *JobAdSectionsSections) GetAdditionalInformation() OptJobAdSection {
 	return s.AdditionalInformation
 }
 
+// GetVideos returns the value of Videos.
+func (s *JobAdSectionsSections) GetVideos() OptJobAdVideosSection {
+	return s.Videos
+}
+
 // SetCompanyDescription sets the value of CompanyDescription.
-func (s *JobAdSections) SetCompanyDescription(val OptJobAdSection) {
+func (s *JobAdSectionsSections) SetCompanyDescription(val OptJobAdSection) {
 	s.CompanyDescription = val
 }
 
 // SetJobDescription sets the value of JobDescription.
-func (s *JobAdSections) SetJobDescription(val OptJobAdSection) {
+func (s *JobAdSectionsSections) SetJobDescription(val OptJobAdSection) {
 	s.JobDescription = val
 }
 
 // SetQualifications sets the value of Qualifications.
-func (s *JobAdSections) SetQualifications(val OptJobAdSection) {
+func (s *JobAdSectionsSections) SetQualifications(val OptJobAdSection) {
 	s.Qualifications = val
 }
 
 // SetAdditionalInformation sets the value of AdditionalInformation.
-func (s *JobAdSections) SetAdditionalInformation(val OptJobAdSection) {
+func (s *JobAdSectionsSections) SetAdditionalInformation(val OptJobAdSection) {
 	s.AdditionalInformation = val
+}
+
+// SetVideos sets the value of Videos.
+func (s *JobAdSectionsSections) SetVideos(val OptJobAdVideosSection) {
+	s.Videos = val
+}
+
+// Ref: #/components/schemas/JobAdVideosSection
+type JobAdVideosSection struct {
+	Title OptString `json:"title"`
+	Urls  []string  `json:"urls"`
+}
+
+// GetTitle returns the value of Title.
+func (s *JobAdVideosSection) GetTitle() OptString {
+	return s.Title
+}
+
+// GetUrls returns the value of Urls.
+func (s *JobAdVideosSection) GetUrls() []string {
+	return s.Urls
+}
+
+// SetTitle sets the value of Title.
+func (s *JobAdVideosSection) SetTitle(val OptString) {
+	s.Title = val
+}
+
+// SetUrls sets the value of Urls.
+func (s *JobAdVideosSection) SetUrls(val []string) {
+	s.Urls = val
 }
 
 // Ref: #/components/schemas/Language
 type Language struct {
-	Code        OptNilString `json:"code"`
-	Label       OptNilString `json:"label"`
-	LabelNative OptNilString `json:"labelNative"`
+	Code        OptString `json:"code"`
+	Label       OptString `json:"label"`
+	LabelNative OptString `json:"labelNative"`
 }
 
 // GetCode returns the value of Code.
-func (s *Language) GetCode() OptNilString {
+func (s *Language) GetCode() OptString {
 	return s.Code
 }
 
 // GetLabel returns the value of Label.
-func (s *Language) GetLabel() OptNilString {
+func (s *Language) GetLabel() OptString {
 	return s.Label
 }
 
 // GetLabelNative returns the value of LabelNative.
-func (s *Language) GetLabelNative() OptNilString {
+func (s *Language) GetLabelNative() OptString {
 	return s.LabelNative
 }
 
 // SetCode sets the value of Code.
-func (s *Language) SetCode(val OptNilString) {
+func (s *Language) SetCode(val OptString) {
 	s.Code = val
 }
 
 // SetLabel sets the value of Label.
-func (s *Language) SetLabel(val OptNilString) {
+func (s *Language) SetLabel(val OptString) {
 	s.Label = val
 }
 
 // SetLabelNative sets the value of LabelNative.
-func (s *Language) SetLabelNative(val OptNilString) {
+func (s *Language) SetLabelNative(val OptString) {
 	s.LabelNative = val
 }
 
-// Ref: #/components/schemas/Location
-type Location struct {
-	City      OptNilString `json:"city"`
-	Region    OptNilString `json:"region"`
-	Country   OptNilString `json:"country"`
-	Remote    OptBool      `json:"remote"`
-	Hybrid    OptBool      `json:"hybrid"`
-	Latitude  OptNilString `json:"latitude"`
-	Longitude OptNilString `json:"longitude"`
-	// Human-readable combined location, e.g. "Austin, TX, United States".
-	FullLocation OptNilString `json:"fullLocation"`
+type ListPostingsCustomField map[string]string
+
+func (s *ListPostingsCustomField) init() ListPostingsCustomField {
+	m := *s
+	if m == nil {
+		m = map[string]string{}
+		*s = m
+	}
+	return m
 }
 
-// GetCity returns the value of City.
-func (s *Location) GetCity() OptNilString {
-	return s.City
+type ListPostingsDestination string
+
+const (
+	ListPostingsDestinationPUBLIC           ListPostingsDestination = "PUBLIC"
+	ListPostingsDestinationINTERNAL         ListPostingsDestination = "INTERNAL"
+	ListPostingsDestinationINTERNALORPUBLIC ListPostingsDestination = "INTERNAL_OR_PUBLIC"
+)
+
+// AllValues returns all ListPostingsDestination values.
+func (ListPostingsDestination) AllValues() []ListPostingsDestination {
+	return []ListPostingsDestination{
+		ListPostingsDestinationPUBLIC,
+		ListPostingsDestinationINTERNAL,
+		ListPostingsDestinationINTERNALORPUBLIC,
+	}
 }
 
-// GetRegion returns the value of Region.
-func (s *Location) GetRegion() OptNilString {
-	return s.Region
+// MarshalText implements encoding.TextMarshaler.
+func (s ListPostingsDestination) MarshalText() ([]byte, error) {
+	switch s {
+	case ListPostingsDestinationPUBLIC:
+		return []byte(s), nil
+	case ListPostingsDestinationINTERNAL:
+		return []byte(s), nil
+	case ListPostingsDestinationINTERNALORPUBLIC:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
 }
 
-// GetCountry returns the value of Country.
-func (s *Location) GetCountry() OptNilString {
-	return s.Country
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ListPostingsDestination) UnmarshalText(data []byte) error {
+	switch ListPostingsDestination(data) {
+	case ListPostingsDestinationPUBLIC:
+		*s = ListPostingsDestinationPUBLIC
+		return nil
+	case ListPostingsDestinationINTERNAL:
+		*s = ListPostingsDestinationINTERNAL
+		return nil
+	case ListPostingsDestinationINTERNALORPUBLIC:
+		*s = ListPostingsDestinationINTERNALORPUBLIC
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
-// GetRemote returns the value of Remote.
-func (s *Location) GetRemote() OptBool {
-	return s.Remote
+type ListPostingsLocationTypeItem string
+
+const (
+	ListPostingsLocationTypeItemREMOTE ListPostingsLocationTypeItem = "REMOTE"
+	ListPostingsLocationTypeItemHYBRID ListPostingsLocationTypeItem = "HYBRID"
+	ListPostingsLocationTypeItemONSITE ListPostingsLocationTypeItem = "ONSITE"
+	ListPostingsLocationTypeItemANY    ListPostingsLocationTypeItem = "ANY"
+)
+
+// AllValues returns all ListPostingsLocationTypeItem values.
+func (ListPostingsLocationTypeItem) AllValues() []ListPostingsLocationTypeItem {
+	return []ListPostingsLocationTypeItem{
+		ListPostingsLocationTypeItemREMOTE,
+		ListPostingsLocationTypeItemHYBRID,
+		ListPostingsLocationTypeItemONSITE,
+		ListPostingsLocationTypeItemANY,
+	}
 }
 
-// GetHybrid returns the value of Hybrid.
-func (s *Location) GetHybrid() OptBool {
-	return s.Hybrid
+// MarshalText implements encoding.TextMarshaler.
+func (s ListPostingsLocationTypeItem) MarshalText() ([]byte, error) {
+	switch s {
+	case ListPostingsLocationTypeItemREMOTE:
+		return []byte(s), nil
+	case ListPostingsLocationTypeItemHYBRID:
+		return []byte(s), nil
+	case ListPostingsLocationTypeItemONSITE:
+		return []byte(s), nil
+	case ListPostingsLocationTypeItemANY:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
 }
 
-// GetLatitude returns the value of Latitude.
-func (s *Location) GetLatitude() OptNilString {
-	return s.Latitude
-}
-
-// GetLongitude returns the value of Longitude.
-func (s *Location) GetLongitude() OptNilString {
-	return s.Longitude
-}
-
-// GetFullLocation returns the value of FullLocation.
-func (s *Location) GetFullLocation() OptNilString {
-	return s.FullLocation
-}
-
-// SetCity sets the value of City.
-func (s *Location) SetCity(val OptNilString) {
-	s.City = val
-}
-
-// SetRegion sets the value of Region.
-func (s *Location) SetRegion(val OptNilString) {
-	s.Region = val
-}
-
-// SetCountry sets the value of Country.
-func (s *Location) SetCountry(val OptNilString) {
-	s.Country = val
-}
-
-// SetRemote sets the value of Remote.
-func (s *Location) SetRemote(val OptBool) {
-	s.Remote = val
-}
-
-// SetHybrid sets the value of Hybrid.
-func (s *Location) SetHybrid(val OptBool) {
-	s.Hybrid = val
-}
-
-// SetLatitude sets the value of Latitude.
-func (s *Location) SetLatitude(val OptNilString) {
-	s.Latitude = val
-}
-
-// SetLongitude sets the value of Longitude.
-func (s *Location) SetLongitude(val OptNilString) {
-	s.Longitude = val
-}
-
-// SetFullLocation sets the value of FullLocation.
-func (s *Location) SetFullLocation(val OptNilString) {
-	s.FullLocation = val
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *ListPostingsLocationTypeItem) UnmarshalText(data []byte) error {
+	switch ListPostingsLocationTypeItem(data) {
+	case ListPostingsLocationTypeItemREMOTE:
+		*s = ListPostingsLocationTypeItemREMOTE
+		return nil
+	case ListPostingsLocationTypeItemHYBRID:
+		*s = ListPostingsLocationTypeItemHYBRID
+		return nil
+	case ListPostingsLocationTypeItemONSITE:
+		*s = ListPostingsLocationTypeItemONSITE
+		return nil
+	case ListPostingsLocationTypeItemANY:
+		*s = ListPostingsLocationTypeItemANY
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }
 
 // NewOptBool returns new OptBool with value set to v.
@@ -539,6 +1406,52 @@ func (o OptCompany) Or(d Company) Company {
 	return d
 }
 
+// NewOptCompensation returns new OptCompensation with value set to v.
+func NewOptCompensation(v Compensation) OptCompensation {
+	return OptCompensation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptCompensation is optional Compensation.
+type OptCompensation struct {
+	Value Compensation
+	Set   bool
+}
+
+// IsSet returns true if OptCompensation was set.
+func (o OptCompensation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptCompensation) Reset() {
+	var v Compensation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptCompensation) SetTo(v Compensation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptCompensation) Get() (v Compensation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptCompensation) Or(d Compensation) Compensation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptCreator returns new OptCreator with value set to v.
 func NewOptCreator(v Creator) OptCreator {
 	return OptCreator{
@@ -579,6 +1492,52 @@ func (o OptCreator) Get() (v Creator, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptCreator) Or(d Creator) Creator {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptDateTime returns new OptDateTime with value set to v.
+func NewOptDateTime(v time.Time) OptDateTime {
+	return OptDateTime{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptDateTime is optional time.Time.
+type OptDateTime struct {
+	Value time.Time
+	Set   bool
+}
+
+// IsSet returns true if OptDateTime was set.
+func (o OptDateTime) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptDateTime) Reset() {
+	var v time.Time
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptDateTime) SetTo(v time.Time) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptDateTime) Get() (v time.Time, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptDateTime) Or(d time.Time) time.Time {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -677,38 +1636,38 @@ func (o OptDepartmentId) Or(d DepartmentId) DepartmentId {
 	return d
 }
 
-// NewOptIdLabel returns new OptIdLabel with value set to v.
-func NewOptIdLabel(v IdLabel) OptIdLabel {
-	return OptIdLabel{
+// NewOptExperienceLevel returns new OptExperienceLevel with value set to v.
+func NewOptExperienceLevel(v ExperienceLevel) OptExperienceLevel {
+	return OptExperienceLevel{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptIdLabel is optional IdLabel.
-type OptIdLabel struct {
-	Value IdLabel
+// OptExperienceLevel is optional ExperienceLevel.
+type OptExperienceLevel struct {
+	Value ExperienceLevel
 	Set   bool
 }
 
-// IsSet returns true if OptIdLabel was set.
-func (o OptIdLabel) IsSet() bool { return o.Set }
+// IsSet returns true if OptExperienceLevel was set.
+func (o OptExperienceLevel) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptIdLabel) Reset() {
-	var v IdLabel
+func (o *OptExperienceLevel) Reset() {
+	var v ExperienceLevel
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptIdLabel) SetTo(v IdLabel) {
+func (o *OptExperienceLevel) SetTo(v ExperienceLevel) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptIdLabel) Get() (v IdLabel, ok bool) {
+func (o OptExperienceLevel) Get() (v ExperienceLevel, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -716,7 +1675,145 @@ func (o OptIdLabel) Get() (v IdLabel, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptIdLabel) Or(d IdLabel) IdLabel {
+func (o OptExperienceLevel) Or(d ExperienceLevel) ExperienceLevel {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptExperienceLevelID returns new OptExperienceLevelID with value set to v.
+func NewOptExperienceLevelID(v ExperienceLevelID) OptExperienceLevelID {
+	return OptExperienceLevelID{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptExperienceLevelID is optional ExperienceLevelID.
+type OptExperienceLevelID struct {
+	Value ExperienceLevelID
+	Set   bool
+}
+
+// IsSet returns true if OptExperienceLevelID was set.
+func (o OptExperienceLevelID) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptExperienceLevelID) Reset() {
+	var v ExperienceLevelID
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptExperienceLevelID) SetTo(v ExperienceLevelID) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptExperienceLevelID) Get() (v ExperienceLevelID, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptExperienceLevelID) Or(d ExperienceLevelID) ExperienceLevelID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptFunction returns new OptFunction with value set to v.
+func NewOptFunction(v Function) OptFunction {
+	return OptFunction{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptFunction is optional Function.
+type OptFunction struct {
+	Value Function
+	Set   bool
+}
+
+// IsSet returns true if OptFunction was set.
+func (o OptFunction) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptFunction) Reset() {
+	var v Function
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptFunction) SetTo(v Function) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptFunction) Get() (v Function, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptFunction) Or(d Function) Function {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptIndustry returns new OptIndustry with value set to v.
+func NewOptIndustry(v Industry) OptIndustry {
+	return OptIndustry{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptIndustry is optional Industry.
+type OptIndustry struct {
+	Value Industry
+	Set   bool
+}
+
+// IsSet returns true if OptIndustry was set.
+func (o OptIndustry) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptIndustry) Reset() {
+	var v Industry
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptIndustry) SetTo(v Industry) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptIndustry) Get() (v Industry, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptIndustry) Or(d Industry) Industry {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -769,38 +1866,38 @@ func (o OptInt) Or(d int) int {
 	return d
 }
 
-// NewOptJobAd returns new OptJobAd with value set to v.
-func NewOptJobAd(v JobAd) OptJobAd {
-	return OptJobAd{
+// NewOptJobAdLanguageCode returns new OptJobAdLanguageCode with value set to v.
+func NewOptJobAdLanguageCode(v JobAdLanguageCode) OptJobAdLanguageCode {
+	return OptJobAdLanguageCode{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptJobAd is optional JobAd.
-type OptJobAd struct {
-	Value JobAd
+// OptJobAdLanguageCode is optional JobAdLanguageCode.
+type OptJobAdLanguageCode struct {
+	Value JobAdLanguageCode
 	Set   bool
 }
 
-// IsSet returns true if OptJobAd was set.
-func (o OptJobAd) IsSet() bool { return o.Set }
+// IsSet returns true if OptJobAdLanguageCode was set.
+func (o OptJobAdLanguageCode) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptJobAd) Reset() {
-	var v JobAd
+func (o *OptJobAdLanguageCode) Reset() {
+	var v JobAdLanguageCode
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptJobAd) SetTo(v JobAd) {
+func (o *OptJobAdLanguageCode) SetTo(v JobAdLanguageCode) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptJobAd) Get() (v JobAd, ok bool) {
+func (o OptJobAdLanguageCode) Get() (v JobAdLanguageCode, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -808,7 +1905,7 @@ func (o OptJobAd) Get() (v JobAd, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptJobAd) Or(d JobAd) JobAd {
+func (o OptJobAdLanguageCode) Or(d JobAdLanguageCode) JobAdLanguageCode {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -907,6 +2004,98 @@ func (o OptJobAdSections) Or(d JobAdSections) JobAdSections {
 	return d
 }
 
+// NewOptJobAdSectionsSections returns new OptJobAdSectionsSections with value set to v.
+func NewOptJobAdSectionsSections(v JobAdSectionsSections) OptJobAdSectionsSections {
+	return OptJobAdSectionsSections{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobAdSectionsSections is optional JobAdSectionsSections.
+type OptJobAdSectionsSections struct {
+	Value JobAdSectionsSections
+	Set   bool
+}
+
+// IsSet returns true if OptJobAdSectionsSections was set.
+func (o OptJobAdSectionsSections) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobAdSectionsSections) Reset() {
+	var v JobAdSectionsSections
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobAdSectionsSections) SetTo(v JobAdSectionsSections) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobAdSectionsSections) Get() (v JobAdSectionsSections, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobAdSectionsSections) Or(d JobAdSectionsSections) JobAdSectionsSections {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobAdVideosSection returns new OptJobAdVideosSection with value set to v.
+func NewOptJobAdVideosSection(v JobAdVideosSection) OptJobAdVideosSection {
+	return OptJobAdVideosSection{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobAdVideosSection is optional JobAdVideosSection.
+type OptJobAdVideosSection struct {
+	Value JobAdVideosSection
+	Set   bool
+}
+
+// IsSet returns true if OptJobAdVideosSection was set.
+func (o OptJobAdVideosSection) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobAdVideosSection) Reset() {
+	var v JobAdVideosSection
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobAdVideosSection) SetTo(v JobAdVideosSection) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobAdVideosSection) Get() (v JobAdVideosSection, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobAdVideosSection) Or(d JobAdVideosSection) JobAdVideosSection {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptLanguage returns new OptLanguage with value set to v.
 func NewOptLanguage(v Language) OptLanguage {
 	return OptLanguage{
@@ -953,38 +2142,38 @@ func (o OptLanguage) Or(d Language) Language {
 	return d
 }
 
-// NewOptLocation returns new OptLocation with value set to v.
-func NewOptLocation(v Location) OptLocation {
-	return OptLocation{
+// NewOptListPostingsCustomField returns new OptListPostingsCustomField with value set to v.
+func NewOptListPostingsCustomField(v ListPostingsCustomField) OptListPostingsCustomField {
+	return OptListPostingsCustomField{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptLocation is optional Location.
-type OptLocation struct {
-	Value Location
+// OptListPostingsCustomField is optional ListPostingsCustomField.
+type OptListPostingsCustomField struct {
+	Value ListPostingsCustomField
 	Set   bool
 }
 
-// IsSet returns true if OptLocation was set.
-func (o OptLocation) IsSet() bool { return o.Set }
+// IsSet returns true if OptListPostingsCustomField was set.
+func (o OptListPostingsCustomField) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptLocation) Reset() {
-	var v Location
+func (o *OptListPostingsCustomField) Reset() {
+	var v ListPostingsCustomField
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptLocation) SetTo(v Location) {
+func (o *OptListPostingsCustomField) SetTo(v ListPostingsCustomField) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptLocation) Get() (v Location, ok bool) {
+func (o OptListPostingsCustomField) Get() (v ListPostingsCustomField, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -992,64 +2181,110 @@ func (o OptLocation) Get() (v Location, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptLocation) Or(d Location) Location {
+func (o OptListPostingsCustomField) Or(d ListPostingsCustomField) ListPostingsCustomField {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilDateTime returns new OptNilDateTime with value set to v.
-func NewOptNilDateTime(v time.Time) OptNilDateTime {
-	return OptNilDateTime{
+// NewOptListPostingsDestination returns new OptListPostingsDestination with value set to v.
+func NewOptListPostingsDestination(v ListPostingsDestination) OptListPostingsDestination {
+	return OptListPostingsDestination{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilDateTime is optional nullable time.Time.
-type OptNilDateTime struct {
-	Value time.Time
+// OptListPostingsDestination is optional ListPostingsDestination.
+type OptListPostingsDestination struct {
+	Value ListPostingsDestination
+	Set   bool
+}
+
+// IsSet returns true if OptListPostingsDestination was set.
+func (o OptListPostingsDestination) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptListPostingsDestination) Reset() {
+	var v ListPostingsDestination
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptListPostingsDestination) SetTo(v ListPostingsDestination) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptListPostingsDestination) Get() (v ListPostingsDestination, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptListPostingsDestination) Or(d ListPostingsDestination) ListPostingsDestination {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilCompensationPeriod returns new OptNilCompensationPeriod with value set to v.
+func NewOptNilCompensationPeriod(v CompensationPeriod) OptNilCompensationPeriod {
+	return OptNilCompensationPeriod{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilCompensationPeriod is optional nullable CompensationPeriod.
+type OptNilCompensationPeriod struct {
+	Value CompensationPeriod
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilDateTime was set.
-func (o OptNilDateTime) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilCompensationPeriod was set.
+func (o OptNilCompensationPeriod) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilDateTime) Reset() {
-	var v time.Time
+func (o *OptNilCompensationPeriod) Reset() {
+	var v CompensationPeriod
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilDateTime) SetTo(v time.Time) {
+func (o *OptNilCompensationPeriod) SetTo(v CompensationPeriod) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilDateTime) IsNull() bool { return o.Null }
+func (o OptNilCompensationPeriod) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilDateTime) SetToNull() {
+func (o *OptNilCompensationPeriod) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v time.Time
+	var v CompensationPeriod
 	o.Value = v
 }
 
 // IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
-func (o OptNilDateTime) IsEmpty() bool {
+func (o OptNilCompensationPeriod) IsEmpty() bool {
 	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilDateTime) Get() (v time.Time, ok bool) {
+func (o OptNilCompensationPeriod) Get() (v CompensationPeriod, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -1060,64 +2295,64 @@ func (o OptNilDateTime) Get() (v time.Time, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilDateTime) Or(d time.Time) time.Time {
+func (o OptNilCompensationPeriod) Or(d CompensationPeriod) CompensationPeriod {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptNilInt returns new OptNilInt with value set to v.
-func NewOptNilInt(v int) OptNilInt {
-	return OptNilInt{
+// NewOptNilFloat64 returns new OptNilFloat64 with value set to v.
+func NewOptNilFloat64(v float64) OptNilFloat64 {
+	return OptNilFloat64{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptNilInt is optional nullable int.
-type OptNilInt struct {
-	Value int
+// OptNilFloat64 is optional nullable float64.
+type OptNilFloat64 struct {
+	Value float64
 	Set   bool
 	Null  bool
 }
 
-// IsSet returns true if OptNilInt was set.
-func (o OptNilInt) IsSet() bool { return o.Set }
+// IsSet returns true if OptNilFloat64 was set.
+func (o OptNilFloat64) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptNilInt) Reset() {
-	var v int
+func (o *OptNilFloat64) Reset() {
+	var v float64
 	o.Value = v
 	o.Set = false
 	o.Null = false
 }
 
 // SetTo sets value to v.
-func (o *OptNilInt) SetTo(v int) {
+func (o *OptNilFloat64) SetTo(v float64) {
 	o.Set = true
 	o.Null = false
 	o.Value = v
 }
 
 // IsNull returns true if value is Null.
-func (o OptNilInt) IsNull() bool { return o.Null }
+func (o OptNilFloat64) IsNull() bool { return o.Null }
 
 // SetToNull sets value to null.
-func (o *OptNilInt) SetToNull() {
+func (o *OptNilFloat64) SetToNull() {
 	o.Set = true
 	o.Null = true
-	var v int
+	var v float64
 	o.Value = v
 }
 
 // IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
-func (o OptNilInt) IsEmpty() bool {
+func (o OptNilFloat64) IsEmpty() bool {
 	return !o.Set && !o.Null
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptNilInt) Get() (v int, ok bool) {
+func (o OptNilFloat64) Get() (v float64, ok bool) {
 	if o.Null {
 		return v, false
 	}
@@ -1128,7 +2363,7 @@ func (o OptNilInt) Get() (v int, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptNilInt) Or(d int) int {
+func (o OptNilFloat64) Or(d float64) float64 {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1203,6 +2438,52 @@ func (o OptNilString) Or(d string) string {
 	return d
 }
 
+// NewOptPostingLocation returns new OptPostingLocation with value set to v.
+func NewOptPostingLocation(v PostingLocation) OptPostingLocation {
+	return OptPostingLocation{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptPostingLocation is optional PostingLocation.
+type OptPostingLocation struct {
+	Value PostingLocation
+	Set   bool
+}
+
+// IsSet returns true if OptPostingLocation was set.
+func (o OptPostingLocation) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptPostingLocation) Reset() {
+	var v PostingLocation
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptPostingLocation) SetTo(v PostingLocation) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptPostingLocation) Get() (v PostingLocation, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptPostingLocation) Or(d PostingLocation) PostingLocation {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -1249,577 +2530,912 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// Ref: #/components/schemas/PostingDetail
-type PostingDetail struct {
-	ID           OptString      `json:"id"`
-	Name         OptNilString   `json:"name"`
-	UUID         OptNilString   `json:"uuid"`
-	JobId        OptNilString   `json:"jobId"`
-	JobAdId      OptNilString   `json:"jobAdId"`
-	DefaultJobAd OptBool        `json:"defaultJobAd"`
-	RefNumber    OptNilString   `json:"refNumber"`
-	Company      OptCompany     `json:"company"`
-	Location     OptLocation    `json:"location"`
-	CustomField  []CustomField  `json:"customField"`
-	ReleasedDate OptNilDateTime `json:"releasedDate"`
-	Creator      OptCreator     `json:"creator"`
+// NewOptTypeOfEmployment returns new OptTypeOfEmployment with value set to v.
+func NewOptTypeOfEmployment(v TypeOfEmployment) OptTypeOfEmployment {
+	return OptTypeOfEmployment{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptTypeOfEmployment is optional TypeOfEmployment.
+type OptTypeOfEmployment struct {
+	Value TypeOfEmployment
+	Set   bool
+}
+
+// IsSet returns true if OptTypeOfEmployment was set.
+func (o OptTypeOfEmployment) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptTypeOfEmployment) Reset() {
+	var v TypeOfEmployment
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptTypeOfEmployment) SetTo(v TypeOfEmployment) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptTypeOfEmployment) Get() (v TypeOfEmployment, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptTypeOfEmployment) Or(d TypeOfEmployment) TypeOfEmployment {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptUUID returns new OptUUID with value set to v.
+func NewOptUUID(v uuid.UUID) OptUUID {
+	return OptUUID{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptUUID is optional uuid.UUID.
+type OptUUID struct {
+	Value uuid.UUID
+	Set   bool
+}
+
+// IsSet returns true if OptUUID was set.
+func (o OptUUID) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptUUID) Reset() {
+	var v uuid.UUID
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptUUID) SetTo(v uuid.UUID) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptUUID) Get() (v uuid.UUID, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptUUID) Or(d uuid.UUID) uuid.UUID {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptVisibility returns new OptVisibility with value set to v.
+func NewOptVisibility(v Visibility) OptVisibility {
+	return OptVisibility{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptVisibility is optional Visibility.
+type OptVisibility struct {
+	Value Visibility
+	Set   bool
+}
+
+// IsSet returns true if OptVisibility was set.
+func (o OptVisibility) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptVisibility) Reset() {
+	var v Visibility
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptVisibility) SetTo(v Visibility) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptVisibility) Get() (v Visibility, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptVisibility) Or(d Visibility) Visibility {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// Ref: #/components/schemas/Posting
+type Posting struct {
+	ID           OptString `json:"id"`
+	UUID         OptString `json:"uuid"`
+	Name         OptString `json:"name"`
+	JobId        OptUUID   `json:"jobId"`
+	JobAdId      OptUUID   `json:"jobAdId"`
+	DefaultJobAd OptBool   `json:"defaultJobAd"`
+	ApplyUrl     OptString `json:"applyUrl"`
 	// Public, human-clickable posting page on jobs.smartrecruiters.com.
-	PostingUrl       OptNilString  `json:"postingUrl"`
-	ApplyUrl         OptNilString  `json:"applyUrl"`
-	ReferralUrl      OptNilString  `json:"referralUrl"`
-	JobAd            OptJobAd      `json:"jobAd"`
-	Active           OptBool       `json:"active"`
-	Visibility       OptNilString  `json:"visibility"`
-	Industry         OptIdLabel    `json:"industry"`
-	Function         OptIdLabel    `json:"function"`
-	Department       OptDepartment `json:"department"`
-	ExperienceLevel  OptIdLabel    `json:"experienceLevel"`
-	TypeOfEmployment OptIdLabel    `json:"typeOfEmployment"`
-	Language         OptLanguage   `json:"language"`
+	PostingUrl       OptString           `json:"postingUrl"`
+	ReferralUrl      OptString           `json:"referralUrl"`
+	RefNumber        OptString           `json:"refNumber"`
+	Company          OptCompany          `json:"company"`
+	ReleasedDate     OptDateTime         `json:"releasedDate"`
+	Location         OptPostingLocation  `json:"location"`
+	Industry         OptIndustry         `json:"industry"`
+	Department       OptDepartment       `json:"department"`
+	Function         OptFunction         `json:"function"`
+	TypeOfEmployment OptTypeOfEmployment `json:"typeOfEmployment"`
+	ExperienceLevel  OptExperienceLevel  `json:"experienceLevel"`
+	CustomField      []CustomField       `json:"customField"`
+	Ref              OptString           `json:"ref"`
+	Creator          OptCreator          `json:"creator"`
+	JobAd            OptJobAdSections    `json:"jobAd"`
+	Active           OptBool             `json:"active"`
+	Visibility       OptVisibility       `json:"visibility"`
+	Compensation     OptCompensation     `json:"compensation"`
+	Language         OptLanguage         `json:"language"`
 }
 
 // GetID returns the value of ID.
-func (s *PostingDetail) GetID() OptString {
+func (s *Posting) GetID() OptString {
 	return s.ID
 }
 
-// GetName returns the value of Name.
-func (s *PostingDetail) GetName() OptNilString {
-	return s.Name
-}
-
 // GetUUID returns the value of UUID.
-func (s *PostingDetail) GetUUID() OptNilString {
+func (s *Posting) GetUUID() OptString {
 	return s.UUID
 }
 
+// GetName returns the value of Name.
+func (s *Posting) GetName() OptString {
+	return s.Name
+}
+
 // GetJobId returns the value of JobId.
-func (s *PostingDetail) GetJobId() OptNilString {
+func (s *Posting) GetJobId() OptUUID {
 	return s.JobId
 }
 
 // GetJobAdId returns the value of JobAdId.
-func (s *PostingDetail) GetJobAdId() OptNilString {
+func (s *Posting) GetJobAdId() OptUUID {
 	return s.JobAdId
 }
 
 // GetDefaultJobAd returns the value of DefaultJobAd.
-func (s *PostingDetail) GetDefaultJobAd() OptBool {
+func (s *Posting) GetDefaultJobAd() OptBool {
 	return s.DefaultJobAd
 }
 
+// GetApplyUrl returns the value of ApplyUrl.
+func (s *Posting) GetApplyUrl() OptString {
+	return s.ApplyUrl
+}
+
+// GetPostingUrl returns the value of PostingUrl.
+func (s *Posting) GetPostingUrl() OptString {
+	return s.PostingUrl
+}
+
+// GetReferralUrl returns the value of ReferralUrl.
+func (s *Posting) GetReferralUrl() OptString {
+	return s.ReferralUrl
+}
+
 // GetRefNumber returns the value of RefNumber.
-func (s *PostingDetail) GetRefNumber() OptNilString {
+func (s *Posting) GetRefNumber() OptString {
 	return s.RefNumber
 }
 
 // GetCompany returns the value of Company.
-func (s *PostingDetail) GetCompany() OptCompany {
+func (s *Posting) GetCompany() OptCompany {
 	return s.Company
 }
 
-// GetLocation returns the value of Location.
-func (s *PostingDetail) GetLocation() OptLocation {
-	return s.Location
-}
-
-// GetCustomField returns the value of CustomField.
-func (s *PostingDetail) GetCustomField() []CustomField {
-	return s.CustomField
-}
-
 // GetReleasedDate returns the value of ReleasedDate.
-func (s *PostingDetail) GetReleasedDate() OptNilDateTime {
+func (s *Posting) GetReleasedDate() OptDateTime {
 	return s.ReleasedDate
 }
 
+// GetLocation returns the value of Location.
+func (s *Posting) GetLocation() OptPostingLocation {
+	return s.Location
+}
+
+// GetIndustry returns the value of Industry.
+func (s *Posting) GetIndustry() OptIndustry {
+	return s.Industry
+}
+
+// GetDepartment returns the value of Department.
+func (s *Posting) GetDepartment() OptDepartment {
+	return s.Department
+}
+
+// GetFunction returns the value of Function.
+func (s *Posting) GetFunction() OptFunction {
+	return s.Function
+}
+
+// GetTypeOfEmployment returns the value of TypeOfEmployment.
+func (s *Posting) GetTypeOfEmployment() OptTypeOfEmployment {
+	return s.TypeOfEmployment
+}
+
+// GetExperienceLevel returns the value of ExperienceLevel.
+func (s *Posting) GetExperienceLevel() OptExperienceLevel {
+	return s.ExperienceLevel
+}
+
+// GetCustomField returns the value of CustomField.
+func (s *Posting) GetCustomField() []CustomField {
+	return s.CustomField
+}
+
+// GetRef returns the value of Ref.
+func (s *Posting) GetRef() OptString {
+	return s.Ref
+}
+
 // GetCreator returns the value of Creator.
-func (s *PostingDetail) GetCreator() OptCreator {
+func (s *Posting) GetCreator() OptCreator {
 	return s.Creator
 }
 
-// GetPostingUrl returns the value of PostingUrl.
-func (s *PostingDetail) GetPostingUrl() OptNilString {
-	return s.PostingUrl
-}
-
-// GetApplyUrl returns the value of ApplyUrl.
-func (s *PostingDetail) GetApplyUrl() OptNilString {
-	return s.ApplyUrl
-}
-
-// GetReferralUrl returns the value of ReferralUrl.
-func (s *PostingDetail) GetReferralUrl() OptNilString {
-	return s.ReferralUrl
-}
-
 // GetJobAd returns the value of JobAd.
-func (s *PostingDetail) GetJobAd() OptJobAd {
+func (s *Posting) GetJobAd() OptJobAdSections {
 	return s.JobAd
 }
 
 // GetActive returns the value of Active.
-func (s *PostingDetail) GetActive() OptBool {
+func (s *Posting) GetActive() OptBool {
 	return s.Active
 }
 
 // GetVisibility returns the value of Visibility.
-func (s *PostingDetail) GetVisibility() OptNilString {
+func (s *Posting) GetVisibility() OptVisibility {
 	return s.Visibility
 }
 
-// GetIndustry returns the value of Industry.
-func (s *PostingDetail) GetIndustry() OptIdLabel {
-	return s.Industry
-}
-
-// GetFunction returns the value of Function.
-func (s *PostingDetail) GetFunction() OptIdLabel {
-	return s.Function
-}
-
-// GetDepartment returns the value of Department.
-func (s *PostingDetail) GetDepartment() OptDepartment {
-	return s.Department
-}
-
-// GetExperienceLevel returns the value of ExperienceLevel.
-func (s *PostingDetail) GetExperienceLevel() OptIdLabel {
-	return s.ExperienceLevel
-}
-
-// GetTypeOfEmployment returns the value of TypeOfEmployment.
-func (s *PostingDetail) GetTypeOfEmployment() OptIdLabel {
-	return s.TypeOfEmployment
+// GetCompensation returns the value of Compensation.
+func (s *Posting) GetCompensation() OptCompensation {
+	return s.Compensation
 }
 
 // GetLanguage returns the value of Language.
-func (s *PostingDetail) GetLanguage() OptLanguage {
+func (s *Posting) GetLanguage() OptLanguage {
 	return s.Language
 }
 
 // SetID sets the value of ID.
-func (s *PostingDetail) SetID(val OptString) {
+func (s *Posting) SetID(val OptString) {
 	s.ID = val
 }
 
-// SetName sets the value of Name.
-func (s *PostingDetail) SetName(val OptNilString) {
-	s.Name = val
-}
-
 // SetUUID sets the value of UUID.
-func (s *PostingDetail) SetUUID(val OptNilString) {
+func (s *Posting) SetUUID(val OptString) {
 	s.UUID = val
 }
 
+// SetName sets the value of Name.
+func (s *Posting) SetName(val OptString) {
+	s.Name = val
+}
+
 // SetJobId sets the value of JobId.
-func (s *PostingDetail) SetJobId(val OptNilString) {
+func (s *Posting) SetJobId(val OptUUID) {
 	s.JobId = val
 }
 
 // SetJobAdId sets the value of JobAdId.
-func (s *PostingDetail) SetJobAdId(val OptNilString) {
+func (s *Posting) SetJobAdId(val OptUUID) {
 	s.JobAdId = val
 }
 
 // SetDefaultJobAd sets the value of DefaultJobAd.
-func (s *PostingDetail) SetDefaultJobAd(val OptBool) {
+func (s *Posting) SetDefaultJobAd(val OptBool) {
 	s.DefaultJobAd = val
 }
 
+// SetApplyUrl sets the value of ApplyUrl.
+func (s *Posting) SetApplyUrl(val OptString) {
+	s.ApplyUrl = val
+}
+
+// SetPostingUrl sets the value of PostingUrl.
+func (s *Posting) SetPostingUrl(val OptString) {
+	s.PostingUrl = val
+}
+
+// SetReferralUrl sets the value of ReferralUrl.
+func (s *Posting) SetReferralUrl(val OptString) {
+	s.ReferralUrl = val
+}
+
 // SetRefNumber sets the value of RefNumber.
-func (s *PostingDetail) SetRefNumber(val OptNilString) {
+func (s *Posting) SetRefNumber(val OptString) {
 	s.RefNumber = val
 }
 
 // SetCompany sets the value of Company.
-func (s *PostingDetail) SetCompany(val OptCompany) {
+func (s *Posting) SetCompany(val OptCompany) {
 	s.Company = val
 }
 
-// SetLocation sets the value of Location.
-func (s *PostingDetail) SetLocation(val OptLocation) {
-	s.Location = val
-}
-
-// SetCustomField sets the value of CustomField.
-func (s *PostingDetail) SetCustomField(val []CustomField) {
-	s.CustomField = val
-}
-
 // SetReleasedDate sets the value of ReleasedDate.
-func (s *PostingDetail) SetReleasedDate(val OptNilDateTime) {
+func (s *Posting) SetReleasedDate(val OptDateTime) {
 	s.ReleasedDate = val
 }
 
+// SetLocation sets the value of Location.
+func (s *Posting) SetLocation(val OptPostingLocation) {
+	s.Location = val
+}
+
+// SetIndustry sets the value of Industry.
+func (s *Posting) SetIndustry(val OptIndustry) {
+	s.Industry = val
+}
+
+// SetDepartment sets the value of Department.
+func (s *Posting) SetDepartment(val OptDepartment) {
+	s.Department = val
+}
+
+// SetFunction sets the value of Function.
+func (s *Posting) SetFunction(val OptFunction) {
+	s.Function = val
+}
+
+// SetTypeOfEmployment sets the value of TypeOfEmployment.
+func (s *Posting) SetTypeOfEmployment(val OptTypeOfEmployment) {
+	s.TypeOfEmployment = val
+}
+
+// SetExperienceLevel sets the value of ExperienceLevel.
+func (s *Posting) SetExperienceLevel(val OptExperienceLevel) {
+	s.ExperienceLevel = val
+}
+
+// SetCustomField sets the value of CustomField.
+func (s *Posting) SetCustomField(val []CustomField) {
+	s.CustomField = val
+}
+
+// SetRef sets the value of Ref.
+func (s *Posting) SetRef(val OptString) {
+	s.Ref = val
+}
+
 // SetCreator sets the value of Creator.
-func (s *PostingDetail) SetCreator(val OptCreator) {
+func (s *Posting) SetCreator(val OptCreator) {
 	s.Creator = val
 }
 
-// SetPostingUrl sets the value of PostingUrl.
-func (s *PostingDetail) SetPostingUrl(val OptNilString) {
-	s.PostingUrl = val
-}
-
-// SetApplyUrl sets the value of ApplyUrl.
-func (s *PostingDetail) SetApplyUrl(val OptNilString) {
-	s.ApplyUrl = val
-}
-
-// SetReferralUrl sets the value of ReferralUrl.
-func (s *PostingDetail) SetReferralUrl(val OptNilString) {
-	s.ReferralUrl = val
-}
-
 // SetJobAd sets the value of JobAd.
-func (s *PostingDetail) SetJobAd(val OptJobAd) {
+func (s *Posting) SetJobAd(val OptJobAdSections) {
 	s.JobAd = val
 }
 
 // SetActive sets the value of Active.
-func (s *PostingDetail) SetActive(val OptBool) {
+func (s *Posting) SetActive(val OptBool) {
 	s.Active = val
 }
 
 // SetVisibility sets the value of Visibility.
-func (s *PostingDetail) SetVisibility(val OptNilString) {
+func (s *Posting) SetVisibility(val OptVisibility) {
 	s.Visibility = val
 }
 
-// SetIndustry sets the value of Industry.
-func (s *PostingDetail) SetIndustry(val OptIdLabel) {
-	s.Industry = val
-}
-
-// SetFunction sets the value of Function.
-func (s *PostingDetail) SetFunction(val OptIdLabel) {
-	s.Function = val
-}
-
-// SetDepartment sets the value of Department.
-func (s *PostingDetail) SetDepartment(val OptDepartment) {
-	s.Department = val
-}
-
-// SetExperienceLevel sets the value of ExperienceLevel.
-func (s *PostingDetail) SetExperienceLevel(val OptIdLabel) {
-	s.ExperienceLevel = val
-}
-
-// SetTypeOfEmployment sets the value of TypeOfEmployment.
-func (s *PostingDetail) SetTypeOfEmployment(val OptIdLabel) {
-	s.TypeOfEmployment = val
+// SetCompensation sets the value of Compensation.
+func (s *Posting) SetCompensation(val OptCompensation) {
+	s.Compensation = val
 }
 
 // SetLanguage sets the value of Language.
-func (s *PostingDetail) SetLanguage(val OptLanguage) {
+func (s *Posting) SetLanguage(val OptLanguage) {
 	s.Language = val
 }
 
-func (*PostingDetail) getPostingRes() {}
+func (*Posting) getPostingRes() {}
 
-// Observed for 404s (unknown company or posting id).
+// Observed 404 body for an unknown company or posting id. Not in the official documents.
 // Ref: #/components/schemas/PostingErrorResponse
 type PostingErrorResponse struct {
-	ID       OptNilString `json:"id"`
-	HttpCode OptNilInt    `json:"httpCode"`
-	Code     OptNilString `json:"code"`
-	Message  OptNilString `json:"message"`
+	ID       OptString `json:"id"`
+	HttpCode OptInt    `json:"httpCode"`
+	Code     OptString `json:"code"`
+	Message  OptString `json:"message"`
 }
 
 // GetID returns the value of ID.
-func (s *PostingErrorResponse) GetID() OptNilString {
+func (s *PostingErrorResponse) GetID() OptString {
 	return s.ID
 }
 
 // GetHttpCode returns the value of HttpCode.
-func (s *PostingErrorResponse) GetHttpCode() OptNilInt {
+func (s *PostingErrorResponse) GetHttpCode() OptInt {
 	return s.HttpCode
 }
 
 // GetCode returns the value of Code.
-func (s *PostingErrorResponse) GetCode() OptNilString {
+func (s *PostingErrorResponse) GetCode() OptString {
 	return s.Code
 }
 
 // GetMessage returns the value of Message.
-func (s *PostingErrorResponse) GetMessage() OptNilString {
+func (s *PostingErrorResponse) GetMessage() OptString {
 	return s.Message
 }
 
 // SetID sets the value of ID.
-func (s *PostingErrorResponse) SetID(val OptNilString) {
+func (s *PostingErrorResponse) SetID(val OptString) {
 	s.ID = val
 }
 
 // SetHttpCode sets the value of HttpCode.
-func (s *PostingErrorResponse) SetHttpCode(val OptNilInt) {
+func (s *PostingErrorResponse) SetHttpCode(val OptInt) {
 	s.HttpCode = val
 }
 
 // SetCode sets the value of Code.
-func (s *PostingErrorResponse) SetCode(val OptNilString) {
+func (s *PostingErrorResponse) SetCode(val OptString) {
 	s.Code = val
 }
 
 // SetMessage sets the value of Message.
-func (s *PostingErrorResponse) SetMessage(val OptNilString) {
+func (s *PostingErrorResponse) SetMessage(val OptString) {
 	s.Message = val
 }
 
 func (*PostingErrorResponse) getPostingRes() {}
 
-// Ref: #/components/schemas/PostingListResponse
-type PostingListResponse struct {
-	Offset     int              `json:"offset"`
-	Limit      int              `json:"limit"`
-	TotalFound int              `json:"totalFound"`
-	Content    []PostingSummary `json:"content"`
-}
-
-// GetOffset returns the value of Offset.
-func (s *PostingListResponse) GetOffset() int {
-	return s.Offset
-}
-
-// GetLimit returns the value of Limit.
-func (s *PostingListResponse) GetLimit() int {
-	return s.Limit
-}
-
-// GetTotalFound returns the value of TotalFound.
-func (s *PostingListResponse) GetTotalFound() int {
-	return s.TotalFound
-}
-
-// GetContent returns the value of Content.
-func (s *PostingListResponse) GetContent() []PostingSummary {
-	return s.Content
-}
-
-// SetOffset sets the value of Offset.
-func (s *PostingListResponse) SetOffset(val int) {
-	s.Offset = val
-}
-
-// SetLimit sets the value of Limit.
-func (s *PostingListResponse) SetLimit(val int) {
-	s.Limit = val
-}
-
-// SetTotalFound sets the value of TotalFound.
-func (s *PostingListResponse) SetTotalFound(val int) {
-	s.TotalFound = val
-}
-
-// SetContent sets the value of Content.
-func (s *PostingListResponse) SetContent(val []PostingSummary) {
-	s.Content = val
-}
-
-// Ref: #/components/schemas/PostingSummary
-type PostingSummary struct {
-	// Posting id, always a string here (unlike department.id).
-	ID               OptString      `json:"id"`
-	Name             OptNilString   `json:"name"`
-	UUID             OptNilString   `json:"uuid"`
-	JobAdId          OptNilString   `json:"jobAdId"`
-	DefaultJobAd     OptBool        `json:"defaultJobAd"`
-	RefNumber        OptNilString   `json:"refNumber"`
-	Company          OptCompany     `json:"company"`
-	ReleasedDate     OptNilDateTime `json:"releasedDate"`
-	Location         OptLocation    `json:"location"`
-	Industry         OptIdLabel     `json:"industry"`
-	Department       OptDepartment  `json:"department"`
-	Function         OptIdLabel     `json:"function"`
-	TypeOfEmployment OptIdLabel     `json:"typeOfEmployment"`
-	ExperienceLevel  OptIdLabel     `json:"experienceLevel"`
-	CustomField      []CustomField  `json:"customField"`
-	Visibility       OptNilString   `json:"visibility"`
+// Ref: #/components/schemas/PostingItem
+type PostingItem struct {
+	ID               OptString           `json:"id"`
+	UUID             OptString           `json:"uuid"`
+	Name             OptString           `json:"name"`
+	JobAdId          OptUUID             `json:"jobAdId"`
+	DefaultJobAd     OptBool             `json:"defaultJobAd"`
+	RefNumber        OptString           `json:"refNumber"`
+	Company          OptCompany          `json:"company"`
+	ReleasedDate     OptDateTime         `json:"releasedDate"`
+	Location         OptPostingLocation  `json:"location"`
+	Industry         OptIndustry         `json:"industry"`
+	Department       OptDepartment       `json:"department"`
+	Function         OptFunction         `json:"function"`
+	TypeOfEmployment OptTypeOfEmployment `json:"typeOfEmployment"`
+	ExperienceLevel  OptExperienceLevel  `json:"experienceLevel"`
+	CustomField      []CustomField       `json:"customField"`
 	// The Posting API's own detail URL for this posting (not the public jobs.smartrecruiters.com page —
 	// that only appears as `postingUrl` on the detail response).
-	Ref      OptNilString `json:"ref"`
-	Language OptLanguage  `json:"language"`
+	Ref        OptString     `json:"ref"`
+	Creator    OptCreator    `json:"creator"`
+	Language   OptLanguage   `json:"language"`
+	Visibility OptVisibility `json:"visibility"`
 }
 
 // GetID returns the value of ID.
-func (s *PostingSummary) GetID() OptString {
+func (s *PostingItem) GetID() OptString {
 	return s.ID
 }
 
-// GetName returns the value of Name.
-func (s *PostingSummary) GetName() OptNilString {
-	return s.Name
-}
-
 // GetUUID returns the value of UUID.
-func (s *PostingSummary) GetUUID() OptNilString {
+func (s *PostingItem) GetUUID() OptString {
 	return s.UUID
 }
 
+// GetName returns the value of Name.
+func (s *PostingItem) GetName() OptString {
+	return s.Name
+}
+
 // GetJobAdId returns the value of JobAdId.
-func (s *PostingSummary) GetJobAdId() OptNilString {
+func (s *PostingItem) GetJobAdId() OptUUID {
 	return s.JobAdId
 }
 
 // GetDefaultJobAd returns the value of DefaultJobAd.
-func (s *PostingSummary) GetDefaultJobAd() OptBool {
+func (s *PostingItem) GetDefaultJobAd() OptBool {
 	return s.DefaultJobAd
 }
 
 // GetRefNumber returns the value of RefNumber.
-func (s *PostingSummary) GetRefNumber() OptNilString {
+func (s *PostingItem) GetRefNumber() OptString {
 	return s.RefNumber
 }
 
 // GetCompany returns the value of Company.
-func (s *PostingSummary) GetCompany() OptCompany {
+func (s *PostingItem) GetCompany() OptCompany {
 	return s.Company
 }
 
 // GetReleasedDate returns the value of ReleasedDate.
-func (s *PostingSummary) GetReleasedDate() OptNilDateTime {
+func (s *PostingItem) GetReleasedDate() OptDateTime {
 	return s.ReleasedDate
 }
 
 // GetLocation returns the value of Location.
-func (s *PostingSummary) GetLocation() OptLocation {
+func (s *PostingItem) GetLocation() OptPostingLocation {
 	return s.Location
 }
 
 // GetIndustry returns the value of Industry.
-func (s *PostingSummary) GetIndustry() OptIdLabel {
+func (s *PostingItem) GetIndustry() OptIndustry {
 	return s.Industry
 }
 
 // GetDepartment returns the value of Department.
-func (s *PostingSummary) GetDepartment() OptDepartment {
+func (s *PostingItem) GetDepartment() OptDepartment {
 	return s.Department
 }
 
 // GetFunction returns the value of Function.
-func (s *PostingSummary) GetFunction() OptIdLabel {
+func (s *PostingItem) GetFunction() OptFunction {
 	return s.Function
 }
 
 // GetTypeOfEmployment returns the value of TypeOfEmployment.
-func (s *PostingSummary) GetTypeOfEmployment() OptIdLabel {
+func (s *PostingItem) GetTypeOfEmployment() OptTypeOfEmployment {
 	return s.TypeOfEmployment
 }
 
 // GetExperienceLevel returns the value of ExperienceLevel.
-func (s *PostingSummary) GetExperienceLevel() OptIdLabel {
+func (s *PostingItem) GetExperienceLevel() OptExperienceLevel {
 	return s.ExperienceLevel
 }
 
 // GetCustomField returns the value of CustomField.
-func (s *PostingSummary) GetCustomField() []CustomField {
+func (s *PostingItem) GetCustomField() []CustomField {
 	return s.CustomField
 }
 
-// GetVisibility returns the value of Visibility.
-func (s *PostingSummary) GetVisibility() OptNilString {
-	return s.Visibility
-}
-
 // GetRef returns the value of Ref.
-func (s *PostingSummary) GetRef() OptNilString {
+func (s *PostingItem) GetRef() OptString {
 	return s.Ref
 }
 
+// GetCreator returns the value of Creator.
+func (s *PostingItem) GetCreator() OptCreator {
+	return s.Creator
+}
+
 // GetLanguage returns the value of Language.
-func (s *PostingSummary) GetLanguage() OptLanguage {
+func (s *PostingItem) GetLanguage() OptLanguage {
 	return s.Language
 }
 
+// GetVisibility returns the value of Visibility.
+func (s *PostingItem) GetVisibility() OptVisibility {
+	return s.Visibility
+}
+
 // SetID sets the value of ID.
-func (s *PostingSummary) SetID(val OptString) {
+func (s *PostingItem) SetID(val OptString) {
 	s.ID = val
 }
 
-// SetName sets the value of Name.
-func (s *PostingSummary) SetName(val OptNilString) {
-	s.Name = val
-}
-
 // SetUUID sets the value of UUID.
-func (s *PostingSummary) SetUUID(val OptNilString) {
+func (s *PostingItem) SetUUID(val OptString) {
 	s.UUID = val
 }
 
+// SetName sets the value of Name.
+func (s *PostingItem) SetName(val OptString) {
+	s.Name = val
+}
+
 // SetJobAdId sets the value of JobAdId.
-func (s *PostingSummary) SetJobAdId(val OptNilString) {
+func (s *PostingItem) SetJobAdId(val OptUUID) {
 	s.JobAdId = val
 }
 
 // SetDefaultJobAd sets the value of DefaultJobAd.
-func (s *PostingSummary) SetDefaultJobAd(val OptBool) {
+func (s *PostingItem) SetDefaultJobAd(val OptBool) {
 	s.DefaultJobAd = val
 }
 
 // SetRefNumber sets the value of RefNumber.
-func (s *PostingSummary) SetRefNumber(val OptNilString) {
+func (s *PostingItem) SetRefNumber(val OptString) {
 	s.RefNumber = val
 }
 
 // SetCompany sets the value of Company.
-func (s *PostingSummary) SetCompany(val OptCompany) {
+func (s *PostingItem) SetCompany(val OptCompany) {
 	s.Company = val
 }
 
 // SetReleasedDate sets the value of ReleasedDate.
-func (s *PostingSummary) SetReleasedDate(val OptNilDateTime) {
+func (s *PostingItem) SetReleasedDate(val OptDateTime) {
 	s.ReleasedDate = val
 }
 
 // SetLocation sets the value of Location.
-func (s *PostingSummary) SetLocation(val OptLocation) {
+func (s *PostingItem) SetLocation(val OptPostingLocation) {
 	s.Location = val
 }
 
 // SetIndustry sets the value of Industry.
-func (s *PostingSummary) SetIndustry(val OptIdLabel) {
+func (s *PostingItem) SetIndustry(val OptIndustry) {
 	s.Industry = val
 }
 
 // SetDepartment sets the value of Department.
-func (s *PostingSummary) SetDepartment(val OptDepartment) {
+func (s *PostingItem) SetDepartment(val OptDepartment) {
 	s.Department = val
 }
 
 // SetFunction sets the value of Function.
-func (s *PostingSummary) SetFunction(val OptIdLabel) {
+func (s *PostingItem) SetFunction(val OptFunction) {
 	s.Function = val
 }
 
 // SetTypeOfEmployment sets the value of TypeOfEmployment.
-func (s *PostingSummary) SetTypeOfEmployment(val OptIdLabel) {
+func (s *PostingItem) SetTypeOfEmployment(val OptTypeOfEmployment) {
 	s.TypeOfEmployment = val
 }
 
 // SetExperienceLevel sets the value of ExperienceLevel.
-func (s *PostingSummary) SetExperienceLevel(val OptIdLabel) {
+func (s *PostingItem) SetExperienceLevel(val OptExperienceLevel) {
 	s.ExperienceLevel = val
 }
 
 // SetCustomField sets the value of CustomField.
-func (s *PostingSummary) SetCustomField(val []CustomField) {
+func (s *PostingItem) SetCustomField(val []CustomField) {
 	s.CustomField = val
 }
 
-// SetVisibility sets the value of Visibility.
-func (s *PostingSummary) SetVisibility(val OptNilString) {
-	s.Visibility = val
-}
-
 // SetRef sets the value of Ref.
-func (s *PostingSummary) SetRef(val OptNilString) {
+func (s *PostingItem) SetRef(val OptString) {
 	s.Ref = val
 }
 
+// SetCreator sets the value of Creator.
+func (s *PostingItem) SetCreator(val OptCreator) {
+	s.Creator = val
+}
+
 // SetLanguage sets the value of Language.
-func (s *PostingSummary) SetLanguage(val OptLanguage) {
+func (s *PostingItem) SetLanguage(val OptLanguage) {
 	s.Language = val
+}
+
+// SetVisibility sets the value of Visibility.
+func (s *PostingItem) SetVisibility(val OptVisibility) {
+	s.Visibility = val
+}
+
+// Ref: #/components/schemas/PostingList
+type PostingList struct {
+	TotalFound int           `json:"totalFound"`
+	Limit      int           `json:"limit"`
+	Offset     int           `json:"offset"`
+	Content    []PostingItem `json:"content"`
+}
+
+// GetTotalFound returns the value of TotalFound.
+func (s *PostingList) GetTotalFound() int {
+	return s.TotalFound
+}
+
+// GetLimit returns the value of Limit.
+func (s *PostingList) GetLimit() int {
+	return s.Limit
+}
+
+// GetOffset returns the value of Offset.
+func (s *PostingList) GetOffset() int {
+	return s.Offset
+}
+
+// GetContent returns the value of Content.
+func (s *PostingList) GetContent() []PostingItem {
+	return s.Content
+}
+
+// SetTotalFound sets the value of TotalFound.
+func (s *PostingList) SetTotalFound(val int) {
+	s.TotalFound = val
+}
+
+// SetLimit sets the value of Limit.
+func (s *PostingList) SetLimit(val int) {
+	s.Limit = val
+}
+
+// SetOffset sets the value of Offset.
+func (s *PostingList) SetOffset(val int) {
+	s.Offset = val
+}
+
+// SetContent sets the value of Content.
+func (s *PostingList) SetContent(val []PostingItem) {
+	s.Content = val
+}
+
+// Ref: #/components/schemas/PostingLocation
+type PostingLocation struct {
+	// ISO 2-letter country code.
+	Country OptString `json:"country"`
+	// This can be state, colloquial name, voivodeship or other area description.
+	Region OptString `json:"region"`
+	City   OptString `json:"city"`
+	// Indicates if employees can work remotely.
+	Remote OptBool `json:"remote"`
+	// Indicates if employees can work in hybrid mode.
+	Hybrid    OptBool   `json:"hybrid"`
+	Latitude  OptString `json:"latitude"`
+	Longitude OptString `json:"longitude"`
+	// Human-readable combined location, e.g. "Houston, TX, United States".
+	FullLocation OptString `json:"fullLocation"`
+}
+
+// GetCountry returns the value of Country.
+func (s *PostingLocation) GetCountry() OptString {
+	return s.Country
+}
+
+// GetRegion returns the value of Region.
+func (s *PostingLocation) GetRegion() OptString {
+	return s.Region
+}
+
+// GetCity returns the value of City.
+func (s *PostingLocation) GetCity() OptString {
+	return s.City
+}
+
+// GetRemote returns the value of Remote.
+func (s *PostingLocation) GetRemote() OptBool {
+	return s.Remote
+}
+
+// GetHybrid returns the value of Hybrid.
+func (s *PostingLocation) GetHybrid() OptBool {
+	return s.Hybrid
+}
+
+// GetLatitude returns the value of Latitude.
+func (s *PostingLocation) GetLatitude() OptString {
+	return s.Latitude
+}
+
+// GetLongitude returns the value of Longitude.
+func (s *PostingLocation) GetLongitude() OptString {
+	return s.Longitude
+}
+
+// GetFullLocation returns the value of FullLocation.
+func (s *PostingLocation) GetFullLocation() OptString {
+	return s.FullLocation
+}
+
+// SetCountry sets the value of Country.
+func (s *PostingLocation) SetCountry(val OptString) {
+	s.Country = val
+}
+
+// SetRegion sets the value of Region.
+func (s *PostingLocation) SetRegion(val OptString) {
+	s.Region = val
+}
+
+// SetCity sets the value of City.
+func (s *PostingLocation) SetCity(val OptString) {
+	s.City = val
+}
+
+// SetRemote sets the value of Remote.
+func (s *PostingLocation) SetRemote(val OptBool) {
+	s.Remote = val
+}
+
+// SetHybrid sets the value of Hybrid.
+func (s *PostingLocation) SetHybrid(val OptBool) {
+	s.Hybrid = val
+}
+
+// SetLatitude sets the value of Latitude.
+func (s *PostingLocation) SetLatitude(val OptString) {
+	s.Latitude = val
+}
+
+// SetLongitude sets the value of Longitude.
+func (s *PostingLocation) SetLongitude(val OptString) {
+	s.Longitude = val
+}
+
+// SetFullLocation sets the value of FullLocation.
+func (s *PostingLocation) SetFullLocation(val OptString) {
+	s.FullLocation = val
+}
+
+// Ref: #/components/schemas/TypeOfEmployment
+type TypeOfEmployment struct {
+	ID    OptString `json:"id"`
+	Label OptString `json:"label"`
+}
+
+// GetID returns the value of ID.
+func (s *TypeOfEmployment) GetID() OptString {
+	return s.ID
+}
+
+// GetLabel returns the value of Label.
+func (s *TypeOfEmployment) GetLabel() OptString {
+	return s.Label
+}
+
+// SetID sets the value of ID.
+func (s *TypeOfEmployment) SetID(val OptString) {
+	s.ID = val
+}
+
+// SetLabel sets the value of Label.
+func (s *TypeOfEmployment) SetLabel(val OptString) {
+	s.Label = val
+}
+
+// Ref: #/components/schemas/Visibility
+type Visibility string
+
+const (
+	VisibilityPUBLIC   Visibility = "PUBLIC"
+	VisibilityINTERNAL Visibility = "INTERNAL"
+)
+
+// AllValues returns all Visibility values.
+func (Visibility) AllValues() []Visibility {
+	return []Visibility{
+		VisibilityPUBLIC,
+		VisibilityINTERNAL,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s Visibility) MarshalText() ([]byte, error) {
+	switch s {
+	case VisibilityPUBLIC:
+		return []byte(s), nil
+	case VisibilityINTERNAL:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *Visibility) UnmarshalText(data []byte) error {
+	switch Visibility(data) {
+	case VisibilityPUBLIC:
+		*s = VisibilityPUBLIC
+		return nil
+	case VisibilityINTERNAL:
+		*s = VisibilityINTERNAL
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
 }

@@ -11,12 +11,12 @@ import (
 )
 
 func TestSummarize(t *testing.T) {
-	p := smartrecruiters.PostingSummary{
+	p := smartrecruiters.PostingItem{
 		ID:           smartrecruiters.NewOptString("744000137225639"),
-		Name:         smartrecruiters.NewOptNilString("Female Locker Room Associate, Houston"),
-		Location:     smartrecruiters.NewOptLocation(smartrecruiters.Location{FullLocation: smartrecruiters.NewOptNilString("Houston, TX, United States")}),
-		Department:   smartrecruiters.NewOptDepartment(smartrecruiters.Department{Label: smartrecruiters.NewOptNilString("Club - Staff")}),
-		ReleasedDate: smartrecruiters.NewOptNilDateTime(time.Date(2026, 7, 10, 23, 49, 3, 0, time.UTC)),
+		Name:         smartrecruiters.NewOptString("Female Locker Room Associate, Houston"),
+		Location:     smartrecruiters.NewOptPostingLocation(smartrecruiters.PostingLocation{FullLocation: smartrecruiters.NewOptString("Houston, TX, United States")}),
+		Department:   smartrecruiters.NewOptDepartment(smartrecruiters.Department{Label: smartrecruiters.NewOptString("Club - Staff")}),
+		ReleasedDate: smartrecruiters.NewOptDateTime(time.Date(2026, 7, 10, 23, 49, 3, 0, time.UTC)),
 	}
 	assert.Equal(t, postingSummaryJSON{
 		ID:         "744000137225639",
@@ -28,23 +28,11 @@ func TestSummarize(t *testing.T) {
 }
 
 func TestSummarizeEmptyOptionals(t *testing.T) {
-	s := summarize(smartrecruiters.PostingSummary{
+	s := summarize(smartrecruiters.PostingItem{
 		ID:   smartrecruiters.NewOptString("1"),
-		Name: smartrecruiters.NewOptNilString("X"),
+		Name: smartrecruiters.NewOptString("X"),
 	})
 	assert.Equal(t, postingSummaryJSON{ID: "1", Title: "X"}, s)
-}
-
-// TestSummarizeNullReleasedDate guards a present-but-explicitly-null
-// releasedDate: PostedAt must stay empty, not format the zero time as if
-// it were real data.
-func TestSummarizeNullReleasedDate(t *testing.T) {
-	p := smartrecruiters.PostingSummary{
-		ID:           smartrecruiters.NewOptString("1"),
-		Name:         smartrecruiters.NewOptNilString("X"),
-		ReleasedDate: smartrecruiters.OptNilDateTime{Set: true, Null: true},
-	}
-	assert.Empty(t, summarize(p).PostedAt)
 }
 
 func TestRunSearchMissingCompany(t *testing.T) {

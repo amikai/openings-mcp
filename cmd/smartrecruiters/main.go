@@ -17,8 +17,9 @@ import (
 )
 
 // apiBaseURL is SmartRecruiters' public Posting API origin — the single
-// production server in the provider's openapi.yaml.
-const apiBaseURL = "https://api.smartrecruiters.com/v1"
+// production server in the provider's openapi.yaml (paths carry the /v1
+// prefix).
+const apiBaseURL = "https://api.smartrecruiters.com"
 
 func main() {
 	rootFlags := ff.NewFlagSet("smartrecruiters")
@@ -161,7 +162,7 @@ type searchResultJSON struct {
 	Jobs  []postingSummaryJSON `json:"jobs"`
 }
 
-func summarize(p smartrecruiters.PostingSummary) postingSummaryJSON {
+func summarize(p smartrecruiters.PostingItem) postingSummaryJSON {
 	s := postingSummaryJSON{
 		ID:       p.ID.Value,
 		Title:    p.Name.Value,
@@ -206,12 +207,10 @@ func runSearch(
 	if err != nil {
 		return err
 	}
-	// Matches openapi.yaml's limit (1–100) and offset (>=0) constraints.
-	// The generated client only validates these on the server-decode path,
-	// never on outgoing requests, so an out-of-range value would otherwise
-	// reach the upstream API — which either 400s opaquely (negative
-	// values) or silently returns an empty page (--limit 0) rather than
-	// erroring.
+	// The upstream documents limit's max as 100 but the spec carries no
+	// numeric constraints, so nothing stops an out-of-range value from
+	// reaching the API — which either 400s opaquely (negative values) or
+	// silently returns an empty page (--limit 0) rather than erroring.
 	if limit < 1 || limit > 100 {
 		return fmt.Errorf("--limit must be between 1 and 100, got %d", limit)
 	}
@@ -303,7 +302,7 @@ func runGet(ctx context.Context, company string, timeout time.Duration, postingI
 	}
 
 	switch d := res.(type) {
-	case *smartrecruiters.PostingDetail:
+	case *smartrecruiters.Posting:
 		return printDetail(d, format)
 	case *smartrecruiters.PostingErrorResponse:
 		return fmt.Errorf("posting %q not found for company %q", postingID, company)
@@ -313,8 +312,8 @@ func runGet(ctx context.Context, company string, timeout time.Duration, postingI
 }
 
 // printDetail renders one full posting. JSON mode encodes the generated
-// PostingDetail as-is — detail is for seeing the whole record.
-func printDetail(d *smartrecruiters.PostingDetail, format string) error {
+// Posting as-is — detail is for seeing the whole record.
+func printDetail(d *smartrecruiters.Posting, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")

@@ -1,0 +1,299 @@
+{
+    "totalFound": 58,
+    "content": [
+        {
+            "id": 899902,
+            "label": "Club - Accelerator Program",
+            "archived": false
+        },
+        {
+            "id": 6815222,
+            "label": "SoulCycle - Instructor",
+            "archived": false
+        },
+        {
+            "id": 660933,
+            "label": "Club - Ancillary",
+            "description": "spa, pilates, kids' club",
+            "archived": false
+        },
+        {
+            "id": 930502,
+            "label": "Club - Estheticians",
+            "archived": false
+        },
+        {
+            "id": 889345,
+            "label": "Club - Group Fitness",
+            "archived": false
+        },
+        {
+            "id": 766027,
+            "label": "Club - Management - Ancillary",
+            "archived": false
+        },
+        {
+            "id": 889362,
+            "label": "Club - Management - Group Fitness",
+            "archived": false
+        },
+        {
+            "id": 660950,
+            "label": "Club - Management - Operations",
+            "archived": false
+        },
+        {
+            "id": 766010,
+            "label": "Club - Management - Personal Training",
+            "archived": false
+        },
+        {
+            "id": 890399,
+            "label": "Club - Management - Pilates",
+            "archived": false
+        },
+        {
+            "id": 890433,
+            "label": "Club - Management - Retail",
+            "archived": false
+        },
+        {
+            "id": 925385,
+            "label": "Club - Management - Sales",
+            "archived": false
+        },
+        {
+            "id": 880182,
+            "label": "Club - Management - Spa",
+            "description": "Non-corporate spa department employees",
+            "archived": false
+        },
+        {
+            "id": 793380,
+            "label": "Club - Management - Staff",
+            "archived": false
+        },
+        {
+            "id": 880165,
+            "label": "Club - Massage Therapists",
+            "description": "Non-management, non-corporate spa department employees",
+            "archived": false
+        },
+        {
+            "id": 660899,
+            "label": "Club - Personal Training",
+            "archived": false
+        },
+        {
+            "id": 783197,
+            "label": "Club - Personal Training - Internship",
+            "archived": false
+        },
+        {
+            "id": 890382,
+            "label": "Club - Pilates",
+            "archived": false
+        },
+        {
+            "id": 890416,
+            "label": "Club - Retail",
+            "archived": false
+        },
+        {
+            "id": 660882,
+            "label": "Club - Sales",
+            "archived": false
+        },
+        {
+            "id": 660916,
+            "label": "Club - Staff",
+            "description": "retail, maintenance, front desk",
+            "archived": false
+        },
+        {
+            "id": 775683,
+            "label": "Corporate - Accounting",
+            "archived": false
+        },
+        {
+            "id": 775751,
+            "label": "Corporate - Administrative",
+            "archived": false
+        },
+        {
+            "id": 895176,
+            "label": "Corporate - Architecture and Planning",
+            "archived": false
+        },
+        {
+            "id": 775734,
+            "label": "Corporate - Business Development",
+            "archived": false
+        },
+        {
+            "id": 775054,
+            "label": "Corporate - Construction",
+            "archived": false
+        },
+        {
+            "id": 775700,
+            "label": "Corporate - Design",
+            "archived": false
+        },
+        {
+            "id": 895142,
+            "label": "Corporate - Equinox Hotels",
+            "archived": false
+        },
+        {
+            "id": 775717,
+            "label": "Corporate - Facilities",
+            "archived": false
+        },
+        {
+            "id": 775666,
+            "label": "Corporate - Finance",
+            "archived": false
+        },
+        {
+            "id": 895159,
+            "label": "Corporate - Furthermore",
+            "archived": false
+        },
+        {
+            "id": 775615,
+            "label": "Corporate - Human Resources",
+            "archived": false
+        },
+        {
+            "id": 775649,
+            "label": "Corporate - Information Technology",
+            "archived": false
+        },
+        {
+            "id": 775598,
+            "label": "Corporate - Legal",
+            "archived": false
+        },
+        {
+            "id": 775632,
+            "label": "Corporate - Marketing",
+            "archived": false
+        },
+        {
+            "id": 775564,
+            "label": "Corporate - Operations",
+            "archived": false
+        },
+        {
+            "id": 775581,
+            "label": "Corporate - Real Estate",
+            "archived": false
+        },
+        {
+            "id": 775547,
+            "label": "Corporate - Sales",
+            "archived": false
+        },
+        {
+            "id": 1410310,
+            "label": "Corporate - Member Services",
+            "archived": false
+        },
+        {
+            "id": 3390521,
+            "label": "Blink - Fitness",
+            "archived": false
+        },
+        {
+            "id": 3390538,
+            "label": "Club - Floor Host",
+            "archived": false
+        },
+        {
+            "id": 3424691,
+            "label": "Club - Pilates Teacher Training",
+            "archived": false
+        },
+        {
+            "id": 3715051,
+            "label": "Corporate - Retail",
+            "archived": false
+        },
+        {
+            "id": 5498351,
+            "label": "Club - Equinox Coaching Program",
+            "archived": false
+        },
+        {
+            "id": 6107631,
+            "label": "Club - New Club Opening",
+            "archived": false
+        },
+        {
+            "id": 6815171,
+            "label": "SoulCycle - Studio Crew",
+            "archived": false
+        },
+        {
+            "id": 6815188,
+            "label": "SoulCycle - ASM / SM",
+            "archived": false
+        },
+        {
+            "id": 6815205,
+            "label": "SoulCycle - Corporate",
+            "archived": false
+        },
+        {
+            "id": 1005166,
+            "label": "Club - Pilot PT",
+            "archived": true
+        },
+        {
+            "id": 10434811,
+            "label": "Club - Corporate Sales",
+            "archived": false
+        },
+        {
+            "id": 11684651,
+            "label": "SoulCycle - Marketing",
+            "archived": false
+        },
+        {
+            "id": 11684668,
+            "label": "SoulCycle -Social Media",
+            "archived": false
+        },
+        {
+            "id": 11831871,
+            "label": "Club - Stretch",
+            "archived": false
+        },
+        {
+            "id": 12413611,
+            "label": "Club - MIT Internal",
+            "archived": false
+        },
+        {
+            "id": 12917491,
+            "label": "TEST - Approval Pilot",
+            "archived": false
+        },
+        {
+            "id": 12994671,
+            "label": "Instructor Rehire",
+            "archived": false
+        },
+        {
+            "id": 13296251,
+            "label": "Club - Inside Sales",
+            "archived": false
+        },
+        {
+            "id": 14432531,
+            "label": "Club - Retail Pilot",
+            "archived": false
+        }
+    ]
+}
