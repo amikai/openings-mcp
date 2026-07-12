@@ -149,8 +149,9 @@ type ListPostingsParams struct {
 	// A `department.id` value (not the display label), e.g. "660916". Equivalent to
 	// `custom_field.{department-fieldId}=<same id>`.
 	Department OptString `json:",omitempty,omitzero"`
-	// Page size. Default and observed maximum both 100; requesting above 100 is silently clamped to 100
-	// rather than erroring.
+	// Page size. Default and observed maximum both 100; the upstream silently clamps a value above 100
+	// rather than erroring, but the schema enforces the cap client-side so callers don't rely on
+	// requesting more than they'll actually get.
 	Limit OptInt `json:",omitempty,omitzero"`
 	// Zero-based result offset for pagination.
 	Offset OptInt `json:",omitempty,omitzero"`
@@ -531,8 +532,8 @@ func decodeListPostingsParams(args [1]string, argsEscaped bool, r *http.Request)
 						if err := (validate.Int{
 							MinSet:        true,
 							Min:           1,
-							MaxSet:        false,
-							Max:           0,
+							MaxSet:        true,
+							Max:           100,
 							MinExclusive:  false,
 							MaxExclusive:  false,
 							MultipleOfSet: false,
