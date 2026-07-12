@@ -58,20 +58,33 @@ alone fully addresses a company.
 
 ## Search
 
-- `q` = `Query` and `Location` joined with a single space, both trimmed.
-  The API's `q` full-text matches titles and location text (verified in
-  the provider openapi.yaml), so location input stays fuzzy and costs no
-  extra upstream call. Trade-off: location words can also match against
-  titles, slightly broadening results.
-- Paging: `limit=PageSize` (20), `offset=(page-1)*PageSize`, with the
-  same overflow guard as Workday.
+- With no `Query` or `Location`, paging stays entirely server-side:
+  `limit=PageSize` (20), `offset=(page-1)*PageSize`, with the same
+  overflow guard as Workday.
+- SmartRecruiters `q` ORs terms and searches both titles and location
+  text. It is therefore used only as a candidate selector, never as the
+  final unified match:
+  - Query-only search requests `q=Query`, then removes postings whose
+    title does not contain every query word.
+  - Location-only search requests `q=Location`, then removes postings
+    whose `location.fullLocation` does not contain the requested text.
+  - When both are present, the adapter requests the first 100 results for
+    each value separately, keeps the smaller candidate set, and applies
+    Query AND Location locally.
+  - Candidate collection is capped at 2,000 postings. A broader search
+    returns a teaching error asking for a narrower query, location, or
+    structured filter rather than silently truncating totals.
+- Text-search totals and pages are computed after local matching via the
+  shared `searchDump` engine. Candidate pages use the API maximum
+  `limit=100` to minimize upstream calls.
 - Filters (keys as `Filters()` reports them):
   - `department` — labels resolved to ids via one `listDepartments` call
     when the filter is set (stateless probe, Workday-style). Labels match
-    case-insensitively; an unknown label errors listing the valid labels
-    (truncated past 20, Workday-style). Multiple resolved ids join
-    comma-separated into the single `department` query param — verified
-    live against Equinox to OR (129 + 23 = 152 postings).
+    case-insensitively after trimming; an unknown label errors listing the
+    valid labels (truncated past 20, Workday-style). Duplicate labels keep
+    every underlying id. Multiple resolved ids join comma-separated into
+    the single `department` query param — verified live against Equinox to
+    OR (129 + 23 = 152 postings).
   - `location_type` — values match Remote/Hybrid/Onsite
     case-insensitively and map to the `locationType` enum
     (REMOTE/HYBRID/ONSITE, passed as an array). An unknown value errors
@@ -84,7 +97,9 @@ alone fully addresses a company.
   carry no `postingUrl`; slug-less public URLs verified to return 200).
   Postings missing an `id` are skipped rather than emitted with an
   un-detailable `job_id`.
-- `TotalCount` = `totalFound`; `TotalPages` via the shared `totalPages`.
+- With no text constraints, `TotalCount` = upstream `totalFound`. With
+  Query or Location, `TotalCount` and `TotalPages` reflect the locally
+  matched set.
 
 ## Filters()
 
@@ -94,7 +109,9 @@ One `listDepartments` call:
   (Companies that don't use departments return empty or unlabeled
   entries; they get no `department` dimension.) Some listed departments
   legitimately have zero live postings; that is fine — filtering by them
-  returns an empty page.
+  returns an empty page. Labels are trimmed and deduplicated
+  case-insensitively; Search resolves one display label to every matching
+  department id.
 - `location_type`: static `[Hybrid, Onsite, Remote]`.
 
 ## Detail
@@ -115,9 +132,11 @@ One `listDepartments` call:
   matching the other adapters.
 - Filter-resolution failures are teaching errors that name the valid
   alternatives (labels, location types, or filter keys).
-- No unknown-slug error path exists in Search/Filters: any string is a
-  syntactically valid identifier and the list endpoint never 404s.
-  Detail's 404 still surfaces for bad job ids.
+- An unfiltered Search has no unknown-slug error path: the postings list
+  endpoint returns an empty 200 response. `Filters()` and a
+  department-filtered Search call the departments endpoint, which may
+  surface a 404 for an unknown company. Detail's 404 still surfaces for
+  bad job ids.
 
 ## Testing
 
@@ -127,12 +146,17 @@ tests:
 
 - Search happy path: mapping of id/title/fullLocation/releasedDate,
   derived public URL, totals and page math.
-- `q` composition: query only, location only, both.
+- Residual text matching: Query excludes location-only hits, Location
+  excludes title-only hits, and Query + Location use AND semantics even
+  though upstream `q` uses OR semantics.
+- Candidate collection: smaller-set selection, multi-page collection,
+  post-filter totals/pages, and the 2,000-candidate bound.
 - Filter resolution: department label → id (single and multiple,
   comma-joined), location_type mapping, teaching errors for unknown
   label, unknown location_type, and unknown filter key.
-- `Filters()`: department labels exclude archived/empty entries; static
-  location_type present.
+- `Filters()`: department labels exclude archived/empty entries, fold
+  case and whitespace, preserve all ids behind duplicate labels, and
+  include the static location_type dimension.
 - `ParseCareersURL`: roster identifier, non-roster identifier, non-SR
   host, bare host without path.
 - Detail: happy path (sections joined, postingUrl, company name from

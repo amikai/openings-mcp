@@ -4,7 +4,13 @@
 
 **Goal:** Implement `internal/ats.Adapter` for SmartRecruiters and register it with the MCP server, so the rostered companies (and any jobs.smartrecruiters.com careers URL) join the unified `search_jobs_by_company` / `get_filters_by_company` / `get_job_detail_by_company` tools.
 
-**Architecture:** Server-side-search adapter (like Workday) over the already-landed provider package `internal/provider/smartrecruiters` (ogen-generated client, fixtures, mock server, 52-company roster). The unified `Location` folds into the API's `q` param; `department` filter labels resolve to ids via one `listDepartments` call at search time; `location_type` maps to the static locationType enum. Spec: `docs/superpowers/specs/2026-07-13-smartrecruiters-ats-adapter-design.md`.
+**Architecture:** Hybrid server/local-search adapter over the already-landed provider package `internal/provider/smartrecruiters` (ogen-generated client, fixtures, mock server, 52-company roster). Structured filters run server-side. SmartRecruiters `q` is only a bounded candidate selector because it ORs terms and searches titles plus locations; the adapter applies Query and Location separately with the shared local filter engine. `department` filter labels resolve to ids via one `listDepartments` call at search time; `location_type` maps to the static locationType enum. Spec: `docs/superpowers/specs/2026-07-13-smartrecruiters-ats-adapter-design.md`.
+
+> **2026-07-13 correction:** Live verification showed `q=trainer Houston`
+> returns the union of the individual searches, not their intersection.
+> Task 3's original `q`-concatenation snippets below are retained as the
+> historical implementation plan but are superseded by the design spec and
+> the final adapter implementation.
 
 **Tech Stack:** Go, ogen-generated client, testify, httptest, html2text.
 
