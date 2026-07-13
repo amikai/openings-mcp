@@ -166,12 +166,7 @@ func summarize(slug string, o recruitee.Offer) jobSummaryJSON {
 		jobURL = fmt.Sprintf("https://%s.recruitee.com/o/%s", slug, o.Slug.Value)
 	}
 
-	posted := ""
-	if o.PublishedAt.Set {
-		posted, _, _ = strings.Cut(o.PublishedAt.Value, " ")
-	} else if o.CreatedAt.Set {
-		posted, _, _ = strings.Cut(o.CreatedAt.Value, " ")
-	}
+	posted, _, _ := strings.Cut(o.PublishedAt.Or(o.CreatedAt.Or("")), " ")
 
 	return jobSummaryJSON{
 		ID:          o.ID,
