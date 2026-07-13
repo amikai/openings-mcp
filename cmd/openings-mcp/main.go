@@ -187,6 +187,7 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 		leverAdapter,
 		ashbyAdapter,
 		greenhouseAdapter,
+		ats.NewTeamtailorAdapter(hc),
 	)
 }
 

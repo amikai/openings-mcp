@@ -82,3 +82,18 @@ func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 	err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	require.NoError(t, err)
 }
+
+func TestATSRegistryIncludesTeamtailor(t *testing.T) {
+	registry, err := newATSRegistry(http.DefaultClient)
+	require.NoError(t, err)
+
+	adapter, slug, err := registry.Resolve("Teamtailor")
+	require.NoError(t, err)
+	assert.Equal(t, "teamtailor", adapter.Name())
+	assert.Equal(t, "career.teamtailor.com", slug)
+
+	adapter, slug, err = registry.Resolve("https://unlisted.na.teamtailor.com/jobs")
+	require.NoError(t, err)
+	assert.Equal(t, "teamtailor", adapter.Name())
+	assert.Equal(t, "unlisted.na.teamtailor.com", slug)
+}

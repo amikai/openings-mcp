@@ -26,7 +26,7 @@ import (
 )
 
 // providerOrder fixes the --provider default and the report's grouping order.
-var providerOrder = []string{"ashby", "greenhouse", "lever", "workday"}
+var providerOrder = []string{"ashby", "greenhouse", "lever", "teamtailor", "workday"}
 
 // Result statuses. ERROR covers every failed check — a stale identifier
 // (upstream 404) and a transient failure (timeout, 5xx) alike; Detail
@@ -57,7 +57,11 @@ type result struct {
 func main() {
 	fs := ff.NewFlagSet("verify-companies")
 	var (
-		providers   = fs.StringLong("provider", strings.Join(providerOrder, ","), "comma-separated subset of ashby,greenhouse,lever,workday")
+		providers = fs.StringLong(
+			"provider",
+			strings.Join(providerOrder, ","),
+			"comma-separated subset of "+strings.Join(providerOrder, ","),
+		)
 		timeout     = fs.DurationLong("timeout", 300*time.Second, "per-request timeout")
 		concurrency = fs.IntLong("concurrency", 8, "number of concurrent checks")
 		format      = fs.StringEnumLong("format", "output format", "text", "json")
@@ -154,6 +158,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
 		case "lever":
 			a, err = ats.NewLeverAdapter("https://api.lever.co", hc)
+		case "teamtailor":
+			a = ats.NewTeamtailorAdapter(hc)
 		case "workday":
 			a = ats.NewWorkdayAdapter(hc)
 		}

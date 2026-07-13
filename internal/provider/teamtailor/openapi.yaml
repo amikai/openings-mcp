@@ -1,0 +1,144 @@
+openapi: 3.1.0
+
+info:
+  title: Teamtailor Career Site Feed
+  version: "1.0.0"
+  description: >
+    Minimal client surface for Teamtailor's unauthenticated career-site job
+    feed. Every Teamtailor career site advertises `/jobs.json` through
+    `/.well-known/api-catalog` as an `application/feed+json` service. The
+    response follows JSON Feed 1.1 and adds a Schema.org JobPosting object to
+    each item under `_jobposting`.
+
+    The endpoint returns the complete current board with full HTML
+    descriptions. It has no server-side search, filters, pagination, or
+    per-job detail operation. Callers construct a client against one career
+    site's origin and filter or select from the dump locally.
+
+    This spec is hand-derived because Teamtailor publishes the feed and its
+    discovery catalog, but not an OpenAPI document for the career-site
+    surface. Fields and nullability were verified against live EU and North
+    America career sites on 2026-07-13. An unknown hosted tenant returns HTTP
+    404 with an empty body despite an application/json content type.
+
+servers:
+  - url: https://career.teamtailor.com
+    description: Example production career site; replace with the selected tenant origin
+
+tags:
+  - name: Jobs
+    description: Public career-site jobs
+
+paths:
+  /jobs.json:
+    get:
+      tags: [Jobs]
+      operationId: getJobs
+      summary: Return every current job on the career site
+      responses:
+        "200":
+          description: The complete current job feed.
+          content:
+            application/feed+json:
+              schema:
+                $ref: "#/components/schemas/CareerFeed"
+        "404":
+          description: The career-site tenant does not exist.
+
+components:
+  schemas:
+    CareerFeed:
+      type: object
+      required: [version, title, home_page_url, feed_url, items]
+      properties:
+        version:
+          type: string
+          description: JSON Feed version URL.
+          example: https://jsonfeed.org/version/1.1
+        title:
+          type: string
+          description: Career-site company name.
+          example: Teamtailor
+        home_page_url:
+          type: string
+          description: Human-facing jobs-list URL.
+          example: https://career.teamtailor.com/jobs
+        feed_url:
+          type: string
+          description: Canonical URL of this feed.
+          example: https://career.teamtailor.com/jobs.json
+        items:
+          type: array
+          description: Every currently published job on the career site.
+          items:
+            $ref: "#/components/schemas/CareerItem"
+
+    CareerItem:
+      type: object
+      required: [id, title, url, date_published, content_html, _jobposting]
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Stable JSON Feed item identifier assigned by Teamtailor.
+        title:
+          type: string
+          description: Public job title.
+        url:
+          type: string
+          description: Human-facing posting URL.
+        date_published:
+          type: string
+          format: date-time
+          description: When the posting was published.
+        content_html:
+          type: string
+          description: Full public job description as HTML.
+        _jobposting:
+          $ref: "#/components/schemas/JobPosting"
+
+    JobPosting:
+      type: object
+      description: Minimal subset of the embedded Schema.org JobPosting object.
+      required: [jobLocation]
+      properties:
+        jobLocation:
+          type: array
+          items:
+            $ref: "#/components/schemas/Place"
+
+    Place:
+      type: object
+      required: [address]
+      properties:
+        address:
+          $ref: "#/components/schemas/PostalAddress"
+
+    PostalAddress:
+      type: object
+      required:
+        - streetAddress
+        - addressLocality
+        - postalCode
+        - addressCountry
+        - addressRegion
+      properties:
+        streetAddress:
+          type: string
+          nullable: true
+          description: Street address, or null when the career site omits it.
+        addressLocality:
+          type: string
+          description: City or the site's location display label.
+        postalCode:
+          type: string
+          nullable: true
+          description: Postal code, or null when unset.
+        addressCountry:
+          type: string
+          description: Two-letter country code.
+          example: SE
+        addressRegion:
+          type: string
+          nullable: true
+          description: Region label, or null when unset.
