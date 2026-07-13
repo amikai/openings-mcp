@@ -19,6 +19,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/logging"
 	"github.com/amikai/openings-mcp/internal/openingsmcp"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
+	"github.com/amikai/openings-mcp/internal/provider/eightfold"
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
@@ -127,6 +128,10 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 	hc := &http.Client{Timeout: 30 * time.Second}
 
+	// Eightfold's edge 403s Go's default User-Agent instead of returning
+	// JSON, so it gets its own client rather than sharing hc.
+	hcEightfold := &http.Client{Timeout: 30 * time.Second, Transport: eightfold.BrowserTransport{}}
+
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(hc))
 	if err != nil {
 		return err
@@ -144,7 +149,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 	jarLinkedin, _ := cookiejar.New(nil)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", &http.Client{Timeout: 30 * time.Second, Jar: jarLinkedin})
 
-	registry, err := newATSRegistry(hc)
+	registry, err := newATSRegistry(hc, hcEightfold)
 	if err != nil {
 		return err
 	}
@@ -166,7 +171,9 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 // newATSRegistry wires all unified company adapters over one shared
 // connection pool, against the providers' production endpoints.
-func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
+// hcEightfold is separate because Eightfold's edge requires a browser-shaped
+// User-Agent that the other adapters don't need.
+func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc)
 	if err != nil {
 		return nil, fmt.Errorf("create Lever ATS adapter: %w", err)
@@ -187,6 +194,7 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 		greenhouseAdapter,
 		ats.NewTeamtailorAdapter(hc),
 		ats.NewRecruiteeAdapter(hc),
+		ats.NewEightfoldAdapter(hcEightfold),
 	)
 }
 

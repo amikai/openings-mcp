@@ -105,6 +105,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"ashby":      "jobs.ashbyhq.com/<org>",
 	"teamtailor": "<company>[.na|.au].teamtailor.com/jobs",
 	"recruitee":  "<company>.recruitee.com",
+	"eightfold":  "<tenant>.eightfold.ai/careers (roster tenants only)",
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered

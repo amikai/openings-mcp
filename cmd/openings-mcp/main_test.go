@@ -35,7 +35,7 @@ func TestServerListsJobTools(t *testing.T) {
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
-	registry, err := newATSRegistry(http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 	server := newServer(providerClients{
 		job104:   c104,
@@ -91,7 +91,7 @@ func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 }
 
 func TestATSRegistryIncludesTeamtailor(t *testing.T) {
-	registry, err := newATSRegistry(http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
 	adapter, slug, err := registry.Resolve("Teamtailor")

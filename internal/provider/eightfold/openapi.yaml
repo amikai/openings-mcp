@@ -1,0 +1,254 @@
+openapi: 3.1.0
+
+info:
+  title: Eightfold PCSX Career Site API
+  version: "1"
+  description: >
+    Eightfold has no public developer documentation for its career-site
+    search API (apidocs.eightfold.ai covers the authenticated enterprise
+    ATS/HRIS integration APIs, not this one). This spec is hand-derived
+    from live traffic captured on morganstanley.eightfold.ai on 2026-07-14
+    by driving the site in a browser and reading the network requests it
+    fired, then replaying and varying those requests directly.
+
+    Every Eightfold-hosted career site (`<tenant>.eightfold.ai`) exposes
+    the same unauthenticated `/api/pcsx/*` endpoints; `domain` identifies
+    the tenant's registered company domain (e.g. `morganstanley.com`) and
+    must match exactly, or the server responds with the site's HTML shell
+    instead of JSON.
+
+    Only the two endpoints this client uses are modeled: `search` (list,
+    paginated, server-side query/location/facet filtering) and
+    `position_details` (single posting, full description). Eightfold also
+    calls `match_details`, `position_insights`, `overrides`, and
+    `similar_positions` when a posting page loads, but nothing here reads
+    them.
+
+    ## Filter facets are dynamic per tenant, not part of this spec
+
+    `search`'s facet filters (seen on Morgan Stanley as `businessarea`,
+    `employmenttype`, `city`) are applied via query parameters named
+    `filter_<facetName>=<value>` (repeatable for OR semantics), e.g.
+    `filter_businessarea=technology&filter_businessarea=finance`. The set
+    of valid facet names and values is tenant-specific and discovered at
+    runtime from `data.filterDef.smartFilters` in an unfiltered search
+    response — OpenAPI has no way to express a dynamically-named query
+    parameter, so `filter_*` application is handled by hand in the Go
+    adapter (`internal/ats`) rather than through the generated client.
+
+servers:
+  - url: https://example.eightfold.ai
+    description: Per-tenant career site template; the actual host is <tenant>.eightfold.ai.
+
+tags:
+  - name: pcsx
+    description: Public career-site search API
+
+paths:
+  /api/pcsx/search:
+    get:
+      operationId: search
+      tags: [pcsx]
+      summary: List job postings for one tenant, with server-side search and pagination.
+      parameters:
+        - name: domain
+          in: query
+          required: true
+          description: The tenant's registered company domain, e.g. `morganstanley.com`.
+          schema:
+            type: string
+        - name: query
+          in: query
+          description: Free-text keyword search across title and description.
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: Free-text fuzzy location match.
+          schema:
+            type: string
+        - name: start
+          in: query
+          description: Zero-based result offset. The server returns a fixed page of 10.
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+
+  /api/pcsx/position_details:
+    get:
+      operationId: positionDetails
+      tags: [pcsx]
+      summary: Fetch one posting's full detail, including its HTML description.
+      parameters:
+        - name: position_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: domain
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: hl
+          in: query
+          description: Response language.
+          schema:
+            type: string
+            default: en
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PositionDetailsResponse"
+        "404":
+          description: >
+            Unknown position_id. Body carries the same envelope shape as a
+            success response, with an empty `data` object and
+            `error.message` set (observed: "Position not found").
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PositionNotFoundResponse"
+
+components:
+  schemas:
+    Position:
+      type: object
+      required: [id, displayJobId, name, locations, postedTs, positionUrl]
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Numeric position ID; the value position_details and the /careers/job/{id} URL take.
+        displayJobId:
+          type: string
+          description: The employer's human-facing requisition number (e.g. "JR040530"), not usable as an API identifier.
+        name:
+          type: string
+        locations:
+          type: array
+          items:
+            type: string
+        postedTs:
+          type: integer
+          format: int64
+          description: Unix seconds.
+        department:
+          type: string
+        workLocationOption:
+          type: string
+          description: 'Observed values: "onsite", "hybrid", "remote".'
+        positionUrl:
+          type: string
+          description: Site-relative posting path, e.g. "/careers/job/549798931483".
+
+    SmartFilterOption:
+      type: object
+      required: [label, value]
+      properties:
+        label:
+          type: string
+        value:
+          type: string
+          description: The value to send back as filter_<filterName>=<value>.
+
+    SmartFilter:
+      type: object
+      required: [filterName, title, options]
+      properties:
+        filterName:
+          type: string
+          description: 'The facet key, used as the filter_<filterName> query parameter name. Tenant-specific — e.g. "businessarea", "employmenttype", "city" on Morgan Stanley.'
+        title:
+          type: string
+          description: Display label for the facet, e.g. "Business Area".
+        options:
+          type: [array, "null"]
+          description: >
+            Null for non-list facets (observed: a "toggle" filter like
+            include_remote, which carries a boolean rather than a value
+            list). The adapter skips any SmartFilter with null options —
+            FilterSet only exposes pick-a-value facets.
+          items:
+            $ref: "#/components/schemas/SmartFilterOption"
+
+    FilterDef:
+      type: object
+      required: [smartFilters]
+      properties:
+        smartFilters:
+          type: array
+          items:
+            $ref: "#/components/schemas/SmartFilter"
+
+    SearchData:
+      type: object
+      required: [positions, count, filterDef]
+      properties:
+        positions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Position"
+        count:
+          type: integer
+          description: Total matching positions across all pages, not just this page's length.
+        filterDef:
+          $ref: "#/components/schemas/FilterDef"
+
+    SearchResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: integer
+        data:
+          $ref: "#/components/schemas/SearchData"
+
+    PositionDetail:
+      allOf:
+        - $ref: "#/components/schemas/Position"
+        - type: object
+          required: [jobDescription, publicUrl]
+          properties:
+            jobDescription:
+              type: string
+              description: Full posting description as HTML.
+            publicUrl:
+              type: string
+              description: Absolute, human-clickable posting URL.
+
+    PositionDetailsResponse:
+      type: object
+      required: [status, data]
+      properties:
+        status:
+          type: integer
+        data:
+          $ref: "#/components/schemas/PositionDetail"
+
+    PositionErrorInfo:
+      type: object
+      required: [message]
+      properties:
+        message:
+          type: string
+
+    PositionNotFoundResponse:
+      type: object
+      required: [status, error]
+      properties:
+        status:
+          type: integer
+        error:
+          $ref: "#/components/schemas/PositionErrorInfo"

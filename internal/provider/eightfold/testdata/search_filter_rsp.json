@@ -1,0 +1,1300 @@
+{
+  "status": 200,
+  "error": {
+    "message": "",
+    "body": ""
+  },
+  "data": {
+    "positions": [
+      {
+        "id": 549798641945,
+        "displayJobId": "PT-JR039943",
+        "name": "Major Incident Manager",
+        "locations": [
+          "Budapest, Budapest, Hungary"
+        ],
+        "standardizedLocations": [
+          "Budapest, HU"
+        ],
+        "postedTs": 1783900800,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Workplace Operations & Support",
+        "creationTs": 1782777600,
+        "isHot": 0,
+        "workLocationOption": "hybrid",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039943",
+        "positionUrl": "/careers/job/549798641945"
+      },
+      {
+        "id": 549798629974,
+        "displayJobId": "PT-JR039881",
+        "name": "Vice President, Lead Software Production Management & Reliability Engineering",
+        "locations": [
+          "Hong Kong, Hong Kong"
+        ],
+        "standardizedLocations": [
+          "HK"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Infra Prod Management & Reliability Engineering",
+        "creationTs": 1782777600,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039881",
+        "positionUrl": "/careers/job/549798629974"
+      },
+      {
+        "id": 549798642102,
+        "displayJobId": "PT-JR039941",
+        "name": "Workforce Technology and Services (WTS) Incident Management & Response - Director",
+        "locations": [
+          "Tokyo, Japan"
+        ],
+        "standardizedLocations": [
+          "Tokyo,JP"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Workplace Operations & Support",
+        "creationTs": 1782777600,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039941",
+        "positionUrl": "/careers/job/549798642102"
+      },
+      {
+        "id": 549798615561,
+        "displayJobId": "PT-JR039812",
+        "name": "Lead Infrastructure Production Management & Reliability Engineer - Director",
+        "locations": [
+          "Hong Kong, Hong Kong"
+        ],
+        "standardizedLocations": [
+          "HK"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Infra Prod Management & Reliability Engineering",
+        "creationTs": 1782691200,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039812",
+        "positionUrl": "/careers/job/549798615561"
+      },
+      {
+        "id": 549796607947,
+        "displayJobId": "JR031772",
+        "name": "Director, Lead Software Engineer",
+        "locations": [
+          "Alpharetta, Georgia, United States of America"
+        ],
+        "standardizedLocations": [
+          "Alpharetta, GA, US"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Software Engineering",
+        "creationTs": 1773014400,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "JR031772",
+        "positionUrl": "/careers/job/549796607947"
+      },
+      {
+        "id": 549798642597,
+        "displayJobId": "PT-JR039952",
+        "name": "Database Engineer - Vice President",
+        "locations": [
+          "New York, New York, United States of America"
+        ],
+        "standardizedLocations": [
+          "New York, NY, US"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Software Engineering",
+        "creationTs": 1782777600,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039952",
+        "positionUrl": "/careers/job/549798642597"
+      },
+      {
+        "id": 549798658924,
+        "displayJobId": "PT-JR040053",
+        "name": "Data Engineer - Director",
+        "locations": [
+          "New York, New York, United States of America"
+        ],
+        "standardizedLocations": [
+          "New York, NY, US"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Data & Analytics Engineering",
+        "creationTs": 1782864000,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR040053",
+        "positionUrl": "/careers/job/549798658924"
+      },
+      {
+        "id": 549798285469,
+        "displayJobId": "PT-JR039072",
+        "name": "Java Tech Lead - Commodities Technology (Hybrid)",
+        "locations": [
+          "Montreal, Quebec, Canada"
+        ],
+        "standardizedLocations": [
+          "Montreal, QC, CA"
+        ],
+        "postedTs": 1783641600,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Software Engineering",
+        "creationTs": 1781568000,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039072",
+        "positionUrl": "/careers/job/549798285469"
+      },
+      {
+        "id": 549798642063,
+        "displayJobId": "PT-JR039945",
+        "name": "C++ Developer (Hybrid)",
+        "locations": [
+          "Montreal, Quebec, Canada"
+        ],
+        "standardizedLocations": [
+          "Montreal, QC, CA"
+        ],
+        "postedTs": 1783555200,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Software Engineering",
+        "creationTs": 1782777600,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR039945",
+        "positionUrl": "/careers/job/549798642063"
+      },
+      {
+        "id": 549797336744,
+        "displayJobId": "PT-JR035255",
+        "name": "Cryptography Infrastructure Engineer (Cybersecurity)",
+        "locations": [
+          "Glasgow, United Kingdom"
+        ],
+        "standardizedLocations": [
+          "Glasgow, Scotland, GB"
+        ],
+        "postedTs": 1783555200,
+        "solrScore": null,
+        "stars": 0,
+        "department": "Cybersecurity Engineering",
+        "creationTs": 1776384000,
+        "isHot": 0,
+        "workLocationOption": "onsite",
+        "locationFlexibility": null,
+        "atsJobId": "PT-JR035255",
+        "positionUrl": "/careers/job/549797336744"
+      }
+    ],
+    "filterDef": {
+      "facets": {
+        "locations": [
+          [
+            "Remote",
+            999999
+          ],
+          [
+            "New York, NY, United States",
+            325
+          ],
+          [
+            "Mumbai, MH, India",
+            99
+          ],
+          [
+            "NY, United States",
+            78
+          ],
+          [
+            "Budapest, Hungary",
+            54
+          ],
+          [
+            "Dallas, TX, United States",
+            52
+          ],
+          [
+            "Boston, MA, United States",
+            49
+          ],
+          [
+            "Alpharetta, GA, United States",
+            48
+          ],
+          [
+            "Hong Kong",
+            48
+          ],
+          [
+            "Glasgow, Scotland, United Kingdom",
+            41
+          ],
+          [
+            "London, England, United Kingdom",
+            37
+          ]
+        ]
+      },
+      "smartFilters": [
+        {
+          "type": "multi_select",
+          "filterName": "businessarea",
+          "title": "Business Area",
+          "options": [
+            {
+              "label": "Wealth Management",
+              "value": "wealth management"
+            },
+            {
+              "label": "Sales And Trading",
+              "value": "sales and trading"
+            },
+            {
+              "label": "Technology",
+              "value": "technology"
+            },
+            {
+              "label": "Legal And Compliance",
+              "value": "legal and compliance"
+            },
+            {
+              "label": "Finance",
+              "value": "finance"
+            },
+            {
+              "label": "Investment Management",
+              "value": "investment management"
+            },
+            {
+              "label": "Investment Banking",
+              "value": "investment banking"
+            },
+            {
+              "label": "Risk Management",
+              "value": "risk management"
+            },
+            {
+              "label": "Operations",
+              "value": "operations"
+            },
+            {
+              "label": "Administration",
+              "value": "administration"
+            },
+            {
+              "label": "Internal Audit",
+              "value": "internal audit"
+            },
+            {
+              "label": "Institutional Securities",
+              "value": "institutional securities"
+            },
+            {
+              "label": "Human Resources",
+              "value": "human resources"
+            },
+            {
+              "label": "Global Capital Markets",
+              "value": "global capital markets"
+            },
+            {
+              "label": "Research",
+              "value": "research"
+            },
+            {
+              "label": "Company Management",
+              "value": "company management"
+            },
+            {
+              "label": "Technology And Operations",
+              "value": "technology and operations"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 100,
+          "translateOptions": false,
+          "allowFreeText": false
+        },
+        {
+          "type": "multi_select",
+          "filterName": "employmenttype",
+          "title": "Employment Type",
+          "options": [
+            {
+              "label": "Full Time",
+              "value": "full time"
+            },
+            {
+              "label": "Part Time",
+              "value": "part time"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 10,
+          "translateOptions": false,
+          "allowFreeText": false
+        },
+        {
+          "type": "multi_select",
+          "filterName": "city",
+          "title": "City",
+          "options": [
+            {
+              "label": "New York",
+              "value": "New York"
+            },
+            {
+              "label": "Mumbai",
+              "value": "Mumbai"
+            },
+            {
+              "label": "Purchase",
+              "value": "Purchase"
+            },
+            {
+              "label": "Budapest",
+              "value": "Budapest"
+            },
+            {
+              "label": "Hong Kong",
+              "value": "Hong Kong"
+            },
+            {
+              "label": "Dallas",
+              "value": "Dallas"
+            },
+            {
+              "label": "Glasgow",
+              "value": "Glasgow"
+            },
+            {
+              "label": "London",
+              "value": "London"
+            },
+            {
+              "label": "Boston",
+              "value": "Boston"
+            },
+            {
+              "label": "Alpharetta",
+              "value": "Alpharetta"
+            },
+            {
+              "label": "Tokyo",
+              "value": "Tokyo"
+            },
+            {
+              "label": "Montreal",
+              "value": "Montreal"
+            },
+            {
+              "label": "Baltimore",
+              "value": "Baltimore"
+            },
+            {
+              "label": "San Francisco",
+              "value": "San Francisco"
+            },
+            {
+              "label": "Seattle",
+              "value": "Seattle"
+            },
+            {
+              "label": "Singapore",
+              "value": "Singapore"
+            },
+            {
+              "label": "Bengaluru",
+              "value": "Bengaluru"
+            },
+            {
+              "label": "Atlanta",
+              "value": "Atlanta"
+            },
+            {
+              "label": "Chicago",
+              "value": "Chicago"
+            },
+            {
+              "label": "Sandy",
+              "value": "Sandy"
+            },
+            {
+              "label": "Houston",
+              "value": "Houston"
+            },
+            {
+              "label": "South Jordan",
+              "value": "South Jordan"
+            },
+            {
+              "label": "Los Angeles",
+              "value": "Los Angeles"
+            },
+            {
+              "label": "Palo Alto",
+              "value": "Palo Alto"
+            },
+            {
+              "label": "Jersey City",
+              "value": "Jersey City"
+            },
+            {
+              "label": "Washington",
+              "value": "Washington"
+            },
+            {
+              "label": "Garden City",
+              "value": "Garden City"
+            },
+            {
+              "label": "Gilbert",
+              "value": "Gilbert"
+            },
+            {
+              "label": "Menlo Park",
+              "value": "Menlo Park"
+            },
+            {
+              "label": "Middleton",
+              "value": "Middleton"
+            },
+            {
+              "label": "Morristown",
+              "value": "Morristown"
+            },
+            {
+              "label": "West Des Moines",
+              "value": "West Des Moines"
+            },
+            {
+              "label": "Birmingham",
+              "value": "Birmingham"
+            },
+            {
+              "label": "Frankfurt",
+              "value": "Frankfurt"
+            },
+            {
+              "label": "Miami",
+              "value": "Miami"
+            },
+            {
+              "label": "Sao Paulo",
+              "value": "Sao Paulo"
+            },
+            {
+              "label": "Albuquerque",
+              "value": "Albuquerque"
+            },
+            {
+              "label": "Colchester",
+              "value": "Colchester"
+            },
+            {
+              "label": "Colorado Springs",
+              "value": "Colorado Springs"
+            },
+            {
+              "label": "Denver",
+              "value": "Denver"
+            },
+            {
+              "label": "Fort Lauderdale",
+              "value": "Fort Lauderdale"
+            },
+            {
+              "label": "Minneapolis",
+              "value": "Minneapolis"
+            },
+            {
+              "label": "Red Bank",
+              "value": "Red Bank"
+            },
+            {
+              "label": "San Jose",
+              "value": "San Jose"
+            },
+            {
+              "label": "Sydney",
+              "value": "Sydney"
+            },
+            {
+              "label": "Tampa",
+              "value": "Tampa"
+            },
+            {
+              "label": "Aventura",
+              "value": "Aventura"
+            },
+            {
+              "label": "Boca Raton",
+              "value": "Boca Raton"
+            },
+            {
+              "label": "Cincinnati",
+              "value": "Cincinnati"
+            },
+            {
+              "label": "Columbus",
+              "value": "Columbus"
+            },
+            {
+              "label": "Indianapolis",
+              "value": "Indianapolis"
+            },
+            {
+              "label": "Las Vegas",
+              "value": "Las Vegas"
+            },
+            {
+              "label": "Long Beach",
+              "value": "Long Beach"
+            },
+            {
+              "label": "Mclean",
+              "value": "Mclean"
+            },
+            {
+              "label": "Newport Beach",
+              "value": "Newport Beach"
+            },
+            {
+              "label": "Oak Brook",
+              "value": "Oak Brook"
+            },
+            {
+              "label": "Osaka",
+              "value": "Osaka"
+            },
+            {
+              "label": "Palm Beach Gardens",
+              "value": "Palm Beach Gardens"
+            },
+            {
+              "label": "Paramus",
+              "value": "Paramus"
+            },
+            {
+              "label": "Pasadena",
+              "value": "Pasadena"
+            },
+            {
+              "label": "Portland",
+              "value": "Portland"
+            },
+            {
+              "label": "Rochester",
+              "value": "Rochester"
+            },
+            {
+              "label": "Salt Lake City",
+              "value": "Salt Lake City"
+            },
+            {
+              "label": "San Mateo",
+              "value": "San Mateo"
+            },
+            {
+              "label": "Taipei",
+              "value": "Taipei"
+            },
+            {
+              "label": "Tempe",
+              "value": "Tempe"
+            },
+            {
+              "label": "Toms River",
+              "value": "Toms River"
+            },
+            {
+              "label": "Utica",
+              "value": "Utica"
+            },
+            {
+              "label": "Wayzata",
+              "value": "Wayzata"
+            },
+            {
+              "label": "West Conshohocken",
+              "value": "West Conshohocken"
+            },
+            {
+              "label": "Woodland Hills",
+              "value": "Woodland Hills"
+            },
+            {
+              "label": "Worcester",
+              "value": "Worcester"
+            },
+            {
+              "label": "Amsterdam",
+              "value": "Amsterdam"
+            },
+            {
+              "label": "Austin",
+              "value": "Austin"
+            },
+            {
+              "label": "Baton Rouge",
+              "value": "Baton Rouge"
+            },
+            {
+              "label": "Bethesda",
+              "value": "Bethesda"
+            },
+            {
+              "label": "Beverly Hills",
+              "value": "Beverly Hills"
+            },
+            {
+              "label": "Bloomfield Hills",
+              "value": "Bloomfield Hills"
+            },
+            {
+              "label": "Calgary",
+              "value": "Calgary"
+            },
+            {
+              "label": "Charlotte",
+              "value": "Charlotte"
+            },
+            {
+              "label": "Chesterfield",
+              "value": "Chesterfield"
+            },
+            {
+              "label": "Coral Gables",
+              "value": "Coral Gables"
+            },
+            {
+              "label": "Cupertino",
+              "value": "Cupertino"
+            },
+            {
+              "label": "Glens Falls",
+              "value": "Glens Falls"
+            },
+            {
+              "label": "Greenwood Village",
+              "value": "Greenwood Village"
+            },
+            {
+              "label": "Kingston",
+              "value": "Kingston"
+            },
+            {
+              "label": "Lafayette",
+              "value": "Lafayette"
+            },
+            {
+              "label": "Laguna Niguel",
+              "value": "Laguna Niguel"
+            },
+            {
+              "label": "Lake Oswego",
+              "value": "Lake Oswego"
+            },
+            {
+              "label": "Louisville",
+              "value": "Louisville"
+            },
+            {
+              "label": "Melbourne",
+              "value": "Melbourne"
+            },
+            {
+              "label": "Miami Beach",
+              "value": "Miami Beach"
+            },
+            {
+              "label": "Milwaukee",
+              "value": "Milwaukee"
+            },
+            {
+              "label": "Mount Laurel",
+              "value": "Mount Laurel"
+            },
+            {
+              "label": "Nashville",
+              "value": "Nashville"
+            },
+            {
+              "label": "Newtown Square",
+              "value": "Newtown Square"
+            },
+            {
+              "label": "Oakland",
+              "value": "Oakland"
+            },
+            {
+              "label": "Omaha",
+              "value": "Omaha"
+            },
+            {
+              "label": "Palm Harbor",
+              "value": "Palm Harbor"
+            },
+            {
+              "label": "Pittsburgh",
+              "value": "Pittsburgh"
+            },
+            {
+              "label": "Ponte Vedra Beach",
+              "value": "Ponte Vedra Beach"
+            },
+            {
+              "label": "Providence",
+              "value": "Providence"
+            },
+            {
+              "label": "Ridgeland",
+              "value": "Ridgeland"
+            },
+            {
+              "label": "Roanoke",
+              "value": "Roanoke"
+            },
+            {
+              "label": "San Antonio",
+              "value": "San Antonio"
+            },
+            {
+              "label": "Scottsdale",
+              "value": "Scottsdale"
+            },
+            {
+              "label": "Syracuse",
+              "value": "Syracuse"
+            },
+            {
+              "label": "Tucson",
+              "value": "Tucson"
+            },
+            {
+              "label": "Valencia",
+              "value": "Valencia"
+            },
+            {
+              "label": "Walnut Creek",
+              "value": "Walnut Creek"
+            },
+            {
+              "label": "West Palm Beach",
+              "value": "West Palm Beach"
+            },
+            {
+              "label": "Westlake Village",
+              "value": "Westlake Village"
+            },
+            {
+              "label": "Williamsburg",
+              "value": "Williamsburg"
+            },
+            {
+              "label": "Alexandria",
+              "value": "Alexandria"
+            },
+            {
+              "label": "Asheville",
+              "value": "Asheville"
+            },
+            {
+              "label": "Bakersfield",
+              "value": "Bakersfield"
+            },
+            {
+              "label": "Beavercreek",
+              "value": "Beavercreek"
+            },
+            {
+              "label": "Bellevue",
+              "value": "Bellevue"
+            },
+            {
+              "label": "Bend",
+              "value": "Bend"
+            },
+            {
+              "label": "Bloomington",
+              "value": "Bloomington"
+            },
+            {
+              "label": "Boise",
+              "value": "Boise"
+            },
+            {
+              "label": "Bowling Green",
+              "value": "Bowling Green"
+            },
+            {
+              "label": "Buffalo",
+              "value": "Buffalo"
+            },
+            {
+              "label": "Carlsbad",
+              "value": "Carlsbad"
+            },
+            {
+              "label": "Charlottesville",
+              "value": "Charlottesville"
+            },
+            {
+              "label": "Clayton",
+              "value": "Clayton"
+            },
+            {
+              "label": "Copenhagen",
+              "value": "Copenhagen"
+            },
+            {
+              "label": "East Lansing",
+              "value": "East Lansing"
+            },
+            {
+              "label": "Farmington Hills",
+              "value": "Farmington Hills"
+            },
+            {
+              "label": "Greensburg",
+              "value": "Greensburg"
+            },
+            {
+              "label": "Greenville",
+              "value": "Greenville"
+            },
+            {
+              "label": "Greenwich",
+              "value": "Greenwich"
+            },
+            {
+              "label": "Hagerstown",
+              "value": "Hagerstown"
+            },
+            {
+              "label": "Honolulu",
+              "value": "Honolulu"
+            },
+            {
+              "label": "Hudson",
+              "value": "Hudson"
+            },
+            {
+              "label": "Hunt Valley",
+              "value": "Hunt Valley"
+            },
+            {
+              "label": "Huntsville",
+              "value": "Huntsville"
+            },
+            {
+              "label": "Hyannis",
+              "value": "Hyannis"
+            },
+            {
+              "label": "Jacksonville",
+              "value": "Jacksonville"
+            },
+            {
+              "label": "Jericho",
+              "value": "Jericho"
+            },
+            {
+              "label": "Johannesburg",
+              "value": "Johannesburg"
+            },
+            {
+              "label": "Kingsport",
+              "value": "Kingsport"
+            },
+            {
+              "label": "Knoxville",
+              "value": "Knoxville"
+            },
+            {
+              "label": "Lawrenceville",
+              "value": "Lawrenceville"
+            },
+            {
+              "label": "Lexington",
+              "value": "Lexington"
+            },
+            {
+              "label": "Lisle",
+              "value": "Lisle"
+            },
+            {
+              "label": "Los Gatos",
+              "value": "Los Gatos"
+            },
+            {
+              "label": "Monterey",
+              "value": "Monterey"
+            },
+            {
+              "label": "Naples",
+              "value": "Naples"
+            },
+            {
+              "label": "New Albany",
+              "value": "New Albany"
+            },
+            {
+              "label": "New Orleans",
+              "value": "New Orleans"
+            },
+            {
+              "label": "Newport",
+              "value": "Newport"
+            },
+            {
+              "label": "Newport News",
+              "value": "Newport News"
+            },
+            {
+              "label": "Norwell",
+              "value": "Norwell"
+            },
+            {
+              "label": "Orland Park",
+              "value": "Orland Park"
+            },
+            {
+              "label": "Orlando",
+              "value": "Orlando"
+            },
+            {
+              "label": "Ormond Beach",
+              "value": "Ormond Beach"
+            },
+            {
+              "label": "Oxnard",
+              "value": "Oxnard"
+            },
+            {
+              "label": "Paris",
+              "value": "Paris"
+            },
+            {
+              "label": "Pepper Pike",
+              "value": "Pepper Pike"
+            },
+            {
+              "label": "Pleasanton",
+              "value": "Pleasanton"
+            },
+            {
+              "label": "Poughkeepsie",
+              "value": "Poughkeepsie"
+            },
+            {
+              "label": "Raleigh",
+              "value": "Raleigh"
+            },
+            {
+              "label": "Richmond",
+              "value": "Richmond"
+            },
+            {
+              "label": "Riverside",
+              "value": "Riverside"
+            },
+            {
+              "label": "Rockford",
+              "value": "Rockford"
+            },
+            {
+              "label": "Rockville",
+              "value": "Rockville"
+            },
+            {
+              "label": "Salem",
+              "value": "Salem"
+            },
+            {
+              "label": "San Rafael",
+              "value": "San Rafael"
+            },
+            {
+              "label": "Santa Ana",
+              "value": "Santa Ana"
+            },
+            {
+              "label": "Santa Barbara",
+              "value": "Santa Barbara"
+            },
+            {
+              "label": "Santa Monica",
+              "value": "Santa Monica"
+            },
+            {
+              "label": "Santa Rosa",
+              "value": "Santa Rosa"
+            },
+            {
+              "label": "Scotts Valley",
+              "value": "Scotts Valley"
+            },
+            {
+              "label": "Shrewsbury",
+              "value": "Shrewsbury"
+            },
+            {
+              "label": "St Petersburg",
+              "value": "St Petersburg"
+            },
+            {
+              "label": "Tallahassee",
+              "value": "Tallahassee"
+            },
+            {
+              "label": "Toronto",
+              "value": "Toronto"
+            },
+            {
+              "label": "Traverse City",
+              "value": "Traverse City"
+            },
+            {
+              "label": "Tulsa",
+              "value": "Tulsa"
+            },
+            {
+              "label": "Vero Beach",
+              "value": "Vero Beach"
+            },
+            {
+              "label": "Wellesley",
+              "value": "Wellesley"
+            },
+            {
+              "label": "Westborough",
+              "value": "Westborough"
+            },
+            {
+              "label": "Westlake",
+              "value": "Westlake"
+            },
+            {
+              "label": "Winston-Salem",
+              "value": "Winston-Salem"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 1000,
+          "translateOptions": false,
+          "allowFreeText": false
+        }
+      ],
+      "allFilters": [
+        {
+          "type": "multi_select",
+          "filterName": "country",
+          "title": "Country",
+          "options": [
+            {
+              "label": "United States of America",
+              "value": "United States of America"
+            },
+            {
+              "label": "India",
+              "value": "India"
+            },
+            {
+              "label": "United Kingdom",
+              "value": "United Kingdom"
+            },
+            {
+              "label": "Hungary",
+              "value": "Hungary"
+            },
+            {
+              "label": "Hong Kong",
+              "value": "Hong Kong"
+            },
+            {
+              "label": "Japan",
+              "value": "Japan"
+            },
+            {
+              "label": "Canada",
+              "value": "Canada"
+            },
+            {
+              "label": "Singapore",
+              "value": "Singapore"
+            },
+            {
+              "label": "Australia",
+              "value": "Australia"
+            },
+            {
+              "label": "Brazil",
+              "value": "Brazil"
+            },
+            {
+              "label": "Germany",
+              "value": "Germany"
+            },
+            {
+              "label": "Taiwan",
+              "value": "Taiwan"
+            },
+            {
+              "label": "Netherlands",
+              "value": "Netherlands"
+            },
+            {
+              "label": "Denmark",
+              "value": "Denmark"
+            },
+            {
+              "label": "France",
+              "value": "France"
+            },
+            {
+              "label": "South Africa",
+              "value": "South Africa"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 100,
+          "translateOptions": false,
+          "allowFreeText": false
+        },
+        {
+          "type": "multi_select_suggest",
+          "filterName": "skills",
+          "title": "Skills",
+          "options": [
+            {
+              "label": "Teamwork",
+              "value": "Teamwork"
+            },
+            {
+              "label": "Microsoft Excel",
+              "value": "Microsoft Excel"
+            },
+            {
+              "label": "Finance",
+              "value": "Finance"
+            },
+            {
+              "label": "Reporting",
+              "value": "Reporting"
+            },
+            {
+              "label": "Financial Analysis",
+              "value": "Financial Analysis"
+            },
+            {
+              "label": "Wealth Management",
+              "value": "Wealth Management"
+            },
+            {
+              "label": "Security",
+              "value": "Security"
+            },
+            {
+              "label": "Equity Analysis",
+              "value": "Equity Analysis"
+            },
+            {
+              "label": "Compliance",
+              "value": "Compliance"
+            },
+            {
+              "label": "Financial Services",
+              "value": "Financial Services"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 10,
+          "translateOptions": false,
+          "allowFreeText": false
+        },
+        {
+          "type": "multi_select",
+          "filterName": "pcsjoblevel",
+          "title": "Job Level",
+          "options": [
+            {
+              "label": "Professional",
+              "value": "professional"
+            },
+            {
+              "label": "Vice President",
+              "value": "vice president"
+            },
+            {
+              "label": "Executive Director",
+              "value": "executive director"
+            },
+            {
+              "label": "Managing Director",
+              "value": "managing director"
+            }
+          ],
+          "tooltip": null,
+          "extraData": {},
+          "displayCount": 10,
+          "translateOptions": false,
+          "allowFreeText": false
+        }
+      ]
+    },
+    "count": 112,
+    "sortBy": "timestamp",
+    "appliedFilters": {
+      "businessarea": [
+        "technology"
+      ]
+    },
+    "debug": {},
+    "savedSearchMetadata": {
+      "savedSearchParamsHash": null,
+      "isSavedSearchActive": false
+    },
+    "resultsMetaData": {
+      "usedFuzzSearch": false,
+      "mocTitle": null
+    }
+  },
+  "metadata": null
+}

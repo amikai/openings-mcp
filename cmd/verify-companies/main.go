@@ -23,10 +23,11 @@ import (
 	"github.com/peterbourgon/ff/v4/ffhelp"
 
 	"github.com/amikai/openings-mcp/internal/ats"
+	"github.com/amikai/openings-mcp/internal/provider/eightfold"
 )
 
 // providerOrder fixes the --provider default and the report's grouping order.
-var providerOrder = []string{"ashby", "greenhouse", "lever", "recruitee", "teamtailor", "workday"}
+var providerOrder = []string{"ashby", "eightfold", "greenhouse", "lever", "recruitee", "teamtailor", "workday"}
 
 // Result statuses. ERROR covers every failed check — a stale identifier
 // (upstream 404) and a transient failure (timeout, 5xx) alike; Detail
@@ -154,6 +155,10 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 		switch name {
 		case "ashby":
 			a, err = ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
+		case "eightfold":
+			// Eightfold's edge 403s Go's default User-Agent instead of
+			// returning JSON, so it gets its own client rather than hc.
+			a = ats.NewEightfoldAdapter(&http.Client{Transport: eightfold.BrowserTransport{}})
 		case "greenhouse":
 			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
 		case "lever":

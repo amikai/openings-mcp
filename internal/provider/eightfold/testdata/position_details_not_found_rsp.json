@@ -1,0 +1,8 @@
+{
+  "status": 404,
+  "error": {
+    "message": "Position not found"
+  },
+  "data": {},
+  "metadata": null
+}

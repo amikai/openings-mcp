@@ -1,0 +1,60 @@
+{
+  "status": 200,
+  "error": {
+    "message": "",
+    "body": ""
+  },
+  "data": {
+    "id": 549798858854,
+    "displayJobId": "PT-JR040351",
+    "name": "Vice President - Prin Software Eng",
+    "locations": [
+      "Bengaluru, Karnataka, India"
+    ],
+    "standardizedLocations": [
+      "Bengaluru, KA, IN"
+    ],
+    "postedTs": 1783900800,
+    "stars": 0,
+    "department": "Software Engineering",
+    "creationTs": 1783555200,
+    "jobDescription": "<p><b>Morgan Stanley</b></p><p></p><p><b>Java developer - Vice President - Software Engineering</b></p><p></p><p><b>Profile Description</b></p><p></p><p>We\u2019re seeking someone to join our FRPPE Tech team as JAVA Developer/Technical Manager position for Operations Technology Team to develop Core Platform Services to help drive program automation and strategy.</p><p></p><p><b>Super Department</b><br>\u00a0</p><p>The Operations Technology division is responsible for building and operating the technology platform catering to critical business processes at Morgan Stanley including Settlements, Regulatory Reporting, Client Reference Data, Position Keeping, Corporate Actions processing and other post-trade functions. The Firm operates at scale with up to 40 million trades processed on peak volume days and hundreds of billions of dollars of daily settlements with activity ongoing in multiple countries and currencies across the globe.</p><p></p><p>There is a great breadth of financial products that our Operations plant handles across equity and fixed income, from cash products to complex derivatives and loans.<br>\u00a0</p><p><b>Department</b><br>\u00a0</p><p>Transaction Reporting, part of Operations Technology, is responsible for building scalable solutions to meet the Firm's trade reporting commitments. This is a 24x5 system, receiving real-time feeds from different trade booking systems across Listed Cash, Listed Derivatives and OTC Derivatives. Our systems consume these feeds and generate reports according to the regulatory specifications defined by each country involved in the trade. The challenge is both functional, to understand complex trade bookings and generate trade reports, as well as technical, to meet the strict time deadlines imposed by regulators while handling massive amount of data across the Firm.</p><p></p><p></p><p>In the Technology division, we leverage innovation to build the connections and capabilities that power our Firm, enabling our clients and colleagues to redefine markets and shape the future of our communities.</p><p></p><p>This is a Lead Software Engineer, which is part of the job family responsible for\u00a0developing and maintaining software solutions that support business needs.</p><p></p><p>Since 1935, Morgan Stanley is known as a global leader in financial services, always evolving and innovating to better serve our clients and our communities in more than 40 countries around the world.</p><p></p><p></p><p><b>What you\u2019ll do in the role:</b></p><p></p><ul><li><p>You are required to be a technologist with solid command on distributed development tools and tech-stack - primarily Java and Java-based web development, Angular, databases, frameworks for enterprise system development, enterprise integration patterns, cloud-focused architecture and tools.</p></li><li><p>You will be owning the development on new platform as per established best practices, adhering to standards set up by the group and with diligent focus on Usability, Cloud Adoption and User Experience.</p></li><li><p>Role involves broad engagement with our wide user base, distributed across the globe to come up with effective user interface for our onboarding and regulatory platform.</p></li><li><p>You will be involved with every facet of software development, from requirement analysis, design and development to helping the team continuously improve its agile development practices.</p></li></ul><p></p><p><b>What you\u2019ll bring to the role:</b></p><p></p><ul><li><p>Strong Senior Technologist with 10+ years of career experience and advanced knowledge on Java and Java-based technology stack.</p></li><li><p>At least 10 years relevant experience would generally be expected to find the skills required for this role.</p></li><li><p>Experience with web service development, REST and Service-Oriented Architecture.</p></li><li><p>Expertise in Object-Oriented Design, Design patterns, Architecture and Application Integration.</p></li><li><p>Working knowledge of Databases including Design and SQL proficiency.</p></li><li><p>Strong experience with frameworks used for development and automated testing like Spring, JUnit, BDD etc.</p></li><li><p>Experience with Unix/Linux.</p></li><li><p>Ability to coordinate with multiple groups, both internal and external to the firm, including offshore development and QA teams, internal infrastructure groups, vendors, and support teams.</p></li><li><p>Strong development skills with ability to understand technical design and translate the same into workable solution.</p></li><li><p>Familiarity with working in a large team.</p></li><li><p>Ability and willingness to learn new technologies and work on the same to meet business requirements.</p></li><li><p>A background that includes strong problem solving such as system integration, infrastructure debugging, or system administration.</p></li><li><p>Experience in effectively executing IT strategy, delivery and complex initiatives.</p></li><li><p>Ability to present information in a clear and concise manner to technology and business leadership.</p></li><li><p>\u00a0Advanced understanding of functional area and competent understanding of competitive environment.</p></li></ul><p></p><p><b>WHAT YOU CAN EXPECT FROM MORGAN STANLEY:</b> </p><p></p><p> At Morgan Stanley, we raise, manage and allocate capital for our clients \u2013 helping them reach their goals. We do it in a way that\u2019s differentiated \u2013 and we\u2019ve done that for 90 years. \u00a0Our values - putting clients first, doing the right thing, leading with exceptional ideas, committing to diversity and inclusion, and giving back - aren\u2019t just beliefs, they guide the decisions we make every day to do what's best for our clients, communities and more than 80,000 employees in 1,200 offices across 42 countries. At Morgan Stanley, you\u2019ll find an opportunity to work alongside the best and the brightest, in an environment where you are supported and empowered. Our teams are relentless collaborators and creative thinkers, fueled by their diverse backgrounds and experiences. We are proud to support our employees and their families at every point along their work-life journey, offering some of the most attractive and comprehensive employee benefits and perks in the industry. There\u2019s also ample opportunity to move about the business for those who show passion and grit in their work. </p><p></p><p>To learn more about our offices across the globe, please copy and paste https://www.morganstanley.com/about-us/global-offices\u200b into your browser.</p><p></p><p style=\"text-align:inherit !important\"></p><p style=\"text-align:left !important\"><span style=\"color:#172b4d\">Morgan Stanley is an equal opportunity employer committed to building and maintaining a workforce that is diverse in experience and background.\u00a0 Our recruiting efforts reflect our strong commitment to a culture of inclusion, where individuals are hired, developed, and advanced based on their skills and talents.</span></p><p></p><p>Our workforce reflects a broad cross-section of the global communities in which we operate, bringing a variety of backgrounds, talents, perspectives, and experiences.</p><p></p><p><span style=\"color:#172b4d\">For more information, please visit: </span><a target=\"_blank\" href=\"https://www.morganstanley.com/people-opportunities/eeo\"><span style=\"color:#0052cc\">https://www.morganstanley.com/people-opportunities/eeo</span></a><span style=\"color:#172b4d\">.</span> </p><p></p>",
+    "location": "Bengaluru, Karnataka, India",
+    "isHot": 0,
+    "workLocationOption": "hybrid",
+    "locationFlexibility": null,
+    "atsJobId": "PT-JR040351",
+    "positionUrl": "/careers/job/549798858854",
+    "publicUrl": "https://morganstanley.eightfold.ai/careers/job/549798858854",
+    "efcustomTextTextTimeType": [
+      "Full time"
+    ],
+    "efcustomTextPcsPostingJobLevel": [
+      "Vice President"
+    ],
+    "jdHighlight": [],
+    "positionExtraDetails": {
+      "videos": [],
+      "blogs": [],
+      "perks": [],
+      "pymww": {
+        "people": [],
+        "count": 0
+      },
+      "customContent": [
+        {
+          "body": "",
+          "title": ""
+        }
+      ]
+    },
+    "positionUserActions": {
+      "isSaved": false,
+      "applyAction": {
+        "status": "link_off",
+        "applyUrl": "https://ms.wd5.myworkdayjobs.com/External/job/Bengaluru-India/Vice-President---Prin-Software-Eng_PT-JR040351-1/apply?src=Eightfold"
+      }
+    }
+  },
+  "metadata": null
+}

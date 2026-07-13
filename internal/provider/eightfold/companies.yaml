@@ -1,0 +1,15 @@
+- company: Eaton
+  tenant: eaton
+  domain: eaton.com
+- company: Infineon
+  tenant: infineon
+  domain: infineon.com
+- company: Lam Research
+  tenant: lamresearch
+  domain: lamresearch.com
+- company: Qualcomm
+  tenant: qualcomm
+  domain: qualcomm.com
+- company: Vodafone
+  tenant: vodafone
+  domain: vodafone.com
