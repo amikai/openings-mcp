@@ -15,7 +15,8 @@ var _ Handler = UnimplementedHandler{}
 
 // GetJobs implements getJobs operation.
 //
-// Return every current job on the career site.
+// Runtime data operation called directly against the selected career-site origin. It does not require
+// a preceding request to `/.well-known/api-catalog`.
 //
 // GET /jobs.json
 func (UnimplementedHandler) GetJobs(ctx context.Context) (r GetJobsRes, _ error) {

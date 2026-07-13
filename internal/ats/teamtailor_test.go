@@ -42,7 +42,12 @@ func TestTeamtailorParseCareersURL(t *testing.T) {
 		wantOK   bool
 	}{
 		{name: "curated", rawURL: "https://career.teamtailor.com/jobs/1-role", wantSlug: "career.teamtailor.com", wantOK: true},
-		{name: "unlisted eu", rawURL: "https://acme.teamtailor.com/jobs", wantSlug: "acme.teamtailor.com", wantOK: true},
+		{
+			name:     "unlisted eu",
+			rawURL:   "https://" + teamtailor.MockNonRosterHost + "/jobs",
+			wantSlug: teamtailor.MockNonRosterHost,
+			wantOK:   true,
+		},
 		{name: "unlisted na", rawURL: "https://acme.na.teamtailor.com/jobs", wantSlug: "acme.na.teamtailor.com", wantOK: true},
 		{name: "unlisted au", rawURL: "https://acme.au.teamtailor.com/jobs", wantSlug: "acme.au.teamtailor.com", wantOK: true},
 		{name: "curated custom domain", rawURL: "https://careers.example.com/jobs", wantSlug: "careers.example.com", wantOK: true},

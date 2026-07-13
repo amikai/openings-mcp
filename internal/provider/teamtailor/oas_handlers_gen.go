@@ -34,7 +34,8 @@ func (c *codeRecorder) Unwrap() http.ResponseWriter {
 
 // handleGetJobsRequest handles getJobs operation.
 //
-// Return every current job on the career site.
+// Runtime data operation called directly against the selected career-site origin. It does not require
+// a preceding request to `/.well-known/api-catalog`.
 //
 // GET /jobs.json
 func (s *Server) handleGetJobsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {

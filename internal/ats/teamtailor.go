@@ -18,6 +18,10 @@ var _ Adapter = (*TeamtailorAdapter)(nil)
 // TeamtailorAdapter serves Teamtailor career sites. The public /jobs.json
 // endpoint returns the complete board with full descriptions, so all search,
 // filter, and detail behavior is implemented over that dump.
+//
+// The feed has no explicit remote-work signal. A location search for "remote"
+// therefore matches only when the structured address itself contains that
+// word; remote-first postings that list an office address cannot be detected.
 type TeamtailorAdapter struct {
 	hc      *http.Client
 	baseURL func(host string) string

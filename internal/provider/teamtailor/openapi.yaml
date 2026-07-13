@@ -5,10 +5,13 @@ info:
   version: "1.0.0"
   description: >
     Minimal client surface for Teamtailor's unauthenticated career-site job
-    feed. Every Teamtailor career site advertises `/jobs.json` through
-    `/.well-known/api-catalog` as an `application/feed+json` service. The
-    response follows JSON Feed 1.1 and adds a Schema.org JobPosting object to
-    each item under `_jobposting`.
+    feed. Teamtailor career sites advertise `/jobs.json` through
+    `/.well-known/api-catalog` as an `application/feed+json` service. That
+    catalog is discovery metadata only: it is not part of this client surface,
+    and runtime callers neither fetch nor depend on it. Once a career-site
+    origin is known, callers request `/jobs.json` directly. The response
+    follows JSON Feed 1.1 and adds a Schema.org JobPosting object to each item
+    under `_jobposting`.
 
     The endpoint returns the complete current board with full HTML
     descriptions. It has no server-side search, filters, pagination, or
@@ -35,6 +38,10 @@ paths:
       tags: [Jobs]
       operationId: getJobs
       summary: Return every current job on the career site
+      description: >
+        Runtime data operation called directly against the selected career-site
+        origin. It does not require a preceding request to
+        `/.well-known/api-catalog`.
       responses:
         "200":
           description: The complete current job feed.

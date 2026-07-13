@@ -29,7 +29,8 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// GetJobs invokes getJobs operation.
 	//
-	// Return every current job on the career site.
+	// Runtime data operation called directly against the selected career-site origin. It does not require
+	// a preceding request to `/.well-known/api-catalog`.
 	//
 	// GET /jobs.json
 	GetJobs(ctx context.Context) (GetJobsRes, error)
@@ -76,7 +77,8 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // GetJobs invokes getJobs operation.
 //
-// Return every current job on the career site.
+// Runtime data operation called directly against the selected career-site origin. It does not require
+// a preceding request to `/.well-known/api-catalog`.
 //
 // GET /jobs.json
 func (c *Client) GetJobs(ctx context.Context) (GetJobsRes, error) {
