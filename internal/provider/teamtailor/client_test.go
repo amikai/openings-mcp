@@ -4,6 +4,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -20,26 +21,47 @@ func TestGetJobs(t *testing.T) {
 
 	feed, ok := res.(*CareerFeed)
 	require.True(t, ok, "want *CareerFeed, got %T", res)
-	assert.Equal(t, "https://jsonfeed.org/version/1.1", feed.Version)
-	assert.Equal(t, "Knauf Belgium", feed.Title)
-	assert.Equal(t, "https://knaufsemea.teamtailor.com/jobs", feed.HomePageURL)
-	assert.Equal(t, "https://knaufsemea.teamtailor.com/jobs.json", feed.FeedURL)
 	require.Len(t, feed.Items, 3)
 
-	job := feed.Items[0]
-	assert.Equal(t, "a97df59d-7a99-4387-8956-8e032e8bf793", job.ID.String())
-	assert.Equal(t, "Electromécanicien de maintenance (H/F/X)", job.Title)
-	assert.Equal(t, "https://knaufsemea.teamtailor.com/jobs/7890179-electromecanicien-de-maintenance-h-f-x", job.URL)
-	assert.True(t, job.DatePublished.Equal(time.Date(2026, 6, 11, 6, 19, 40, 0, time.UTC)))
-	assert.NotEmpty(t, job.ContentHTML)
+	wantFeed := &CareerFeed{
+		Version:     "https://jsonfeed.org/version/1.1",
+		Title:       "Knauf Belgium",
+		HomePageURL: "https://knaufsemea.teamtailor.com/jobs",
+		FeedURL:     "https://knaufsemea.teamtailor.com/jobs.json",
+	}
+	gotFeed := &CareerFeed{
+		Version:     feed.Version,
+		Title:       feed.Title,
+		HomePageURL: feed.HomePageURL,
+		FeedURL:     feed.FeedURL,
+	}
+	assert.Equal(t, wantFeed, gotFeed)
 
-	require.Len(t, job.Jobposting.JobLocation, 1)
-	address := job.Jobposting.JobLocation[0].Address
-	assert.Equal(t, NewNilString("Rue du Parc Industriel 1"), address.StreetAddress)
-	assert.Equal(t, "Engis", address.AddressLocality)
-	assert.Equal(t, NewNilString("4480"), address.PostalCode)
-	assert.Equal(t, "BE", address.AddressCountry)
-	assert.Equal(t, NewNilString("WE&I"), address.AddressRegion)
+	job := feed.Items[0]
+	assert.NotEmpty(t, job.ContentHTML)
+	assert.True(t, job.DatePublished.Equal(time.Date(2026, 6, 11, 6, 19, 40, 0, time.UTC)))
+
+	want := CareerItem{
+		ID:            uuid.MustParse("a97df59d-7a99-4387-8956-8e032e8bf793"),
+		Title:         "Electromécanicien de maintenance (H/F/X)",
+		URL:           "https://knaufsemea.teamtailor.com/jobs/7890179-electromecanicien-de-maintenance-h-f-x",
+		DatePublished: job.DatePublished,
+		ContentHTML:   job.ContentHTML,
+		Jobposting: JobPosting{
+			JobLocation: []Place{
+				{
+					Address: PostalAddress{
+						StreetAddress:   NewNilString("Rue du Parc Industriel 1"),
+						AddressLocality: "Engis",
+						PostalCode:      NewNilString("4480"),
+						AddressCountry:  "BE",
+						AddressRegion:   NewNilString("WE&I"),
+					},
+				},
+			},
+		},
+	}
+	assert.Equal(t, want, job)
 }
 
 func TestGetJobsNotFound(t *testing.T) {
