@@ -25,13 +25,28 @@ func TestGetOffers(t *testing.T) {
 
 	// Verify first item is parsed correctly
 	offer := feed.Offers[0]
-	assert.Equal(t, 2675345, offer.ID)
-	assert.Equal(t, recruitee.NewNilString("Fraud Ops Expert"), offer.Title)
-	assert.Equal(t, recruitee.NewOptNilString("Support & Operations"), offer.Department)
-	assert.Equal(t, recruitee.NewNilString("https://careers.bunq.com/o/fraud-ops-expert"), offer.CareersURL)
-	assert.Equal(t, recruitee.NewOptNilString("Sofia, Sofia (stolitsa), Bulgaria"), offer.Location)
-	assert.Equal(t, recruitee.NewOptNilString("2026-07-13 13:42:26 UTC"), offer.PublishedAt)
-	assert.Equal(t, recruitee.NewOptNilString("banking"), offer.CategoryCode)
+
+	wantID := 2675345
+	assert.Equal(t, wantID, offer.ID)
+
+	wantTitle := recruitee.NewNilString("Fraud Ops Expert")
+	assert.Equal(t, wantTitle, offer.Title)
+
+	wantDepartment := recruitee.NewOptNilString("Support & Operations")
+	assert.Equal(t, wantDepartment, offer.Department)
+
+	wantCareersURL := recruitee.NewNilString("https://careers.bunq.com/o/fraud-ops-expert")
+	assert.Equal(t, wantCareersURL, offer.CareersURL)
+
+	wantLocation := recruitee.NewOptNilString("Sofia, Sofia (stolitsa), Bulgaria")
+	assert.Equal(t, wantLocation, offer.Location)
+
+	wantPublishedAt := recruitee.NewOptNilString("2026-07-13 13:42:26 UTC")
+	assert.Equal(t, wantPublishedAt, offer.PublishedAt)
+
+	wantCategoryCode := recruitee.NewOptNilString("banking")
+	assert.Equal(t, wantCategoryCode, offer.CategoryCode)
+
 	assert.Contains(t, offer.Tags, "Promise Keeper")
 }
 
@@ -63,9 +78,18 @@ func TestGetOffersNullFields(t *testing.T) {
 	require.Len(t, feed.Offers, 1)
 
 	offer := feed.Offers[0]
-	assert.Equal(t, 12345, offer.ID)
-	assert.Equal(t, recruitee.OptNilString{Null: true, Set: true}, offer.Description)
-	assert.Equal(t, recruitee.OptNilString{Null: true, Set: true}, offer.Location)
-	assert.Equal(t, recruitee.OptNilSalary{Set: true, Null: true}, offer.Salary)
+
+	wantID := 12345
+	assert.Equal(t, wantID, offer.ID)
+
+	wantDescription := recruitee.OptNilString{Null: true, Set: true}
+	assert.Equal(t, wantDescription, offer.Description)
+
+	wantLocation := recruitee.OptNilString{Null: true, Set: true}
+	assert.Equal(t, wantLocation, offer.Location)
+
+	wantSalary := recruitee.OptNilSalary{Set: true, Null: true}
+	assert.Equal(t, wantSalary, offer.Salary)
+
 	assert.Empty(t, offer.Locations)
 }
