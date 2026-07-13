@@ -1,0 +1,33 @@
+{
+  "offers": [
+    {
+      "id": 12345,
+      "title": "Minimal Job",
+      "slug": "minimal-job",
+      "status": "published",
+      "position": 1,
+      "created_at": "2026-07-13 12:00:00 UTC",
+      "published_at": "2026-07-13 12:00:00 UTC",
+      "description": null,
+      "requirements": null,
+      "careers_url": "https://minimal.recruitee.com/o/minimal-job",
+      "careers_apply_url": "https://minimal.recruitee.com/o/minimal-job/c/new",
+      "location": null,
+      "locations": [],
+      "city": null,
+      "country": null,
+      "country_code": null,
+      "state_code": null,
+      "remote": false,
+      "hybrid": false,
+      "on_site": false,
+      "employment_type_code": null,
+      "experience_code": null,
+      "education_code": null,
+      "category_code": null,
+      "department": null,
+      "tags": [],
+      "salary": null
+    }
+  ]
+}

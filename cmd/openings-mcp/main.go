@@ -188,6 +188,7 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 		ashbyAdapter,
 		greenhouseAdapter,
 		ats.NewTeamtailorAdapter(hc),
+		ats.NewRecruiteeAdapter(hc),
 	)
 }
 

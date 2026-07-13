@@ -104,6 +104,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"lever":      "jobs.lever.co/<org>",
 	"ashby":      "jobs.ashbyhq.com/<org>",
 	"teamtailor": "<company>[.na|.au].teamtailor.com/jobs",
+	"recruitee":  "<company>.recruitee.com/o/<job>",
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered

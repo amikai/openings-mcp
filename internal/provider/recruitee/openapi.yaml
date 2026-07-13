@@ -1,0 +1,198 @@
+openapi: 3.1.0
+
+info:
+  title: Recruitee Public Careers API
+  version: "1.0.0"
+  description: >
+    Minimal client surface for Recruitee's public career site job offers feed.
+    Each company has a subdomain on `*.recruitee.com` (or a custom domain) and
+    advertises open positions at `https://{subdomain}.recruitee.com/api/offers/`.
+
+    This endpoint returns all published job offers for the company in a single
+    response. It has no server-side search, filters, pagination, or separate
+    detail endpoint. Callers construct a client against one company's origin
+    and filter or select from the dump locally.
+
+servers:
+  - url: https://example.recruitee.com
+    description: Production career site template
+
+tags:
+  - name: Jobs
+    description: Public career-site jobs
+
+paths:
+  /api/offers:
+    get:
+      tags: [Jobs]
+      operationId: getOffers
+      summary: Return every current job offer on the career site
+      responses:
+        "200":
+          description: The list of job offers.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OffersResponse"
+        "404":
+          description: Company not found.
+
+components:
+  schemas:
+    OffersResponse:
+      type: object
+      required: [offers]
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Offer"
+
+    Offer:
+      type: object
+      required:
+        - id
+        - title
+        - slug
+        - careers_url
+        - careers_apply_url
+      properties:
+        id:
+          type: integer
+          description: Job ID.
+          example: 2547884
+        title:
+          type: string
+          nullable: true
+          description: Job title.
+          example: "Senior Full Stack Engineer"
+        slug:
+          type: string
+          nullable: true
+          description: URL slug.
+          example: "senior-full-stack-engineer"
+        status:
+          type: string
+          nullable: true
+          description: Listing status.
+          example: "published"
+        position:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          nullable: true
+          description: UTC creation time string.
+          example: "2026-03-30 15:53:39 UTC"
+        published_at:
+          type: string
+          nullable: true
+          description: UTC publish time string.
+          example: "2026-06-01 12:02:02 UTC"
+        description:
+          type: string
+          nullable: true
+          description: Full description HTML.
+        requirements:
+          type: string
+          nullable: true
+          description: Requirements HTML.
+        careers_url:
+          type: string
+          nullable: true
+          description: Public career site job posting URL.
+          example: "https://jobs.hygraph.com/o/senior-full-stack-engineer"
+        careers_apply_url:
+          type: string
+          nullable: true
+          description: Direct application URL.
+          example: "https://jobs.hygraph.com/o/senior-full-stack-engineer/c/new"
+        location:
+          type: string
+          nullable: true
+          description: Free-form location text.
+          example: "Berlin, Berlin, Germany"
+        locations:
+          type: array
+          description: List of location details.
+          items:
+            $ref: "#/components/schemas/Location"
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        country_code:
+          type: string
+          nullable: true
+        state_code:
+          type: string
+          nullable: true
+        remote:
+          type: boolean
+          nullable: true
+        hybrid:
+          type: boolean
+          nullable: true
+        on_site:
+          type: boolean
+          nullable: true
+        employment_type_code:
+          type: string
+          nullable: true
+        experience_code:
+          type: string
+          nullable: true
+        education_code:
+          type: string
+          nullable: true
+        category_code:
+          type: string
+          nullable: true
+        department:
+          type: string
+          nullable: true
+        tags:
+          type: array
+          items:
+            type: string
+        salary:
+          allOf:
+            - $ref: "#/components/schemas/Salary"
+          nullable: true
+
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: true
+        name:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        country_code:
+          type: string
+          nullable: true
+
+    Salary:
+      type: object
+      properties:
+        min:
+          type: string
+          nullable: true
+        max:
+          type: string
+          nullable: true
+        period:
+          type: string
+          nullable: true
+        currency:
+          type: string
+          nullable: true

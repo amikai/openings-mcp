@@ -12,9 +12,9 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 - **Company career sites**: 2,000+ companies hosted on the
   **[Workday](https://www.workday.com)**, **[Ashby](https://www.ashbyhq.com)**,
   **[Greenhouse](https://www.greenhouse.com)**, **[Lever](https://www.lever.co)**,
-  and **[Teamtailor](https://www.teamtailor.com)** ATS platforms, all behind one
-  company-search tool. A company outside the built-in roster works too: pass its
-  careers-page URL on any of those platforms.
+  **[Teamtailor](https://www.teamtailor.com)**, and **[Recruitee](https://recruitee.com)**
+  ATS platforms, all behind one company-search tool. A company outside the built-in
+  roster works too: pass its careers-page URL on any of those platforms.
 - **Dedicated sites**: **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
   **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
   **[TSMC careers](https://careers.tsmc.com)**.
