@@ -168,7 +168,7 @@ func cakeHTTPToMCPResponse(resp *cake.JobSearchResponse) *cakeSearchOutput {
 		Data:         make([]cakeJobSummary, 0, len(resp.Data)),
 	}
 	for _, j := range resp.Data {
-		pagePath := ""
+		var pagePath string
 		if page, ok := j.Page.Get(); ok {
 			pagePath = page.Path.Value
 		}

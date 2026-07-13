@@ -46,34 +46,34 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
-	keyword := searchFlags.StringLong("keyword", "", "case-insensitive substring filter on job titles")
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
+	keyword := searchFS.StringLong("keyword", "", "case-insensitive substring filter on job titles")
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "teamtailor --host HOST search [--keyword TEXT] [--format text|json]",
 		ShortHelp: "list one career site's jobs with a client-side title filter",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
 			}
-			return runSearch(ctx, *host, *timeout, *keyword, *format)
+			return runSearch(ctx, searchFlags{host: *host, timeout: *timeout, keyword: *keyword, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
-	jobID := getFlags.StringLong("id", "", "JSON Feed item id from a search result")
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
+	jobID := getFS.StringLong("id", "", "JSON Feed item id from a search result")
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "teamtailor --host HOST get --id ITEM-ID [--format text|json]",
 		ShortHelp: "print one job in full",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
 			}
-			return runGet(ctx, *host, *timeout, *jobID, *format)
+			return runGet(ctx, getFlags{host: *host, timeout: *timeout, jobID: *jobID, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -196,19 +196,21 @@ func locations(places []teamtailor.Place) string {
 	return strings.Join(parts, "; ")
 }
 
-func runSearch(
-	ctx context.Context,
-	host string,
-	timeout time.Duration,
-	keyword string,
-	format string,
-) error {
-	feed, err := fetchFeed(ctx, host, timeout)
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	host    string
+	timeout time.Duration
+	keyword string
+	format  string
+}
+
+func runSearch(ctx context.Context, f searchFlags) error {
+	feed, err := fetchFeed(ctx, f.host, f.timeout)
 	if err != nil {
 		return err
 	}
 
-	needle := strings.ToLower(strings.TrimSpace(keyword))
+	needle := strings.ToLower(strings.TrimSpace(f.keyword))
 	jobs := make([]jobSummaryJSON, 0, len(feed.Items))
 	for _, j := range feed.Items {
 		if needle != "" && !strings.Contains(strings.ToLower(j.Title), needle) {
@@ -217,7 +219,7 @@ func runSearch(
 		jobs = append(jobs, summarize(j))
 	}
 
-	if format == formatJSON {
+	if f.format == formatJSON {
 		return writeJSON(searchResultJSON{Total: len(jobs), Jobs: jobs})
 	}
 
@@ -240,23 +242,25 @@ func printSummary(j jobSummaryJSON) {
 	fmt.Printf("URL: %s\n", j.URL)
 }
 
-func runGet(
-	ctx context.Context,
-	host string,
-	timeout time.Duration,
-	jobID string,
-	format string,
-) error {
-	if jobID == "" {
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	host    string
+	timeout time.Duration
+	jobID   string
+	format  string
+}
+
+func runGet(ctx context.Context, f getFlags) error {
+	if f.jobID == "" {
 		return errors.New("--id is required")
 	}
-	feed, err := fetchFeed(ctx, host, timeout)
+	feed, err := fetchFeed(ctx, f.host, f.timeout)
 	if err != nil {
 		return err
 	}
 
 	for _, j := range feed.Items {
-		if j.ID.String() != jobID {
+		if j.ID.String() != f.jobID {
 			continue
 		}
 		description, err := html2text.FromString(j.ContentHTML, html2text.Options{})
@@ -268,7 +272,7 @@ func runGet(
 			Company:        feed.Title,
 			Description:    description,
 		}
-		if format == formatJSON {
+		if f.format == formatJSON {
 			return writeJSON(detail)
 		}
 		fmt.Println(detail.Title)
@@ -277,7 +281,7 @@ func runGet(
 		fmt.Println(detail.Description)
 		return nil
 	}
-	return fmt.Errorf("job %q not found for host %q; pass an id exactly as returned by search", jobID, host)
+	return fmt.Errorf("job %q not found for host %q; pass an id exactly as returned by search", f.jobID, f.host)
 }
 
 func writeJSON(v any) error {

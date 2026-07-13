@@ -49,42 +49,53 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
-		keyword    = searchFlags.StringLong("keyword", "", "free-text keyword search across posting titles")
-		country    = searchFlags.StringLong("country", "", "lowercase ISO country code, e.g. us")
-		region     = searchFlags.StringLong("region", "", "state/region code, e.g. TX")
-		city       = searchFlags.StringLong("city", "", "city name")
-		department = searchFlags.StringLong("department", "", "department.id value from a search result (not the display label)")
-		limit      = searchFlags.IntLong("limit", 20, "page size (upstream caps at 100)")
-		offset     = searchFlags.IntLong("offset", 0, "zero-based result offset")
+		keyword    = searchFS.StringLong("keyword", "", "free-text keyword search across posting titles")
+		country    = searchFS.StringLong("country", "", "lowercase ISO country code, e.g. us")
+		region     = searchFS.StringLong("region", "", "state/region code, e.g. TX")
+		city       = searchFS.StringLong("city", "", "city name")
+		department = searchFS.StringLong("department", "", "department.id value from a search result (not the display label)")
+		limit      = searchFS.IntLong("limit", 20, "page size (upstream caps at 100)")
+		offset     = searchFS.IntLong("offset", 0, "zero-based result offset")
 	)
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "smartrecruiters --company COMPANY search [--keyword TEXT] [--country CC] [--region R] [--city CITY] [--department ID] [--limit N] [--offset N] [--format text|json]",
 		ShortHelp: "search postings for a company (server-side filters)",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
 			}
-			return runSearch(ctx, *company, *timeout, *keyword, *country, *region, *city, *department, *limit, *offset, *format)
+			return runSearch(ctx, searchFlags{
+				company:    *company,
+				timeout:    *timeout,
+				keyword:    *keyword,
+				country:    *country,
+				region:     *region,
+				city:       *city,
+				department: *department,
+				limit:      *limit,
+				offset:     *offset,
+				format:     *format,
+			})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
-	postingID := getFlags.StringLong("id", "", "posting id from a search result")
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
+	postingID := getFS.StringLong("id", "", "posting id from a search result")
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "smartrecruiters --company COMPANY get --id POSTING-ID [--format text|json]",
 		ShortHelp: "print one posting in full (description sections and public URL)",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
 			}
-			return runGet(ctx, *company, *timeout, *postingID, *format)
+			return runGet(ctx, getFlags{company: *company, timeout: *timeout, postingID: *postingID, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -192,18 +203,25 @@ func printSummary(s postingSummaryJSON) {
 	fmt.Printf("ID: %s\n", s.ID)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	company    string
+	timeout    time.Duration
+	keyword    string
+	country    string
+	region     string
+	city       string
+	department string
+	limit      int
+	offset     int
+	format     string
+}
+
 // runSearch maps every flag directly onto the Posting API's real
 // server-side filters — unlike Greenhouse's client-side dump-and-filter,
 // SmartRecruiters does the narrowing upstream.
-func runSearch(
-	ctx context.Context,
-	company string,
-	timeout time.Duration,
-	keyword, country, region, city, department string,
-	limit, offset int,
-	format string,
-) error {
-	company, err := normalizeCompany(company)
+func runSearch(ctx context.Context, f searchFlags) error {
+	company, err := normalizeCompany(f.company)
 	if err != nil {
 		return err
 	}
@@ -211,14 +229,14 @@ func runSearch(
 	// numeric constraints, so nothing stops an out-of-range value from
 	// reaching the API — which either 400s opaquely (negative values) or
 	// silently returns an empty page (--limit 0) rather than erroring.
-	if limit < 1 || limit > 100 {
-		return fmt.Errorf("--limit must be between 1 and 100, got %d", limit)
+	if f.limit < 1 || f.limit > 100 {
+		return fmt.Errorf("--limit must be between 1 and 100, got %d", f.limit)
 	}
-	if offset < 0 {
-		return fmt.Errorf("--offset must be >= 0, got %d", offset)
+	if f.offset < 0 {
+		return fmt.Errorf("--offset must be >= 0, got %d", f.offset)
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := smartrecruiters.NewClient(apiBaseURL)
@@ -228,23 +246,23 @@ func runSearch(
 
 	params := smartrecruiters.ListPostingsParams{
 		CompanyIdentifier: company,
-		Limit:             smartrecruiters.NewOptInt(limit),
-		Offset:            smartrecruiters.NewOptInt(offset),
+		Limit:             smartrecruiters.NewOptInt(f.limit),
+		Offset:            smartrecruiters.NewOptInt(f.offset),
 	}
-	if keyword != "" {
-		params.Q = smartrecruiters.NewOptString(keyword)
+	if f.keyword != "" {
+		params.Q = smartrecruiters.NewOptString(f.keyword)
 	}
-	if country != "" {
-		params.Country = smartrecruiters.NewOptString(country)
+	if f.country != "" {
+		params.Country = smartrecruiters.NewOptString(f.country)
 	}
-	if region != "" {
-		params.Region = smartrecruiters.NewOptString(region)
+	if f.region != "" {
+		params.Region = smartrecruiters.NewOptString(f.region)
 	}
-	if city != "" {
-		params.City = smartrecruiters.NewOptString(city)
+	if f.city != "" {
+		params.City = smartrecruiters.NewOptString(f.city)
 	}
-	if department != "" {
-		params.Department = smartrecruiters.NewOptString(department)
+	if f.department != "" {
+		params.Department = smartrecruiters.NewOptString(f.department)
 	}
 
 	res, err := client.ListPostings(ctx, params)
@@ -257,7 +275,7 @@ func runSearch(
 		jobs[i] = summarize(p)
 	}
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Total: res.TotalFound, Jobs: jobs})
@@ -273,19 +291,27 @@ func runSearch(
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	company   string
+	timeout   time.Duration
+	postingID string
+	format    string
+}
+
 // runGet fetches one posting in full via the Posting API's detail
 // endpoint, which — unlike the list endpoint — 404s for an unknown id
 // rather than returning an empty result.
-func runGet(ctx context.Context, company string, timeout time.Duration, postingID, format string) error {
-	company, err := normalizeCompany(company)
+func runGet(ctx context.Context, f getFlags) error {
+	company, err := normalizeCompany(f.company)
 	if err != nil {
 		return err
 	}
-	if postingID == "" {
+	if f.postingID == "" {
 		return errors.New("--id is required (take it from a search result's ID)")
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := smartrecruiters.NewClient(apiBaseURL)
@@ -295,7 +321,7 @@ func runGet(ctx context.Context, company string, timeout time.Duration, postingI
 
 	res, err := client.GetPosting(ctx, smartrecruiters.GetPostingParams{
 		CompanyIdentifier: company,
-		PostingId:         postingID,
+		PostingId:         f.postingID,
 	})
 	if err != nil {
 		return err
@@ -303,9 +329,9 @@ func runGet(ctx context.Context, company string, timeout time.Duration, postingI
 
 	switch d := res.(type) {
 	case *smartrecruiters.Posting:
-		return printDetail(d, format)
+		return printDetail(d, f.format)
 	case *smartrecruiters.PostingErrorResponse:
-		return fmt.Errorf("posting %q not found for company %q", postingID, company)
+		return fmt.Errorf("posting %q not found for company %q", f.postingID, company)
 	default:
 		return fmt.Errorf("unexpected response type %T", res)
 	}

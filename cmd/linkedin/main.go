@@ -45,15 +45,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(
-		*keywords,
-		*location,
-		*workplaceType,
-		*jobType,
-		*companyIDs,
-		*postedWithin,
-		*start,
-	)
+	req := buildJobsRequest(searchFlags{
+		keywords:      *keywords,
+		location:      *location,
+		workplaceType: *workplaceType,
+		jobType:       *jobType,
+		companyIDs:    *companyIDs,
+		postedWithin:  *postedWithin,
+		start:         *start,
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -76,41 +76,46 @@ func main() {
 		details[job.ID] = detail
 	}
 
-	writeReport(
-		os.Stdout,
-		*keywords,
-		*baseURL,
-		search,
-		details,
-	)
+	writeReport(os.Stdout, reportData{
+		keywords: *keywords,
+		baseURL:  *baseURL,
+		search:   search,
+		details:  details,
+	})
 }
 
-func buildJobsRequest(
-	keywords, location, workplaceType, jobType string,
-	companyIDs string,
-	postedWithin time.Duration,
-	start int,
-) *linkedin.JobsRequest {
+// searchFlags carries the parsed flag values into buildJobsRequest.
+type searchFlags struct {
+	keywords      string
+	location      string
+	workplaceType string
+	jobType       string
+	companyIDs    string
+	postedWithin  time.Duration
+	start         int
+}
+
+func buildJobsRequest(f searchFlags) *linkedin.JobsRequest {
 	req := &linkedin.JobsRequest{
-		Keywords: keywords,
-		Location: location,
-		Start:    start,
+		Keywords: f.keywords,
+		Location: f.location,
+		Start:    f.start,
 	}
-	if workplaceType != "" {
-		req.WorkplaceType = linkedin.WorkplaceTypeIDs[workplaceType]
+	if f.workplaceType != "" {
+		req.WorkplaceType = linkedin.WorkplaceTypeIDs[f.workplaceType]
 	}
-	if jobType != "" {
-		req.JobType = linkedin.JobTypeIDs[jobType]
+	if f.jobType != "" {
+		req.JobType = linkedin.JobTypeIDs[f.jobType]
 	}
-	if companyIDs != "" {
-		for id := range strings.SplitSeq(companyIDs, ",") {
+	if f.companyIDs != "" {
+		for id := range strings.SplitSeq(f.companyIDs, ",") {
 			if id = strings.TrimSpace(id); id != "" {
 				req.CompanyIDs = append(req.CompanyIDs, id)
 			}
 		}
 	}
-	if postedWithin > 0 {
-		req.PostedWithinSeconds = int(postedWithin.Seconds())
+	if f.postedWithin > 0 {
+		req.PostedWithinSeconds = int(f.postedWithin.Seconds())
 	}
 	return req
 }
@@ -123,19 +128,22 @@ func jobsForDetail(jobs []linkedin.Job, n int) []linkedin.Job {
 	return jobs[:n]
 }
 
-func writeReport(
-	w io.Writer,
-	keywords, baseURL string,
-	search *linkedin.JobsResponse,
-	details map[string]*linkedin.JobDetailResponse,
-) {
-	fmt.Fprintf(w, "LinkedIn Jobs Report\n")
-	fmt.Fprintf(w, "Keywords: %s\n", keywords)
-	fmt.Fprintf(w, "Found %d jobs\n\n", len(search.Jobs))
+// reportData carries the data writeReport renders.
+type reportData struct {
+	keywords string
+	baseURL  string
+	search   *linkedin.JobsResponse
+	details  map[string]*linkedin.JobDetailResponse
+}
 
-	for i, job := range search.Jobs {
+func writeReport(w io.Writer, d reportData) {
+	fmt.Fprintf(w, "LinkedIn Jobs Report\n")
+	fmt.Fprintf(w, "Keywords: %s\n", d.keywords)
+	fmt.Fprintf(w, "Found %d jobs\n\n", len(d.search.Jobs))
+
+	for i, job := range d.search.Jobs {
 		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.ID, job.Title)
-		fmt.Fprintf(w, "URL: %s/jobs/view/%s\n", baseURL, job.ID)
+		fmt.Fprintf(w, "URL: %s/jobs/view/%s\n", d.baseURL, job.ID)
 		if job.Company != "" {
 			fmt.Fprintf(w, "Company: %s\n", job.Company)
 		}
@@ -148,7 +156,7 @@ func writeReport(
 		if job.Remote {
 			fmt.Fprintln(w, "Looks remote")
 		}
-		if detail := details[job.ID]; detail != nil {
+		if detail := d.details[job.ID]; detail != nil {
 			writeDetail(w, detail)
 		}
 		fmt.Fprintln(w)

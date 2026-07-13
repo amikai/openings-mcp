@@ -141,7 +141,7 @@ func (r *Registry) suggest(key string, n int) []string {
 	ranked := make([]scored, 0, len(r.slugs))
 	for _, s := range r.slugs {
 		// Substring hits win outright; levenshtein only runs when needed.
-		dist := 0
+		var dist int
 		if !strings.Contains(s.norm, key) && !strings.Contains(key, s.norm) {
 			dist = levenshtein(key, s.norm)
 		}

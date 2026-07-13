@@ -75,10 +75,10 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 	}
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/PageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("workday: page %d is too large; retry with a smaller page", page)
 	}
-	offset := pageIndex * PageSize
+	offset := pageIndex * pageSize
 	// Trim before deciding whether location filtering is requested: a
 	// whitespace location would otherwise substring-match every facet label.
 	location := strings.TrimSpace(p.Location)
@@ -95,7 +95,7 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 	}
 	rsp, err := client.SearchJobs(ctx, &workday.JobsRequest{
 		AppliedFacets: applied,
-		Limit:         PageSize,
+		Limit:         pageSize,
 		Offset:        offset,
 		SearchText:    p.Query,
 	})
@@ -285,7 +285,7 @@ func flattenFacets(nodes []workday.FacetNode) []flatFacet {
 // GUIDs, failing with teaching errors that name the valid alternatives.
 func resolveFacets(flat []flatFacet, location string, filters map[string][]string) (workday.AppliedFacets, error) {
 	applied := workday.AppliedFacets{}
-	locParam := ""
+	var locParam string
 	if location != "" {
 		param, ids, err := resolveLocationFacet(flat, location)
 		if err != nil {
@@ -364,7 +364,7 @@ func resolveFacetValues(flat []flatFacet, key string, values []string) ([]string
 			slices.Sort(labels)
 			const maxListed = 20
 			listed := labels
-			suffix := ""
+			var suffix string
 			if len(listed) > maxListed {
 				listed = listed[:maxListed]
 				suffix = ", …"

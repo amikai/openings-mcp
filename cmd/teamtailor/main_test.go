@@ -15,16 +15,16 @@ func TestNormalizeHost(t *testing.T) {
 }
 
 func TestRunSearchMissingHost(t *testing.T) {
-	err := runSearch(t.Context(), "", time.Second, "", "text")
+	err := runSearch(t.Context(), searchFlags{timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "--host is required")
 }
 
 func TestRunSearchUnknownHost(t *testing.T) {
-	err := runSearch(t.Context(), "does-not-exist.teamtailor.com", time.Second, "", "text")
+	err := runSearch(t.Context(), searchFlags{host: "does-not-exist.teamtailor.com", timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "teamtailor companies")
 }
 
 func TestRunGetMissingID(t *testing.T) {
-	err := runGet(t.Context(), "career.teamtailor.com", time.Second, "", "text")
+	err := runGet(t.Context(), getFlags{host: "career.teamtailor.com", timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "--id is required")
 }

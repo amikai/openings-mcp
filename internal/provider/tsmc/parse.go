@@ -21,7 +21,7 @@ func parseSearchHTML(doc *goquery.Document) ([]Job, int, error) {
 		return nil, 0, errors.New("unrecognized search page: results panel missing")
 	}
 
-	total := 0
+	var total int
 	if m := totalRE.FindStringSubmatch(doc.Text()); m != nil {
 		total, _ = strconv.Atoi(m[1])
 	}
@@ -61,23 +61,35 @@ func parseJobCard(article *goquery.Selection) (Job, bool) {
 	// xq -q "a[id^='shareButton--email']" -a "href" → mailto href, URL-decode body to get slug
 	if a := article.Find(`a[id^='shareButton--email']`).First(); a.Length() > 0 {
 		href, _ := a.Attr("href")
-		if u, err := url.Parse(href); err == nil {
-			body := u.Query().Get("body")
-			if decoded, err := url.QueryUnescape(body); err == nil {
-				// path: /zh_TW/careers/JobDetail/{slug}/{id}
-				idx := strings.LastIndex(decoded, "/JobDetail/")
-				if idx >= 0 {
-					rest := decoded[idx+len("/JobDetail/"):]
-					seg := strings.SplitN(rest, "/", 2)
-					if len(seg) == 2 {
-						job.Slug = seg[0]
-					}
-				}
-			}
+		if slug, ok := slugFromEmailHref(href); ok {
+			job.Slug = slug
 		}
 	}
 
 	return job, job.ID != ""
+}
+
+// slugFromEmailHref extracts the job slug from a "share by email" mailto
+// href, whose URL-decoded body contains a path like
+// /zh_TW/careers/JobDetail/{slug}/{id}.
+func slugFromEmailHref(href string) (string, bool) {
+	u, err := url.Parse(href)
+	if err != nil {
+		return "", false
+	}
+	decoded, err := url.QueryUnescape(u.Query().Get("body"))
+	if err != nil {
+		return "", false
+	}
+	idx := strings.LastIndex(decoded, "/JobDetail/")
+	if idx < 0 {
+		return "", false
+	}
+	seg := strings.SplitN(decoded[idx+len("/JobDetail/"):], "/", 2)
+	if len(seg) != 2 {
+		return "", false
+	}
+	return seg[0], true
 }
 
 // parseDetailHTML parses a job detail page.
@@ -88,14 +100,9 @@ func parseDetailHTML(doc *goquery.Document) (JobDetailResponse, bool) {
 
 	if link := doc.Find(`link[rel="canonical"]`).First(); link.Length() > 0 {
 		href, _ := link.Attr("href")
-		if href != "" {
-			if u, err := url.Parse(href); err == nil {
-				parts := strings.Split(strings.Trim(u.Path, "/"), "/")
-				if len(parts) >= 2 {
-					detail.ID = parts[len(parts)-1]
-					detail.Slug = parts[len(parts)-2]
-				}
-			}
+		if id, slug, ok := idSlugFromCanonicalHref(href); ok {
+			detail.ID = id
+			detail.Slug = slug
 		}
 	}
 
@@ -139,6 +146,23 @@ func parseDetailArticle(article *goquery.Selection, detail *JobDetailResponse) {
 			label = ""
 		}
 	}
+}
+
+// idSlugFromCanonicalHref extracts the job ID and slug from a canonical link
+// href of the form /zh_TW/careers/JobDetail/{slug}/{id}.
+func idSlugFromCanonicalHref(href string) (string, string, bool) {
+	if href == "" {
+		return "", "", false
+	}
+	u, err := url.Parse(href)
+	if err != nil {
+		return "", "", false
+	}
+	parts := strings.Split(strings.Trim(u.Path, "/"), "/")
+	if len(parts) < 2 {
+		return "", "", false
+	}
+	return parts[len(parts)-1], parts[len(parts)-2], true
 }
 
 // divChildrenText collects text from <div> children joined by newlines,

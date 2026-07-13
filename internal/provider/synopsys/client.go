@@ -75,10 +75,10 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	return result, nil
 }
 
-// ResolveLocation geocodes a partial place name typed by the user. Its result
-// must be passed as JobsRequest.Location (via LocationSuggestion.AsFilter) for
+// resolveLocation geocodes a partial place name typed by the user. Its result
+// must be passed as JobsRequest.Location (via locationSuggestion.asFilter) for
 // location filtering to have any effect on Jobs — see package docs.
-func (c *Client) ResolveLocation(ctx context.Context, term string) ([]LocationSuggestion, error) {
+func (c *Client) resolveLocation(ctx context.Context, term string) ([]locationSuggestion, error) {
 	q := url.Values{"term": {term}, "countryCodes": {""}, "lat": {""}, "lon": {""}}
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/locations?"+q.Encode())
 	if err != nil {
@@ -93,7 +93,7 @@ func (c *Client) ResolveLocation(ctx context.Context, term string) ([]LocationSu
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("resolve location: HTTP %d", resp.StatusCode)
 	}
-	var suggestions []LocationSuggestion
+	var suggestions []locationSuggestion
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
 		return nil, fmt.Errorf("resolve location: decode: %w", err)
 	}

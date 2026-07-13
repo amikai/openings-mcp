@@ -48,52 +48,50 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	facetsFlags := ff.NewFlagSet("facets").SetParent(rootFlags)
+	facetsFS := ff.NewFlagSet("facets").SetParent(rootFlags)
 	var (
-		facetsSearchText = facetsFlags.StringLong("search-text", "", "free-text keyword search to narrow the facet tree")
-		facetsFacetArgs  = facetsFlags.StringListLong("facet", "facet filter as name=id, repeatable")
+		facetsSearchText = facetsFS.StringLong("search-text", "", "free-text keyword search to narrow the facet tree")
+		facetsFacetArgs  = facetsFS.StringListLong("facet", "facet filter as name=id, repeatable")
 	)
 	facetsCmd := &ff.Command{
 		Name:      "facets",
 		Usage:     "workday --tenant TENANT facets [--search-text TEXT] [--facet name=id ...] [--format text|json]",
 		ShortHelp: "discover a tenant's current facet tree (categories, locations, ...)",
-		Flags:     facetsFlags,
+		Flags:     facetsFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runFacets(
-				ctx,
-				*tenant,
-				*timeout,
-				*facetsSearchText,
-				*facetsFacetArgs,
-				*format,
-			)
+			return runFacets(ctx, facetsFlags{
+				tenant:     *tenant,
+				timeout:    *timeout,
+				searchText: *facetsSearchText,
+				facetArgs:  *facetsFacetArgs,
+				format:     *format,
+			})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, facetsCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
-		searchText      = searchFlags.StringLong("search-text", "", "free-text keyword search")
-		limit           = searchFlags.IntLong("limit", 20, "page size")
-		offset          = searchFlags.IntLong("offset", 0, "zero-based result offset")
-		searchFacetArgs = searchFlags.StringListLong("facet", "facet filter as name=id, repeatable")
+		searchText      = searchFS.StringLong("search-text", "", "free-text keyword search")
+		limit           = searchFS.IntLong("limit", 20, "page size")
+		offset          = searchFS.IntLong("offset", 0, "zero-based result offset")
+		searchFacetArgs = searchFS.StringListLong("facet", "facet filter as name=id, repeatable")
 	)
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "workday --tenant TENANT search [--search-text TEXT] [--limit N] [--offset N] [--facet name=id ...] [--format text|json]",
 		ShortHelp: "search jobs and fetch full detail for each result",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(
-				ctx,
-				*tenant,
-				*timeout,
-				*searchText,
-				*limit,
-				*offset,
-				*searchFacetArgs,
-				*format,
-			)
+			return runSearch(ctx, searchFlags{
+				tenant:     *tenant,
+				timeout:    *timeout,
+				searchText: *searchText,
+				limit:      *limit,
+				offset:     *offset,
+				facetArgs:  *searchFacetArgs,
+				format:     *format,
+			})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
@@ -153,32 +151,34 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// facetsFlags carries the parsed "facets" subcommand flags into runFacets.
+type facetsFlags struct {
+	tenant     string
+	timeout    time.Duration
+	searchText string
+	facetArgs  []string
+	format     string
+}
+
 // runFacets discovers a tenant's current facet tree via a search whose only
 // job is to read back JobsResponse.Facets — Limit is 1 because the actual
 // jobPostings aren't used here (see openapi.yaml's note that every /jobs
 // response, filtered or not, carries the full current facet tree).
-func runFacets(
-	ctx context.Context,
-	tenant string,
-	timeout time.Duration,
-	searchText string,
-	facetArgs []string,
-	format string,
-) error {
-	if tenant == "" {
+func runFacets(ctx context.Context, f facetsFlags) error {
+	if f.tenant == "" {
 		return errors.New("--tenant is required")
 	}
-	_, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
+	_, ok := workday.CompaniesByTenant[strings.ToLower(f.tenant)]
 	if !ok {
-		return fmt.Errorf("tenant %q not found; run 'workday companies' to see supported tenants", tenant)
+		return fmt.Errorf("tenant %q not found; run 'workday companies' to see supported tenants", f.tenant)
 	}
 
-	appliedFacets, err := parseFacets(facetArgs)
+	appliedFacets, err := parseFacets(f.facetArgs)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := workday.NewTenantClient()
@@ -186,11 +186,11 @@ func runFacets(
 		return err
 	}
 
-	search, err := client.JobsByTenant(ctx, tenant, &workday.JobsRequest{
+	search, err := client.JobsByTenant(ctx, f.tenant, &workday.JobsRequest{
 		AppliedFacets: appliedFacets,
 		Limit:         1,
 		Offset:        0,
-		SearchText:    searchText,
+		SearchText:    f.searchText,
 	})
 	if err != nil {
 		return err
@@ -199,7 +199,7 @@ func runFacets(
 	// Get returns a nil slice when the tenant omitted facets or sent null.
 	facets, _ := search.Facets.Get()
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(facets)
@@ -255,34 +255,37 @@ type searchResultJSON struct {
 	Jobs  []jobResultJSON `json:"jobs"`
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	tenant     string
+	timeout    time.Duration
+	searchText string
+	limit      int
+	offset     int
+	facetArgs  []string
+	format     string
+}
+
 // runSearch searches jobs, then fetches full detail for every result
 // (mirrors cmd/nvidia's report behavior: a posting with no ExternalPath is
 // listed with a "no detail available" note rather than silently dropped, so
 // "showing N" always matches the page's posting count) — one page per
 // invocation, no auto-pagination.
-func runSearch(
-	ctx context.Context,
-	tenant string,
-	timeout time.Duration,
-	searchText string,
-	limit, offset int,
-	facetArgs []string,
-	format string,
-) error {
-	if tenant == "" {
+func runSearch(ctx context.Context, f searchFlags) error {
+	if f.tenant == "" {
 		return errors.New("--tenant is required")
 	}
-	company, ok := workday.CompaniesByTenant[strings.ToLower(tenant)]
+	company, ok := workday.CompaniesByTenant[strings.ToLower(f.tenant)]
 	if !ok {
-		return fmt.Errorf("tenant %q not found; run 'workday companies' to see supported tenants", tenant)
+		return fmt.Errorf("tenant %q not found; run 'workday companies' to see supported tenants", f.tenant)
 	}
 
-	appliedFacets, err := parseFacets(facetArgs)
+	appliedFacets, err := parseFacets(f.facetArgs)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	baseURL := company.BaseURL()
@@ -291,11 +294,11 @@ func runSearch(
 		return err
 	}
 
-	search, err := client.JobsByTenant(ctx, tenant, &workday.JobsRequest{
+	search, err := client.JobsByTenant(ctx, f.tenant, &workday.JobsRequest{
 		AppliedFacets: appliedFacets,
-		Limit:         limit,
-		Offset:        offset,
-		SearchText:    searchText,
+		Limit:         f.limit,
+		Offset:        f.offset,
+		SearchText:    f.searchText,
 	})
 	if err != nil {
 		return err
@@ -306,13 +309,13 @@ func runSearch(
 	g.SetLimit(maxConcurrentDetailFetches)
 	for i, job := range search.JobPostings {
 		g.Go(func() error {
-			results[i] = fetchJobResult(gCtx, client, tenant, baseURL, job)
+			results[i] = fetchJobResult(gCtx, client, f.tenant, baseURL, job)
 			return nil
 		})
 	}
 	_ = g.Wait() // fetchJobResult never returns an error; failures land in each result's Error field instead.
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Total: search.Total.Value, Jobs: results})

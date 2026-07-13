@@ -64,9 +64,9 @@ func TestRecruiteeSearchAll(t *testing.T) {
 	a, _ := testRecruiteeAdapter(t)
 	res, err := a.Search(t.Context(), recruitee.MockSlug, SearchParams{})
 	require.NoError(t, err)
-	// bunq mock has 58 offers (let's check total returned in Search page 1 which is limited to PageSize=20)
+	// bunq mock has 58 offers (let's check total returned in Search page 1 which is limited to pageSize=20)
 	assert.Greater(t, res.TotalCount, 0)
-	assert.Len(t, res.Jobs, min(PageSize, res.TotalCount))
+	assert.Len(t, res.Jobs, min(pageSize, res.TotalCount))
 	for _, j := range res.Jobs {
 		assert.NotEmpty(t, j.JobID)
 		assert.NotEmpty(t, j.Title)

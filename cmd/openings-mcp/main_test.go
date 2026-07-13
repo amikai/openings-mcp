@@ -37,7 +37,14 @@ func TestServerListsJobTools(t *testing.T) {
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
 	registry, err := newATSRegistry(http.DefaultClient)
 	require.NoError(t, err)
-	server := newServer(c104, cCake, cNvidia, cTsmc, cGoogle, cLinkedin, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	server := newServer(providerClients{
+		job104:   c104,
+		cake:     cCake,
+		nvidia:   cNvidia,
+		tsmc:     cTsmc,
+		google:   cGoogle,
+		linkedin: cLinkedin,
+	}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)

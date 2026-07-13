@@ -149,16 +149,14 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 		return err
 	}
 
-	server := newServer(
-		c104,
-		cCake,
-		cNvidia,
-		cTsmc,
-		cGoogle,
-		cLinkedin,
-		registry,
-		logger,
-	)
+	server := newServer(providerClients{
+		job104:   c104,
+		cake:     cCake,
+		nvidia:   cNvidia,
+		tsmc:     cTsmc,
+		google:   cGoogle,
+		linkedin: cLinkedin,
+	}, registry, logger)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
 		return err
@@ -192,27 +190,29 @@ func newATSRegistry(hc *http.Client) (*ats.Registry, error) {
 	)
 }
 
-func newServer(
-	c104 *job104.Client,
-	cCake *cake.Client,
-	cNvidia *nvidia.Client,
-	cTsmc *tsmc.Client,
-	cGoogle *google.Client,
-	cLinkedin *linkedin.Client,
-	registry *ats.Registry,
-	logger *slog.Logger,
-) *mcp.Server {
+// providerClients bundles one client per per-provider tool family, so
+// newServer's signature doesn't grow with every provider added.
+type providerClients struct {
+	job104   *job104.Client
+	cake     *cake.Client
+	nvidia   *nvidia.Client
+	tsmc     *tsmc.Client
+	google   *google.Client
+	linkedin *linkedin.Client
+}
+
+func newServer(clients providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
 	server := mcp.NewServer(&mcp.Implementation{Name: "openings-mcp", Version: version}, &mcp.ServerOptions{Instructions: serverInstructions, Logger: logger})
 	server.AddReceivingMiddleware(logging.LoggingMiddleware(logger))
 	// Registered last so it wraps outermost, catching panics from tool
 	// handlers and from other middleware alike.
 	server.AddReceivingMiddleware(logging.RecoveryMiddleware(logger))
-	openingsmcp.RegisterJob104(server, c104)
-	openingsmcp.RegisterCake(server, cCake)
-	openingsmcp.RegisterNvidia(server, cNvidia)
-	openingsmcp.RegisterTsmc(server, cTsmc)
-	openingsmcp.RegisterGoogle(server, cGoogle)
-	openingsmcp.RegisterLinkedin(server, cLinkedin)
+	openingsmcp.RegisterJob104(server, clients.job104)
+	openingsmcp.RegisterCake(server, clients.cake)
+	openingsmcp.RegisterNvidia(server, clients.nvidia)
+	openingsmcp.RegisterTsmc(server, clients.tsmc)
+	openingsmcp.RegisterGoogle(server, clients.google)
+	openingsmcp.RegisterLinkedin(server, clients.linkedin)
 	openingsmcp.RegisterCompany(server, registry)
 	return server
 }

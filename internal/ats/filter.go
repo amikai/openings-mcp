@@ -64,10 +64,10 @@ func searchDump(jobs []dumpJob, p SearchParams) (*SearchResult, error) {
 	total := len(matched)
 	pageIndex := page - 1
 	start := total
-	if pageIndex <= total/PageSize {
-		start = pageIndex * PageSize
+	if pageIndex <= total/pageSize {
+		start = pageIndex * pageSize
 	}
-	end := start + min(PageSize, total-start)
+	end := start + min(pageSize, total-start)
 	out := make([]JobSummary, 0, end-start)
 	for _, m := range matched[start:end] {
 		out = append(out, m.job.summary)

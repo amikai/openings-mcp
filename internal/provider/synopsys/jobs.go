@@ -12,7 +12,7 @@ import (
 // company's job data to query and is fixed, not user-supplied.
 const orgID = "44408"
 
-type FacetFilter struct {
+type facetFilter struct {
 	ID        string
 	FacetType int
 	Display   string
@@ -23,18 +23,18 @@ type FacetFilter struct {
 
 type JobsRequest struct {
 	Keywords       string
-	Location       *Location
+	Location       *location
 	Page           int
 	RecordsPerPage int
 	SortCriteria   int // 0=Most Relevant, 13=Most Recent
 	IsPagination   bool
-	FacetFilters   []FacetFilter
+	FacetFilters   []facetFilter
 }
 
-// Location filters search results to a geocoded place. Free-text alone does
+// location filters search results to a geocoded place. Free-text alone does
 // nothing on this API; all four fields must be sent together, resolved via
-// Client.ResolveLocation. Build one from a LocationSuggestion with AsFilter.
-type Location struct {
+// Client.resolveLocation. Build one from a locationSuggestion with asFilter.
+type location struct {
 	Display   string // human-readable label, cosmetic only
 	Latitude  float64
 	Longitude float64
@@ -42,9 +42,9 @@ type Location struct {
 	Path      string // suggestion's "lp" field, dash-separated ancestor IDs
 }
 
-// LocationSuggestion is one geocoded candidate returned by
-// Client.ResolveLocation for a partial place name typed by the user.
-type LocationSuggestion struct {
+// locationSuggestion is one geocoded candidate returned by
+// Client.resolveLocation for a partial place name typed by the user.
+type locationSuggestion struct {
 	ID           int     `json:"id"`
 	Value        string  `json:"value"`
 	Latitude     float64 `json:"lat"`
@@ -58,10 +58,10 @@ type LocationSuggestion struct {
 	PostalCode   string  `json:"pc"`
 }
 
-// AsFilter converts a suggestion into the Location filter accepted by
+// asFilter converts a suggestion into the location filter accepted by
 // JobsRequest.
-func (s LocationSuggestion) AsFilter() *Location {
-	return &Location{
+func (s locationSuggestion) asFilter() *location {
+	return &location{
 		Display:   s.Value,
 		Latitude:  s.Latitude,
 		Longitude: s.Longitude,

@@ -8,15 +8,15 @@ import (
 	"time"
 )
 
-// PageSize is the fixed page size for every adapter. Workday caps limit at
+// pageSize is the fixed page size for every adapter. Workday caps limit at
 // 20 on at least one tenant, so 20 is the largest safe uniform value.
-const PageSize = 20
+const pageSize = 20
 
-// clampPage and totalPages enforce 1-based pages, PageSize, and ceil-div
+// clampPage and totalPages enforce 1-based pages, pageSize, and ceil-div
 // totals.
 func clampPage(p int) int { return max(p, 1) }
 
-func totalPages(total int) int { return (total + PageSize - 1) / PageSize }
+func totalPages(total int) int { return (total + pageSize - 1) / pageSize }
 
 // isoDate renders the unified PostedAt format for upstreams that provide a
 // real timestamp.

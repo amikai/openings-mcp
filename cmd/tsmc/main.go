@@ -40,15 +40,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(
-		*keyword,
-		*location,
-		*category,
-		*jobType,
-		*employmentType,
-		*page,
-		*perPage,
-	)
+	req := buildJobsRequest(searchFlags{
+		keyword:        *keyword,
+		location:       *location,
+		category:       *category,
+		jobType:        *jobType,
+		employmentType: *employmentType,
+		page:           *page,
+		perPage:        *perPage,
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -98,30 +98,38 @@ func main() {
 	}
 }
 
+// searchFlags carries the parsed flag values into buildJobsRequest.
+type searchFlags struct {
+	keyword        string
+	location       string
+	category       string
+	jobType        string
+	employmentType string
+	page           int
+	perPage        int
+}
+
 // buildJobsRequest resolves each flag's human label to a form-field id via
 // the ids.go lookup tables. Labels are already validated against the flag's
 // enum at parse time, so a lookup miss here can't happen for a non-empty
 // label. An empty label (flag not set) leaves that filter unset.
-func buildJobsRequest(
-	keyword, location, category, jobType, employmentType string,
-	page, perPage int,
-) *tsmc.JobsRequest {
+func buildJobsRequest(f searchFlags) *tsmc.JobsRequest {
 	req := &tsmc.JobsRequest{
-		Keyword: keyword,
-		Page:    page,
-		PerPage: perPage,
+		Keyword: f.keyword,
+		Page:    f.page,
+		PerPage: f.perPage,
 	}
-	if location != "" {
-		req.Locations = []string{tsmc.LocationIDs[location]}
+	if f.location != "" {
+		req.Locations = []string{tsmc.LocationIDs[f.location]}
 	}
-	if category != "" {
-		req.Categories = []string{tsmc.CategoryIDs[category]}
+	if f.category != "" {
+		req.Categories = []string{tsmc.CategoryIDs[f.category]}
 	}
-	if jobType != "" {
-		req.JobTypes = []string{tsmc.JobTypeIDs[jobType]}
+	if f.jobType != "" {
+		req.JobTypes = []string{tsmc.JobTypeIDs[f.jobType]}
 	}
-	if employmentType != "" {
-		req.EmploymentTypes = []string{tsmc.EmploymentTypeIDs[employmentType]}
+	if f.employmentType != "" {
+		req.EmploymentTypes = []string{tsmc.EmploymentTypeIDs[f.employmentType]}
 	}
 	return req
 }

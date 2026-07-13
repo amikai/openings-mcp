@@ -45,51 +45,50 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
-		locations   = searchFlags.StringListLong("location", "filter by location, repeatable (values OR'ed, case-sensitive)")
-		commitments = searchFlags.StringListLong("commitment", "filter by commitment, repeatable (values OR'ed, case-sensitive)")
-		teams       = searchFlags.StringListLong("team", "filter by team, repeatable (values OR'ed, case-sensitive)")
-		departments = searchFlags.StringListLong("department", "filter by department, repeatable (values OR'ed, case-sensitive)")
-		level       = searchFlags.StringLong("level", "", "filter by level")
-		limit       = searchFlags.IntLong("limit", 20, "page size")
-		skip        = searchFlags.IntLong("skip", 0, "number of postings to skip")
+		locations   = searchFS.StringListLong("location", "filter by location, repeatable (values OR'ed, case-sensitive)")
+		commitments = searchFS.StringListLong("commitment", "filter by commitment, repeatable (values OR'ed, case-sensitive)")
+		teams       = searchFS.StringListLong("team", "filter by team, repeatable (values OR'ed, case-sensitive)")
+		departments = searchFS.StringListLong("department", "filter by department, repeatable (values OR'ed, case-sensitive)")
+		level       = searchFS.StringLong("level", "", "filter by level")
+		limit       = searchFS.IntLong("limit", 20, "page size")
+		skip        = searchFS.IntLong("skip", 0, "number of postings to skip")
 	)
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "lever --site SITE search [--location L ...] [--commitment C ...] [--team T ...] [--department D ...] [--level LVL] [--limit N] [--skip N] [--format text|json]",
 		ShortHelp: "list postings for a site, with optional filters",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(
-				ctx,
-				*site,
-				*timeout,
-				*locations,
-				*commitments,
-				*teams,
-				*departments,
-				*level,
-				*limit,
-				*skip,
-				*format,
-			)
+			return runSearch(ctx, searchFlags{
+				site:        *site,
+				timeout:     *timeout,
+				locations:   *locations,
+				commitments: *commitments,
+				teams:       *teams,
+				departments: *departments,
+				level:       *level,
+				limit:       *limit,
+				skip:        *skip,
+				format:      *format,
+			})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "lever --site SITE get POSTING-ID [--format text|json]",
 		ShortHelp: "fetch one posting by id",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			var id string
 			if len(args) > 0 {
 				id = args[0]
 			}
-			return runGet(ctx, *site, *timeout, id, *format)
+			return runGet(ctx, getFlags{site: *site, timeout: *timeout, postingID: id, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -153,24 +152,30 @@ type searchResultJSON struct {
 	Postings []postingJSON `json:"postings"`
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	site        string
+	timeout     time.Duration
+	locations   []string
+	commitments []string
+	teams       []string
+	departments []string
+	level       string
+	limit       int
+	skip        int
+	format      string
+}
+
 // runSearch fetches one page of postings with the given filters. The list
 // response already carries full posting content, so there are no
 // per-result detail fetches — one API call per invocation.
-func runSearch(
-	ctx context.Context,
-	site string,
-	timeout time.Duration,
-	locations, commitments, teams, departments []string,
-	level string,
-	limit, skip int,
-	format string,
-) error {
-	s, err := normalizeSite(site)
+func runSearch(ctx context.Context, f searchFlags) error {
+	s, err := normalizeSite(f.site)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := lever.NewClient(leverAPIBaseURL)
@@ -181,15 +186,15 @@ func runSearch(
 	params := lever.ListPostingsParams{
 		Site:       s,
 		Mode:       lever.ListPostingsModeJSON,
-		Skip:       lever.NewOptInt(skip),
-		Limit:      lever.NewOptInt(limit),
-		Location:   locations,
-		Commitment: commitments,
-		Team:       teams,
-		Department: departments,
+		Skip:       lever.NewOptInt(f.skip),
+		Limit:      lever.NewOptInt(f.limit),
+		Location:   f.locations,
+		Commitment: f.commitments,
+		Team:       f.teams,
+		Department: f.departments,
 	}
-	if level != "" {
-		params.Level = lever.NewOptString(level)
+	if f.level != "" {
+		params.Level = lever.NewOptString(f.level)
 	}
 
 	postings, err := client.ListPostings(ctx, params)
@@ -202,7 +207,7 @@ func runSearch(
 		results[i] = toPostingJSON(p)
 	}
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Postings: results})
@@ -217,17 +222,25 @@ func runSearch(
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	site      string
+	timeout   time.Duration
+	postingID string
+	format    string
+}
+
 // runGet fetches one posting by id and renders it unnumbered.
-func runGet(ctx context.Context, site string, timeout time.Duration, postingID, format string) error {
-	s, err := normalizeSite(site)
+func runGet(ctx context.Context, f getFlags) error {
+	s, err := normalizeSite(f.site)
 	if err != nil {
 		return err
 	}
-	if postingID == "" {
+	if f.postingID == "" {
 		return errors.New("a posting id argument is required (take it from a search result's id)")
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := lever.NewClient(leverAPIBaseURL)
@@ -235,14 +248,14 @@ func runGet(ctx context.Context, site string, timeout time.Duration, postingID, 
 		return err
 	}
 
-	p, err := client.GetPosting(ctx, lever.GetPostingParams{Site: s, PostingId: postingID})
+	p, err := client.GetPosting(ctx, lever.GetPostingParams{Site: s, PostingId: f.postingID})
 	if err != nil {
 		return err
 	}
 
 	r := toPostingJSON(*p)
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(r)

@@ -151,7 +151,7 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 	//   1. skip leading span.job-info
 	//   2. first h3 = metadata container → extract category/hireType/remote
 	//   3. rest = job description
-	firstH3Seen := false
+	var firstH3Seen bool
 	var descSB strings.Builder
 	for _, c := range atsDesc.Contents().EachIter() {
 		n := c.Nodes[0]

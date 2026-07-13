@@ -46,28 +46,28 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
-	keyword := searchFlags.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
+	keyword := searchFS.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "ashby --board BOARD search [--keyword TEXT] [--format text|json]",
 		ShortHelp: "list a board's jobs as summaries (client-side keyword filter)",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(ctx, *board, *timeout, *keyword, *format)
+			return runSearch(ctx, searchFlags{board: *board, timeout: *timeout, keyword: *keyword, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
-	jobID := getFlags.StringLong("id", "", "job posting UUID from search results")
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
+	jobID := getFS.StringLong("id", "", "job posting UUID from search results")
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "ashby --board BOARD get --id UUID [--format text|json]",
 		ShortHelp: "print one job in full (description and compensation)",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runGet(ctx, *board, *timeout, *jobID, *format)
+			return runGet(ctx, getFlags{board: *board, timeout: *timeout, jobID: *jobID, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -208,24 +208,32 @@ func summarize(j ashby.JobPosting) jobSummaryJSON {
 	return s
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	board   string
+	timeout time.Duration
+	keyword string
+	format  string
+}
+
 // runSearch fetches the whole board and prints summaries, optionally
 // filtered by a case-insensitive substring match on the title. There is no
 // pagination — the API returns everything in one response.
-func runSearch(ctx context.Context, board string, timeout time.Duration, keyword, format string) error {
-	resp, err := fetchBoard(ctx, board, timeout)
+func runSearch(ctx context.Context, f searchFlags) error {
+	resp, err := fetchBoard(ctx, f.board, f.timeout)
 	if err != nil {
 		return err
 	}
 
 	matched := make([]jobSummaryJSON, 0, len(resp.Jobs))
 	for _, j := range resp.Jobs {
-		if keyword != "" && !strings.Contains(strings.ToLower(j.Title.Value), strings.ToLower(keyword)) {
+		if f.keyword != "" && !strings.Contains(strings.ToLower(j.Title.Value), strings.ToLower(f.keyword)) {
 			continue
 		}
 		matched = append(matched, summarize(j))
 	}
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Total: len(resp.Jobs), Jobs: matched})
@@ -285,22 +293,30 @@ func printSummary(s jobSummaryJSON) {
 	}
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	board   string
+	timeout time.Duration
+	jobID   string
+	format  string
+}
+
 // runGet fetches the whole board (Ashby has no per-job endpoint) and prints
 // the one job whose id matches, in full.
-func runGet(ctx context.Context, board string, timeout time.Duration, jobID, format string) error {
-	if jobID == "" {
+func runGet(ctx context.Context, f getFlags) error {
+	if f.jobID == "" {
 		return errors.New("--id is required")
 	}
-	resp, err := fetchBoard(ctx, board, timeout)
+	resp, err := fetchBoard(ctx, f.board, f.timeout)
 	if err != nil {
 		return err
 	}
 	for _, j := range resp.Jobs {
-		if j.ID.Value == jobID {
-			return printJob(j, format)
+		if j.ID.Value == f.jobID {
+			return printJob(j, f.format)
 		}
 	}
-	return fmt.Errorf("job %q not found on board %q", jobID, board)
+	return fmt.Errorf("job %q not found on board %q", f.jobID, f.board)
 }
 
 func printJob(j ashby.JobPosting, format string) error {
@@ -319,7 +335,7 @@ func printJob(j ashby.JobPosting, format string) error {
 		printCompensation(j.Compensation.Value)
 	}
 
-	desc := ""
+	var desc string
 	if v, ok := j.DescriptionHtml.Get(); ok {
 		if text, err := html2text.FromString(v, html2text.Options{}); err == nil {
 			desc = text

@@ -64,28 +64,28 @@ func TestToPostingJSONNoCategories(t *testing.T) {
 }
 
 func TestRunSearchMissingSite(t *testing.T) {
-	err := runSearch(t.Context(), "", time.Second, nil, nil, nil, nil, "", 20, 0, "text")
+	err := runSearch(t.Context(), searchFlags{timeout: time.Second, limit: 20, format: "text"})
 	assert.ErrorContains(t, err, "--site is required")
 }
 
 func TestRunSearchUnknownSite(t *testing.T) {
-	err := runSearch(t.Context(), "doesnotexist-site-xyz", time.Second, nil, nil, nil, nil, "", 20, 0, "text")
+	err := runSearch(t.Context(), searchFlags{site: "doesnotexist-site-xyz", timeout: time.Second, limit: 20, format: "text"})
 	require.ErrorContains(t, err, `site "doesnotexist-site-xyz" not found`)
 	assert.ErrorContains(t, err, "lever companies")
 }
 
 func TestRunGetMissingSite(t *testing.T) {
-	err := runGet(t.Context(), "", time.Second, "some-id", "text")
+	err := runGet(t.Context(), getFlags{timeout: time.Second, postingID: "some-id", format: "text"})
 	assert.ErrorContains(t, err, "--site is required")
 }
 
 func TestRunGetUnknownSite(t *testing.T) {
-	err := runGet(t.Context(), "doesnotexist-site-xyz", time.Second, "some-id", "text")
+	err := runGet(t.Context(), getFlags{site: "doesnotexist-site-xyz", timeout: time.Second, postingID: "some-id", format: "text"})
 	require.ErrorContains(t, err, `site "doesnotexist-site-xyz" not found`)
 	assert.ErrorContains(t, err, "lever companies")
 }
 
 func TestRunGetMissingPostingID(t *testing.T) {
-	err := runGet(t.Context(), "leverdemo", time.Second, "", "text")
+	err := runGet(t.Context(), getFlags{site: "leverdemo", timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "posting id argument is required")
 }

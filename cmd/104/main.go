@@ -43,17 +43,17 @@ func main() {
 		os.Exit(1)
 	}
 
-	params, err := buildSearchParams(
-		*keyword,
-		*area,
-		*ro,
-		*order,
-		*edu,
-		*remoteWork,
-		*s9,
-		*jobexp,
-		*page,
-	)
+	params, err := buildSearchParams(searchFlags{
+		keyword:    *keyword,
+		area:       *area,
+		ro:         *ro,
+		order:      *order,
+		edu:        *edu,
+		remoteWork: *remoteWork,
+		s9:         *s9,
+		jobexp:     *jobexp,
+		page:       *page,
+	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
@@ -105,53 +105,59 @@ func main() {
 	}
 }
 
+// searchFlags carries the parsed flag values into buildSearchParams.
+type searchFlags struct {
+	keyword    string
+	area       string
+	ro         string
+	order      string
+	edu        []string
+	remoteWork string
+	s9         []string
+	jobexp     []string
+	page       int
+}
+
 // buildSearchParams resolves each flag's human label to its job104 request
 // value via the lookup tables above. Labels are already validated against
 // the flag's enum at parse time. An empty label (flag not set) leaves that
 // field unset (unfiltered); page 0 leaves Page unset.
-func buildSearchParams(
-	keyword, area, ro, order string,
-	edu []string,
-	remoteWork string,
-	s9 []string,
-	jobexp []string,
-	page int,
-) (job104.SearchJobsParams, error) {
+func buildSearchParams(f searchFlags) (job104.SearchJobsParams, error) {
 	params := job104.SearchJobsParams{}
-	if keyword != "" {
-		params.Keyword = job104.NewOptString(keyword)
+	if f.keyword != "" {
+		params.Keyword = job104.NewOptString(f.keyword)
 	}
-	if area != "" {
-		params.Area = job104.NewOptSearchJobsArea(job104.AreaIDs[area])
+	if f.area != "" {
+		params.Area = job104.NewOptSearchJobsArea(job104.AreaIDs[f.area])
 	}
-	if ro != "" {
-		params.Ro = job104.NewOptSearchJobsRo(job104.RoIDs[ro])
+	if f.ro != "" {
+		params.Ro = job104.NewOptSearchJobsRo(job104.RoIDs[f.ro])
 	}
-	if order != "" {
-		params.Order = job104.NewOptSearchJobsOrder(job104.OrderIDs[order])
+	if f.order != "" {
+		params.Order = job104.NewOptSearchJobsOrder(job104.OrderIDs[f.order])
 	}
-	if page != 0 {
-		params.Page = job104.NewOptInt(page)
+	if f.page != 0 {
+		params.Page = job104.NewOptInt(f.page)
 	}
-	if len(edu) > 0 {
-		items, err := lookupList(job104.EduIDs, edu, "--edu")
+	if len(f.edu) > 0 {
+		items, err := lookupList(job104.EduIDs, f.edu, "--edu")
 		if err != nil {
 			return params, err
 		}
 		params.Edu = items
 	}
-	if remoteWork != "" {
-		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(job104.RemoteWorkIDs[remoteWork])
+	if f.remoteWork != "" {
+		params.RemoteWork = job104.NewOptSearchJobsRemoteWork(job104.RemoteWorkIDs[f.remoteWork])
 	}
-	if len(s9) > 0 {
-		items, err := lookupList(job104.S9IDs, s9, "--s9")
+	if len(f.s9) > 0 {
+		items, err := lookupList(job104.S9IDs, f.s9, "--s9")
 		if err != nil {
 			return params, err
 		}
 		params.S9 = items
 	}
-	if len(jobexp) > 0 {
-		items, err := lookupList(job104.JobExpIDs, jobexp, "--jobexp")
+	if len(f.jobexp) > 0 {
+		items, err := lookupList(job104.JobExpIDs, f.jobexp, "--jobexp")
 		if err != nil {
 			return params, err
 		}

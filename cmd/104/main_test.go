@@ -10,14 +10,24 @@ import (
 )
 
 func TestBuildSearchParamsUnfilteredByDefault(t *testing.T) {
-	got, err := buildSearchParams("Golang", "", "", "", nil, "", nil, nil, 0)
+	got, err := buildSearchParams(searchFlags{keyword: "Golang"})
 	require.NoError(t, err)
 	want := job104.SearchJobsParams{Keyword: job104.NewOptString("Golang")}
 	assert.Equal(t, want, got)
 }
 
 func TestBuildSearchParamsResolvesLabels(t *testing.T) {
-	got, err := buildSearchParams("Golang", "Taipei", "Full-time", "Newest", []string{"University", "Master"}, "Partial", []string{"Day", "Night"}, []string{"Under1Year", "1To3Years"}, 2)
+	got, err := buildSearchParams(searchFlags{
+		keyword:    "Golang",
+		area:       "Taipei",
+		ro:         "Full-time",
+		order:      "Newest",
+		edu:        []string{"University", "Master"},
+		remoteWork: "Partial",
+		s9:         []string{"Day", "Night"},
+		jobexp:     []string{"Under1Year", "1To3Years"},
+		page:       2,
+	})
 	require.NoError(t, err)
 
 	want := job104.SearchJobsParams{
@@ -35,22 +45,22 @@ func TestBuildSearchParamsResolvesLabels(t *testing.T) {
 }
 
 func TestBuildSearchParamsUnknownEduLabel(t *testing.T) {
-	_, err := buildSearchParams("", "", "", "", []string{"Bogus"}, "", nil, nil, 0)
+	_, err := buildSearchParams(searchFlags{edu: []string{"Bogus"}})
 	require.ErrorContains(t, err, "--edu")
 }
 
 func TestBuildSearchParamsUnknownS9Label(t *testing.T) {
-	_, err := buildSearchParams("", "", "", "", nil, "", []string{"Bogus"}, nil, 0)
+	_, err := buildSearchParams(searchFlags{s9: []string{"Bogus"}})
 	require.ErrorContains(t, err, "--s9")
 }
 
 func TestBuildSearchParamsUnknownJobexpLabel(t *testing.T) {
-	_, err := buildSearchParams("", "", "", "", nil, "", nil, []string{"Bogus"}, 0)
+	_, err := buildSearchParams(searchFlags{jobexp: []string{"Bogus"}})
 	require.ErrorContains(t, err, "--jobexp")
 }
 
 func TestBuildSearchParamsPageZeroLeavesPageUnset(t *testing.T) {
-	got, err := buildSearchParams("", "", "", "", nil, "", nil, nil, 0)
+	got, err := buildSearchParams(searchFlags{})
 	require.NoError(t, err)
 	assert.False(t, got.Page.Set)
 }

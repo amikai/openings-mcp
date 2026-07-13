@@ -48,14 +48,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	appliedFacets := buildAppliedFacets(
-		*jobCategory,
-		*jobType,
-		*timeType,
-		*locationType,
-		*country,
-		*site,
-	)
+	appliedFacets := buildAppliedFacets(facetFlags{
+		jobCategory:  *jobCategory,
+		jobType:      *jobType,
+		timeType:     *timeType,
+		locationType: *locationType,
+		country:      *country,
+		site:         *site,
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -130,31 +130,39 @@ func main() {
 	}
 }
 
+// facetFlags carries the parsed flag values into buildAppliedFacets.
+type facetFlags struct {
+	jobCategory  string
+	jobType      string
+	timeType     string
+	locationType string
+	country      string
+	site         string
+}
+
 // buildAppliedFacets resolves each flag's human label to a Workday facet id
 // via the facets.go lookup tables. Labels are already validated against the
 // flag's enum at parse time, so a lookup miss here can't happen for a
 // non-empty label. An empty label (flag not set) leaves that facet field nil.
-func buildAppliedFacets(
-	jobCategory, jobType, timeType, locationType, country, site string,
-) nvidia.AppliedFacets {
+func buildAppliedFacets(f facetFlags) nvidia.AppliedFacets {
 	var af nvidia.AppliedFacets
-	if jobCategory != "" {
-		af.JobFamilyGroup = []nvidia.AppliedFacetsJobFamilyGroupItem{nvidia.JobCategoryIDs[jobCategory]}
+	if f.jobCategory != "" {
+		af.JobFamilyGroup = []nvidia.AppliedFacetsJobFamilyGroupItem{nvidia.JobCategoryIDs[f.jobCategory]}
 	}
-	if jobType != "" {
-		af.WorkerSubType = []nvidia.AppliedFacetsWorkerSubTypeItem{nvidia.JobTypeIDs[jobType]}
+	if f.jobType != "" {
+		af.WorkerSubType = []nvidia.AppliedFacetsWorkerSubTypeItem{nvidia.JobTypeIDs[f.jobType]}
 	}
-	if timeType != "" {
-		af.TimeType = []nvidia.AppliedFacetsTimeTypeItem{nvidia.TimeTypeIDs[timeType]}
+	if f.timeType != "" {
+		af.TimeType = []nvidia.AppliedFacetsTimeTypeItem{nvidia.TimeTypeIDs[f.timeType]}
 	}
-	if locationType != "" {
-		af.LocationHierarchy2 = []nvidia.AppliedFacetsLocationHierarchy2Item{nvidia.LocationTypeIDs[locationType]}
+	if f.locationType != "" {
+		af.LocationHierarchy2 = []nvidia.AppliedFacetsLocationHierarchy2Item{nvidia.LocationTypeIDs[f.locationType]}
 	}
-	if country != "" {
-		af.LocationHierarchy1 = []nvidia.AppliedFacetsLocationHierarchy1Item{nvidia.CountryIDs[country]}
+	if f.country != "" {
+		af.LocationHierarchy1 = []nvidia.AppliedFacetsLocationHierarchy1Item{nvidia.CountryIDs[f.country]}
 	}
-	if site != "" {
-		af.Locations = []nvidia.AppliedFacetsLocationsItem{nvidia.SiteIDs[site]}
+	if f.site != "" {
+		af.Locations = []nvidia.AppliedFacetsLocationsItem{nvidia.SiteIDs[f.site]}
 	}
 	return af
 }

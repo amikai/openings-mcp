@@ -47,31 +47,31 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
-		keyword  = searchFlags.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
-		location = searchFlags.StringLong("location", "", "case-insensitive substring filter on location names")
+		keyword  = searchFS.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
+		location = searchFS.StringLong("location", "", "case-insensitive substring filter on location names")
 	)
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "greenhouse --board BOARD search [--keyword TEXT] [--location TEXT] [--format text|json]",
 		ShortHelp: "list a board's jobs as summaries (client-side filters)",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runSearch(ctx, *board, *timeout, *keyword, *location, *format)
+			return runSearch(ctx, searchFlags{board: *board, timeout: *timeout, keyword: *keyword, location: *location, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
-	jobID := getFlags.IntLong("id", 0, "job posting id from search results")
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
+	jobID := getFS.IntLong("id", 0, "job posting id from search results")
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "greenhouse --board BOARD get --id JOB-ID [--format text|json]",
 		ShortHelp: "print one job in full (description and pay ranges)",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
-			return runGet(ctx, *board, *timeout, *jobID, *format)
+			return runGet(ctx, getFlags{board: *board, timeout: *timeout, jobID: *jobID, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -225,16 +225,25 @@ func normalizeBoard(board string) (string, error) {
 	return slug, nil
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	board    string
+	timeout  time.Duration
+	keyword  string
+	location string
+	format   string
+}
+
 // runSearch fetches the board's whole job list (the API has no pagination
 // and no server-side filters) WITHOUT content=true — summaries stay small —
 // then filters client-side and prints summaries.
-func runSearch(ctx context.Context, board string, timeout time.Duration, keyword, location, format string) error {
-	slug, err := normalizeBoard(board)
+func runSearch(ctx context.Context, f searchFlags) error {
+	slug, err := normalizeBoard(f.board)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := greenhouse.NewClient(apiBaseURL)
@@ -253,7 +262,7 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 	case *greenhouse.ListJobsNotFound:
 		// Theoretically unreachable for roster boards, but reported
 		// rather than swallowed.
-		return fmt.Errorf("board %q not found upstream", board)
+		return fmt.Errorf("board %q not found upstream", f.board)
 	default:
 		return fmt.Errorf("unexpected response type %T", res)
 	}
@@ -261,12 +270,12 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 	matched := make([]jobSummaryJSON, 0, len(resp.Jobs))
 	for _, j := range resp.Jobs {
 		s := summarize(j)
-		if matches(s, keyword, location) {
+		if matches(s, f.keyword, f.location) {
 			matched = append(matched, s)
 		}
 	}
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Total: len(resp.Jobs), Jobs: matched})
@@ -282,19 +291,27 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	board   string
+	timeout time.Duration
+	jobID   int
+	format  string
+}
+
 // runGet fetches one job in full via Greenhouse's single-job endpoint —
 // unlike Ashby there's no need to re-fetch the whole board — with
 // pay_transparency=true so pay_input_ranges come back.
-func runGet(ctx context.Context, board string, timeout time.Duration, jobID int, format string) error {
-	if jobID == 0 {
+func runGet(ctx context.Context, f getFlags) error {
+	if f.jobID == 0 {
 		return errors.New("--id is required (take it from a search result's ID)")
 	}
-	slug, err := normalizeBoard(board)
+	slug, err := normalizeBoard(f.board)
 	if err != nil {
 		return err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, timeout)
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
 	client, err := greenhouse.NewClient(apiBaseURL)
@@ -304,7 +321,7 @@ func runGet(ctx context.Context, board string, timeout time.Duration, jobID int,
 
 	res, err := client.GetJob(ctx, greenhouse.GetJobParams{
 		BoardToken:      slug,
-		JobID:           jobID,
+		JobID:           f.jobID,
 		PayTransparency: greenhouse.NewOptBool(true),
 	})
 	if err != nil {
@@ -312,9 +329,9 @@ func runGet(ctx context.Context, board string, timeout time.Duration, jobID int,
 	}
 	switch r := res.(type) {
 	case *greenhouse.JobDetail:
-		return printDetail(r, format)
+		return printDetail(r, f.format)
 	case *greenhouse.GetJobNotFound:
-		return fmt.Errorf("job %d not found on board %q", jobID, board)
+		return fmt.Errorf("job %d not found on board %q", f.jobID, f.board)
 	default:
 		return fmt.Errorf("unexpected response type %T", res)
 	}

@@ -127,7 +127,7 @@ func TestSearchDumpPagination(t *testing.T) {
 	assert.Equal(t, 45, page2.TotalCount)
 	assert.Equal(t, 3, page2.TotalPages)
 	assert.Equal(t, 2, page2.Page)
-	assert.Len(t, page2.Jobs, PageSize)
+	assert.Len(t, page2.Jobs, pageSize)
 
 	page3, err := searchDump(jobs, SearchParams{Page: 3})
 	require.NoError(t, err)

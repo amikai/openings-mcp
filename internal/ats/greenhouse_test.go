@@ -47,7 +47,7 @@ func TestGreenhouseSearchAll(t *testing.T) {
 		assert.NotEmptyf(t, j.URL, "summary with empty field: %+v", j)
 		assert.Truef(t, strings.HasPrefix(j.PostedAt, "20"), "PostedAt should be an ISO date, got %q", j.PostedAt)
 	}
-	// 5 jobs < PageSize, so page 2 is empty but the envelope stays sane.
+	// 5 jobs < pageSize, so page 2 is empty but the envelope stays sane.
 	page2, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Page: 2})
 	require.NoError(t, err)
 	assert.Empty(t, page2.Jobs)

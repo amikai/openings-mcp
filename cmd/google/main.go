@@ -52,18 +52,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	req := buildJobsRequest(
-		*query,
-		*location,
-		*hasRemote,
-		*targetLevel,
-		*skills,
-		*degree,
-		*employmentType,
-		*company,
-		*sortBy,
-		*page,
-	)
+	req := buildJobsRequest(searchFlags{
+		query:          *query,
+		location:       *location,
+		hasRemote:      *hasRemote,
+		targetLevel:    *targetLevel,
+		skills:         *skills,
+		degree:         *degree,
+		employmentType: *employmentType,
+		company:        *company,
+		sortBy:         *sortBy,
+		page:           *page,
+	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
 	defer cancel()
@@ -86,43 +86,51 @@ func main() {
 		details[job.ID] = detail
 	}
 
-	writeReport(
-		os.Stdout,
-		*query,
-		*baseURL,
-		search,
-		jobs,
-		details,
-	)
+	writeReport(os.Stdout, reportData{
+		query:   *query,
+		baseURL: *baseURL,
+		search:  search,
+		jobs:    jobs,
+		details: details,
+	})
 }
 
-func buildJobsRequest(
-	query, location string,
-	hasRemote bool,
-	targetLevel, skills, degree, employmentType, company, sortBy string,
-	page int,
-) *google.JobsRequest {
+// searchFlags carries the parsed flag values into buildJobsRequest.
+type searchFlags struct {
+	query          string
+	location       string
+	hasRemote      bool
+	targetLevel    string
+	skills         string
+	degree         string
+	employmentType string
+	company        string
+	sortBy         string
+	page           int
+}
+
+func buildJobsRequest(f searchFlags) *google.JobsRequest {
 	req := &google.JobsRequest{
-		Query:     query,
-		HasRemote: hasRemote,
-		Skills:    skills,
-		SortBy:    sortBy,
-		Page:      page,
+		Query:     f.query,
+		HasRemote: f.hasRemote,
+		Skills:    f.skills,
+		SortBy:    f.sortBy,
+		Page:      f.page,
 	}
-	if location != "" {
-		req.Locations = []string{location}
+	if f.location != "" {
+		req.Locations = []string{f.location}
 	}
-	if targetLevel != "" {
-		req.TargetLevels = []string{targetLevel}
+	if f.targetLevel != "" {
+		req.TargetLevels = []string{f.targetLevel}
 	}
-	if degree != "" {
-		req.Degrees = []string{degree}
+	if f.degree != "" {
+		req.Degrees = []string{f.degree}
 	}
-	if employmentType != "" {
-		req.EmploymentType = []string{employmentType}
+	if f.employmentType != "" {
+		req.EmploymentType = []string{f.employmentType}
 	}
-	if company != "" {
-		req.Companies = []string{company}
+	if f.company != "" {
+		req.Companies = []string{f.company}
 	}
 	return req
 }
@@ -149,20 +157,23 @@ func jobsForDetail(jobs []google.Job) []google.Job {
 	return jobs
 }
 
-func writeReport(
-	w io.Writer,
-	query, baseURL string,
-	search *google.JobsResponse,
-	jobs []google.Job,
-	details map[string]*google.JobDetailResponse,
-) {
-	fmt.Fprintf(w, "Google Jobs Report\n")
-	fmt.Fprintf(w, "Query: %s\n", query)
-	fmt.Fprintf(w, "Found %d jobs; showing %d\n\n", len(search.Jobs), len(jobs))
+// reportData carries the data writeReport renders.
+type reportData struct {
+	query   string
+	baseURL string
+	search  *google.JobsResponse
+	jobs    []google.Job
+	details map[string]*google.JobDetailResponse
+}
 
-	for i, job := range jobs {
+func writeReport(w io.Writer, d reportData) {
+	fmt.Fprintf(w, "Google Jobs Report\n")
+	fmt.Fprintf(w, "Query: %s\n", d.query)
+	fmt.Fprintf(w, "Found %d jobs; showing %d\n\n", len(d.search.Jobs), len(d.jobs))
+
+	for i, job := range d.jobs {
 		fmt.Fprintf(w, "%d. [%s] %s\n", i+1, job.ID, job.Title)
-		fmt.Fprintf(w, "URL: %s/jobs/results/%s\n", baseURL, job.ID)
+		fmt.Fprintf(w, "URL: %s/jobs/results/%s\n", d.baseURL, job.ID)
 		if job.Company != "" {
 			fmt.Fprintf(w, "Company: %s\n", job.Company)
 		}
@@ -172,7 +183,7 @@ func writeReport(
 		if job.Remote {
 			fmt.Fprintln(w, "Remote eligible")
 		}
-		if detail := details[job.ID]; detail != nil {
+		if detail := d.details[job.ID]; detail != nil {
 			writeDetail(w, detail)
 		}
 		fmt.Fprintln(w)

@@ -46,34 +46,34 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
-	searchFlags := ff.NewFlagSet("search").SetParent(rootFlags)
-	keyword := searchFlags.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
+	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
+	keyword := searchFS.StringLong("keyword", "", "case-insensitive substring filter on job titles (empty lists every job)")
 	searchCmd := &ff.Command{
 		Name:      "search",
 		Usage:     "recruitee --board BOARD search [--keyword TEXT] [--format text|json]",
 		ShortHelp: "list a board's jobs as summaries (client-side keyword filter)",
-		Flags:     searchFlags,
+		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
 			}
-			return runSearch(ctx, *board, *timeout, *keyword, *format)
+			return runSearch(ctx, searchFlags{board: *board, timeout: *timeout, keyword: *keyword, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
 
-	getFlags := ff.NewFlagSet("get").SetParent(rootFlags)
-	jobID := getFlags.StringLong("id", "", "job posting ID from search results")
+	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
+	jobID := getFS.StringLong("id", "", "job posting ID from search results")
 	getCmd := &ff.Command{
 		Name:      "get",
 		Usage:     "recruitee --board BOARD get --id ID [--format text|json]",
 		ShortHelp: "print one job in full (description)",
-		Flags:     getFlags,
+		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
 			}
-			return runGet(ctx, *board, *timeout, *jobID, *format)
+			return runGet(ctx, getFlags{board: *board, timeout: *timeout, jobID: *jobID, format: *format})
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, getCmd)
@@ -178,8 +178,16 @@ func summarize(slug string, o recruitee.Offer) jobSummaryJSON {
 	}
 }
 
-func runSearch(ctx context.Context, board string, timeout time.Duration, keyword, format string) error {
-	resp, err := fetchOffers(ctx, board, timeout)
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
+type searchFlags struct {
+	board   string
+	timeout time.Duration
+	keyword string
+	format  string
+}
+
+func runSearch(ctx context.Context, f searchFlags) error {
+	resp, err := fetchOffers(ctx, f.board, f.timeout)
 	if err != nil {
 		return err
 	}
@@ -187,19 +195,19 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 	matched := make([]jobSummaryJSON, 0, len(resp.Offers))
 	for _, o := range resp.Offers {
 		title := o.Title.Or("")
-		if keyword != "" && !strings.Contains(strings.ToLower(title), strings.ToLower(keyword)) {
+		if f.keyword != "" && !strings.Contains(strings.ToLower(title), strings.ToLower(f.keyword)) {
 			continue
 		}
-		matched = append(matched, summarize(board, o))
+		matched = append(matched, summarize(f.board, o))
 	}
 
-	if format == "json" {
+	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(searchResultJSON{Total: len(resp.Offers), Jobs: matched})
 	}
 
-	fmt.Printf("Recruitee Jobs Report for %q\n", board)
+	fmt.Printf("Recruitee Jobs Report for %q\n", f.board)
 	fmt.Printf("Found %d jobs; showing %d\n\n", len(resp.Offers), len(matched))
 	for i, s := range matched {
 		fmt.Printf("%d. %s\n", i+1, s.Title)
@@ -216,20 +224,28 @@ func runSearch(ctx context.Context, board string, timeout time.Duration, keyword
 	return nil
 }
 
-func runGet(ctx context.Context, board string, timeout time.Duration, jobID, format string) error {
-	if jobID == "" {
+// getFlags carries the parsed "get" subcommand flags into runGet.
+type getFlags struct {
+	board   string
+	timeout time.Duration
+	jobID   string
+	format  string
+}
+
+func runGet(ctx context.Context, f getFlags) error {
+	if f.jobID == "" {
 		return errors.New("--id is required")
 	}
-	resp, err := fetchOffers(ctx, board, timeout)
+	resp, err := fetchOffers(ctx, f.board, f.timeout)
 	if err != nil {
 		return err
 	}
 	for _, o := range resp.Offers {
-		if strconv.Itoa(o.ID) == jobID {
-			return printJob(board, o, format)
+		if strconv.Itoa(o.ID) == f.jobID {
+			return printJob(f.board, o, f.format)
 		}
 	}
-	return fmt.Errorf("job %q not found on board %q", jobID, board)
+	return fmt.Errorf("job %q not found on board %q", f.jobID, f.board)
 }
 
 func printJob(slug string, o recruitee.Offer, format string) error {
@@ -259,7 +275,7 @@ func printJob(slug string, o recruitee.Offer, format string) error {
 		fullHTML = fullHTML + "\n\n<h3>Requirements</h3>\n" + reqHTML
 	}
 
-	desc := ""
+	var desc string
 	if fullHTML != "" {
 		if text, err := html2text.FromString(fullHTML, html2text.Options{}); err == nil {
 			desc = text

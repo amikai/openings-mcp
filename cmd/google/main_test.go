@@ -21,7 +21,13 @@ func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	writeReport(&buf, "software engineer", "https://www.google.com/about/careers/applications", search, jobsForDetail(search.Jobs), details)
+	writeReport(&buf, reportData{
+		query:   "software engineer",
+		baseURL: "https://www.google.com/about/careers/applications",
+		search:  search,
+		jobs:    jobsForDetail(search.Jobs),
+		details: details,
+	})
 	got := buf.String()
 
 	for _, want := range []string{
@@ -50,7 +56,18 @@ func TestJobsForDetailLimitsGoogleJobsToTen(t *testing.T) {
 }
 
 func TestBuildJobsRequest(t *testing.T) {
-	got := buildJobsRequest("software engineer", "Taiwan", true, "MID", "Python", "MASTERS", "FULL_TIME", "Google", "date", 2)
+	got := buildJobsRequest(searchFlags{
+		query:          "software engineer",
+		location:       "Taiwan",
+		hasRemote:      true,
+		targetLevel:    "MID",
+		skills:         "Python",
+		degree:         "MASTERS",
+		employmentType: "FULL_TIME",
+		company:        "Google",
+		sortBy:         "date",
+		page:           2,
+	})
 
 	want := &google.JobsRequest{
 		Query:          "software engineer",
@@ -68,7 +85,7 @@ func TestBuildJobsRequest(t *testing.T) {
 }
 
 func TestBuildJobsRequestLeavesUnsetFiltersOut(t *testing.T) {
-	got := buildJobsRequest("software engineer", "", false, "", "", "", "", "", "", 1)
+	got := buildJobsRequest(searchFlags{query: "software engineer", page: 1})
 
 	want := &google.JobsRequest{
 		Query: "software engineer",

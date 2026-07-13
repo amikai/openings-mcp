@@ -36,29 +36,29 @@ func TestSummarizeEmptyOptionals(t *testing.T) {
 }
 
 func TestRunSearchMissingCompany(t *testing.T) {
-	err := runSearch(t.Context(), "", time.Second, "", "", "", "", "", 20, 0, "text")
+	err := runSearch(t.Context(), searchFlags{timeout: time.Second, limit: 20, format: "text"})
 	assert.ErrorContains(t, err, "--company is required")
 }
 
 func TestRunGetMissingCompany(t *testing.T) {
-	err := runGet(t.Context(), "", time.Second, "744000137225639", "text")
+	err := runGet(t.Context(), getFlags{timeout: time.Second, postingID: "744000137225639", format: "text"})
 	assert.ErrorContains(t, err, "--company is required")
 }
 
 func TestRunGetMissingID(t *testing.T) {
-	err := runGet(t.Context(), "equinox", time.Second, "", "text")
+	err := runGet(t.Context(), getFlags{company: "equinox", timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "--id is required")
 }
 
 func TestRunSearchLimitOutOfRange(t *testing.T) {
 	for _, limit := range []int{0, -1, 101} {
-		err := runSearch(t.Context(), "equinox", time.Second, "", "", "", "", "", limit, 0, "text")
+		err := runSearch(t.Context(), searchFlags{company: "equinox", timeout: time.Second, limit: limit, format: "text"})
 		assert.ErrorContainsf(t, err, "--limit must be between 1 and 100", "limit=%d", limit)
 	}
 }
 
 func TestRunSearchOffsetNegative(t *testing.T) {
-	err := runSearch(t.Context(), "equinox", time.Second, "", "", "", "", "", 20, -1, "text")
+	err := runSearch(t.Context(), searchFlags{company: "equinox", timeout: time.Second, limit: 20, offset: -1, format: "text"})
 	assert.ErrorContains(t, err, "--offset must be >= 0")
 }
 
@@ -79,13 +79,13 @@ func TestNormalizeCompanyCanonicalCasing(t *testing.T) {
 }
 
 func TestRunSearchUnknownCompany(t *testing.T) {
-	err := runSearch(t.Context(), "doesnotexist-company-xyz", time.Second, "", "", "", "", "", 20, 0, "text")
+	err := runSearch(t.Context(), searchFlags{company: "doesnotexist-company-xyz", timeout: time.Second, limit: 20, format: "text"})
 	require.ErrorContains(t, err, `company "doesnotexist-company-xyz" not found`)
 	assert.ErrorContains(t, err, "smartrecruiters companies")
 }
 
 func TestRunGetUnknownCompany(t *testing.T) {
-	err := runGet(t.Context(), "doesnotexist-company-xyz", time.Second, "744000137225639", "text")
+	err := runGet(t.Context(), getFlags{company: "doesnotexist-company-xyz", timeout: time.Second, postingID: "744000137225639", format: "text"})
 	require.ErrorContains(t, err, `company "doesnotexist-company-xyz" not found`)
 	assert.ErrorContains(t, err, "smartrecruiters companies")
 }

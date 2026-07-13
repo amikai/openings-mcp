@@ -99,28 +99,28 @@ func TestRenderDescription(t *testing.T) {
 }
 
 func TestRunSearchMissingBoard(t *testing.T) {
-	err := runSearch(t.Context(), "", time.Second, "", "", "text")
+	err := runSearch(t.Context(), searchFlags{timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "--board is required")
 }
 
 func TestRunSearchUnknownBoard(t *testing.T) {
-	err := runSearch(t.Context(), "doesnotexist-board-xyz", time.Second, "", "", "text")
+	err := runSearch(t.Context(), searchFlags{board: "doesnotexist-board-xyz", timeout: time.Second, format: "text"})
 	require.ErrorContains(t, err, `board "doesnotexist-board-xyz" not found`)
 	assert.ErrorContains(t, err, "greenhouse companies")
 }
 
 func TestRunGetMissingID(t *testing.T) {
-	err := runGet(t.Context(), "anthropic", time.Second, 0, "text")
+	err := runGet(t.Context(), getFlags{board: "anthropic", timeout: time.Second, format: "text"})
 	assert.ErrorContains(t, err, "--id is required")
 }
 
 func TestRunGetMissingBoard(t *testing.T) {
-	err := runGet(t.Context(), "", time.Second, 123, "text")
+	err := runGet(t.Context(), getFlags{timeout: time.Second, jobID: 123, format: "text"})
 	assert.ErrorContains(t, err, "--board is required")
 }
 
 func TestRunGetUnknownBoard(t *testing.T) {
-	err := runGet(t.Context(), "doesnotexist-board-xyz", time.Second, 123, "text")
+	err := runGet(t.Context(), getFlags{board: "doesnotexist-board-xyz", timeout: time.Second, jobID: 123, format: "text"})
 	require.ErrorContains(t, err, `board "doesnotexist-board-xyz" not found`)
 	assert.ErrorContains(t, err, "greenhouse companies")
 }
