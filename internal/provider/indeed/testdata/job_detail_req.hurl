@@ -15,6 +15,7 @@ query GetJobDetail {
         key
         title
         datePublished
+        dateOnIndeed
         description { html }
         location { countryName countryCode admin1Code city postalCode streetAddress formatted { short long } }
         compensation {
@@ -33,6 +34,7 @@ query GetJobDetail {
           }
         }
         recruit { viewJobUrl detailedSalary workSchedule }
+        source { name }
       }
     }
   }

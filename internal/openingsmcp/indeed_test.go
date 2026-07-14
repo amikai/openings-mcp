@@ -73,19 +73,27 @@ func TestIndeedHTTPToMCPDetail(t *testing.T) {
 		Title:              "t",
 		Company:            "c",
 		CompanyURL:         "cu",
-		Location:           "l",
+		Location:           indeed.Location{Country: "Taiwan", CountryCode: "TW", State: "TPE", City: "Taipei", Formatted: "Taipei, Taiwan"},
 		JobURL:             "u",
 		PostedDate:         "d",
 		Description:        "desc",
 		JobTypes:           []string{"Full-time"},
 		Compensation:       &indeed.Compensation{MinAmount: 1, MaxAmount: 2, Currency: "USD", Interval: "YEAR"},
+		Source:             "src",
+		DateIndexed:        "d2",
 		CompanyWebsite:     "web",
 		CompanyIndustry:    "ind",
 		CompanyEmployees:   "10,000+",
 		CompanyRevenue:     "rev",
 		CompanyDescription: "cdesc",
 		CompanyLogo:        "logo-url",
+		CompanyAddresses:   []string{"addr1"},
+		CompanyCEO:         "ceo",
+		CompanyCEOPhoto:    "ceo-photo",
+		CompanyBannerImage: "banner-url",
 		ApplyURL:           "apply-url",
+		DetailedSalary:     "detailed-salary",
+		WorkSchedule:       "schedule",
 	}
 	got := indeedHTTPToMCPDetail(&in)
 
@@ -97,19 +105,31 @@ func TestIndeedHTTPToMCPDetail(t *testing.T) {
 		Title:              "t",
 		Company:            "c",
 		CompanyURL:         "cu",
-		Location:           "l",
+		Location:           &indeedLocation{Country: "Taiwan", CountryCode: "TW", State: "TPE", City: "Taipei", Formatted: "Taipei, Taiwan"},
 		PostedDate:         "d",
 		Description:        "desc",
 		JobTypes:           []string{"Full-time"},
 		Compensation:       &indeedCompensation{MinAmount: 1, MaxAmount: 2, Currency: "USD", Interval: "YEAR"},
+		Source:             "src",
+		DateIndexed:        "d2",
 		CompanyWebsite:     "web",
 		CompanyIndustry:    "ind",
 		CompanyEmployees:   "10,000+",
 		CompanyRevenue:     "rev",
 		CompanyDescription: "cdesc",
+		CompanyAddresses:   []string{"addr1"},
+		CompanyCEO:         "ceo",
+		CompanyCEOPhoto:    "ceo-photo",
+		CompanyBannerImage: "banner-url",
 		ApplyURL:           "apply-url",
+		DetailedSalary:     "detailed-salary",
+		WorkSchedule:       "schedule",
 	}
 	assert.Equal(t, want, got)
+}
+
+func TestIndeedLocationFromHTTPZeroValue(t *testing.T) {
+	assert.Nil(t, indeedLocationFromHTTP(indeed.Location{}))
 }
 
 func testIndeedMCPClientServer(t *testing.T) (*mcp.ClientSession, *mcp.ServerSession) {
@@ -211,13 +231,19 @@ func TestIndeedGetJobDetailE2E(t *testing.T) {
 		Title:              "Senior Staff Engineer System Application Engineering",
 		Company:            "Infineon Technologies",
 		CompanyURL:         "https://tw.indeed.com/cmp/Infineon-Technologies",
-		Location:           "台北市",
+		Location:           &indeedLocation{Country: "台灣", CountryCode: "TW", State: "TPE", City: "台北市", Formatted: "台北市"},
 		PostedDate:         "2026-06-04",
 		JobTypes:           []string{"Permanent", "Full-time"},
+		Source:             "Infineon Technologies",
+		DateIndexed:        "2026-07-14",
 		CompanyWebsite:     "https://www.infineon.com/",
 		CompanyEmployees:   "10,000+",
 		CompanyRevenue:     "more than $10B (USD)",
 		CompanyDescription: "Infineon designs, develops, manufactures, and markets a broad range of semiconductors and semiconductor-based solutions, focusing on key markets in the automotive, industrial, and consumer sectors.",
+		CompanyAddresses:   []string{"Neubiberg"},
+		CompanyCEO:         "Jochen Hanebeck",
+		CompanyCEOPhoto:    "https://d2q79iu7y748jz.cloudfront.net/s/_ceophoto/512x512/e164f653df3541221b0c25a3f6610e5c",
+		CompanyBannerImage: "https://d2q79iu7y748jz.cloudfront.net/s/_headerimage/1960x400/e9a83e0c63c4266c44c12762aed91d6c",
 		ApplyURL:           "https://jobs.infineon.com/careers/job/563808971122356?utm_source=indeed&domain=infineon.com",
 	}
 	assert.Equal(t, want, got)

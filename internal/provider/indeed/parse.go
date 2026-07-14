@@ -56,9 +56,12 @@ type wireEmployer struct {
 			EmployeesLocalizedLabel string   `json:"employeesLocalizedLabel"`
 			RevenueLocalizedLabel   string   `json:"revenueLocalizedLabel"`
 			BriefDescription        string   `json:"briefDescription"`
+			CEOName                 string   `json:"ceoName"`
+			CEOPhotoURL             string   `json:"ceoPhotoUrl"`
 		} `json:"employerDetails"`
 		Images *struct {
-			SquareLogoURL string `json:"squareLogoUrl"`
+			HeaderImageURL string `json:"headerImageUrl"`
+			SquareLogoURL  string `json:"squareLogoUrl"`
 		} `json:"images"`
 		Links *struct {
 			CorporateWebsite string `json:"corporateWebsite"`
@@ -67,13 +70,16 @@ type wireEmployer struct {
 }
 
 type wireRecruit struct {
-	ViewJobURL string `json:"viewJobUrl"`
+	ViewJobURL     string `json:"viewJobUrl"`
+	DetailedSalary string `json:"detailedSalary"`
+	WorkSchedule   string `json:"workSchedule"`
 }
 
 type wireJob struct {
 	Key           string `json:"key"`
 	Title         string `json:"title"`
 	DatePublished int64  `json:"datePublished"`
+	DateOnIndeed  int64  `json:"dateOnIndeed"`
 	Description   *struct {
 		HTML string `json:"html"`
 	} `json:"description"`
@@ -82,6 +88,9 @@ type wireJob struct {
 	Attributes   []wireAttribute  `json:"attributes"`
 	Employer     *wireEmployer    `json:"employer"`
 	Recruit      *wireRecruit     `json:"recruit"`
+	Source       *struct {
+		Name string `json:"name"`
+	} `json:"source"`
 }
 
 type wireSearchResult struct {
@@ -171,6 +180,27 @@ func employerCompanyURL(e *wireEmployer, siteBaseURL string) string {
 	return companyURLFromRelative(e.RelativeCompanyPageURL, siteBaseURL)
 }
 
+func locationFromWire(l wireLocation) Location {
+	return Location{
+		Country:       l.CountryName,
+		CountryCode:   l.CountryCode,
+		State:         l.Admin1Code,
+		City:          l.City,
+		PostalCode:    l.PostalCode,
+		StreetAddress: l.StreetAddress,
+		Formatted:     l.Formatted.Long,
+	}
+}
+
+func sourceName(s *struct {
+	Name string `json:"name"`
+}) string {
+	if s == nil {
+		return ""
+	}
+	return s.Name
+}
+
 func jobFromWire(w wireJob, siteBaseURL string) Job {
 	return Job{
 		Key:          w.Key,
@@ -191,9 +221,11 @@ func jobDetailFromWire(w wireJob, siteBaseURL string) JobDetail {
 		Title:        w.Title,
 		Company:      employerName(w.Employer),
 		CompanyURL:   employerCompanyURL(w.Employer, siteBaseURL),
-		Location:     w.Location.Formatted.Long,
+		Location:     locationFromWire(w.Location),
 		JobURL:       jobURL(siteBaseURL, w.Key),
 		PostedDate:   dateFromEpochMillis(w.DatePublished),
+		DateIndexed:  dateFromEpochMillis(w.DateOnIndeed),
+		Source:       sourceName(w.Source),
 		JobTypes:     jobTypesFromAttributes(w.Attributes),
 		Compensation: compensationFromWire(w.Compensation),
 	}
@@ -202,6 +234,8 @@ func jobDetailFromWire(w wireJob, siteBaseURL string) JobDetail {
 	}
 	if w.Recruit != nil {
 		detail.ApplyURL = w.Recruit.ViewJobURL
+		detail.DetailedSalary = w.Recruit.DetailedSalary
+		detail.WorkSchedule = w.Recruit.WorkSchedule
 	}
 	if w.Employer != nil && w.Employer.Dossier != nil {
 		d := w.Employer.Dossier
@@ -210,9 +244,13 @@ func jobDetailFromWire(w wireJob, siteBaseURL string) JobDetail {
 			detail.CompanyEmployees = d.EmployerDetails.EmployeesLocalizedLabel
 			detail.CompanyRevenue = d.EmployerDetails.RevenueLocalizedLabel
 			detail.CompanyDescription = d.EmployerDetails.BriefDescription
+			detail.CompanyAddresses = d.EmployerDetails.Addresses
+			detail.CompanyCEO = d.EmployerDetails.CEOName
+			detail.CompanyCEOPhoto = d.EmployerDetails.CEOPhotoURL
 		}
 		if d.Images != nil {
 			detail.CompanyLogo = d.Images.SquareLogoURL
+			detail.CompanyBannerImage = d.Images.HeaderImageURL
 		}
 		if d.Links != nil {
 			detail.CompanyWebsite = d.Links.CorporateWebsite

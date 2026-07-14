@@ -88,18 +88,48 @@ type JobsResponse struct {
 	NextCursor string
 }
 
-// JobDetail is a jobData result: the full field set, including description.
+// Location is jobData's structured location, used only by JobDetail —
+// Job (search) stays a flat formatted string by design (see its doc
+// comment): a lean summary for up to 100 rows shouldn't carry per-row
+// structured fields it never asked for.
+type Location struct {
+	Country     string // countryName, e.g. "台灣"
+	CountryCode string // e.g. "TW"
+	State       string // admin1Code, Indeed's own region code, e.g. "TPE"
+	City        string
+	// PostalCode and StreetAddress are usually empty: Indeed rarely
+	// discloses either.
+	PostalCode    string
+	StreetAddress string
+	// Formatted is Indeed's own human-readable rendering (formatted.long).
+	Formatted string
+}
+
+// JobDetail is a jobData result: every field the query requests, not just
+// a subset. jobData is already an Indeed-specific type — unlike
+// python-jobspy's cross-site JobPost, nothing here needs to fit a shared
+// schema, so there's no reason to leave data on the table.
 type JobDetail struct {
 	Key          string
 	Title        string
 	Company      string
 	CompanyURL   string
-	Location     string
+	Location     Location
 	JobURL       string
 	PostedDate   string
 	Description  string // HTML, as Indeed sends it.
 	JobTypes     []string
 	Compensation *Compensation
+
+	// Source is the listing's source name: usually the employer's own name
+	// for a direct-post job, but a third-party board's name when Indeed
+	// aggregated the posting from elsewhere.
+	Source string
+	// DateIndexed is dateOnIndeed, YYYY-MM-DD: when Indeed indexed/last
+	// refreshed this posting, distinct from PostedDate (datePublished, the
+	// employer's original post date) — DateIndexed can be later for
+	// reposted or refreshed listings.
+	DateIndexed string
 
 	CompanyWebsite     string
 	CompanyIndustry    string
@@ -107,9 +137,24 @@ type JobDetail struct {
 	CompanyRevenue     string
 	CompanyDescription string
 	CompanyLogo        string
+	// CompanyAddresses lists the employer's disclosed office addresses,
+	// when available (rare).
+	CompanyAddresses []string
+	// CompanyCEO and CompanyCEOPhoto come from the employer's dossier, when
+	// Indeed has one on file.
+	CompanyCEO      string
+	CompanyCEOPhoto string
+	// CompanyBannerImage is the employer's profile banner (headerImageUrl),
+	// distinct from CompanyLogo (the square logo).
+	CompanyBannerImage string
 
 	// ApplyURL is recruit.viewJobUrl: the external ATS URL a poster
 	// configured for direct apply, if any. Empty for Indeed-native apply
 	// flows.
 	ApplyURL string
+	// DetailedSalary and WorkSchedule are free-text fields a poster can set
+	// beyond the structured Compensation (e.g. a shift pattern); both are
+	// usually empty.
+	DetailedSalary string
+	WorkSchedule   string
 }

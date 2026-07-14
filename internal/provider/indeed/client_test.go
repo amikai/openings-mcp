@@ -85,6 +85,16 @@ func TestJobDetail(t *testing.T) {
 	assert.Contains(t, got.CompanyLogo, "squarelogo")
 	assert.Contains(t, got.ApplyURL, "jobs.infineon.com")
 	assert.Contains(t, got.Description, "Your Role")
+
+	assert.Equal(t, Location{Country: "台灣", CountryCode: "TW", State: "TPE", City: "台北市", Formatted: "台北市"}, got.Location)
+	assert.Equal(t, "Infineon Technologies", got.Source)
+	assert.Equal(t, "2026-07-14", got.DateIndexed)
+	assert.Equal(t, []string{"Neubiberg"}, got.CompanyAddresses)
+	assert.Equal(t, "Jochen Hanebeck", got.CompanyCEO)
+	assert.Contains(t, got.CompanyCEOPhoto, "ceophoto")
+	assert.Contains(t, got.CompanyBannerImage, "headerimage")
+	assert.Empty(t, got.DetailedSalary)
+	assert.Empty(t, got.WorkSchedule)
 }
 
 func TestJobDetailNotFound(t *testing.T) {

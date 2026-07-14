@@ -66,6 +66,9 @@
                             "viewJobUrl": "https://jobs.infineon.com/careers/job/563808971122356?utm_source=indeed&domain=infineon.com",
                             "detailedSalary": null,
                             "workSchedule": null
+                        },
+                        "source": {
+                            "name": "Infineon Technologies"
                         }
                     }
                 }

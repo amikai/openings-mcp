@@ -140,11 +140,32 @@ func writeReport(w io.Writer, d reportData) {
 }
 
 func writeDetail(w io.Writer, detail *indeed.JobDetail) {
+	if detail.Source != "" {
+		fmt.Fprintf(w, "Source: %s\n", detail.Source)
+	}
+	if detail.DateIndexed != "" {
+		fmt.Fprintf(w, "Date indexed: %s\n", detail.DateIndexed)
+	}
 	if detail.CompanyIndustry != "" {
 		fmt.Fprintf(w, "Industry: %s\n", detail.CompanyIndustry)
 	}
 	if detail.CompanyEmployees != "" {
 		fmt.Fprintf(w, "Company size: %s\n", detail.CompanyEmployees)
+	}
+	if detail.CompanyRevenue != "" {
+		fmt.Fprintf(w, "Company revenue: %s\n", detail.CompanyRevenue)
+	}
+	if len(detail.CompanyAddresses) > 0 {
+		fmt.Fprintf(w, "Company addresses: %v\n", detail.CompanyAddresses)
+	}
+	if detail.CompanyCEO != "" {
+		fmt.Fprintf(w, "Company CEO: %s\n", detail.CompanyCEO)
+	}
+	if detail.DetailedSalary != "" {
+		fmt.Fprintf(w, "Detailed salary: %s\n", detail.DetailedSalary)
+	}
+	if detail.WorkSchedule != "" {
+		fmt.Fprintf(w, "Work schedule: %s\n", detail.WorkSchedule)
 	}
 	if detail.ApplyURL != "" {
 		fmt.Fprintf(w, "Apply URL: %s\n", detail.ApplyURL)

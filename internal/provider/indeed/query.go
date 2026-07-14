@@ -23,11 +23,17 @@ const searchFieldSet = `
 	}
 `
 
+// detailFieldSet requests every field jobData exposes for a job, not just
+// the ones this package happens to map to JobDetail's earlier, leaner shape
+// — JobDetail is already Indeed-specific (unlike python-jobspy's cross-site
+// JobPost), so there's no shared-schema reason to leave any of this on the
+// table.
 const detailFieldSet = `
 	job {
 		key
 		title
 		datePublished
+		dateOnIndeed
 		description { html }
 		location { countryName countryCode admin1Code city postalCode streetAddress formatted { short long } }
 		compensation {
@@ -40,12 +46,13 @@ const detailFieldSet = `
 			relativeCompanyPageUrl
 			name
 			dossier {
-				employerDetails { addresses industry employeesLocalizedLabel revenueLocalizedLabel briefDescription }
-				images { squareLogoUrl }
+				employerDetails { addresses industry employeesLocalizedLabel revenueLocalizedLabel briefDescription ceoName ceoPhotoUrl }
+				images { headerImageUrl squareLogoUrl }
 				links { corporateWebsite }
 			}
 		}
 		recruit { viewJobUrl detailedSalary workSchedule }
+		source { name }
 	}
 `
 

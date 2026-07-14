@@ -147,25 +147,62 @@ type indeedDetailInput struct {
 	Country string `json:"country,omitempty" jsonschema:"Country used to resolve the job's site domain for its URL; should match the country used in the original search. Defaults to Taiwan."`
 }
 
+type indeedLocation struct {
+	Country       string `json:"country,omitempty"`
+	CountryCode   string `json:"country_code,omitempty"`
+	State         string `json:"state,omitempty" jsonschema:"Indeed's own region code, e.g. 'TPE'."`
+	City          string `json:"city,omitempty"`
+	PostalCode    string `json:"postal_code,omitempty" jsonschema:"Usually absent; Indeed rarely discloses it."`
+	StreetAddress string `json:"street_address,omitempty" jsonschema:"Usually absent; Indeed rarely discloses it."`
+	Formatted     string `json:"formatted,omitempty" jsonschema:"Indeed's own human-readable rendering."`
+}
+
+func indeedLocationFromHTTP(l indeed.Location) *indeedLocation {
+	if l == (indeed.Location{}) {
+		return nil
+	}
+	return &indeedLocation{
+		Country:       l.Country,
+		CountryCode:   l.CountryCode,
+		State:         l.State,
+		City:          l.City,
+		PostalCode:    l.PostalCode,
+		StreetAddress: l.StreetAddress,
+		Formatted:     l.Formatted,
+	}
+}
+
+// indeedDetailOutput surfaces every field indeed.JobDetail carries. Unlike
+// python-jobspy's cross-site JobPost, this type only ever holds Indeed data,
+// so there's no shared-schema reason to trim it down.
 type indeedDetailOutput struct {
 	Key          string              `json:"key"`
 	URL          string              `json:"url,omitempty" jsonschema:"Public job posting URL."`
 	Title        string              `json:"title"`
 	Company      string              `json:"company,omitempty"`
 	CompanyURL   string              `json:"company_url,omitempty"`
-	Location     string              `json:"location,omitempty"`
+	Location     *indeedLocation     `json:"location,omitempty"`
 	PostedDate   string              `json:"posted_date,omitempty"`
 	Description  string              `json:"description,omitempty" jsonschema:"Full job description as HTML, as Indeed sends it."`
 	JobTypes     []string            `json:"job_types,omitempty"`
 	Compensation *indeedCompensation `json:"compensation,omitempty"`
 
-	CompanyWebsite     string `json:"company_website,omitempty"`
-	CompanyIndustry    string `json:"company_industry,omitempty"`
-	CompanyEmployees   string `json:"company_employees,omitempty"`
-	CompanyRevenue     string `json:"company_revenue,omitempty"`
-	CompanyDescription string `json:"company_description,omitempty"`
+	Source      string `json:"source,omitempty" jsonschema:"Listing source: usually the employer's own name, or a third-party board's name when Indeed aggregated the posting."`
+	DateIndexed string `json:"date_indexed,omitempty" jsonschema:"When Indeed indexed/last refreshed this posting; can be later than posted_date for reposted or refreshed listings."`
 
-	ApplyURL string `json:"apply_url,omitempty" jsonschema:"External ATS apply URL, when the poster configured direct apply instead of Indeed-native apply."`
+	CompanyWebsite     string   `json:"company_website,omitempty"`
+	CompanyIndustry    string   `json:"company_industry,omitempty"`
+	CompanyEmployees   string   `json:"company_employees,omitempty"`
+	CompanyRevenue     string   `json:"company_revenue,omitempty"`
+	CompanyDescription string   `json:"company_description,omitempty"`
+	CompanyAddresses   []string `json:"company_addresses,omitempty" jsonschema:"Employer's disclosed office addresses, when available (rare)."`
+	CompanyCEO         string   `json:"company_ceo,omitempty"`
+	CompanyCEOPhoto    string   `json:"company_ceo_photo,omitempty"`
+	CompanyBannerImage string   `json:"company_banner_image,omitempty" jsonschema:"Employer's profile banner image, distinct from the square logo."`
+
+	ApplyURL       string `json:"apply_url,omitempty" jsonschema:"External ATS apply URL, when the poster configured direct apply instead of Indeed-native apply."`
+	DetailedSalary string `json:"detailed_salary,omitempty" jsonschema:"Free-text salary detail beyond compensation, when the poster provided one; usually absent."`
+	WorkSchedule   string `json:"work_schedule,omitempty" jsonschema:"Free-text work schedule (e.g. shift pattern), when disclosed; usually absent."`
 }
 
 func indeedHTTPToMCPDetail(d *indeed.JobDetail) *indeedDetailOutput {
@@ -175,17 +212,25 @@ func indeedHTTPToMCPDetail(d *indeed.JobDetail) *indeedDetailOutput {
 		Title:              d.Title,
 		Company:            d.Company,
 		CompanyURL:         d.CompanyURL,
-		Location:           d.Location,
+		Location:           indeedLocationFromHTTP(d.Location),
 		PostedDate:         d.PostedDate,
 		Description:        d.Description,
 		JobTypes:           d.JobTypes,
 		Compensation:       indeedCompensationFromHTTP(d.Compensation),
+		Source:             d.Source,
+		DateIndexed:        d.DateIndexed,
 		CompanyWebsite:     d.CompanyWebsite,
 		CompanyIndustry:    d.CompanyIndustry,
 		CompanyEmployees:   d.CompanyEmployees,
 		CompanyRevenue:     d.CompanyRevenue,
 		CompanyDescription: d.CompanyDescription,
+		CompanyAddresses:   d.CompanyAddresses,
+		CompanyCEO:         d.CompanyCEO,
+		CompanyCEOPhoto:    d.CompanyCEOPhoto,
+		CompanyBannerImage: d.CompanyBannerImage,
 		ApplyURL:           d.ApplyURL,
+		DetailedSalary:     d.DetailedSalary,
+		WorkSchedule:       d.WorkSchedule,
 	}
 }
 
