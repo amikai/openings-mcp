@@ -27,7 +27,7 @@ import (
 )
 
 // providerOrder fixes the --provider default and the report's grouping order.
-var providerOrder = []string{"ashby", "eightfold", "greenhouse", "lever", "recruitee", "teamtailor", "workday"}
+var providerOrder = []string{"ashby", "eightfold", "greenhouse", "lever", "recruitee", "successfactors", "teamtailor", "workday"}
 
 // Result statuses. ERROR covers every failed check — a stale identifier
 // (upstream 404) and a transient failure (timeout, 5xx) alike; Detail
@@ -165,6 +165,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a, err = ats.NewLeverAdapter("https://api.lever.co", hc)
 		case "recruitee":
 			a = ats.NewRecruiteeAdapter(hc)
+		case "successfactors":
+			a = ats.NewSuccessFactorsAdapter(hc)
 		case "teamtailor":
 			a = ats.NewTeamtailorAdapter(hc)
 		case "workday":

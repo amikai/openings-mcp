@@ -195,6 +195,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		ats.NewTeamtailorAdapter(hc),
 		ats.NewRecruiteeAdapter(hc),
 		ats.NewEightfoldAdapter(hcEightfold),
+		ats.NewSuccessFactorsAdapter(hc),
 	)
 }
 

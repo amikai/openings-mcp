@@ -12,6 +12,7 @@ OPENAPI_SPECS := \
 	internal/provider/nvidia/openapi.yaml \
 	internal/provider/recruitee/openapi.yaml \
 	internal/provider/smartrecruiters/openapi.yaml \
+	internal/provider/successfactors/openapi.yaml \
 	internal/provider/synopsys/openapi.yaml \
 	internal/provider/teamtailor/openapi.yaml \
 	internal/provider/tsmc/openapi.yaml \

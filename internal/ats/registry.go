@@ -99,13 +99,14 @@ func (r *Registry) Resolve(company string) (Adapter, string, error) {
 // careers-page URL shape it recognizes, so the "unrecognized careers URL"
 // error only advertises hosts the registry actually has an adapter for.
 var careersHostPatternsByAdapter = map[string]string{
-	"workday":    "<tenant>.<wd*>.myworkdayjobs.com/<site>",
-	"greenhouse": "job-boards.greenhouse.io/<board>",
-	"lever":      "jobs.lever.co/<org>",
-	"ashby":      "jobs.ashbyhq.com/<org>",
-	"teamtailor": "<company>[.na|.au].teamtailor.com/jobs",
-	"recruitee":  "<company>.recruitee.com",
-	"eightfold":  "<tenant>.eightfold.ai/careers (roster tenants only)",
+	"workday":        "<tenant>.<wd*>.myworkdayjobs.com/<site>",
+	"greenhouse":     "job-boards.greenhouse.io/<board>",
+	"lever":          "jobs.lever.co/<org>",
+	"ashby":          "jobs.ashbyhq.com/<org>",
+	"teamtailor":     "<company>[.na|.au].teamtailor.com/jobs",
+	"recruitee":      "<company>.recruitee.com",
+	"eightfold":      "<tenant>.eightfold.ai/careers (roster tenants only)",
+	"successfactors": "jobs.<company>.com/search (roster tenants only)",
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered
