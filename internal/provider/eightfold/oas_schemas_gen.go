@@ -2,9 +2,88 @@
 
 package eightfold
 
+import (
+	"github.com/go-faster/jx"
+)
+
+// Ref: #/components/schemas/AllFilter
+type AllFilter struct {
+	// Same role as SmartFilter.filterName.
+	FilterName string `json:"filterName"`
+	Title      string `json:"title"`
+	// Null for non-list facets, mirroring SmartFilter.options.
+	Options []AllFilterOption `json:"options"`
+}
+
+// GetFilterName returns the value of FilterName.
+func (s *AllFilter) GetFilterName() string {
+	return s.FilterName
+}
+
+// GetTitle returns the value of Title.
+func (s *AllFilter) GetTitle() string {
+	return s.Title
+}
+
+// GetOptions returns the value of Options.
+func (s *AllFilter) GetOptions() []AllFilterOption {
+	return s.Options
+}
+
+// SetFilterName sets the value of FilterName.
+func (s *AllFilter) SetFilterName(val string) {
+	s.FilterName = val
+}
+
+// SetTitle sets the value of Title.
+func (s *AllFilter) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetOptions sets the value of Options.
+func (s *AllFilter) SetOptions(val []AllFilterOption) {
+	s.Options = val
+}
+
+// Same intent as SmartFilterOption, but label is deliberately left untyped rather than string:
+// "latlong" facets (observed on Eaton's and Qualcomm's latlong_non_remote, live-verified 2026-07-14)
+// send an integer nearby-postings count as label instead of a name, and a plain `type: string` here
+// would fail to decode the entire search response over one unusable facet. The adapter decodes label
+// permissively and drops any option whose label isn't a JSON string.
+// Ref: #/components/schemas/AllFilterOption
+type AllFilterOption struct {
+	Label jx.Raw `json:"label"`
+	// The value to send back as filter_=.
+	Value string `json:"value"`
+}
+
+// GetLabel returns the value of Label.
+func (s *AllFilterOption) GetLabel() jx.Raw {
+	return s.Label
+}
+
+// GetValue returns the value of Value.
+func (s *AllFilterOption) GetValue() string {
+	return s.Value
+}
+
+// SetLabel sets the value of Label.
+func (s *AllFilterOption) SetLabel(val jx.Raw) {
+	s.Label = val
+}
+
+// SetValue sets the value of Value.
+func (s *AllFilterOption) SetValue(val string) {
+	s.Value = val
+}
+
 // Ref: #/components/schemas/FilterDef
 type FilterDef struct {
 	SmartFilters []SmartFilter `json:"smartFilters"`
+	// A second facet list, usually disjoint from smartFilters, that some tenants populate instead of (or
+	// alongside) it — e.g. Eaton, Infineon, and Qualcomm return empty smartFilters but a populated
+	// allFilters. Not required: tenants that populate smartFilters have been observed omitting it.
+	AllFilters []AllFilter `json:"allFilters"`
 }
 
 // GetSmartFilters returns the value of SmartFilters.
@@ -12,9 +91,19 @@ func (s *FilterDef) GetSmartFilters() []SmartFilter {
 	return s.SmartFilters
 }
 
+// GetAllFilters returns the value of AllFilters.
+func (s *FilterDef) GetAllFilters() []AllFilter {
+	return s.AllFilters
+}
+
 // SetSmartFilters sets the value of SmartFilters.
 func (s *FilterDef) SetSmartFilters(val []SmartFilter) {
 	s.SmartFilters = val
+}
+
+// SetAllFilters sets the value of AllFilters.
+func (s *FilterDef) SetAllFilters(val []AllFilter) {
+	s.AllFilters = val
 }
 
 // NewOptInt returns new OptInt with value set to v.

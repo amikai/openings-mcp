@@ -82,6 +82,22 @@ func TestEightfoldFilters(t *testing.T) {
 	assert.Contains(t, fs["businessarea"], "Technology")
 	// "include_remote" is a toggle with null options — it must not appear.
 	assert.NotContains(t, fs, "include_remote")
+	// "country" only lives in filterDef.allFilters, not smartFilters — must
+	// be merged in for tenants (Eaton, Infineon, Qualcomm) that populate
+	// allFilters instead of smartFilters.
+	require.NotEmptyf(t, fs["country"], "FilterSet missing allFilters-only dimension: %v", fs)
+	assert.Contains(t, fs["country"], "Taiwan")
+}
+
+// TestEightfoldSearchWithAllFiltersOnlyFacetResolvesLabelToValue proves a
+// facet that only appears in filterDef.allFilters (not smartFilters) still
+// resolves through resolveFilters.
+func TestEightfoldSearchWithAllFiltersOnlyFacetResolvesLabelToValue(t *testing.T) {
+	a := testEightfoldAdapter(t)
+	_, err := a.Search(t.Context(), "eaton", SearchParams{
+		Filters: map[string][]string{"country": {"Taiwan"}},
+	})
+	require.NoError(t, err)
 }
 
 // TestEightfoldSearchWithFilterResolvesLabelToValue proves a display label

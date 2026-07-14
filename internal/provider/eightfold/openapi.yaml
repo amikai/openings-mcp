@@ -31,10 +31,11 @@ info:
     `filter_<facetName>=<value>` (repeatable for OR semantics), e.g.
     `filter_businessarea=technology&filter_businessarea=finance`. The set
     of valid facet names and values is tenant-specific and discovered at
-    runtime from `data.filterDef.smartFilters` in an unfiltered search
-    response — OpenAPI has no way to express a dynamically-named query
-    parameter, so `filter_*` application is handled by hand in the Go
-    adapter (`internal/ats`) rather than through the generated client.
+    runtime from `data.filterDef.smartFilters` and `data.filterDef.allFilters`
+    in an unfiltered search response — OpenAPI has no way to express a
+    dynamically-named query parameter, so `filter_*` application is handled
+    by hand in the Go adapter (`internal/ats`) rather than through the
+    generated client.
 
     ## v2: the other public search API
 
@@ -269,6 +270,38 @@ components:
           items:
             $ref: "#/components/schemas/SmartFilterOption"
 
+    AllFilterOption:
+      type: object
+      required: [label, value]
+      description: >
+        Same intent as SmartFilterOption, but label is deliberately left
+        untyped rather than string: "latlong" facets (observed on Eaton's
+        and Qualcomm's latlong_non_remote, live-verified 2026-07-14) send
+        an integer nearby-postings count as label instead of a name, and a
+        plain `type: string` here would fail to decode the entire search
+        response over one unusable facet. The adapter decodes label
+        permissively and drops any option whose label isn't a JSON string.
+      properties:
+        label: {}
+        value:
+          type: string
+          description: The value to send back as filter_<filterName>=<value>.
+
+    AllFilter:
+      type: object
+      required: [filterName, title, options]
+      properties:
+        filterName:
+          type: string
+          description: Same role as SmartFilter.filterName.
+        title:
+          type: string
+        options:
+          type: [array, "null"]
+          description: Null for non-list facets, mirroring SmartFilter.options.
+          items:
+            $ref: "#/components/schemas/AllFilterOption"
+
     FilterDef:
       type: object
       required: [smartFilters]
@@ -277,6 +310,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SmartFilter"
+        allFilters:
+          type: array
+          description: >
+            A second facet list, usually disjoint from smartFilters, that
+            some tenants populate instead of (or alongside) it — e.g.
+            Eaton, Infineon, and Qualcomm return empty smartFilters but a
+            populated allFilters. Not required: tenants that populate
+            smartFilters have been observed omitting it.
+          items:
+            $ref: "#/components/schemas/AllFilter"
 
     SearchData:
       type: object

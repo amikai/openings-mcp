@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"strconv"
@@ -311,9 +312,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 }
 
 // runFilters fetches one unfiltered search page and prints its facet
-// dimensions — the values 'search --filter' accepts. Facets with null
-// options (e.g. Morgan Stanley's "include_remote" toggle) are skipped;
-// they carry a boolean, not a value list.
+// dimensions — the values 'search --filter' accepts.
 func runFilters(ctx context.Context, company string, timeout time.Duration, format string) error {
 	c, err := resolveCompany(company)
 	if err != nil {
@@ -327,7 +326,19 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	if err != nil {
 		return err
 	}
-	res, err := client.Search(ctx, eightfold.SearchParams{Domain: c.Domain})
+	return printFilters(ctx, client, c.Domain, format, os.Stdout)
+}
+
+// printFilters fetches one unfiltered search page through client and writes
+// its facet dimensions to w. Split out from runFilters so tests can point
+// client at a mock server and inspect the output. Facets whose every option
+// gets dropped by eightfold.MergedFacets (e.g. Morgan Stanley's
+// "include_remote" toggle, whose options are null, or a facet where every
+// option's label isn't a pickable value) are skipped — same merge and
+// normalization the unified adapter (internal/ats) uses, so this CLI always
+// discovers the same facets 'search --filter' will accept.
+func printFilters(ctx context.Context, client *eightfold.Client, domain, format string, w io.Writer) error {
+	res, err := client.Search(ctx, eightfold.SearchParams{Domain: domain})
 	if err != nil {
 		return err
 	}
@@ -338,7 +349,7 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 		Values []string `json:"values"`
 	}
 	var out []filterJSON
-	for _, sf := range res.Data.FilterDef.SmartFilters {
+	for _, sf := range eightfold.MergedFacets(res.Data.FilterDef) {
 		if sf.Options == nil {
 			continue
 		}
@@ -350,12 +361,12 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	}
 
 	if format == "json" {
-		enc := json.NewEncoder(os.Stdout)
+		enc := json.NewEncoder(w)
 		enc.SetIndent("", "  ")
 		return enc.Encode(out)
 	}
 	for _, f := range out {
-		fmt.Printf("%s (%s): %s\n", f.Name, f.Title, strings.Join(f.Values, ", "))
+		fmt.Fprintf(w, "%s (%s): %s\n", f.Name, f.Title, strings.Join(f.Values, ", "))
 	}
 	return nil
 }

@@ -15,7 +15,8 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[Teamtailor](https://www.teamtailor.com)**, **[Recruitee](https://recruitee.com)**,
   and **[Eightfold](https://eightfold.ai)** ATS platforms, all behind one
   company-search tool. A company outside the built-in roster works too: pass its
-  careers-page URL on any of those platforms.
+  careers-page URL on any of those platforms except Eightfold, which supports
+  roster companies only.
 - **Dedicated sites**: **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
   **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
   **[TSMC careers](https://careers.tsmc.com)**.
