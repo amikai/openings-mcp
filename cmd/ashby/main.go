@@ -171,7 +171,7 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
-func summarize(j ashby.JobPosting) jobSummaryJSON {
+func summarize(j *ashby.JobPosting) jobSummaryJSON {
 	s := jobSummaryJSON{
 		ID:         j.ID.Value,
 		Title:      j.Title.Value,
@@ -230,7 +230,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		if f.keyword != "" && !strings.Contains(strings.ToLower(j.Title.Value), strings.ToLower(f.keyword)) {
 			continue
 		}
-		matched = append(matched, summarize(j))
+		matched = append(matched, summarize(&j))
 	}
 
 	if f.format == "json" {
@@ -313,13 +313,13 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 	for _, j := range resp.Jobs {
 		if j.ID.Value == f.jobID {
-			return printJob(j, f.format)
+			return printJob(&j, f.format)
 		}
 	}
 	return fmt.Errorf("job %q not found on board %q", f.jobID, f.board)
 }
 
-func printJob(j ashby.JobPosting, format string) error {
+func printJob(j *ashby.JobPosting, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")

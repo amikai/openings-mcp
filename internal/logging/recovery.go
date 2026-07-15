@@ -28,15 +28,13 @@ func RecoveryMiddleware(logger *slog.Logger) mcp.Middleware {
 				stack := debug.Stack()
 				logger.Error("panic recovered", "method", method, "panic", rec, "stack", string(stack))
 
-				if req != nil {
-					if p, ok := req.GetParams().(*mcp.CallToolParamsRaw); ok {
-						result = &mcp.CallToolResult{
-							IsError: true,
-							Content: []mcp.Content{&mcp.TextContent{Text: "tool " + p.Name + " panicked"}},
-						}
-						err = nil
-						return
+				if p, ok := toolCallParams(req); ok {
+					result = &mcp.CallToolResult{
+						IsError: true,
+						Content: []mcp.Content{&mcp.TextContent{Text: "tool " + p.Name + " panicked"}},
 					}
+					err = nil
+					return
 				}
 
 				result = nil
@@ -46,4 +44,12 @@ func RecoveryMiddleware(logger *slog.Logger) mcp.Middleware {
 			return next(ctx, method, req)
 		}
 	}
+}
+
+func toolCallParams(req mcp.Request) (*mcp.CallToolParamsRaw, bool) {
+	if req == nil {
+		return nil, false
+	}
+	p, ok := req.GetParams().(*mcp.CallToolParamsRaw)
+	return p, ok
 }

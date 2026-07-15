@@ -98,7 +98,7 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 			// Encoded option values that are not free-text matches still work
 			// when the caller already holds a portal token.
 			if !icims.LooksLikeLocationValue(location) {
-				return &SearchResult{Jobs: nil, TotalCount: 0, Page: page, TotalPages: 0}, nil
+				return &SearchResult{Jobs: []JobSummary{}, TotalCount: 0, Page: page, TotalPages: 0}, nil
 			}
 			locValues = []string{location}
 		}
@@ -111,7 +111,8 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 	// Discover the tenant page size from pr=0 under the active filters.
 	// When TotalPages > 1, pr=0 is always a full page.
 	first := probe
-	if len(base.Locations) > 0 || len(base.Categories) > 0 || len(base.PositionTypes) > 0 {
+	hasServerFilters := len(base.Locations) > 0 || len(base.Categories) > 0 || len(base.PositionTypes) > 0
+	if hasServerFilters {
 		first, err = client.Search(ctx, &base)
 		if err != nil {
 			return nil, fmt.Errorf("icims: search %q: %w", host, err)
@@ -121,7 +122,7 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 	upSize := first.PageSize
 	totalPagesUp := first.TotalPages
 	if upSize == 0 {
-		return &SearchResult{Jobs: nil, TotalCount: 0, Page: page, TotalPages: 0}, nil
+		return &SearchResult{Jobs: []JobSummary{}, TotalCount: 0, Page: page, TotalPages: 0}, nil
 	}
 
 	total, err := icimsExactTotal(ctx, client, base, first)
@@ -129,16 +130,14 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 		return nil, fmt.Errorf("icims: search %q: %w", host, err)
 	}
 	if start >= total {
-		return &SearchResult{Jobs: nil, TotalCount: total, Page: page, TotalPages: totalPages(total)}, nil
+		return &SearchResult{Jobs: []JobSummary{}, TotalCount: total, Page: page, TotalPages: totalPages(total)}, nil
 	}
 
 	correctPr := start / upSize
 	offsetInPage := start % upSize
 
-	var res *icims.SearchResponse
-	if correctPr == 0 {
-		res = first
-	} else {
+	res := first
+	if correctPr != 0 {
 		r := base
 		r.Page = correctPr
 		res, err = client.Search(ctx, &r)
@@ -147,7 +146,7 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 		}
 	}
 
-	var selected []icims.Job
+	selected := make([]icims.Job, 0)
 	if offsetInPage < len(res.Jobs) {
 		selected = append(selected, res.Jobs[offsetInPage:]...)
 	}

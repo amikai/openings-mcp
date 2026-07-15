@@ -108,7 +108,7 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		return "", fmt.Errorf("parse url %s: %w", c.baseURL, err)
+		return "", fmt.Errorf("parse url %q: %w", c.baseURL, err)
 	}
 	u = u.JoinPath(jobsPath)
 
@@ -218,17 +218,18 @@ func (c *Client) getHTML(ctx context.Context, rawURL, referer string) (*goquery.
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 999 {
+	switch resp.StatusCode {
+	case 999:
 		return nil, errors.New("HTTP 999: bot-suspected, LinkedIn redirected to its authwall; one retry may pass now that the session carries cookies — if 999 recurs, stop and back off")
-	}
-	if resp.StatusCode == http.StatusTooManyRequests {
+	case http.StatusTooManyRequests:
 		return nil, errors.New("HTTP 429: rate limited, and LinkedIn provides no Retry-After; immediate retries keep failing — stop LinkedIn requests for now and back off on your own schedule")
-	}
-	if resp.StatusCode != http.StatusOK {
+	case http.StatusOK:
+		// continue
+	default:
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
 	if final := resp.Request.URL.String(); strings.Contains(final, "linkedin.com/signup") || strings.Contains(final, "/authwall") {
-		return nil, fmt.Errorf("redirected to %s: no usable session", final)
+		return nil, fmt.Errorf("redirected to %q: no usable session", final)
 	}
 
 	doc, err := goquery.NewDocumentFromReader(resp.Body)

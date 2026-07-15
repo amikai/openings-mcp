@@ -71,7 +71,7 @@ func main() {
 		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
-				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
+				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
 			return runGet(ctx, getFlags{board: *board, timeout: *timeout, jobID: *jobID, format: *format})
 		},
@@ -156,7 +156,7 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
-func summarize(slug string, o recruitee.Offer) jobSummaryJSON {
+func summarize(slug string, o *recruitee.Offer) jobSummaryJSON {
 	title := o.Title.Or("")
 	dept := o.Department.Or("")
 	loc := o.Location.Or("")
@@ -198,7 +198,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		if f.keyword != "" && !strings.Contains(strings.ToLower(title), strings.ToLower(f.keyword)) {
 			continue
 		}
-		matched = append(matched, summarize(f.board, o))
+		matched = append(matched, summarize(f.board, &o))
 	}
 
 	if f.format == "json" {
@@ -242,13 +242,13 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 	for _, o := range resp.Offers {
 		if strconv.Itoa(o.ID) == f.jobID {
-			return printJob(f.board, o, f.format)
+			return printJob(f.board, &o, f.format)
 		}
 	}
 	return fmt.Errorf("job %q not found on board %q", f.jobID, f.board)
 }
 
-func printJob(slug string, o recruitee.Offer, format string) error {
+func printJob(slug string, o *recruitee.Offer, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")

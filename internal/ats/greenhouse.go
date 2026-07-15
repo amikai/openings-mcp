@@ -24,6 +24,15 @@ type GreenhouseAdapter struct {
 	client *greenhouse.Client
 }
 
+// greenhouseHosts are the public board hosts Greenhouse serves careers
+// pages from, including the EU data-residency variants.
+var greenhouseHosts = map[string]bool{
+	"job-boards.greenhouse.io":    true,
+	"boards.greenhouse.io":        true,
+	"job-boards.eu.greenhouse.io": true,
+	"boards.eu.greenhouse.io":     true,
+}
+
 func NewGreenhouseAdapter(baseURL string, hc *http.Client) (*GreenhouseAdapter, error) {
 	c, err := greenhouse.NewClient(baseURL, greenhouse.WithClient(hc))
 	if err != nil {
@@ -40,15 +49,6 @@ func (a *GreenhouseAdapter) Roster() []CompanyInfo {
 		infos = append(infos, CompanyInfo{Slug: c.BoardToken, Name: c.Name})
 	}
 	return infos
-}
-
-// greenhouseHosts are the public board hosts Greenhouse serves careers
-// pages from, including the EU data-residency variants.
-var greenhouseHosts = map[string]bool{
-	"job-boards.greenhouse.io":    true,
-	"boards.greenhouse.io":        true,
-	"job-boards.eu.greenhouse.io": true,
-	"boards.eu.greenhouse.io":     true,
 }
 
 // ParseCareersURL recognizes Greenhouse-hosted board URLs; the first path

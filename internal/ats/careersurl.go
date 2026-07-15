@@ -17,7 +17,11 @@ func parseCareersInput(s string) (*url.URL, bool) {
 		s = "https://" + s
 	}
 	u, err := url.Parse(s)
-	if err != nil || u.Hostname() == "" || (u.Scheme != "http" && u.Scheme != "https") {
+	if err != nil {
+		return nil, false
+	}
+	invalidScheme := u.Scheme != "http" && u.Scheme != "https"
+	if u.Hostname() == "" || invalidScheme {
 		return nil, false
 	}
 	return u, true

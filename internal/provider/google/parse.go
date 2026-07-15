@@ -130,23 +130,25 @@ func parseQualifications(h3 *html.Node) string {
 	var sb strings.Builder
 	appendNodeText(&sb, h3)
 	for sib := h3.NextSibling; sib != nil; sib = sib.NextSibling {
-		if sib.Type == html.ElementNode {
-			if sib.Data == "h3" {
-				qt := strings.TrimSpace(textContent(sib))
-				if strings.HasPrefix(qt, "Preferred qualifications") {
-					appendNodeText(&sb, sib)
-					continue
-				}
-				break
-			}
-			if sib.Data == "div" {
-				break
-			}
-			if sib.Data == "br" {
+		if sib.Type != html.ElementNode {
+			appendNodeText(&sb, sib)
+			continue
+		}
+		switch sib.Data {
+		case "h3":
+			qt := strings.TrimSpace(textContent(sib))
+			if strings.HasPrefix(qt, "Preferred qualifications") {
+				appendNodeText(&sb, sib)
 				continue
 			}
+			return strings.TrimSpace(sb.String())
+		case "div":
+			return strings.TrimSpace(sb.String())
+		case "br":
+			continue
+		default:
+			appendNodeText(&sb, sib)
 		}
-		appendNodeText(&sb, sib)
 	}
 	return strings.TrimSpace(sb.String())
 }

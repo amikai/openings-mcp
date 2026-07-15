@@ -411,11 +411,11 @@ func hiringOrgName(v any) string {
 func locationFromJSONLD(v any) string {
 	candidates, ok := v.([]any)
 	if !ok {
-		if m, isMap := v.(map[string]any); isMap {
-			candidates = []any{m}
-		} else {
+		m, isMap := v.(map[string]any)
+		if !isMap {
 			return ""
 		}
+		candidates = []any{m}
 	}
 	var places []string
 	seen := make(map[string]struct{}, len(candidates))

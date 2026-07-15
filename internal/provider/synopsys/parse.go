@@ -138,13 +138,13 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description string) {
 	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
 	if err != nil {
-		return
+		return "", "", "", ""
 	}
 
 	// xq -q "div.ats-description" --html
 	atsDesc := doc.Find("div.ats-description").First()
 	if atsDesc.Length() == 0 {
-		return
+		return "", "", "", ""
 	}
 
 	// Direct children:
@@ -155,11 +155,13 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 	var descSB strings.Builder
 	for _, c := range atsDesc.Contents().EachIter() {
 		n := c.Nodes[0]
-		if n.Type == html.ElementNode && n.Data == "span" &&
-			strings.Contains(c.AttrOr("class", ""), "job-info") {
+		isJobInfoSpan := n.Type == html.ElementNode && n.Data == "span" &&
+			strings.Contains(c.AttrOr("class", ""), "job-info")
+		if isJobInfoSpan {
 			continue
 		}
-		if n.Type == html.ElementNode && n.Data == "h3" && !firstH3Seen {
+		isMetadataH3 := n.Type == html.ElementNode && n.Data == "h3" && !firstH3Seen
+		if isMetadataH3 {
 			firstH3Seen = true
 			for _, s := range c.Find("span").EachIter() {
 				class := s.AttrOr("class", "")
@@ -181,7 +183,7 @@ func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description 
 		appendNodeText(&descSB, n)
 	}
 	description = strings.TrimSpace(strings.ReplaceAll(descSB.String(), "\r", ""))
-	return
+	return category, hireType, remoteEligible, description
 }
 
 func appendNodeText(sb *strings.Builder, n *html.Node) {

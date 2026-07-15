@@ -80,7 +80,7 @@ func main() {
 		Flags:     detailFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
-				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
+				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
 			return runDetail(ctx, detailFlags{company: *company, timeout: *timeout, jobID: *jobID, format: *format})
 		},

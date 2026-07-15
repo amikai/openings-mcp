@@ -14,7 +14,9 @@ func SplitExternalPath(externalPath string) (location, titleSlug string, ok bool
 		return "", "", false
 	}
 	location, titleSlug, ok = strings.Cut(rest, "/")
-	if !ok || location == "" || titleSlug == "" || strings.Contains(titleSlug, "/") {
+	missingSegs := !ok || location == "" || titleSlug == ""
+	extraSlash := strings.Contains(titleSlug, "/")
+	if missingSegs || extraSlash {
 		return "", "", false
 	}
 	return location, titleSlug, true

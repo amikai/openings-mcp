@@ -93,7 +93,7 @@ func main() {
 		Flags:     getFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
-				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
+				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
 			return runGet(ctx, getFlags{company: *company, timeout: *timeout, postingID: *postingID, format: *format})
 		},

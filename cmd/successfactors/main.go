@@ -104,7 +104,7 @@ func main() {
 		Flags:     detailFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
-				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
+				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
 			return runDetail(ctx, detailFlags{company: *company, timeout: *timeout, jobID: *jobID, format: *format})
 		},
@@ -269,7 +269,7 @@ func buildSearchFilters(f searchFlags) (map[string]string, error) {
 			continue
 		}
 		if _, exists := filters[filter.name]; exists {
-			return nil, fmt.Errorf("filter %q conflicts with %s", filter.name, filter.flag)
+			return nil, fmt.Errorf("filter %q conflicts with %q", filter.name, filter.flag)
 		}
 		filters[filter.name] = filter.value
 	}

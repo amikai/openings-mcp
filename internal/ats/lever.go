@@ -21,6 +21,12 @@ type LeverAdapter struct {
 	client *lever.Client
 }
 
+// leverHosts are Lever's public board hosts, including the EU variant.
+var leverHosts = map[string]bool{
+	"jobs.lever.co":    true,
+	"jobs.eu.lever.co": true,
+}
+
 func NewLeverAdapter(baseURL string, hc *http.Client) (*LeverAdapter, error) {
 	c, err := lever.NewClient(baseURL, lever.WithClient(hc))
 	if err != nil {
@@ -37,12 +43,6 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 		infos = append(infos, CompanyInfo{Slug: c.Site, Name: c.Name})
 	}
 	return infos
-}
-
-// leverHosts are Lever's public board hosts, including the EU variant.
-var leverHosts = map[string]bool{
-	"jobs.lever.co":    true,
-	"jobs.eu.lever.co": true,
 }
 
 // ParseCareersURL recognizes Lever-hosted board URLs; the first path

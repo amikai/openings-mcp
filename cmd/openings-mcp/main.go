@@ -212,7 +212,10 @@ type providerClients struct {
 }
 
 func newServer(clients providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
-	server := mcp.NewServer(&mcp.Implementation{Name: "openings-mcp", Version: version}, &mcp.ServerOptions{Instructions: serverInstructions, Logger: logger})
+	server := mcp.NewServer(
+		&mcp.Implementation{Name: "openings-mcp", Version: version},
+		&mcp.ServerOptions{Instructions: serverInstructions, Logger: logger},
+	)
 	server.AddReceivingMiddleware(logging.LoggingMiddleware(logger))
 	// Registered last so it wraps outermost, catching panics from tool
 	// handlers and from other middleware alike.

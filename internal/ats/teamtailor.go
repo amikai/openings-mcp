@@ -40,17 +40,6 @@ func (a *TeamtailorAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-// ParseCareersURL recognizes every non-reserved Teamtailor-hosted career site
-// and curated custom-domain sites. The lowercase hostname is already the slug
-// form accepted by the other adapter methods.
-func (a *TeamtailorAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	host := strings.ToLower(u.Hostname())
-	if !isTeamtailorCareerHost(host) {
-		return "", false
-	}
-	return host, true
-}
-
 var teamtailorReservedHosts = map[string]bool{
 	"api":          true,
 	"app":          true,
@@ -74,6 +63,17 @@ func isTeamtailorCareerHost(host string) bool {
 	}
 	first, _, _ := strings.Cut(prefix, ".")
 	return !teamtailorReservedHosts[first]
+}
+
+// ParseCareersURL recognizes every non-reserved Teamtailor-hosted career site
+// and curated custom-domain sites. The lowercase hostname is already the slug
+// form accepted by the other adapter methods.
+func (a *TeamtailorAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	host := strings.ToLower(u.Hostname())
+	if !isTeamtailorCareerHost(host) {
+		return "", false
+	}
+	return host, true
 }
 
 func (a *TeamtailorAdapter) Search(

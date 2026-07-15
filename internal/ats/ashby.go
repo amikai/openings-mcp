@@ -78,7 +78,7 @@ func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 			JobID:       j.ID.Value,
 			Title:       j.Title.Value,
 			Company:     cmp.Or(ashby.CompaniesByBoard[slug].Name, slug),
-			Location:    ashbyLocations(j),
+			Location:    ashbyLocations(&j),
 			PostedAt:    ashbyPostedAt(j.PublishedAt),
 			URL:         j.JobUrl.Value,
 			Description: j.DescriptionPlain.Value,
@@ -139,7 +139,7 @@ func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error)
 			sortKey:     j.PublishedAt.Value,
 			orgUnit:     j.Department.Value + " " + j.Team.Value,
 			description: j.DescriptionPlain.Value,
-			locations:   ashbyLocations(j),
+			locations:   ashbyLocations(&j),
 			fields:      fields,
 			isRemote:    j.IsRemote.Or(false),
 		})
@@ -158,7 +158,7 @@ func ashbyPostedAt(t ashby.NilDateTime) string {
 	return isoDate(v)
 }
 
-func ashbyLocations(j ashby.JobPosting) string {
+func ashbyLocations(j *ashby.JobPosting) string {
 	parts := make([]string, 0, 1+len(j.SecondaryLocations))
 	parts = append(parts, j.Location.Value)
 	for _, s := range j.SecondaryLocations {
