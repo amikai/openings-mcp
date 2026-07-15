@@ -92,8 +92,10 @@ type JobDetailResponse struct {
 // Location must be either an encoded portal option value (e.g.
 // "12781-12827-Austin") or free text matched against option labels/values
 // (e.g. "Austin"). Free text is resolved via a probe request before the
-// real search; unknown locations yield an empty result set rather than
-// silently ignoring the filter.
+// real search. When several options match (e.g. "US"), every match is
+// searched and the job lists are merged so broad fuzzy inputs are not
+// collapsed to a single city. Unknown locations yield an empty result set
+// rather than silently ignoring the filter.
 func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchResponse, error) {
 	if req == nil {
 		req = &SearchRequest{}
@@ -105,32 +107,112 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 		page = 0
 	}
 
-	if loc != "" && !looksLikeLocationValue(loc) {
-		resolved, opts, err := c.resolveLocation(ctx, keyword, loc)
+	if loc != "" && !LooksLikeLocationValue(loc) {
+		matches, opts, err := c.resolveLocations(ctx, keyword, loc)
 		if err != nil {
 			return nil, err
 		}
-		if resolved == "" {
+		switch len(matches) {
+		case 0:
 			return &SearchResponse{Jobs: nil, TotalPages: 1, PageSize: 0, Locations: opts}, nil
+		case 1:
+			loc = matches[0]
+		default:
+			// Multi-match: union every matching option. Page is applied per
+			// option then merged; adapters that need exact unified paging
+			// should dump all pages per option (see SearchAllForLocations).
+			return c.searchMerged(ctx, keyword, matches, page, opts)
 		}
-		loc = resolved
 	}
 
 	return c.doSearch(ctx, keyword, loc, page)
 }
 
-// resolveLocation probes pr=0 (keyword only) for the location <select> and
-// maps free-text loc onto an option value. Returns ("", opts, nil) when no
-// option matches.
-func (c *Client) resolveLocation(ctx context.Context, keyword, loc string) (string, []LocationOption, error) {
+// resolveLocations probes pr=0 (keyword only) for the location <select> and
+// maps free-text loc onto every matching option value.
+func (c *Client) resolveLocations(ctx context.Context, keyword, loc string) ([]string, []LocationOption, error) {
 	probe, err := c.doSearch(ctx, keyword, "", 0)
 	if err != nil {
-		return "", nil, err
+		return nil, nil, err
 	}
-	if v, ok := MatchLocationOption(probe.Locations, loc); ok {
-		return v, probe.Locations, nil
+	return MatchLocationOptions(probe.Locations, loc), probe.Locations, nil
+}
+
+// SearchAllForLocations fetches every upstream page for each encoded
+// location value and returns the de-duplicated union (stable: location
+// order, then page order). Used by the adapter for multi-option fuzzy
+// location matches.
+func (c *Client) SearchAllForLocations(ctx context.Context, keyword string, locations []string) ([]Job, []LocationOption, error) {
+	var (
+		out  []Job
+		opts []LocationOption
+		seen = make(map[string]struct{})
+	)
+	for i, loc := range locations {
+		loc = strings.TrimSpace(loc)
+		if loc == "" {
+			continue
+		}
+		page := 0
+		for {
+			res, err := c.doSearch(ctx, keyword, loc, page)
+			if err != nil {
+				return nil, nil, err
+			}
+			if i == 0 && page == 0 {
+				opts = res.Locations
+			}
+			for _, j := range res.Jobs {
+				if _, dup := seen[j.ID]; dup {
+					continue
+				}
+				seen[j.ID] = struct{}{}
+				out = append(out, j)
+			}
+			if res.PageSize == 0 || page+1 >= res.TotalPages {
+				break
+			}
+			page++
+		}
 	}
-	return "", probe.Locations, nil
+	return out, opts, nil
+}
+
+// searchMerged unions one upstream page across several location values.
+func (c *Client) searchMerged(ctx context.Context, keyword string, locations []string, page int, opts []LocationOption) (*SearchResponse, error) {
+	var (
+		jobs     []Job
+		seen     = make(map[string]struct{})
+		maxPages int
+	)
+	for _, loc := range locations {
+		res, err := c.doSearch(ctx, keyword, loc, page)
+		if err != nil {
+			return nil, err
+		}
+		if res.TotalPages > maxPages {
+			maxPages = res.TotalPages
+		}
+		if len(opts) == 0 {
+			opts = res.Locations
+		}
+		for _, j := range res.Jobs {
+			if _, dup := seen[j.ID]; dup {
+				continue
+			}
+			seen[j.ID] = struct{}{}
+			jobs = append(jobs, j)
+		}
+	}
+	if maxPages < 1 {
+		maxPages = 1
+	}
+	return &SearchResponse{
+		Jobs:       jobs,
+		TotalPages: maxPages,
+		PageSize:   len(jobs),
+		Locations:  opts,
+	}, nil
 }
 
 func (c *Client) doSearch(ctx context.Context, keyword, location string, page int) (*SearchResponse, error) {

@@ -29,6 +29,18 @@ func TestParseSearchHTMLFixture(t *testing.T) {
 	assert.Contains(t, locs[0].Label, "Austin")
 }
 
+func TestMatchLocationOptions(t *testing.T) {
+	opts := []LocationOption{
+		{Value: "12781-12827-Austin", Label: "TX Austin US"},
+		{Value: "12781-12830-Lorton", Label: "VA Lorton US"},
+	}
+	assert.Equal(t, []string{"12781-12827-Austin"}, MatchLocationOptions(opts, "Austin"))
+	assert.Equal(t, []string{"12781-12830-Lorton"}, MatchLocationOptions(opts, "12781-12830-Lorton"))
+	// Broad country match must retain every US option, not collapse to one city.
+	assert.Equal(t, []string{"12781-12827-Austin", "12781-12830-Lorton"}, MatchLocationOptions(opts, "US"))
+	assert.Empty(t, MatchLocationOptions(opts, "Seattle"))
+}
+
 func TestMatchLocationOption(t *testing.T) {
 	opts := []LocationOption{
 		{Value: "12781-12827-Austin", Label: "TX Austin US"},
@@ -38,18 +50,19 @@ func TestMatchLocationOption(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "12781-12827-Austin", v)
 
-	v, ok = MatchLocationOption(opts, "12781-12830-Lorton")
+	// Multi-match convenience returns the first hit only.
+	v, ok = MatchLocationOption(opts, "US")
 	require.True(t, ok)
-	assert.Equal(t, "12781-12830-Lorton", v)
+	assert.Equal(t, "12781-12827-Austin", v)
 
 	_, ok = MatchLocationOption(opts, "Seattle")
 	assert.False(t, ok)
 }
 
 func TestLooksLikeLocationValue(t *testing.T) {
-	assert.True(t, looksLikeLocationValue("12781-12827-Austin"))
-	assert.False(t, looksLikeLocationValue("Austin"))
-	assert.False(t, looksLikeLocationValue("TX Austin US"))
+	assert.True(t, LooksLikeLocationValue("12781-12827-Austin"))
+	assert.False(t, LooksLikeLocationValue("Austin"))
+	assert.False(t, LooksLikeLocationValue("TX Austin US"))
 }
 
 func TestParseSearchNoResults(t *testing.T) {

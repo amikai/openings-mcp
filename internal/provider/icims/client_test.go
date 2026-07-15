@@ -76,6 +76,34 @@ func TestSearchLocationUnknown(t *testing.T) {
 	assert.Equal(t, 0, got.PageSize)
 }
 
+func TestSearchLocationMultiMatchFansOut(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(srv.URL, srv.Client())
+
+	// "US" matches Austin and Lorton options; fan-out must keep both cities.
+	got, err := c.Search(t.Context(), &SearchRequest{Location: "US"})
+	require.NoError(t, err)
+	require.Len(t, got.Jobs, 3)
+	ids := []string{got.Jobs[0].ID, got.Jobs[1].ID, got.Jobs[2].ID}
+	assert.Equal(t, []string{"1977", "1922", "1925"}, ids)
+}
+
+func TestSearchAllForLocations(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(srv.URL, srv.Client())
+
+	jobs, _, err := c.SearchAllForLocations(t.Context(), "", []string{
+		"12781-12827-Austin",
+		"12781-12830-Lorton",
+	})
+	require.NoError(t, err)
+	require.Len(t, jobs, 3)
+	assert.Equal(t, "1977", jobs[0].ID)
+	assert.Equal(t, "1925", jobs[2].ID)
+}
+
 func TestSearchNoResults(t *testing.T) {
 	srv := NewMockServer()
 	defer srv.Close()

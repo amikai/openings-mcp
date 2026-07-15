@@ -78,52 +78,54 @@ func parseLocationOptions(doc *goquery.Document) []LocationOption {
 	return out
 }
 
-// MatchLocationOption maps free-text user input onto a portal option value.
-// Exact (case-insensitive) matches on value or label win; otherwise the
-// shortest label/value containing the text is chosen. ok is false when no
-// option matches.
-func MatchLocationOption(opts []LocationOption, text string) (value string, ok bool) {
+// MatchLocationOptions maps free-text user input onto every matching portal
+// option value. Exact (case-insensitive) value/label hits are preferred when
+// any exist; otherwise every option whose label or value contains the text
+// is returned, in portal order. Callers that need a complete result set for
+// broad inputs such as a country or state must fan out across all values
+// (or otherwise merge), not pick one arbitrarily.
+func MatchLocationOptions(opts []LocationOption, text string) []string {
 	text = strings.TrimSpace(text)
 	if text == "" || len(opts) == 0 {
-		return "", false
+		return nil
 	}
 	lower := strings.ToLower(text)
 
+	var exact []string
 	for _, o := range opts {
 		if strings.EqualFold(o.Value, text) || strings.EqualFold(o.Label, text) {
-			return o.Value, true
+			exact = append(exact, o.Value)
 		}
 	}
-
-	type hit struct {
-		value string
-		rank  int // smaller is better: prefer shorter labels
+	if len(exact) > 0 {
+		return exact
 	}
-	var best *hit
+
+	var fuzzy []string
 	for _, o := range opts {
 		lv := strings.ToLower(o.Value)
 		ll := strings.ToLower(o.Label)
-		if !strings.Contains(ll, lower) && !strings.Contains(lv, lower) {
-			continue
-		}
-		rank := len(o.Label)
-		if rank == 0 {
-			rank = len(o.Value)
-		}
-		if best == nil || rank < best.rank || (rank == best.rank && o.Value < best.value) {
-			h := hit{value: o.Value, rank: rank}
-			best = &h
+		if strings.Contains(ll, lower) || strings.Contains(lv, lower) {
+			fuzzy = append(fuzzy, o.Value)
 		}
 	}
-	if best == nil {
-		return "", false
-	}
-	return best.value, true
+	return fuzzy
 }
 
-// looksLikeLocationValue reports whether s is already an encoded portal
+// MatchLocationOption is a convenience for the single-match case. ok is
+// false when no option matches; when several match, the first is returned.
+// Prefer MatchLocationOptions when the caller must preserve every hit.
+func MatchLocationOption(opts []LocationOption, text string) (value string, ok bool) {
+	matches := MatchLocationOptions(opts, text)
+	if len(matches) == 0 {
+		return "", false
+	}
+	return matches[0], true
+}
+
+// LooksLikeLocationValue reports whether s is already an encoded portal
 // option value (digits-digits-name), so Search can skip a resolve probe.
-func looksLikeLocationValue(s string) bool {
+func LooksLikeLocationValue(s string) bool {
 	// e.g. "12781-12827-Austin"
 	i := strings.IndexByte(s, '-')
 	if i <= 0 {

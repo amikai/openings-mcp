@@ -2,6 +2,7 @@ package ats
 
 import (
 	"fmt"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -102,6 +103,25 @@ func TestICIMSSearchLocation(t *testing.T) {
 	}
 	assert.Equal(t, "1977", res.Jobs[0].JobID)
 	assert.Equal(t, "1922", res.Jobs[1].JobID)
+}
+
+func TestICIMSSearchLocationMultiMatch(t *testing.T) {
+	a := testICIMSAdapter(t)
+	// "US" hits Austin and Lorton options; must return all three board jobs.
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Location: "US"})
+	require.NoError(t, err)
+	require.Len(t, res.Jobs, 3)
+	assert.Equal(t, 3, res.TotalCount)
+	assert.Equal(t, "1977", res.Jobs[0].JobID)
+	assert.Equal(t, "1922", res.Jobs[1].JobID)
+	assert.Equal(t, "1925", res.Jobs[2].JobID)
+}
+
+func TestICIMSSearchPageOverflow(t *testing.T) {
+	a := testICIMSAdapter(t)
+	_, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: math.MaxInt})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "too large")
 }
 
 func TestICIMSSearchNoResults(t *testing.T) {

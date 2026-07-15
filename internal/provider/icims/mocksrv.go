@@ -16,6 +16,9 @@ var mockSearchFilteredRsp []byte
 //go:embed testdata/search_location_rsp.html
 var mockSearchLocationRsp []byte
 
+//go:embed testdata/search_location_lorton_rsp.html
+var mockSearchLocationLortonRsp []byte
+
 //go:embed testdata/search_no_results_rsp.html
 var mockSearchNoResultsRsp []byte
 
@@ -39,9 +42,11 @@ func NewMockServer() *httptest.Server {
 		case q.Get("searchKeyword") == "zzzznonexistentkeyword12345":
 			serveHTML(mockSearchNoResultsRsp)(w, r)
 		case loc != "" && (strings.Contains(loc, "Austin") || strings.Contains(strings.ToLower(loc), "austin")):
-			// Encoded value (12781-12827-Austin) or free text that somehow
-			// reached the wire — fixture is Austin-only (jobs 1977, 1922).
+			// Encoded value (12781-12827-Austin) — Austin-only jobs 1977, 1922.
 			serveHTML(mockSearchLocationRsp)(w, r)
+		case loc != "" && (strings.Contains(loc, "Lorton") || strings.Contains(strings.ToLower(loc), "lorton")):
+			// Encoded value (12781-12830-Lorton) — Lorton-only job 1925.
+			serveHTML(mockSearchLocationLortonRsp)(w, r)
 		case strings.Contains(strings.ToLower(q.Get("searchKeyword")), "product"):
 			serveHTML(mockSearchFilteredRsp)(w, r)
 		default:

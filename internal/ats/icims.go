@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strings"
@@ -66,36 +67,68 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 	}
 
 	page := clampPage(p.Page)
-	start := (page - 1) * pageSize
+	pageIndex := page - 1
+	// Page is user-controlled with no schema maximum; reject values that
+	// would overflow the start offset (same guard as the Workday adapter).
+	if pageIndex > math.MaxInt/pageSize {
+		return nil, fmt.Errorf("icims: page %d is too large; retry with a smaller page", page)
+	}
+	start := pageIndex * pageSize
 
 	client := icims.NewClient(a.baseURL(host), a.hc)
-	// Discover the tenant page size from pr=0. When TotalPages > 1, pr=0 is
-	// always a full page, so PageSize is the stable configured size — not a
-	// partial last page (which would break offset math).
-	//
-	// Free-text Location is resolved to an encoded option value inside the
-	// client; pass it through so the filter is applied on every request.
-	base := icims.SearchRequest{
-		Keyword:  p.Query,
-		Location: strings.TrimSpace(p.Location),
-	}
-	first, err := client.Search(ctx, &icims.SearchRequest{
-		Keyword:  base.Keyword,
-		Location: base.Location,
-		Page:     0,
-	})
+	keyword := strings.TrimSpace(p.Query)
+	location := strings.TrimSpace(p.Location)
+
+	// Probe pr=0 without a location filter to learn options and, when no
+	// location is requested, the stable upstream page size.
+	probe, err := client.Search(ctx, &icims.SearchRequest{Keyword: keyword, Page: 0})
 	if err != nil {
 		return nil, fmt.Errorf("icims: search %q: %w", host, err)
 	}
 
-	// Prefer the encoded option value for subsequent pages so the client
-	// skips a free-text resolve probe on every request.
-	if base.Location != "" {
-		if v, ok := icims.MatchLocationOption(first.Locations, base.Location); ok {
-			base.Location = v
-		} else if first.PageSize == 0 && len(first.Jobs) == 0 {
-			// Unknown location: client already returned empty.
-			return &SearchResult{Jobs: nil, TotalCount: 0, Page: page, TotalPages: 0}, nil
+	var locValues []string
+	if location != "" {
+		locValues = icims.MatchLocationOptions(probe.Locations, location)
+		if len(locValues) == 0 {
+			// Encoded option values that are not free-text matches still work
+			// when the caller already holds a portal token.
+			if icims.LooksLikeLocationValue(location) {
+				locValues = []string{location}
+			} else {
+				return &SearchResult{Jobs: nil, TotalCount: 0, Page: page, TotalPages: 0}, nil
+			}
+		}
+	}
+
+	// Broad fuzzy inputs (country/state) often hit several portal options.
+	// Fan out, union every matching board, then page locally so no option
+	// is dropped the way a single-option rank would.
+	if len(locValues) > 1 {
+		all, _, err := client.SearchAllForLocations(ctx, keyword, locValues)
+		if err != nil {
+			return nil, fmt.Errorf("icims: search %q: %w", host, err)
+		}
+		return icimsPageJobs(all, host, companyName, page, start), nil
+	}
+
+	base := icims.SearchRequest{Keyword: keyword}
+	if len(locValues) == 1 {
+		base.Location = locValues[0]
+	}
+
+	// Discover the tenant page size from pr=0 under the active filters.
+	// When TotalPages > 1, pr=0 is always a full page.
+	var first *icims.SearchResponse
+	if base.Location == "" {
+		first = probe
+	} else {
+		first, err = client.Search(ctx, &icims.SearchRequest{
+			Keyword:  base.Keyword,
+			Location: base.Location,
+			Page:     0,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("icims: search %q: %w", host, err)
 		}
 	}
 
@@ -159,6 +192,20 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 		Page:       page,
 		TotalPages: totalPages(total),
 	}, nil
+}
+
+func icimsPageJobs(all []icims.Job, host, companyName string, page, start int) *SearchResult {
+	total := len(all)
+	if start >= total {
+		return &SearchResult{Jobs: nil, TotalCount: total, Page: page, TotalPages: totalPages(total)}
+	}
+	end := min(start+pageSize, total)
+	return &SearchResult{
+		Jobs:       icimsJobSummaries(all[start:end], host, companyName),
+		TotalCount: total,
+		Page:       page,
+		TotalPages: totalPages(total),
+	}
 }
 
 // icimsExactTotal returns the job count for the current filters.
