@@ -1,153 +1,168 @@
-- company: Eaton
-  tenant: eaton
-  domain: eaton.com
-- company: Infineon
-  tenant: infineon
-  domain: infineon.com
-- company: Lam Research
-  tenant: lamresearch
-  domain: lamresearch.com
-- company: Qualcomm
-  tenant: qualcomm
-  domain: qualcomm.com
-- company: Vodafone
-  tenant: vodafone
-  domain: vodafone.com
-- company: Fortive
-  tenant: fortive
-  domain: fortive.com
-- company: Boston Scientific
-  tenant: bostonscientific
-  domain: bostonscientific.com
-- company: Estée Lauder Companies
-  tenant: elcompanies
-  domain: elcompanies.com
-- company: Starbucks
-  tenant: starbucks
-  domain: starbucks.com
-- company: Ericsson
-  tenant: ericsson
-  domain: ericsson.com
-- company: UKG
-  tenant: ukg
-  domain: ukg.com
-- company: dsm-firmenich
-  tenant: dsm
-  domain: dsm.com
-- company: Johns Hopkins University
-  tenant: jhu
-  domain: jhu.edu
-- company: Whirlpool
-  tenant: whirlpool
-  domain: whirlpool.com
-- company: Ralliant
-  tenant: ralliant
-  domain: ralliant.com
-- company: John Deere
-  tenant: johndeere
-  domain: johndeere.com
+- company: 10x Genomics
+  tenant: 10xgenomics
+  domain: 10xgenomics.com
+- company: ATB Financial
+  tenant: atb
+  domain: atb.com
 - company: Amdocs
   tenant: amdocs
   domain: amdocs.com
 - company: Arcadis
   tenant: arcadis
   domain: arcadis.com
-- company: Coca-Cola Europacific Partners
-  tenant: ccep
-  domain: ccep.com
-- company: Dolby
-  tenant: dolby
-  domain: dolby.com
-- company: Mercado Libre
-  tenant: mercadolibre
-  domain: mercadolibre.com
-- company: TriNet
-  tenant: trinet
-  domain: trinet.com
-- company: Ford
-  tenant: ford
-  domain: ford.com
-- company: Microsoft
-  tenant: microsoft
-  domain: microsoft.com
-- company: SLB
-  tenant: slb
-  domain: slb.com
-- company: Keurig Dr Pepper
-  tenant: kdrp
-  domain: kdrp.com
-- company: Vale
-  tenant: vale
-  domain: vale.com
+- company: AstraZeneca
+  tenant: astrazeneca
+  domain: astrazeneca.com
 - company: Bayer
   tenant: bayer
   domain: bayer.com
-- company: HSBC
-  tenant: hsbc
-  domain: hsbc.com
-- company: STMicroelectronics
-  tenant: stmicroelectronics
-  domain: stmicroelectronics.com
-- company: Symetra
-  tenant: symetra
-  domain: symetra.com
-- company: Liberty Mutual Insurance
-  tenant: libertymutual
-  domain: libertymutual.com
-- company: Insight Enterprises
-  tenant: insight
-  domain: insight.com
-- company: NetApp
-  tenant: netapp
-  domain: netapp.com
-- company: MM Group
-  tenant: mm-group
-  domain: mm-group.com
-- company: Freeport-McMoRan
-  tenant: fcx
-  domain: fcx.com
-- company: Forvia
-  tenant: faurecia
-  domain: faurecia.com
-- company: Coca-Cola FEMSA
-  tenant: coca-colafemsa
-  domain: coca-colafemsa.com
-- company: New York Life
-  tenant: newyorklife
-  domain: newyorklife.com
-- company: Deutsche Telekom
-  tenant: telekom-growthhub
-  domain: telekom-growthhub.com
-- company: Tailored Brands
-  tenant: tailoredbrands
-  domain: tailoredbrands.com
-- company: Softtek
-  tenant: softtek
-  domain: softtek.com
-- company: Teva Pharmaceutical Industries
-  tenant: tevapharm
-  domain: tevapharm.com
-- company: British Council
-  tenant: britishcouncil
-  domain: britishcouncil.org
-- company: Worley
-  tenant: worley
-  domain: worley.com
-- company: ATB Financial
-  tenant: atb
-  domain: atb.com
-- company: Houston Independent School District
-  tenant: houstonisd
-  domain: houstonisd.org
-- company: 10x Genomics
-  tenant: 10xgenomics
-  domain: 10xgenomics.com
-- company: Modern Technology Solutions Inc
-  tenant: mtsi-va
-  domain: mtsi-va.com
 - company: Bimbo Bakeries USA
   tenant: grupobimbo
   domain: grupobimbo.com
+- company: Boston Scientific
+  tenant: bostonscientific
+  domain: bostonscientific.com
+- company: British Council
+  tenant: britishcouncil
+  domain: britishcouncil.org
+- company: Circana
+  tenant: circana
+  domain: circana.com
+- company: Coca-Cola Europacific Partners
+  tenant: ccep
+  domain: ccep.com
+- company: Coca-Cola FEMSA
+  tenant: coca-colafemsa
+  domain: coca-colafemsa.com
+- company: Deutsche Telekom
+  tenant: telekom-growthhub
+  domain: telekom-growthhub.com
+- company: Dolby
+  tenant: dolby
+  domain: dolby.com
+- company: Eaton
+  tenant: eaton
+  domain: eaton.com
+- company: Ericsson
+  tenant: ericsson
+  domain: ericsson.com
+- company: Estée Lauder Companies
+  tenant: elcompanies
+  domain: elcompanies.com
+- company: Ford
+  tenant: ford
+  domain: ford.com
+- company: Fortive
+  tenant: fortive
+  domain: fortive.com
+- company: Forvia
+  tenant: faurecia
+  domain: faurecia.com
+- company: Freeport-McMoRan
+  tenant: fcx
+  domain: fcx.com
 - company: Frontier Communications
   tenant: ftr
   domain: ftr.com
+- company: HSBC
+  tenant: hsbc
+  domain: hsbc.com
+- company: Houston Independent School District
+  tenant: houstonisd
+  domain: houstonisd.org
+- company: Infineon
+  tenant: infineon
+  domain: infineon.com
+- company: Insight Enterprises
+  tenant: insight
+  domain: insight.com
+- company: John Deere
+  tenant: johndeere
+  domain: johndeere.com
+- company: Johns Hopkins University
+  tenant: jhu
+  domain: jhu.edu
+- company: Keurig Dr Pepper
+  tenant: kdrp
+  domain: kdrp.com
+- company: Lam Research
+  tenant: lamresearch
+  domain: lamresearch.com
+- company: Liberty Mutual Insurance
+  tenant: libertymutual
+  domain: libertymutual.com
+- company: MM Group
+  tenant: mm-group
+  domain: mm-group.com
+- company: Mercado Libre
+  tenant: mercadolibre
+  domain: mercadolibre.com
+- company: Microsoft
+  tenant: microsoft
+  domain: microsoft.com
+- company: Millennium
+  tenant: mlp
+  domain: mlp.com
+- company: Modern Technology Solutions Inc
+  tenant: mtsi-va
+  domain: mtsi-va.com
+- company: Morgan Stanley Inc.
+  tenant: morganstanley
+  domain: morganstanley.com
+- company: NetApp
+  tenant: netapp
+  domain: netapp.com
+- company: New York Life
+  tenant: newyorklife
+  domain: newyorklife.com
+- company: Qualcomm
+  tenant: qualcomm
+  domain: qualcomm.com
+- company: Ralliant
+  tenant: ralliant
+  domain: ralliant.com
+- company: SLB
+  tenant: slb
+  domain: slb.com
+- company: STMicroelectronics
+  tenant: stmicroelectronics
+  domain: stmicroelectronics.com
+- company: Sephora
+  tenant: sephora
+  domain: sephora.com
+- company: Softtek
+  tenant: softtek
+  domain: softtek.com
+- company: Starbucks
+  tenant: starbucks
+  domain: starbucks.com
+- company: Symetra
+  tenant: symetra
+  domain: symetra.com
+- company: Tailored Brands
+  tenant: tailoredbrands
+  domain: tailoredbrands.com
+- company: Teva Pharmaceutical Industries
+  tenant: tevapharm
+  domain: tevapharm.com
+- company: TriNet
+  tenant: trinet
+  domain: trinet.com
+- company: UKG
+  tenant: ukg
+  domain: ukg.com
+- company: Vale
+  tenant: vale
+  domain: vale.com
+- company: Vodafone
+  tenant: vodafone
+  domain: vodafone.com
+- company: Whirlpool
+  tenant: whirlpool
+  domain: whirlpool.com
+- company: Worley
+  tenant: worley
+  domain: worley.com
+- company: dsm-firmenich
+  tenant: dsm
+  domain: dsm.com
