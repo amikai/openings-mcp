@@ -1,8 +1,11 @@
 package icims
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -81,50 +84,94 @@ func TestSearchLocationMultiMatchFansOut(t *testing.T) {
 	defer srv.Close()
 	c := NewClient(srv.URL, srv.Client())
 
-	// "US" matches Austin and Lorton options; local filter keeps both cities
-	// in unfiltered board order (1977 Austin, 1925 Lorton, 1922 Austin).
+	// "US" matches Austin and Lorton options; encoded searches keep both
+	// cities in option order (Austin jobs, then Lorton jobs).
 	got, err := c.Search(t.Context(), &SearchRequest{Location: "US"})
 	require.NoError(t, err)
 	require.Len(t, got.Jobs, 3)
 	ids := []string{got.Jobs[0].ID, got.Jobs[1].ID, got.Jobs[2].ID}
-	assert.Equal(t, []string{"1977", "1925", "1922"}, ids)
+	assert.Equal(t, []string{"1977", "1922", "1925"}, ids)
 }
 
-func TestCollectJobsMatchingLocation(t *testing.T) {
+func TestSearchLocationMultiMatchUsesEncodedOptions(t *testing.T) {
+	// Some tenants expose a country token in option labels while job cards
+	// only show city/state. Filtering unfiltered cards by the original "US"
+	// text would therefore drop both valid jobs; encoded option searches must
+	// remain the source of truth.
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		location := r.URL.Query().Get("searchLocation")
+		jobs := []string{
+			jobCardHTML("1", "Austin role", "Austin, TX"),
+			jobCardHTML("2", "Lorton role", "Lorton, VA"),
+		}
+		switch location {
+		case "1-1-Austin":
+			jobs = jobs[:1]
+		case "1-2-Lorton":
+			jobs = jobs[1:]
+		}
+		writeSearchHTML(w, []string{
+			`<option value="1-1-Austin">TX Austin US</option>`,
+			`<option value="1-2-Lorton">VA Lorton US</option>`,
+		}, jobs, 1)
+	}))
+	defer srv.Close()
+
+	c := NewClient(srv.URL, srv.Client())
+	got, err := c.Search(t.Context(), &SearchRequest{Location: "US"})
+	require.NoError(t, err)
+	require.Len(t, got.Jobs, 2)
+	assert.Equal(t, []string{"1", "2"}, []string{got.Jobs[0].ID, got.Jobs[1].ID})
+}
+
+func TestSearchLocationTooBroadStopsAfterProbe(t *testing.T) {
+	var requests atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		requests.Add(1)
+		options := make([]string, 11)
+		for i := range options {
+			options[i] = fmt.Sprintf(`<option value="1-%d-City">ST City %d US</option>`, i, i)
+		}
+		writeSearchHTML(w, options, nil, 1)
+	}))
+	defer srv.Close()
+
+	c := NewClient(srv.URL, srv.Client())
+	_, err := c.Search(t.Context(), &SearchRequest{Location: "US"})
+	require.ErrorIs(t, err, ErrLocationTooBroad)
+	assert.Equal(t, int32(1), requests.Load())
+}
+
+func TestSearchAllForLocations(t *testing.T) {
 	srv := NewMockServer()
 	defer srv.Close()
 	c := NewClient(srv.URL, srv.Client())
 
-	jobs, _, err := c.CollectJobsMatchingLocation(t.Context(), "", "US")
+	jobs, _, err := c.SearchAllForLocations(t.Context(), "", []string{
+		"12781-12827-Austin",
+		"12781-12830-Lorton",
+	})
 	require.NoError(t, err)
 	require.Len(t, jobs, 3)
-	assert.Equal(t, []string{"1977", "1925", "1922"}, []string{jobs[0].ID, jobs[1].ID, jobs[2].ID})
+	assert.Equal(t, []string{"1977", "1922", "1925"}, []string{jobs[0].ID, jobs[1].ID, jobs[2].ID})
 }
 
-func TestCollectJobsMatchingLocationCapsPages(t *testing.T) {
-	// Synthetic board advertising more pages than maxUpstreamPages.
+func TestSearchAllForLocationsCapsRequests(t *testing.T) {
+	var requests atomic.Int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		_, _ = w.Write([]byte(`<!DOCTYPE html><html><body>
-<form id="searchForm"><input name="searchKeyword"/>
-<select name="searchLocation">
-<option value="1-1-Austin">TX Austin US</option>
-<option value="1-1-Lorton">VA Lorton US</option>
-</select></form>
-<div class="iCIMS_PagingBatch">Page 1 of 99</div>
-<ul class="iCIMS_JobsTable">
-<li class="iCIMS_JobCardItem">
-  <span class="sr-only field-label">Location</span><span>US-TX-Austin</span>
-  <a class="iCIMS_Anchor" href="/jobs/1/job-title/job"><h3>Job 1</h3></a>
-</li>
-</ul></body></html>`))
+		requests.Add(1)
+		writeSearchHTML(w,
+			[]string{`<option value="1-1-Austin">TX Austin US</option>`},
+			[]string{jobCardHTML("1", "Job 1", "Austin, TX")},
+			99,
+		)
 	}))
 	defer srv.Close()
 	c := NewClient(srv.URL, srv.Client())
 
-	_, _, err := c.CollectJobsMatchingLocation(t.Context(), "", "US")
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "cap")
+	_, _, err := c.SearchAllForLocations(t.Context(), "", []string{"1-1-Austin"})
+	require.ErrorIs(t, err, ErrLocationRequestLimit)
+	assert.Equal(t, int32(1), requests.Load())
 }
 
 func TestSearchNoResults(t *testing.T) {
@@ -206,4 +253,21 @@ func TestJobDetailRejectsNonNumericID(t *testing.T) {
 
 func TestJobURL(t *testing.T) {
 	assert.Equal(t, "https://careers-buspatrol.icims.com/jobs/1977/job/job", JobURL("careers-buspatrol.icims.com", "1977"))
+}
+
+func jobCardHTML(id, title, location string) string {
+	return fmt.Sprintf(`<li class="iCIMS_JobCardItem">
+  <span class="sr-only field-label">Location</span><span>%s</span>
+  <a class="iCIMS_Anchor" href="/jobs/%s/job-title/job"><h3>%s</h3></a>
+</li>`, location, id, title)
+}
+
+func writeSearchHTML(w http.ResponseWriter, options, jobs []string, totalPages int) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	_, _ = fmt.Fprintf(w, `<!DOCTYPE html><html><body>
+<form id="searchForm"><input name="searchKeyword"/>
+<select name="searchLocation">%s</select></form>
+<div class="iCIMS_PagingBatch">Page 1 of %d</div>
+<ul class="iCIMS_JobsTable">%s</ul>
+</body></html>`, strings.Join(options, ""), totalPages, strings.Join(jobs, ""))
 }

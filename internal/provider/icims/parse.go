@@ -117,27 +117,6 @@ func MatchLocationOptions(opts []LocationOption, text string) []string {
 	return fuzzy
 }
 
-// locationTextMatches reports whether free-text loc matches a job/card
-// location string under the same token rules as MatchLocationOptions.
-func locationTextMatches(jobLocation, loc string) bool {
-	loc = strings.TrimSpace(loc)
-	jobLocation = strings.TrimSpace(jobLocation)
-	if loc == "" {
-		return true
-	}
-	if jobLocation == "" {
-		return false
-	}
-	if strings.EqualFold(jobLocation, loc) {
-		return true
-	}
-	q := locationTokens(loc)
-	if len(q) == 0 {
-		return false
-	}
-	return tokensCover(locationTokens(jobLocation), q)
-}
-
 // locationTokens lowercases s and splits on any non-letter/non-digit rune
 // (spaces, hyphens, commas, …).
 func locationTokens(s string) []string {

@@ -51,14 +51,30 @@ func TestMatchLocationOptions(t *testing.T) {
 	}, "OR"))
 }
 
-func TestLocationTextMatches(t *testing.T) {
-	assert.True(t, locationTextMatches("US-TX-Austin", "US"))
-	assert.True(t, locationTextMatches("US-TX-Austin", "Austin"))
-	assert.True(t, locationTextMatches("US-VA-Lorton", "Lorton"))
-	assert.False(t, locationTextMatches("US-TX-Austin", "Seattle"))
-	// "us" inside "Austin" is not a token match against a city-only string
-	// that lacks a US token — but "US-TX-Austin" has an explicit US token.
-	assert.False(t, locationTextMatches("Austin", "US"))
+func TestMatchLocationOptionsRealisticLabels(t *testing.T) {
+	opts := []LocationOption{
+		{Value: "1-1-Titusville", Label: "FL,Titusville"},
+		{Value: "1-2-Columbus", Label: "OH,Columbus"},
+		{Value: "1-3-King-of-Prussia", Label: "PA,King of Prussia"},
+		{Value: "1-4-Los-Angeles", Label: "CA,Los Angeles"},
+		{Value: "1-5-Indianapolis", Label: "IN,Indianapolis"},
+	}
+
+	tests := []struct {
+		name string
+		text string
+		want []string
+	}{
+		{name: "country is not embedded substring", text: "US", want: nil},
+		{name: "state token CA", text: "CA", want: []string{"1-4-Los-Angeles"}},
+		{name: "state token IN", text: "IN", want: []string{"1-5-Indianapolis"}},
+		{name: "multi-word city", text: "Los Angeles", want: []string{"1-4-Los-Angeles"}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.want, MatchLocationOptions(opts, tt.text))
+		})
+	}
 }
 
 func TestMatchLocationOption(t *testing.T) {

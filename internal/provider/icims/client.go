@@ -24,9 +24,19 @@ var ErrJobNotFound = errors.New("icims: job not found")
 // (HTTP 404 on /jobs/search).
 var ErrCompanyNotFound = errors.New("icims: company not found")
 
+// ErrLocationTooBroad indicates free text matched more location options than
+// can be searched safely in one request.
+var ErrLocationTooBroad = errors.New("icims: location is too broad")
+
+// ErrLocationRequestLimit indicates a multi-location search would exceed the
+// bounded number of upstream requests.
+var ErrLocationRequestLimit = errors.New("icims: location search request limit exceeded")
+
 const (
-	searchPath = "/jobs/search"
-	userAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+	searchPath          = "/jobs/search"
+	userAgent           = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+	maxLocationMatches  = 10
+	maxUpstreamRequests = 50
 )
 
 // Client talks to one iCIMS career-portal origin.
@@ -87,21 +97,15 @@ type JobDetailResponse struct {
 	URL             string
 }
 
-// maxUpstreamPages caps sequential /jobs/search fetches when walking an
-// unfiltered board for multi-option location text. Beyond this, callers get
-// an error instead of unbounded request storms on large tenants.
-const maxUpstreamPages = 30
-
 // Search fetches one upstream results page.
 //
 // Location must be either an encoded portal option value (e.g.
 // "12781-12827-Austin") or free text matched against option labels/values
 // (e.g. "Austin"). Free text is resolved via a probe request before the
 // real search. A single option match is sent as searchLocation; several
-// option matches (e.g. "US") are applied by walking the unfiltered board
-// once and filtering cards locally so results are not collapsed to one city
-// and fan-out does not multiply pages by option count. Unknown locations
-// yield an empty result set rather than silently ignoring the filter.
+// option matches are searched separately and merged, up to a strict match
+// limit. Unknown or excessively broad locations never fall back to an
+// unfiltered result set.
 func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchResponse, error) {
 	if req == nil {
 		req = &SearchRequest{}
@@ -118,74 +122,144 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 		if err != nil {
 			return nil, err
 		}
-		matches := MatchLocationOptions(probe.Locations, loc)
+		matches := normalizeLocationValues(MatchLocationOptions(probe.Locations, loc))
+		if err := validateLocationCount(matches); err != nil {
+			return nil, err
+		}
 		switch len(matches) {
 		case 0:
 			return &SearchResponse{Jobs: nil, TotalPages: 1, PageSize: 0, Locations: probe.Locations}, nil
 		case 1:
 			loc = matches[0]
 		default:
-			// Multi-match: one bounded unfiltered walk + local card filter
-			// (reuse the probe as page 0).
-			jobs, err := c.collectMatchingFromProbe(ctx, keyword, loc, probe)
-			if err != nil {
-				return nil, err
-			}
-			return &SearchResponse{
-				Jobs:       jobs,
-				TotalPages: 1,
-				PageSize:   len(jobs),
-				Locations:  probe.Locations,
-			}, nil
+			return c.searchMerged(ctx, keyword, matches, page, probe.Locations)
 		}
 	}
 
 	return c.doSearch(ctx, keyword, loc, page)
 }
 
-// CollectJobsMatchingLocation walks the keyword-only board (no searchLocation)
-// and keeps cards whose location text matches loc under token rules. Used when
-// free-text location hits several portal options so every match is retained
-// without N×pages fan-out. At most maxUpstreamPages requests are issued.
-func (c *Client) CollectJobsMatchingLocation(ctx context.Context, keyword, loc string) ([]Job, []LocationOption, error) {
-	probe, err := c.doSearch(ctx, keyword, "", 0)
-	if err != nil {
+// SearchAllForLocations fetches every page for a bounded set of encoded
+// location values and returns a stable de-duplicated union. It uses the
+// portal's own encoded filters as the source of truth because job-card text
+// may omit country/state tokens present in the option labels.
+func (c *Client) SearchAllForLocations(ctx context.Context, keyword string, locations []string) ([]Job, []LocationOption, error) {
+	locations = normalizeLocationValues(locations)
+	if err := validateLocationCount(locations); err != nil {
 		return nil, nil, err
 	}
-	jobs, err := c.collectMatchingFromProbe(ctx, keyword, loc, probe)
-	if err != nil {
-		return nil, nil, err
+
+	var (
+		out      []Job
+		opts     []LocationOption
+		seen     = make(map[string]struct{})
+		requests int
+	)
+	for i, loc := range locations {
+		for page := 0; ; page++ {
+			if requests >= maxUpstreamRequests {
+				return nil, nil, locationRequestLimitError(requests)
+			}
+			res, err := c.doSearch(ctx, keyword, loc, page)
+			if err != nil {
+				return nil, nil, err
+			}
+			requests++
+			if i == 0 && page == 0 {
+				opts = res.Locations
+			}
+			for _, j := range res.Jobs {
+				if _, dup := seen[j.ID]; dup {
+					continue
+				}
+				seen[j.ID] = struct{}{}
+				out = append(out, j)
+			}
+			if res.PageSize == 0 || page+1 >= res.TotalPages {
+				break
+			}
+
+			// Stop as soon as the advertised remaining pages plus one probe
+			// for each untouched location cannot fit in the request budget.
+			budget := maxUpstreamRequests - requests
+			untouchedLocations := len(locations) - (i + 1)
+			remainingCurrent := res.TotalPages - (page + 1)
+			if untouchedLocations > budget || remainingCurrent > budget-untouchedLocations {
+				return nil, nil, locationRequestLimitError(requests)
+			}
+		}
 	}
-	return jobs, probe.Locations, nil
+	return out, opts, nil
 }
 
-func (c *Client) collectMatchingFromProbe(ctx context.Context, keyword, loc string, probe *SearchResponse) ([]Job, error) {
-	if probe.TotalPages > maxUpstreamPages {
-		return nil, fmt.Errorf("icims: board has %d upstream pages (cap %d); narrow keyword/location instead of scanning the full multi-location board", probe.TotalPages, maxUpstreamPages)
+// searchMerged unions one upstream page across a bounded set of locations.
+func (c *Client) searchMerged(ctx context.Context, keyword string, locations []string, page int, opts []LocationOption) (*SearchResponse, error) {
+	locations = normalizeLocationValues(locations)
+	if err := validateLocationCount(locations); err != nil {
+		return nil, err
 	}
-	var out []Job
-	seen := make(map[string]struct{})
-	appendMatching := func(jobs []Job) {
-		for _, j := range jobs {
-			if !locationTextMatches(j.Location, loc) {
-				continue
-			}
+
+	var (
+		jobs     []Job
+		seen     = make(map[string]struct{})
+		maxPages int
+	)
+	for _, loc := range locations {
+		res, err := c.doSearch(ctx, keyword, loc, page)
+		if err != nil {
+			return nil, err
+		}
+		if res.TotalPages > maxPages {
+			maxPages = res.TotalPages
+		}
+		if len(opts) == 0 {
+			opts = res.Locations
+		}
+		for _, j := range res.Jobs {
 			if _, dup := seen[j.ID]; dup {
 				continue
 			}
 			seen[j.ID] = struct{}{}
-			out = append(out, j)
+			jobs = append(jobs, j)
 		}
 	}
-	appendMatching(probe.Jobs)
-	for page := 1; page < probe.TotalPages; page++ {
-		res, err := c.doSearch(ctx, keyword, "", page)
-		if err != nil {
-			return nil, err
-		}
-		appendMatching(res.Jobs)
+	if maxPages < 1 {
+		maxPages = 1
 	}
-	return out, nil
+	return &SearchResponse{
+		Jobs:       jobs,
+		TotalPages: maxPages,
+		PageSize:   len(jobs),
+		Locations:  opts,
+	}, nil
+}
+
+func normalizeLocationValues(locations []string) []string {
+	out := make([]string, 0, len(locations))
+	seen := make(map[string]struct{}, len(locations))
+	for _, loc := range locations {
+		loc = strings.TrimSpace(loc)
+		if loc == "" {
+			continue
+		}
+		if _, duplicate := seen[loc]; duplicate {
+			continue
+		}
+		seen[loc] = struct{}{}
+		out = append(out, loc)
+	}
+	return out
+}
+
+func validateLocationCount(locations []string) error {
+	if len(locations) <= maxLocationMatches {
+		return nil
+	}
+	return fmt.Errorf("%w: matched %d options (maximum %d); provide a more specific city or state", ErrLocationTooBroad, len(locations), maxLocationMatches)
+}
+
+func locationRequestLimitError(requests int) error {
+	return fmt.Errorf("%w after %d requests (maximum %d); provide a more specific location or keyword", ErrLocationRequestLimit, requests, maxUpstreamRequests)
 }
 
 func (c *Client) doSearch(ctx context.Context, keyword, location string, page int) (*SearchResponse, error) {

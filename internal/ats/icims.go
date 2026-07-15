@@ -100,11 +100,11 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 		}
 	}
 
-	// Broad fuzzy inputs (country/state) often hit several portal options.
-	// Walk the unfiltered board once and filter cards locally so every
-	// matching city is kept without N×pages fan-out of sequential requests.
+	// Broad fuzzy inputs can hit several portal options. Use each encoded
+	// option as the source of truth because listing-card text may omit country
+	// or state tokens, while the provider client bounds matches and requests.
 	if len(locValues) > 1 {
-		all, _, err := client.CollectJobsMatchingLocation(ctx, keyword, location)
+		all, _, err := client.SearchAllForLocations(ctx, keyword, locValues)
 		if err != nil {
 			return nil, fmt.Errorf("icims: search %q: %w", host, err)
 		}
