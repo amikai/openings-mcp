@@ -37,7 +37,7 @@ func TestBuildSearchFilters(t *testing.T) {
 		{
 			name:    "dynamic and legacy conflict",
 			flags:   searchFlags{filters: []string{"country=US"}, country: "DE"},
-			wantErr: "conflicts with --country",
+			wantErr: `conflicts with "--country"`,
 		},
 	}
 

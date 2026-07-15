@@ -111,11 +111,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 	for dimension, value := range req.Filters {
 		q.Set("optionsFacetsDD_"+dimension, value)
 	}
-	if req.StartRow > 0 {
-		q.Set("startrow", strconv.Itoa(req.StartRow))
-	} else {
-		q.Set("startrow", "0")
-	}
+	q.Set("startrow", strconv.Itoa(max(req.StartRow, 0)))
 	u.RawQuery = q.Encode()
 
 	doc, _, err := c.getHTML(ctx, u.String())

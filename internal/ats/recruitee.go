@@ -44,19 +44,6 @@ func (a *RecruiteeAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-// ParseCareersURL recognizes Recruitee subdomain career pages.
-func (a *RecruiteeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	host := strings.ToLower(u.Hostname())
-	if !strings.HasSuffix(host, ".recruitee.com") {
-		return "", false
-	}
-	slug := strings.TrimSuffix(host, ".recruitee.com")
-	if slug == "" || recruiteeReservedHosts[slug] {
-		return "", false
-	}
-	return slug, true
-}
-
 var recruiteeReservedHosts = map[string]bool{
 	"api":          true,
 	"app":          true,
@@ -68,6 +55,19 @@ var recruiteeReservedHosts = map[string]bool{
 	"support":      true,
 	"trust":        true,
 	"www":          true,
+}
+
+// ParseCareersURL recognizes Recruitee subdomain career pages.
+func (a *RecruiteeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	host := strings.ToLower(u.Hostname())
+	if !strings.HasSuffix(host, ".recruitee.com") {
+		return "", false
+	}
+	slug := strings.TrimSuffix(host, ".recruitee.com")
+	if slug == "" || recruiteeReservedHosts[slug] {
+		return "", false
+	}
+	return slug, true
 }
 
 func (a *RecruiteeAdapter) Search(

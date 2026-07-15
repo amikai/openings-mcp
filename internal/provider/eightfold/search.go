@@ -10,6 +10,15 @@ import (
 	"strings"
 )
 
+// FilteredSearch is the input to SearchFiltered: transport, tenant base URL,
+// typed search params, and resolved facet filter values.
+type FilteredSearch struct {
+	HTTPClient *http.Client
+	BaseURL    string
+	Params     SearchParams
+	Filters    map[string][]string
+}
+
 // SearchFiltered issues a search request with server-side facet filters
 // applied, bypassing the generated Client. Facet filters are sent as
 // filter_<facetName>=<value> query parameters (repeatable per value for OR
@@ -18,7 +27,11 @@ import (
 // known ahead of time. OpenAPI has no way to declare a dynamically-named
 // parameter, so this builds the request by hand and decodes into the same
 // generated SearchResponse type the typed client uses.
-func SearchFiltered(ctx context.Context, hc *http.Client, baseURL string, params SearchParams, filters map[string][]string) (*SearchResponse, error) {
+func SearchFiltered(ctx context.Context, r FilteredSearch) (*SearchResponse, error) {
+	hc := r.HTTPClient
+	baseURL := r.BaseURL
+	params := r.Params
+	filters := r.Filters
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return nil, fmt.Errorf("eightfold: parse base URL %q: %w", baseURL, err)

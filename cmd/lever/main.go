@@ -203,8 +203,8 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	}
 
 	results := make([]postingJSON, len(postings))
-	for i, p := range postings {
-		results[i] = toPostingJSON(p)
+	for i := range postings {
+		results[i] = toPostingJSON(&postings[i])
 	}
 
 	if f.format == "json" {
@@ -253,7 +253,7 @@ func runGet(ctx context.Context, f getFlags) error {
 		return err
 	}
 
-	r := toPostingJSON(*p)
+	r := toPostingJSON(p)
 
 	if f.format == "json" {
 		enc := json.NewEncoder(os.Stdout)
@@ -281,7 +281,7 @@ type postingJSON struct {
 	Description string   `json:"description,omitempty"`
 }
 
-func toPostingJSON(p lever.Posting) postingJSON {
+func toPostingJSON(p *lever.Posting) postingJSON {
 	cats := p.Categories.Value
 	r := postingJSON{
 		ID:          p.ID,
@@ -301,7 +301,7 @@ func toPostingJSON(p lever.Posting) postingJSON {
 // postingLocations prefers the full allLocations list; the primary
 // location is its first entry when present, so the fallback only matters
 // for postings that carry a single location field.
-func postingLocations(p lever.Posting) []string {
+func postingLocations(p *lever.Posting) []string {
 	cats := p.Categories.Value
 	if len(cats.AllLocations) > 0 {
 		return cats.AllLocations

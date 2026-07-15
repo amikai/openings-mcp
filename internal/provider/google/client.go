@@ -67,7 +67,7 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 func (c *Client) jobsRawURL(req *JobsRequest) (string, error) {
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
-		return "", fmt.Errorf("parse url %s: %w", c.baseURL, err)
+		return "", fmt.Errorf("parse url %q: %w", c.baseURL, err)
 	}
 	u = u.JoinPath(jobsPath)
 

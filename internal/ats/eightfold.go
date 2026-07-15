@@ -133,17 +133,17 @@ func (a *EightfoldAdapter) Search(ctx context.Context, slug string, p SearchPara
 // requests, since v2 has no facet-filter equivalent here.
 func (a *EightfoldAdapter) searchPage(ctx context.Context, c eightfold.RosterCompany, params eightfold.SearchParams, filterValues map[string][]string) ([]JobSummary, int, error) {
 	res, err := a.fetchSearch(ctx, c, params, filterValues)
-	if err == nil {
-		return eightfoldJobSummaries(res.Data.Positions, a.baseURL(c.Tenant)), res.Data.Count, nil
-	}
-	if len(filterValues) > 0 || !isPCSXDisabled(err) {
-		return nil, 0, err
-	}
-	v2, err := a.fetchSearchV2(ctx, c, params)
 	if err != nil {
-		return nil, 0, err
+		if len(filterValues) > 0 || !isPCSXDisabled(err) {
+			return nil, 0, err
+		}
+		v2, err := a.fetchSearchV2(ctx, c, params)
+		if err != nil {
+			return nil, 0, err
+		}
+		return v2JobSummaries(v2.Positions), v2.Count, nil
 	}
-	return v2JobSummaries(v2.Positions), v2.Count, nil
+	return eightfoldJobSummaries(res.Data.Positions, a.baseURL(c.Tenant)), res.Data.Count, nil
 }
 
 // isPCSXDisabled reports whether err is the 403 pcsx returns for tenants
@@ -198,7 +198,13 @@ func (a *EightfoldAdapter) Detail(ctx context.Context, slug, jobID string) (*Job
 	res, err := client.PositionDetails(ctx, eightfold.PositionDetailsParams{PositionID: id, Domain: c.Domain})
 	if err != nil {
 		if isPCSXDisabled(err) {
-			return a.detailV2(ctx, client, c, slug, jobID, id)
+			return a.detailV2(ctx, detailV2Args{
+				Client:  client,
+				Company: c,
+				Slug:    slug,
+				JobID:   jobID,
+				ID:      id,
+			})
 		}
 		return nil, fmt.Errorf("eightfold: fetch job %q for %q: %w", jobID, slug, err)
 	}
@@ -225,12 +231,24 @@ func (a *EightfoldAdapter) Detail(ctx context.Context, slug, jobID string) (*Job
 	}
 }
 
+// detailV2Args groups the inputs for a pcsx-disabled v2 position detail fetch.
+type detailV2Args struct {
+	Client  *eightfold.Client
+	Company eightfold.RosterCompany
+	Slug    string
+	JobID   string
+	ID      int64
+}
+
 // detailV2 fetches a job's detail through the v2 API, for tenants where
 // pcsx's position_details 403'd the same way pcsx's search did.
-func (a *EightfoldAdapter) detailV2(ctx context.Context, client *eightfold.Client, c eightfold.RosterCompany, slug, jobID string, id int64) (*JobDetail, error) {
-	res, err := client.PositionDetailsV2(ctx, eightfold.PositionDetailsV2Params{ID: id, Domain: c.Domain})
+func (a *EightfoldAdapter) detailV2(ctx context.Context, args detailV2Args) (*JobDetail, error) {
+	res, err := args.Client.PositionDetailsV2(ctx, eightfold.PositionDetailsV2Params{
+		ID:     args.ID,
+		Domain: args.Company.Domain,
+	})
 	if err != nil {
-		return nil, fmt.Errorf("eightfold: fetch job %q for %q (v2): %w", jobID, slug, err)
+		return nil, fmt.Errorf("eightfold: fetch job %q for %q (v2): %w", args.JobID, args.Slug, err)
 	}
 	switch d := res.(type) {
 	case *eightfold.V2PositionDetail:
@@ -239,16 +257,16 @@ func (a *EightfoldAdapter) detailV2(ctx context.Context, client *eightfold.Clien
 			return nil, fmt.Errorf("eightfold: convert job description: %w", err)
 		}
 		return &JobDetail{
-			JobID:       jobID,
+			JobID:       args.JobID,
 			Title:       d.Name,
-			Company:     c.Name,
+			Company:     args.Company.Name,
 			Location:    strings.Join(d.Locations, "; "),
 			PostedAt:    isoDate(time.Unix(d.TCreate, 0)),
 			URL:         d.CanonicalPositionUrl,
 			Description: desc,
 		}, nil
 	case *eightfold.V2ErrorResponse:
-		return nil, fmt.Errorf("eightfold: job %q not found for company %q; pass a job_id exactly as returned by the job search", jobID, slug)
+		return nil, fmt.Errorf("eightfold: job %q not found for company %q; pass a job_id exactly as returned by the job search", args.JobID, args.Slug)
 	default:
 		return nil, fmt.Errorf("eightfold: unexpected response type %T", res)
 	}
@@ -269,7 +287,12 @@ func (a *EightfoldAdapter) resolveSlug(slug string) (eightfold.RosterCompany, er
 func (a *EightfoldAdapter) fetchSearch(ctx context.Context, c eightfold.RosterCompany, params eightfold.SearchParams, filterValues map[string][]string) (*eightfold.SearchResponse, error) {
 	base := a.baseURL(c.Tenant)
 	if len(filterValues) > 0 {
-		res, err := eightfold.SearchFiltered(ctx, a.hc, base, params, filterValues)
+		res, err := eightfold.SearchFiltered(ctx, eightfold.FilteredSearch{
+			HTTPClient: a.hc,
+			BaseURL:    base,
+			Params:     params,
+			Filters:    filterValues,
+		})
 		if err != nil {
 			return nil, fmt.Errorf("eightfold: search %q: %w", c.Tenant, err)
 		}

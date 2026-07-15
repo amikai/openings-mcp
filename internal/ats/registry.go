@@ -32,6 +32,21 @@ type Registry struct {
 	slugs    []slugEntry              // sorted by slug, for suggestions
 }
 
+// careersHostPatternsByAdapter maps each known adapter name to the
+// careers-page URL shape it recognizes, so the "unrecognized careers URL"
+// error only advertises hosts the registry actually has an adapter for.
+var careersHostPatternsByAdapter = map[string]string{
+	"workday":        "<tenant>.<wd*>.myworkdayjobs.com/<site>",
+	"greenhouse":     "job-boards.greenhouse.io/<board>",
+	"lever":          "jobs.lever.co/<org>",
+	"ashby":          "jobs.ashbyhq.com/<org>",
+	"teamtailor":     "<company>[.na|.au].teamtailor.com/jobs",
+	"recruitee":      "<company>.recruitee.com",
+	"eightfold":      "<tenant>.eightfold.ai/careers (roster tenants only)",
+	"successfactors": "jobs.<company>.com/search (roster tenants only)",
+	"icims":          "careers-<slug>.icims.com/jobs/search",
+}
+
 // NewRegistry unions the adapters' rosters. A slug or normalized display
 // name colliding across entries is a curation bug — fail startup loudly
 // rather than silently shadowing one company with another.
@@ -93,21 +108,6 @@ func (r *Registry) Resolve(company string) (Adapter, string, error) {
 	}
 	return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
 		company, strings.Join(r.suggest(key, 3), ", "), len(r.bySlug))
-}
-
-// careersHostPatternsByAdapter maps each known adapter name to the
-// careers-page URL shape it recognizes, so the "unrecognized careers URL"
-// error only advertises hosts the registry actually has an adapter for.
-var careersHostPatternsByAdapter = map[string]string{
-	"workday":        "<tenant>.<wd*>.myworkdayjobs.com/<site>",
-	"greenhouse":     "job-boards.greenhouse.io/<board>",
-	"lever":          "jobs.lever.co/<org>",
-	"ashby":          "jobs.ashbyhq.com/<org>",
-	"teamtailor":     "<company>[.na|.au].teamtailor.com/jobs",
-	"recruitee":      "<company>.recruitee.com",
-	"eightfold":      "<tenant>.eightfold.ai/careers (roster tenants only)",
-	"successfactors": "jobs.<company>.com/search (roster tenants only)",
-	"icims":          "careers-<slug>.icims.com/jobs/search",
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered

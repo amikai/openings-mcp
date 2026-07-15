@@ -266,7 +266,9 @@ func flattenFacets(nodes []workday.FacetNode) []flatFacet {
 			param = v
 		}
 		if len(n.Values) == 0 {
-			if descriptor, ok := n.Descriptor.Get(); param != "" && n.ID.Set && ok {
+			descriptor, ok := n.Descriptor.Get()
+			isLeafFacet := param != "" && n.ID.Set && ok
+			if isLeafFacet {
 				out = append(out, flatFacet{param: param, label: descriptor, id: n.ID.Value})
 			}
 			return

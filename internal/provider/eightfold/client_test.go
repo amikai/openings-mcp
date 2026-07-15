@@ -70,8 +70,11 @@ func TestSearchFiltered(t *testing.T) {
 	srv := NewMockServer()
 	defer srv.Close()
 
-	res, err := SearchFiltered(t.Context(), srv.Client(), srv.URL, SearchParams{Domain: MockDomain}, map[string][]string{
-		"businessarea": {"technology"},
+	res, err := SearchFiltered(t.Context(), FilteredSearch{
+		HTTPClient: srv.Client(),
+		BaseURL:    srv.URL,
+		Params:     SearchParams{Domain: MockDomain},
+		Filters:    map[string][]string{"businessarea": {"technology"}},
 	})
 	require.NoError(t, err)
 

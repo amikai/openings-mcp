@@ -36,7 +36,7 @@ func TestToPostingJSON(t *testing.T) {
 		Commitment:  "Full-time",
 		Description: "plain description",
 	}
-	assert.Equal(t, want, toPostingJSON(p))
+	assert.Equal(t, want, toPostingJSON(&p))
 }
 
 func TestToPostingJSONSingleLocationFallback(t *testing.T) {
@@ -53,14 +53,14 @@ func TestToPostingJSONSingleLocationFallback(t *testing.T) {
 		Title:    "Designer",
 		Location: "Remote",
 	}
-	assert.Equal(t, want, toPostingJSON(p))
+	assert.Equal(t, want, toPostingJSON(&p))
 }
 
 func TestToPostingJSONNoCategories(t *testing.T) {
 	p := lever.Posting{ID: "id-3", Text: lever.NewNilString("PM")}
 
 	want := postingJSON{ID: "id-3", Title: "PM"}
-	assert.Equal(t, want, toPostingJSON(p))
+	assert.Equal(t, want, toPostingJSON(&p))
 }
 
 func TestRunSearchMissingSite(t *testing.T) {

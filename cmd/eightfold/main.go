@@ -100,7 +100,7 @@ func main() {
 		Flags:     detailFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
-				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %s?)", args, args[0])
+				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
 			return runDetail(ctx, detailFlags{company: *company, timeout: *timeout, positionID: *positionID, format: *format})
 		},
@@ -278,16 +278,24 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	base := baseURL(c)
 	var res *eightfold.SearchResponse
 	if len(parsedFilters) > 0 {
-		res, err = eightfold.SearchFiltered(ctx, httpClient(), base, params, parsedFilters)
-	} else {
-		var client *eightfold.Client
-		client, err = eightfold.NewClient(base, eightfold.WithClient(httpClient()))
-		if err == nil {
-			res, err = client.Search(ctx, params)
+		res, err = eightfold.SearchFiltered(ctx, eightfold.FilteredSearch{
+			HTTPClient: httpClient(),
+			BaseURL:    base,
+			Params:     params,
+			Filters:    parsedFilters,
+		})
+		if err != nil {
+			return err
 		}
-	}
-	if err != nil {
-		return err
+	} else {
+		client, err := eightfold.NewClient(base, eightfold.WithClient(httpClient()))
+		if err != nil {
+			return err
+		}
+		res, err = client.Search(ctx, params)
+		if err != nil {
+			return err
+		}
 	}
 
 	jobs := make([]positionSummaryJSON, len(res.Data.Positions))
@@ -348,7 +356,7 @@ func printFilters(ctx context.Context, client *eightfold.Client, domain, format 
 		Title  string   `json:"title"`
 		Values []string `json:"values"`
 	}
-	var out []filterJSON
+	out := make([]filterJSON, 0)
 	for _, sf := range eightfold.MergedFacets(res.Data.FilterDef) {
 		if sf.Options == nil {
 			continue

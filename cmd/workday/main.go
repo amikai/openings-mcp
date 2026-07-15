@@ -399,10 +399,9 @@ func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, b
 		r.PostedOn = info.PostedOn.Value
 	}
 	r.JobReqId = info.JobReqId.Value
+	r.URL = fallbackURL(baseURL, job.ExternalPath.Value)
 	if info.ExternalUrl.Set {
 		r.URL = info.ExternalUrl.Value
-	} else {
-		r.URL = fallbackURL(baseURL, job.ExternalPath.Value)
 	}
 
 	itemized := make([]string, 0, 1+len(info.AdditionalLocations))

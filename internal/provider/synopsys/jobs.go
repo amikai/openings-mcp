@@ -2,7 +2,6 @@ package synopsys
 
 import (
 	"cmp"
-	"fmt"
 	"net/url"
 	"strconv"
 )
@@ -131,13 +130,13 @@ func buildSearchQuery(p *JobsRequest) url.Values {
 	q.Set("CurrentPage", strconv.Itoa(cmp.Or(p.Page, 1)))
 	q.Set("RecordsPerPage", strconv.Itoa(cmp.Or(p.RecordsPerPage, 15)))
 	q.Set("SortCriteria", strconv.Itoa(p.SortCriteria))
+	isPagination := "False"
 	if p.IsPagination {
-		q.Set("IsPagination", "True")
-	} else {
-		q.Set("IsPagination", "False")
+		isPagination = "True"
 	}
+	q.Set("IsPagination", isPagination)
 	for i, f := range p.FacetFilters {
-		prefix := fmt.Sprintf("FacetFilters[%d].", i)
+		prefix := "FacetFilters[" + strconv.Itoa(i) + "]."
 		q.Set(prefix+"ID", f.ID)
 		q.Set(prefix+"FacetType", strconv.Itoa(f.FacetType))
 		q.Set(prefix+"Display", f.Display)
