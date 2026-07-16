@@ -7,6 +7,7 @@ import (
 	"math"
 	"net/http"
 	"net/url"
+	"regexp"
 	"slices"
 	"strconv"
 	"strings"
@@ -17,6 +18,17 @@ import (
 )
 
 var _ Adapter = (*SmartRecruitersAdapter)(nil)
+
+// smartRecruitersCareersURLRE matches SmartRecruiters career-site URLs and
+// captures the companyIdentifier (first path segment).
+//
+// Examples (hostname + escaped path):
+//   - jobs.smartrecruiters.com/Equinox
+//   - jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston
+//   - jobs.smartrecruiters.com/SomeUnknownCo
+var smartRecruitersCareersURLRE = regexp.MustCompile(
+	`(?i)^jobs\.smartrecruiters\.com/(?P<slug>[^/]+)`,
+)
 
 const (
 	smartRecruitersCandidatePageSize = 100
@@ -57,11 +69,8 @@ func (a *SmartRecruitersAdapter) Roster() []CompanyInfo {
 // the list endpoint answers HTTP 200 with zero results — so a typo'd URL
 // degrades to an empty search, mirroring the raw API.
 func (a *SmartRecruitersAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	if strings.ToLower(u.Hostname()) != "jobs.smartrecruiters.com" {
-		return "", false
-	}
-	id := firstPathSegment(u)
-	if id == "" {
+	id, ok := matchCareersSlug(smartRecruitersCareersURLRE, u)
+	if !ok {
 		return "", false
 	}
 	return strings.ToLower(id), true

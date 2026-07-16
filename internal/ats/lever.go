@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -21,11 +22,16 @@ type LeverAdapter struct {
 	client *lever.Client
 }
 
-// leverHosts are Lever's public board hosts, including the EU variant.
-var leverHosts = map[string]bool{
-	"jobs.lever.co":    true,
-	"jobs.eu.lever.co": true,
-}
+// leverCareersURLRE matches Lever board URLs and captures the organization
+// slug (first path segment), including the EU host.
+//
+// Examples (hostname + escaped path):
+//   - jobs.lever.co/acme
+//   - jobs.eu.lever.co/acme
+//   - jobs.lever.co/acme/00000000-0000
+var leverCareersURLRE = regexp.MustCompile(
+	`(?i)^jobs(?:\.eu)?\.lever\.co/(?P<slug>[^/]+)`,
+)
 
 func NewLeverAdapter(baseURL string, hc *http.Client) (*LeverAdapter, error) {
 	c, err := lever.NewClient(baseURL, lever.WithClient(hc))
@@ -48,11 +54,7 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 // ParseCareersURL recognizes Lever-hosted board URLs; the first path
 // segment is the organization, which is already this adapter's slug form.
 func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	if !leverHosts[strings.ToLower(u.Hostname())] {
-		return "", false
-	}
-	org := firstPathSegment(u)
-	return org, org != ""
+	return matchCareersSlug(leverCareersURLRE, u)
 }
 
 func (a *LeverAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {

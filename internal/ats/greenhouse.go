@@ -7,6 +7,7 @@ import (
 	"html"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -24,14 +25,16 @@ type GreenhouseAdapter struct {
 	client *greenhouse.Client
 }
 
-// greenhouseHosts are the public board hosts Greenhouse serves careers
-// pages from, including the EU data-residency variants.
-var greenhouseHosts = map[string]bool{
-	"job-boards.greenhouse.io":    true,
-	"boards.greenhouse.io":        true,
-	"job-boards.eu.greenhouse.io": true,
-	"boards.eu.greenhouse.io":     true,
-}
+// greenhouseCareersURLRE matches Greenhouse board URLs and captures the
+// board token (first path segment), including EU data-residency hosts.
+//
+// Examples (hostname + escaped path):
+//   - job-boards.greenhouse.io/acme
+//   - boards.greenhouse.io/acme/jobs/123
+//   - job-boards.eu.greenhouse.io/acme
+var greenhouseCareersURLRE = regexp.MustCompile(
+	`(?i)^(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/(?P<slug>[^/]+)`,
+)
 
 func NewGreenhouseAdapter(baseURL string, hc *http.Client) (*GreenhouseAdapter, error) {
 	c, err := greenhouse.NewClient(baseURL, greenhouse.WithClient(hc))
@@ -54,11 +57,7 @@ func (a *GreenhouseAdapter) Roster() []CompanyInfo {
 // ParseCareersURL recognizes Greenhouse-hosted board URLs; the first path
 // segment is the board token, which is already this adapter's slug form.
 func (a *GreenhouseAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	if !greenhouseHosts[strings.ToLower(u.Hostname())] {
-		return "", false
-	}
-	token := firstPathSegment(u)
-	return token, token != ""
+	return matchCareersSlug(greenhouseCareersURLRE, u)
 }
 
 func (a *GreenhouseAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {

@@ -2,6 +2,7 @@ package ats
 
 import (
 	"net/url"
+	"regexp"
 	"strings"
 )
 
@@ -27,18 +28,31 @@ func parseCareersInput(s string) (*url.URL, bool) {
 	return u, true
 }
 
-// firstPathSegment returns the first non-empty path segment, URL-decoded,
-// or "" when the path has none (or decoding fails).
-func firstPathSegment(u *url.URL) string {
-	for seg := range strings.SplitSeq(strings.Trim(u.EscapedPath(), "/"), "/") {
-		if seg == "" {
-			continue
-		}
-		dec, err := url.PathUnescape(seg)
-		if err != nil {
-			return ""
-		}
-		return dec
+// matchCareersSlug matches re against lowercase(host)+escapedPath and
+// returns the URL-decoded named capture group "slug".
+//
+// Example:
+//
+//	re := regexp.MustCompile(`(?i)^jobs\.ashbyhq\.com/(?P<slug>[^/]+)`)
+//	u, _ := url.Parse("https://jobs.ashbyhq.com/Acme%20Inc")
+//	slug, ok := matchCareersSlug(re, u) // "Acme Inc", true
+func matchCareersSlug(re *regexp.Regexp, u *url.URL) (string, bool) {
+	m := re.FindStringSubmatch(strings.ToLower(u.Hostname()) + u.EscapedPath())
+	if m == nil {
+		return "", false
 	}
-	return ""
+	slug, err := url.PathUnescape(namedGroup(re, m, "slug"))
+	if err != nil || slug == "" {
+		return "", false
+	}
+	return slug, true
+}
+
+// namedGroup returns the named capture from m, or "" if missing.
+func namedGroup(re *regexp.Regexp, m []string, name string) string {
+	i := re.SubexpIndex(name)
+	if i < 0 || i >= len(m) {
+		return ""
+	}
+	return m[i]
 }

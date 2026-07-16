@@ -16,8 +16,23 @@ type CareersSite struct {
 	Site   string // career-site path segment
 }
 
-// localeSegment matches the optional language prefix careers URLs carry
-// before the site segment ("en-US", "zh-tw", "fr").
+// careersURLRE matches myworkdayjobs.com career URLs and captures tenant
+// and site. An optional locale segment before the site is tolerated and
+// stripped; job deep links after the site are ignored.
+//
+// Examples (hostname + escaped path):
+//   - stripe.wd5.myworkdayjobs.com/Stripe_Careers
+//   - stripe.wd5.myworkdayjobs.com/en-US/Stripe_Careers
+//   - acme.wd103.myworkdayjobs.com/zh-tw/jobs4acme/job/Taipei/Engineer_JR1
+//
+// myworkdaysite.com is deliberately unsupported (#113).
+var careersURLRE = regexp.MustCompile(
+	`(?i)^(?P<tenant>[^.]+)\.wd[^.]+\.myworkdayjobs\.com/` +
+		`(?:(?P<locale>[a-z]{2}(?:-[a-z]{2})?)/)?(?P<site>[^/]+)`,
+)
+
+// localeSegment matches a lone language prefix used to reject locale-only
+// paths like /en-US with no site segment after.
 var localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
 
 // ParseCareersURL reports whether u is a Workday career-site URL and
@@ -33,24 +48,18 @@ var localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
 // https://github.com/amikai/openings-mcp/issues/113 for the evidence.
 func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 	host := strings.ToLower(u.Hostname())
-	labels := strings.Split(host, ".")
-	if len(labels) != 4 {
+	m := careersURLRE.FindStringSubmatch(host + u.EscapedPath())
+	if m == nil {
 		return CareersSite{}, false
 	}
-	if labels[2]+"."+labels[3] != "myworkdayjobs.com" {
+	tenant := m[careersURLRE.SubexpIndex("tenant")]
+	locale := m[careersURLRE.SubexpIndex("locale")]
+	site := m[careersURLRE.SubexpIndex("site")]
+	// Locale-only paths like /en-US leave the locale in the site group.
+	if locale == "" && localeSegment.MatchString(site) {
 		return CareersSite{}, false
 	}
-	if labels[0] == "" || !strings.HasPrefix(labels[1], "wd") {
-		return CareersSite{}, false
-	}
-	segs := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")
-	if len(segs) > 0 && localeSegment.MatchString(segs[0]) {
-		segs = segs[1:]
-	}
-	if len(segs) == 0 || segs[0] == "" {
-		return CareersSite{}, false
-	}
-	return CareersSite{Host: host, Tenant: labels[0], Site: segs[0]}, true
+	return CareersSite{Host: host, Tenant: tenant, Site: site}, true
 }
 
 // BaseURL derives the CXS API base URL, mirroring Company.BaseURL.

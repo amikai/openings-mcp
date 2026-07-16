@@ -3,6 +3,7 @@ package ats
 import (
 	"context"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -21,7 +22,7 @@ func (f *fakeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	if f.host == "" || u.Hostname() != f.host {
 		return "", false
 	}
-	slug := firstPathSegment(u)
+	slug, _, _ := strings.Cut(strings.Trim(u.Path, "/"), "/")
 	return slug, slug != ""
 }
 

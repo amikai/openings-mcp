@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/amikai/openings-mcp/internal/provider/ashby"
@@ -19,6 +20,17 @@ import (
 type AshbyAdapter struct {
 	client *ashby.Client
 }
+
+// ashbyCareersURLRE matches Ashby board URLs and captures the organization
+// slug (first path segment; URL-decoded — org names may contain spaces).
+//
+// Examples (hostname + escaped path):
+//   - jobs.ashbyhq.com/acme
+//   - jobs.ashbyhq.com/Acme%20Inc
+//   - jobs.ashbyhq.com/acme/application/job-id
+var ashbyCareersURLRE = regexp.MustCompile(
+	`(?i)^jobs\.ashbyhq\.com/(?P<slug>[^/]+)`,
+)
 
 func NewAshbyAdapter(baseURL string, hc *http.Client) (*AshbyAdapter, error) {
 	c, err := ashby.NewClient(baseURL, ashby.WithClient(hc))
@@ -42,11 +54,7 @@ func (a *AshbyAdapter) Roster() []CompanyInfo {
 // segment is the organization name, which is already this adapter's slug
 // form (URL-decoded — Ashby org names may contain spaces).
 func (a *AshbyAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	if strings.ToLower(u.Hostname()) != "jobs.ashbyhq.com" {
-		return "", false
-	}
-	org := firstPathSegment(u)
-	return org, org != ""
+	return matchCareersSlug(ashbyCareersURLRE, u)
 }
 
 func (a *AshbyAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {

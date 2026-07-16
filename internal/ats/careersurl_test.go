@@ -40,12 +40,6 @@ func TestParseCareersInput(t *testing.T) {
 	}
 }
 
-func TestFirstPathSegment(t *testing.T) {
-	assert.Equal(t, "acme", firstPathSegment(mustParseURL(t, "https://x.co/acme/jobs/1")))
-	assert.Equal(t, "acme co", firstPathSegment(mustParseURL(t, "https://x.co/acme%20co")))
-	assert.Equal(t, "", firstPathSegment(mustParseURL(t, "https://x.co/")))
-}
-
 func TestSlugAdaptersParseCareersURL(t *testing.T) {
 	gh, err := NewGreenhouseAdapter("https://example.invalid", http.DefaultClient)
 	require.NoError(t, err)
@@ -75,6 +69,11 @@ func TestSlugAdaptersParseCareersURL(t *testing.T) {
 		{name: "ashby", adapter: ab, raw: "https://jobs.ashbyhq.com/acme", slug: "acme", ok: true},
 		{name: "ashby url-encoded org", adapter: ab, raw: "https://jobs.ashbyhq.com/Acme%20Inc", slug: "Acme Inc", ok: true},
 		{name: "ashby wrong host", adapter: ab, raw: "https://jobs.lever.co/acme", ok: false},
+		// Empty path segments are rejected; a double slash is not a real
+		// careers URL shape.
+		{name: "lever double slash rejected", adapter: lv, raw: "https://jobs.lever.co//acme", ok: false},
+		{name: "ashby double slash rejected", adapter: ab, raw: "https://jobs.ashbyhq.com//acme", ok: false},
+		{name: "greenhouse double slash rejected", adapter: gh, raw: "https://job-boards.greenhouse.io//acme", ok: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

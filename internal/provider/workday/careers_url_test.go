@@ -57,6 +57,9 @@ func TestParseCareersURL(t *testing.T) {
 		},
 		{name: "no site segment", raw: "https://acme.wd1.myworkdayjobs.com/", ok: false},
 		{name: "locale only, no site", raw: "https://acme.wd1.myworkdayjobs.com/en-US", ok: false},
+		// Empty path segments are rejected (unlike the old Trim-based split,
+		// which skipped a leading empty segment from "//Site").
+		{name: "double slash rejected", raw: "https://acme.wd1.myworkdayjobs.com//External", ok: false},
 		{name: "wrong domain", raw: "https://acme.wd1.example.com/External", ok: false},
 		{name: "three host labels", raw: "https://www.myworkdayjobs.com/External", ok: false},
 		{name: "five host labels", raw: "https://a.b.wd1.myworkdayjobs.com/External", ok: false},

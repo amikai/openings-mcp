@@ -50,7 +50,13 @@ func (a *SuccessFactorsAdapter) Roster() []CompanyInfo {
 
 // ParseCareersURL only recognizes curated hosts: unlike Teamtailor's shared
 // *.teamtailor.com suffix, every SuccessFactors CSB tenant uses its own
-// custom domain with no common pattern to match uncurated tenants against.
+// custom domain with no common pattern to match uncurated tenants against,
+// so recognition is a roster lookup rather than a URL regex.
+//
+// Examples:
+//   - https://jobs.sap.com/job/1414343333/1414343333/
+//   - https://careers.capgemini.com/search/
+//   - https://jobs.deere.com/search/
 func (a *SuccessFactorsAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
 	if _, ok := successfactors.CompaniesByHost[host]; !ok {
