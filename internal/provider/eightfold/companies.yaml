@@ -1,9 +1,6 @@
-- company: 10x Genomics
-  tenant: 10xgenomics
-  domain: 10xgenomics.com
-- company: ATB Financial
-  tenant: atb
-  domain: atb.com
+- company: "10x Genomics"
+  tenant: "10xgenomics"
+  domain: "10xgenomics.com"
 - company: Amdocs
   tenant: amdocs
   domain: amdocs.com
@@ -13,6 +10,9 @@
 - company: AstraZeneca
   tenant: astrazeneca
   domain: astrazeneca.com
+- company: ATB Financial
+  tenant: atb
+  domain: atb.com
 - company: Bayer
   tenant: bayer
   domain: bayer.com
@@ -25,6 +25,9 @@
 - company: British Council
   tenant: britishcouncil
   domain: britishcouncil.org
+- company: CACI
+  tenant: caci
+  domain: caci.com
 - company: Circana
   tenant: circana
   domain: circana.com
@@ -40,6 +43,9 @@
 - company: Dolby
   tenant: dolby
   domain: dolby.com
+- company: dsm-firmenich
+  tenant: dsm
+  domain: dsm.com
 - company: Eaton
   tenant: eaton
   domain: eaton.com
@@ -64,12 +70,15 @@
 - company: Frontier Communications
   tenant: ftr
   domain: ftr.com
-- company: HSBC
-  tenant: hsbc
-  domain: hsbc.com
+- company: GlobalFoundries
+  tenant: globalfoundries
+  domain: globalfoundries.com
 - company: Houston Independent School District
   tenant: houstonisd
   domain: houstonisd.org
+- company: HSBC
+  tenant: hsbc
+  domain: hsbc.com
 - company: Infineon
   tenant: infineon
   domain: infineon.com
@@ -91,9 +100,6 @@
 - company: Liberty Mutual Insurance
   tenant: libertymutual
   domain: libertymutual.com
-- company: MM Group
-  tenant: mm-group
-  domain: mm-group.com
 - company: Mercado Libre
   tenant: mercadolibre
   domain: mercadolibre.com
@@ -103,6 +109,9 @@
 - company: Millennium
   tenant: mlp
   domain: mlp.com
+- company: MM Group
+  tenant: mm-group
+  domain: mm-group.com
 - company: Modern Technology Solutions Inc
   tenant: mtsi-va
   domain: mtsi-va.com
@@ -115,27 +124,30 @@
 - company: New York Life
   tenant: newyorklife
   domain: newyorklife.com
+- company: NVIDIA Corporation
+  tenant: nvidia
+  domain: nvidia.com
 - company: Qualcomm
   tenant: qualcomm
   domain: qualcomm.com
 - company: Ralliant
   tenant: ralliant
   domain: ralliant.com
-- company: SLB
-  tenant: slb
-  domain: slb.com
-- company: STMicroelectronics
-  tenant: stmicroelectronics
-  domain: stmicroelectronics.com
 - company: Sephora
   tenant: sephora
   domain: sephora.com
+- company: SLB
+  tenant: slb
+  domain: slb.com
 - company: Softtek
   tenant: softtek
   domain: softtek.com
 - company: Starbucks
   tenant: starbucks
   domain: starbucks.com
+- company: STMicroelectronics
+  tenant: stmicroelectronics
+  domain: stmicroelectronics.com
 - company: Symetra
   tenant: symetra
   domain: symetra.com
@@ -163,6 +175,3 @@
 - company: Worley
   tenant: worley
   domain: worley.com
-- company: dsm-firmenich
-  tenant: dsm
-  domain: dsm.com
