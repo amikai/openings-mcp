@@ -20,10 +20,10 @@ type CareersSite struct {
 // and site. An optional locale segment before the site is tolerated and
 // stripped; job deep links after the site are ignored.
 //
-// Examples:
-//   - https://stripe.wd5.myworkdayjobs.com/Stripe_Careers
-//   - https://stripe.wd5.myworkdayjobs.com/en-US/Stripe_Careers
-//   - https://acme.wd103.myworkdayjobs.com/zh-tw/jobs4acme/job/Taipei/Engineer_JR1
+// Examples (hostname + escaped path):
+//   - stripe.wd5.myworkdayjobs.com/Stripe_Careers
+//   - stripe.wd5.myworkdayjobs.com/en-US/Stripe_Careers
+//   - acme.wd103.myworkdayjobs.com/zh-tw/jobs4acme/job/Taipei/Engineer_JR1
 //
 // myworkdaysite.com is deliberately unsupported (#113).
 var careersURLRE = regexp.MustCompile(

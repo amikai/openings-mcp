@@ -25,10 +25,10 @@ type LeverAdapter struct {
 // leverCareersURLRE matches Lever board URLs and captures the organization
 // slug (first path segment), including the EU host.
 //
-// Examples:
-//   - https://jobs.lever.co/acme
-//   - https://jobs.eu.lever.co/acme
-//   - https://jobs.lever.co/acme/00000000-0000
+// Examples (hostname + escaped path):
+//   - jobs.lever.co/acme
+//   - jobs.eu.lever.co/acme
+//   - jobs.lever.co/acme/00000000-0000
 var leverCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs(?:\.eu)?\.lever\.co/([^/]+)`,
 )

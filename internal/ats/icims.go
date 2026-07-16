@@ -21,9 +21,9 @@ var _ Adapter = (*ICIMSAdapter)(nil)
 // icimsCareersHostRE matches *.icims.com hosts. login*, cdn*, api.*, and
 // www.icims.com are rejected after the match — they are not job boards.
 //
-// Examples:
-//   - https://careers-peraton.icims.com/jobs/search?ss=1
-//   - https://uscareers-example.icims.com/jobs/1/x/job
+// Examples (hostname):
+//   - careers-peraton.icims.com
+//   - uscareers-example.icims.com
 var icimsCareersHostRE = regexp.MustCompile(
 	`(?i)^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.icims\.com$`,
 )

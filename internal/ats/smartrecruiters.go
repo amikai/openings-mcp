@@ -22,10 +22,10 @@ var _ Adapter = (*SmartRecruitersAdapter)(nil)
 // smartRecruitersCareersURLRE matches SmartRecruiters career-site URLs and
 // captures the companyIdentifier (first path segment).
 //
-// Examples:
-//   - https://jobs.smartrecruiters.com/Equinox
-//   - https://jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston
-//   - https://jobs.smartrecruiters.com/SomeUnknownCo
+// Examples (hostname + escaped path):
+//   - jobs.smartrecruiters.com/Equinox
+//   - jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston
+//   - jobs.smartrecruiters.com/SomeUnknownCo
 var smartRecruitersCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.smartrecruiters\.com/([^/]+)`,
 )

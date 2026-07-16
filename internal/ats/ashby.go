@@ -24,10 +24,10 @@ type AshbyAdapter struct {
 // ashbyCareersURLRE matches Ashby board URLs and captures the organization
 // slug (first path segment; URL-decoded — org names may contain spaces).
 //
-// Examples:
-//   - https://jobs.ashbyhq.com/acme
-//   - https://jobs.ashbyhq.com/Acme%20Inc
-//   - https://jobs.ashbyhq.com/acme/application/job-id
+// Examples (hostname + escaped path):
+//   - jobs.ashbyhq.com/acme
+//   - jobs.ashbyhq.com/Acme%20Inc
+//   - jobs.ashbyhq.com/acme/application/job-id
 var ashbyCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.ashbyhq\.com/([^/]+)`,
 )

@@ -21,10 +21,10 @@ import (
 // language + public site name. Fixed segments are case-insensitive; the
 // site may sit under an optional path prefix.
 //
-// Examples:
-//   - https://fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Mayo-US/job/386920
-//   - https://fa-example.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en-US/sites/Acme/jobs
-//   - http://fa-example.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Acme/job/123?source=test
+// Examples (URL path):
+//   - /hcmUI/CandidateExperience/en/sites/Mayo-US/job/386920
+//   - /hcmUI/CandidateExperience/en-US/sites/Acme/jobs
+//   - /hcmUI/CandidateExperience/en/sites/Acme/job/123
 var oracleCareersPathRE = regexp.MustCompile(
 	`(?i)(?:^|/)hcmUI/CandidateExperience/([^/]+)/sites/([^/]+)(?:/|$)`,
 )

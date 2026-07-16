@@ -20,10 +20,10 @@ var _ Adapter = (*TeamtailorAdapter)(nil)
 // labels like .na / .eu / .au). Reserved product hosts are rejected after
 // the match; curated custom domains are recognized via the roster.
 //
-// Examples:
-//   - https://career.teamtailor.com/jobs/1-role
-//   - https://acme.na.teamtailor.com/jobs
-//   - https://acme.au.teamtailor.com/jobs
+// Examples (hostname):
+//   - career.teamtailor.com
+//   - acme.na.teamtailor.com
+//   - acme.au.teamtailor.com
 var teamtailorCareersHostRE = regexp.MustCompile(
 	`(?i)^[a-z0-9.-]+\.teamtailor\.com$`,
 )

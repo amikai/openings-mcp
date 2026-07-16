@@ -22,9 +22,9 @@ var _ Adapter = (*RecruiteeAdapter)(nil)
 // the company slug (subdomain). Reserved product hosts are rejected after
 // the match.
 //
-// Examples:
-//   - https://bunq.recruitee.com/o/role-1
-//   - https://acme.recruitee.com/o/job
+// Examples (hostname):
+//   - bunq.recruitee.com
+//   - acme.recruitee.com
 var recruiteeCareersHostRE = regexp.MustCompile(
 	`(?i)^(.+)\.recruitee\.com$`,
 )

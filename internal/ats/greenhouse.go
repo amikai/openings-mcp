@@ -28,10 +28,10 @@ type GreenhouseAdapter struct {
 // greenhouseCareersURLRE matches Greenhouse board URLs and captures the
 // board token (first path segment), including EU data-residency hosts.
 //
-// Examples:
-//   - https://job-boards.greenhouse.io/acme
-//   - https://boards.greenhouse.io/acme/jobs/123
-//   - https://job-boards.eu.greenhouse.io/acme
+// Examples (hostname + escaped path):
+//   - job-boards.greenhouse.io/acme
+//   - boards.greenhouse.io/acme/jobs/123
+//   - job-boards.eu.greenhouse.io/acme
 var greenhouseCareersURLRE = regexp.MustCompile(
 	`(?i)^(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/([^/]+)`,
 )

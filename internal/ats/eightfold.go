@@ -22,9 +22,8 @@ var _ Adapter = (*EightfoldAdapter)(nil)
 // eightfoldCareersHostRE matches Eightfold career-site hosts and captures
 // the tenant subdomain. Roster membership is still required after the match.
 //
-// Examples:
-//   - https://eaton.eightfold.ai/careers
-//   - https://eaton.eightfold.ai/careers/job/687237347150
+// Examples (hostname):
+//   - eaton.eightfold.ai
 var eightfoldCareersHostRE = regexp.MustCompile(
 	`(?i)^(.+)\.eightfold\.ai$`,
 )
