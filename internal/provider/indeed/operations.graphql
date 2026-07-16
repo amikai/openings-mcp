@@ -1,0 +1,188 @@
+# Struct inputs use pointer+omitempty so unset branches are omitted from JSON
+# (encoding/json never treats a struct value as empty).
+# Do NOT put a blanket omitempty on the operation: $filters is
+# [JobSearchFilterInput!]! and an empty list must still be serialized as
+# "filters":[] — encoding/json's omitempty drops empty slices, which the
+# live API rejects as a missing required variable.
+# @genqlient(for: "JobSearchFilterInput.date", pointer: true, omitempty: true)
+# @genqlient(for: "JobSearchFilterInput.keyword", pointer: true, omitempty: true)
+# @genqlient(for: "JobSearchFilterInput.composite", pointer: true, omitempty: true)
+# @genqlient(for: "CompositeFilterInput.filters", omitempty: true)
+query GetJobSearch(
+  # @genqlient(omitempty: true)
+  $what: String
+  # @genqlient(omitempty: true, pointer: true)
+  $location: JobSearchLocationInput
+  # @genqlient(omitempty: true)
+  $limit: Int
+  $sort: JobSearchSortOrder!
+  # @genqlient(omitempty: true)
+  $cursor: String
+  # Required list: no omitempty — empty means "filters":[].
+  $filters: [JobSearchFilterInput!]!
+) {
+  # @genqlient(pointer: true)
+  jobSearch(
+    what: $what
+    location: $location
+    limit: $limit
+    sort: $sort
+    cursor: $cursor
+    filters: $filters
+  ) {
+    pageInfo {
+      # @genqlient(pointer: true)
+      nextCursor
+    }
+    results {
+      trackingKey
+      job {
+        key
+        title
+        datePublished
+        location {
+          countryCode
+          admin1Code
+          city
+          formatted {
+            long
+          }
+        }
+        compensation {
+          # @genqlient(pointer: true)
+          estimated {
+            currencyCode
+            # @genqlient(pointer: true)
+            baseSalary {
+              unitOfWork
+              range {
+                ... on Range {
+                  min
+                  max
+                }
+              }
+            }
+          }
+          # @genqlient(pointer: true)
+          baseSalary {
+            unitOfWork
+            range {
+              ... on Range {
+                min
+                max
+              }
+            }
+          }
+          currencyCode
+        }
+        attributes {
+          key
+          label
+        }
+        # @genqlient(pointer: true)
+        employer {
+          relativeCompanyPageUrl
+          name
+        }
+      }
+    }
+  }
+}
+
+query GetJobDetail($jobKeys: [ID!]!) {
+  # @genqlient(pointer: true)
+  jobData(jobKeys: $jobKeys) {
+    results {
+      job {
+        key
+        title
+        datePublished
+        dateOnIndeed
+        # @genqlient(pointer: true)
+        description {
+          html
+        }
+        location {
+          countryName
+          countryCode
+          admin1Code
+          city
+          postalCode
+          streetAddress
+          formatted {
+            short
+            long
+          }
+        }
+        compensation {
+          # @genqlient(pointer: true)
+          estimated {
+            currencyCode
+            # @genqlient(pointer: true)
+            baseSalary {
+              unitOfWork
+              range {
+                ... on Range {
+                  min
+                  max
+                }
+              }
+            }
+          }
+          # @genqlient(pointer: true)
+          baseSalary {
+            unitOfWork
+            range {
+              ... on Range {
+                min
+                max
+              }
+            }
+          }
+          currencyCode
+        }
+        attributes {
+          key
+          label
+        }
+        # @genqlient(pointer: true)
+        employer {
+          relativeCompanyPageUrl
+          name
+          # @genqlient(pointer: true)
+          dossier {
+            # @genqlient(pointer: true)
+            employerDetails {
+              addresses
+              industry
+              employeesLocalizedLabel
+              revenueLocalizedLabel
+              briefDescription
+              ceoName
+              ceoPhotoUrl
+            }
+            # @genqlient(pointer: true)
+            images {
+              headerImageUrl
+              squareLogoUrl
+            }
+            # @genqlient(pointer: true)
+            links {
+              corporateWebsite
+            }
+          }
+        }
+        # @genqlient(pointer: true)
+        recruit {
+          viewJobUrl
+          detailedSalary
+          workSchedule
+        }
+        # @genqlient(pointer: true)
+        source {
+          name
+        }
+      }
+    }
+  }
+}

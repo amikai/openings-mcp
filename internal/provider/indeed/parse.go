@@ -5,151 +5,42 @@ import (
 	"time"
 )
 
-type wireGraphQLError struct {
-	Message string `json:"message"`
+// salaryRange is the min/max pair shared by search and detail compensation
+// shapes (genqlient generates distinct types per selection set).
+type salaryRange struct {
+	Min float64
+	Max float64
 }
 
-type wireRange struct {
-	Min *float64 `json:"min"`
-	Max *float64 `json:"max"`
+type baseSalary struct {
+	UnitOfWork string
+	Range      salaryRange
 }
 
-type wireBaseSalary struct {
-	UnitOfWork string    `json:"unitOfWork"`
-	Range      wireRange `json:"range"`
-}
-
-type wireCompensation struct {
-	Estimated *struct {
-		CurrencyCode string          `json:"currencyCode"`
-		BaseSalary   *wireBaseSalary `json:"baseSalary"`
-	} `json:"estimated"`
-	BaseSalary   *wireBaseSalary `json:"baseSalary"`
-	CurrencyCode string          `json:"currencyCode"`
-}
-
-type wireAttribute struct {
-	Key   string `json:"key"`
-	Label string `json:"label"`
-}
-
-type wireLocation struct {
-	CountryName   string `json:"countryName"`
-	CountryCode   string `json:"countryCode"`
-	Admin1Code    string `json:"admin1Code"`
-	City          string `json:"city"`
-	PostalCode    string `json:"postalCode"`
-	StreetAddress string `json:"streetAddress"`
-	Formatted     struct {
-		Short string `json:"short"`
-		Long  string `json:"long"`
-	} `json:"formatted"`
-}
-
-type wireEmployer struct {
-	RelativeCompanyPageURL string `json:"relativeCompanyPageUrl"`
-	Name                   string `json:"name"`
-	Dossier                *struct {
-		EmployerDetails *struct {
-			Addresses               []string `json:"addresses"`
-			Industry                string   `json:"industry"`
-			EmployeesLocalizedLabel string   `json:"employeesLocalizedLabel"`
-			RevenueLocalizedLabel   string   `json:"revenueLocalizedLabel"`
-			BriefDescription        string   `json:"briefDescription"`
-			CEOName                 string   `json:"ceoName"`
-			CEOPhotoURL             string   `json:"ceoPhotoUrl"`
-		} `json:"employerDetails"`
-		Images *struct {
-			HeaderImageURL string `json:"headerImageUrl"`
-			SquareLogoURL  string `json:"squareLogoUrl"`
-		} `json:"images"`
-		Links *struct {
-			CorporateWebsite string `json:"corporateWebsite"`
-		} `json:"links"`
-	} `json:"dossier"`
-}
-
-type wireRecruit struct {
-	ViewJobURL     string `json:"viewJobUrl"`
-	DetailedSalary string `json:"detailedSalary"`
-	WorkSchedule   string `json:"workSchedule"`
-}
-
-type wireJob struct {
-	Key           string `json:"key"`
-	Title         string `json:"title"`
-	DatePublished int64  `json:"datePublished"`
-	DateOnIndeed  int64  `json:"dateOnIndeed"`
-	Description   *struct {
-		HTML string `json:"html"`
-	} `json:"description"`
-	Location     wireLocation     `json:"location"`
-	Compensation wireCompensation `json:"compensation"`
-	Attributes   []wireAttribute  `json:"attributes"`
-	Employer     *wireEmployer    `json:"employer"`
-	Recruit      *wireRecruit     `json:"recruit"`
-	Source       *struct {
-		Name string `json:"name"`
-	} `json:"source"`
-}
-
-type wireSearchResult struct {
-	TrackingKey string  `json:"trackingKey"`
-	Job         wireJob `json:"job"`
-}
-
-type wireSearchResponse struct {
-	Data struct {
-		JobSearch *struct {
-			PageInfo struct {
-				NextCursor *string `json:"nextCursor"`
-			} `json:"pageInfo"`
-			Results []wireSearchResult `json:"results"`
-		} `json:"jobSearch"`
-	} `json:"data"`
-	Errors []wireGraphQLError `json:"errors"`
-}
-
-type wireDetailResponse struct {
-	Data struct {
-		JobData *struct {
-			Results []struct {
-				Job wireJob `json:"job"`
-			} `json:"results"`
-		} `json:"jobData"`
-	} `json:"data"`
-	Errors []wireGraphQLError `json:"errors"`
-}
-
-func compensationFromWire(c wireCompensation) *Compensation {
-	bs := c.BaseSalary
-	currency := c.CurrencyCode
-	if bs == nil && c.Estimated != nil {
-		bs = c.Estimated.BaseSalary
-		currency = c.Estimated.CurrencyCode
+func compensationFromParts(base *baseSalary, estimated *baseSalary, currency, estimatedCurrency string) *Compensation {
+	bs := base
+	cur := currency
+	if bs == nil && estimated != nil {
+		bs = estimated
+		cur = estimatedCurrency
 	}
 	if bs == nil {
 		return nil
 	}
-	comp := &Compensation{Currency: currency, Interval: strings.ToUpper(bs.UnitOfWork)}
-	if bs.Range.Min != nil {
-		comp.MinAmount = int(*bs.Range.Min)
+	comp := &Compensation{Currency: cur, Interval: strings.ToUpper(bs.UnitOfWork)}
+	if bs.Range.Min != 0 {
+		comp.MinAmount = int(bs.Range.Min)
 	}
-	if bs.Range.Max != nil {
-		comp.MaxAmount = int(*bs.Range.Max)
+	if bs.Range.Max != 0 {
+		comp.MaxAmount = int(bs.Range.Max)
 	}
-	return comp
-}
-
-func jobTypesFromAttributes(attrs []wireAttribute) []string {
-	if len(attrs) == 0 {
+	// Still expose a Compensation when only unit/currency is set and min/max
+	// are zero — callers treat zero amounts as "not disclosed" the same way
+	// the prior *float64 path did when min/max were null.
+	if comp.MinAmount == 0 && comp.MaxAmount == 0 && bs.UnitOfWork == "" && cur == "" {
 		return nil
 	}
-	types := make([]string, 0, len(attrs))
-	for _, a := range attrs {
-		types = append(types, a.Label)
-	}
-	return types
+	return comp
 }
 
 func dateFromEpochMillis(ms int64) string {
@@ -159,110 +50,155 @@ func dateFromEpochMillis(ms int64) string {
 	return time.UnixMilli(ms).UTC().Format("2006-01-02")
 }
 
-func companyURLFromRelative(rel, siteBaseURL string) string {
+func companyURLFromRelative(rel, siteBase string) string {
 	if rel == "" {
 		return ""
 	}
-	return siteBaseURL + rel
-}
-
-func employerName(e *wireEmployer) string {
-	if e == nil {
-		return ""
-	}
-	return e.Name
-}
-
-func employerCompanyURL(e *wireEmployer, siteBaseURL string) string {
-	if e == nil {
-		return ""
-	}
-	return companyURLFromRelative(e.RelativeCompanyPageURL, siteBaseURL)
-}
-
-func locationFromWire(l wireLocation) Location {
-	return Location{
-		Country:       l.CountryName,
-		CountryCode:   l.CountryCode,
-		State:         l.Admin1Code,
-		City:          l.City,
-		PostalCode:    l.PostalCode,
-		StreetAddress: l.StreetAddress,
-		Formatted:     l.Formatted.Long,
-	}
-}
-
-func sourceName(s *struct {
-	Name string `json:"name"`
-}) string {
-	if s == nil {
-		return ""
-	}
-	return s.Name
-}
-
-func jobFromWire(w wireJob, siteBaseURL string) Job {
-	return Job{
-		Key:          w.Key,
-		Title:        w.Title,
-		Company:      employerName(w.Employer),
-		CompanyURL:   employerCompanyURL(w.Employer, siteBaseURL),
-		Location:     w.Location.Formatted.Long,
-		JobURL:       jobURL(siteBaseURL, w.Key),
-		PostedDate:   dateFromEpochMillis(w.DatePublished),
-		JobTypes:     jobTypesFromAttributes(w.Attributes),
-		Compensation: compensationFromWire(w.Compensation),
-	}
-}
-
-func jobDetailFromWire(w wireJob, siteBaseURL string) JobDetail {
-	detail := JobDetail{
-		Key:          w.Key,
-		Title:        w.Title,
-		Company:      employerName(w.Employer),
-		CompanyURL:   employerCompanyURL(w.Employer, siteBaseURL),
-		Location:     locationFromWire(w.Location),
-		JobURL:       jobURL(siteBaseURL, w.Key),
-		PostedDate:   dateFromEpochMillis(w.DatePublished),
-		DateIndexed:  dateFromEpochMillis(w.DateOnIndeed),
-		Source:       sourceName(w.Source),
-		JobTypes:     jobTypesFromAttributes(w.Attributes),
-		Compensation: compensationFromWire(w.Compensation),
-	}
-	if w.Description != nil {
-		detail.Description = w.Description.HTML
-	}
-	if w.Recruit != nil {
-		detail.ApplyURL = w.Recruit.ViewJobURL
-		detail.DetailedSalary = w.Recruit.DetailedSalary
-		detail.WorkSchedule = w.Recruit.WorkSchedule
-	}
-	if w.Employer != nil && w.Employer.Dossier != nil {
-		d := w.Employer.Dossier
-		if d.EmployerDetails != nil {
-			detail.CompanyIndustry = d.EmployerDetails.Industry
-			detail.CompanyEmployees = d.EmployerDetails.EmployeesLocalizedLabel
-			detail.CompanyRevenue = d.EmployerDetails.RevenueLocalizedLabel
-			detail.CompanyDescription = d.EmployerDetails.BriefDescription
-			detail.CompanyAddresses = d.EmployerDetails.Addresses
-			detail.CompanyCEO = d.EmployerDetails.CEOName
-			detail.CompanyCEOPhoto = d.EmployerDetails.CEOPhotoURL
-		}
-		if d.Images != nil {
-			detail.CompanyLogo = d.Images.SquareLogoURL
-			detail.CompanyBannerImage = d.Images.HeaderImageURL
-		}
-		if d.Links != nil {
-			detail.CompanyWebsite = d.Links.CorporateWebsite
-		}
-	}
-	return detail
+	return siteBase + rel
 }
 
 // jobURL builds the Indeed-hosted posting page URL for a job key.
-func jobURL(siteBaseURL, key string) string {
+func jobURL(siteBase, key string) string {
 	if key == "" {
 		return ""
 	}
-	return siteBaseURL + "/viewjob?jk=" + key
+	return siteBase + "/viewjob?jk=" + key
+}
+
+// rangeMinMax reads min/max from a genqlient RangeType interface value.
+// Concrete type is always *...Range when the fragment matched; nil otherwise.
+func rangeMinMax(r any) salaryRange {
+	if r == nil {
+		return salaryRange{}
+	}
+	type minMax interface {
+		GetMin() float64
+		GetMax() float64
+	}
+	if mm, ok := r.(minMax); ok {
+		return salaryRange{Min: mm.GetMin(), Max: mm.GetMax()}
+	}
+	return salaryRange{}
+}
+
+func jobFromSearch(j GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJob, siteBase string) Job {
+	company, companyURL := "", ""
+	if j.Employer != nil {
+		company = j.Employer.Name
+		companyURL = companyURLFromRelative(j.Employer.RelativeCompanyPageUrl, siteBase)
+	}
+	var types []string
+	if len(j.Attributes) > 0 {
+		types = make([]string, 0, len(j.Attributes))
+		for _, a := range j.Attributes {
+			types = append(types, a.Label)
+		}
+	}
+	var base, estimated *baseSalary
+	if j.Compensation.BaseSalary != nil {
+		base = &baseSalary{
+			UnitOfWork: j.Compensation.BaseSalary.UnitOfWork,
+			Range:      rangeMinMax(j.Compensation.BaseSalary.Range),
+		}
+	}
+	estCurrency := ""
+	if j.Compensation.Estimated != nil {
+		estCurrency = j.Compensation.Estimated.CurrencyCode
+		if j.Compensation.Estimated.BaseSalary != nil {
+			estimated = &baseSalary{
+				UnitOfWork: j.Compensation.Estimated.BaseSalary.UnitOfWork,
+				Range:      rangeMinMax(j.Compensation.Estimated.BaseSalary.Range),
+			}
+		}
+	}
+	return Job{
+		Key:          j.Key,
+		Title:        j.Title,
+		Company:      company,
+		CompanyURL:   companyURL,
+		Location:     j.Location.Formatted.Long,
+		JobURL:       jobURL(siteBase, j.Key),
+		PostedDate:   dateFromEpochMillis(j.DatePublished),
+		JobTypes:     types,
+		Compensation: compensationFromParts(base, estimated, j.Compensation.CurrencyCode, estCurrency),
+	}
+}
+
+func jobDetailFromDetail(j GetJobDetailJobDataJobDataConnectionResultsJobDataResultJob, siteBase string) JobDetail {
+	detail := JobDetail{
+		Key:         j.Key,
+		Title:       j.Title,
+		JobURL:      jobURL(siteBase, j.Key),
+		PostedDate:  dateFromEpochMillis(j.DatePublished),
+		DateIndexed: dateFromEpochMillis(j.DateOnIndeed),
+		Location: Location{
+			Country:       j.Location.CountryName,
+			CountryCode:   j.Location.CountryCode,
+			State:         j.Location.Admin1Code,
+			City:          j.Location.City,
+			PostalCode:    j.Location.PostalCode,
+			StreetAddress: j.Location.StreetAddress,
+			Formatted:     j.Location.Formatted.Long,
+		},
+	}
+	if j.Description != nil {
+		detail.Description = j.Description.Html
+	}
+	if j.Source != nil {
+		detail.Source = j.Source.Name
+	}
+	if len(j.Attributes) > 0 {
+		detail.JobTypes = make([]string, 0, len(j.Attributes))
+		for _, a := range j.Attributes {
+			detail.JobTypes = append(detail.JobTypes, a.Label)
+		}
+	}
+	var base, estimated *baseSalary
+	if j.Compensation.BaseSalary != nil {
+		base = &baseSalary{
+			UnitOfWork: j.Compensation.BaseSalary.UnitOfWork,
+			Range:      rangeMinMax(j.Compensation.BaseSalary.Range),
+		}
+	}
+	estCurrency := ""
+	if j.Compensation.Estimated != nil {
+		estCurrency = j.Compensation.Estimated.CurrencyCode
+		if j.Compensation.Estimated.BaseSalary != nil {
+			estimated = &baseSalary{
+				UnitOfWork: j.Compensation.Estimated.BaseSalary.UnitOfWork,
+				Range:      rangeMinMax(j.Compensation.Estimated.BaseSalary.Range),
+			}
+		}
+	}
+	detail.Compensation = compensationFromParts(base, estimated, j.Compensation.CurrencyCode, estCurrency)
+
+	if j.Employer != nil {
+		detail.Company = j.Employer.Name
+		detail.CompanyURL = companyURLFromRelative(j.Employer.RelativeCompanyPageUrl, siteBase)
+		if j.Employer.Dossier != nil {
+			d := j.Employer.Dossier
+			if d.EmployerDetails != nil {
+				detail.CompanyIndustry = d.EmployerDetails.Industry
+				detail.CompanyEmployees = d.EmployerDetails.EmployeesLocalizedLabel
+				detail.CompanyRevenue = d.EmployerDetails.RevenueLocalizedLabel
+				detail.CompanyDescription = d.EmployerDetails.BriefDescription
+				detail.CompanyAddresses = d.EmployerDetails.Addresses
+				detail.CompanyCEO = d.EmployerDetails.CeoName
+				detail.CompanyCEOPhoto = d.EmployerDetails.CeoPhotoUrl
+			}
+			if d.Images != nil {
+				detail.CompanyLogo = d.Images.SquareLogoUrl
+				detail.CompanyBannerImage = d.Images.HeaderImageUrl
+			}
+			if d.Links != nil {
+				detail.CompanyWebsite = d.Links.CorporateWebsite
+			}
+		}
+	}
+	if j.Recruit != nil {
+		detail.ApplyURL = j.Recruit.ViewJobUrl
+		detail.DetailedSalary = j.Recruit.DetailedSalary
+		detail.WorkSchedule = j.Recruit.WorkSchedule
+	}
+	return detail
 }

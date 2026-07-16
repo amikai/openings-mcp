@@ -25,11 +25,14 @@ info:
       separate REST-style `/jobs/{id}` path.
 
     Both operations share the same URL, headers, and auth — only the
-    `query` string in the POST body differs — so unlike a typical multi-path
+    `query`/variables in the POST body differ — so unlike a typical multi-path
     REST API this spec cannot be generated into an ogen client (ogen models
-    distinct paths per operation); the Go client in this package is
-    hand-written against this spec instead, the same way `../linkedin`
-    hand-writes against its own non-REST-shaped spec.
+    distinct paths per operation). The Go client is built with
+    Khan/genqlient against a reverse-engineered `schema.graphql` (Indeed has
+    no public SDL). Live-validated type names (via GraphQL validation errors
+    and the `cmd/indeed` CLI): `JobSearchSortOrder`,
+    `filters: [JobSearchFilterInput!]!`, `JobSearchLocationInput`,
+    `jobData(jobKeys: [ID!])`, `Salary.range` → `RangeType` / `Range`.
 
     ## Key Behaviors
 

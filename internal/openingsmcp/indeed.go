@@ -55,7 +55,7 @@ var indeedSearchInputRawSchema = []byte(`{
 }`)
 
 // indeedSearchInputSchema is hand-written JSON kept aligned with the
-// jobSearch GraphQL fields query.go builds: human labels instead of the
+// jobSearch GraphQL fields the Indeed provider requests: human labels instead of the
 // site's raw filter codes (job_type maps back via indeed.JobTypeIDs).
 var indeedSearchInputSchema = mustSchema(indeedSearchInputRawSchema)
 

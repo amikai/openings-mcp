@@ -26,32 +26,40 @@ var mockJobDetailNotFoundRsp []byte
 // testdata/job_detail_notfound_rsp.json.
 const MockNotFoundJobKey = "0000000000000000"
 
+type mockGraphQLBody struct {
+	Query     string          `json:"query"`
+	Variables json.RawMessage `json:"variables"`
+}
+
 // NewMockServer returns an httptest.Server that mimics Indeed's GraphQL
 // endpoint with canned fixture responses, so tests never hit the real API.
-// Every query goes to the same /graphql path; this dispatches on the
-// request body's query string, the same way the real single-endpoint API
-// dispatches on it server-side. The caller owns the server and must Close
-// it.
+// Dispatch looks at the operation document and variables the same way the
+// real single-endpoint API keys off the request body. The caller owns the
+// server and must Close it.
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
-		var body graphqlRequestBody
+		var body mockGraphQLBody
 		defer r.Body.Close()
 		raw, _ := io.ReadAll(r.Body)
 		_ = json.Unmarshal(raw, &body)
 
 		w.Header().Set("Content-Type", "application/json")
 		switch {
-		case strings.Contains(body.Query, "jobData("):
-			if strings.Contains(body.Query, MockNotFoundJobKey) {
-				w.Write(mockJobDetailNotFoundRsp)
+		case strings.Contains(body.Query, "jobData"):
+			// jobKeys live in variables under genqlient; fall back to the
+			// document string for hand-written clients / hurl captures.
+			if strings.Contains(string(body.Variables), MockNotFoundJobKey) ||
+				strings.Contains(body.Query, MockNotFoundJobKey) {
+				_, _ = w.Write(mockJobDetailNotFoundRsp)
 				return
 			}
-			w.Write(mockJobDetailRsp)
-		case strings.Contains(body.Query, "dateOnIndeed"):
-			w.Write(mockJobsFilteredRsp)
+			_, _ = w.Write(mockJobDetailRsp)
+		case strings.Contains(string(body.Variables), "dateOnIndeed") ||
+			strings.Contains(body.Query, "dateOnIndeed"):
+			_, _ = w.Write(mockJobsFilteredRsp)
 		default:
-			w.Write(mockJobsRsp)
+			_, _ = w.Write(mockJobsRsp)
 		}
 	})
 	return httptest.NewServer(mux)

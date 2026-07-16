@@ -1,0 +1,183 @@
+# Reverse-engineered subset of Indeed's mobile GraphQL API.
+# Type names confirmed live via GRAPHQL_VALIDATION_FAILED messages and
+# curl probes (2026-07-16): JobSearchSortOrder, JobSearchFilterInput (list),
+# JobSearchLocationInput, Salary.range → RangeType / Range.
+# Not an official schema — only the fields/args this package uses.
+
+scalar Long
+
+enum JobSearchSortOrder {
+  RELEVANCE
+}
+
+enum RadiusUnit {
+  MILES
+}
+
+input JobSearchLocationInput {
+  where: String
+  radius: Int
+  radiusUnit: RadiusUnit
+}
+
+input DateFilterInput {
+  field: String
+  start: String
+}
+
+input KeywordFilterInput {
+  field: String
+  keys: [String!]
+}
+
+# Server arg type is [JobSearchFilterInput!]! — a list of filter objects,
+# not a single wrapper. Confirmed live with variables filters: [].
+input JobSearchFilterInput {
+  date: DateFilterInput
+  keyword: KeywordFilterInput
+  composite: CompositeFilterInput
+}
+
+input CompositeFilterInput {
+  filters: [JobSearchFilterInput!]
+}
+
+type PageInfo {
+  nextCursor: String
+}
+
+type FormattedLocation {
+  short: String
+  long: String
+}
+
+type Location {
+  countryName: String
+  countryCode: String
+  admin1Code: String
+  city: String
+  postalCode: String
+  streetAddress: String
+  formatted: FormattedLocation
+}
+
+type Range {
+  min: Float
+  max: Float
+}
+
+# Live error: "Cannot query field min on type RangeType" when selecting
+# min/max without a fragment — range is RangeType, concrete type is Range.
+union RangeType = Range
+
+# Live error: 'Field "range" of type "Salary" must have a selection...'
+type Salary {
+  unitOfWork: String
+  range: RangeType
+}
+
+type EstimatedCompensation {
+  currencyCode: String
+  baseSalary: Salary
+}
+
+type Compensation {
+  estimated: EstimatedCompensation
+  baseSalary: Salary
+  currencyCode: String
+}
+
+type Attribute {
+  key: String
+  label: String
+}
+
+type EmployerDetails {
+  addresses: [String!]
+  industry: String
+  employeesLocalizedLabel: String
+  revenueLocalizedLabel: String
+  briefDescription: String
+  ceoName: String
+  ceoPhotoUrl: String
+}
+
+type EmployerImages {
+  headerImageUrl: String
+  squareLogoUrl: String
+}
+
+type EmployerLinks {
+  corporateWebsite: String
+}
+
+type EmployerDossier {
+  employerDetails: EmployerDetails
+  images: EmployerImages
+  links: EmployerLinks
+}
+
+type Employer {
+  relativeCompanyPageUrl: String
+  name: String
+  dossier: EmployerDossier
+}
+
+type JobDescription {
+  html: String
+}
+
+type Recruit {
+  viewJobUrl: String
+  detailedSalary: String
+  workSchedule: String
+}
+
+type JobSource {
+  name: String
+}
+
+type Job {
+  key: String
+  title: String
+  datePublished: Long
+  dateOnIndeed: Long
+  description: JobDescription
+  location: Location
+  compensation: Compensation
+  attributes: [Attribute!]
+  employer: Employer
+  recruit: Recruit
+  source: JobSource
+}
+
+type JobSearchResult {
+  trackingKey: String
+  job: Job
+}
+
+type JobSearchConnection {
+  pageInfo: PageInfo
+  results: [JobSearchResult!]
+}
+
+type JobDataResult {
+  job: Job
+}
+
+type JobDataConnection {
+  results: [JobDataResult!]
+}
+
+type Query {
+  jobSearch(
+    what: String
+    location: JobSearchLocationInput
+    limit: Int
+    sort: JobSearchSortOrder!
+    cursor: String
+    filters: [JobSearchFilterInput!]!
+  ): JobSearchConnection
+  # Live: position type is [ID!] (not [String!]!).
+  jobData(jobKeys: [ID!]): JobDataConnection
+}

@@ -1,0 +1,11 @@
+# genqlient config for the reverse-engineered Indeed mobile GraphQL surface.
+# Schema is hand-maintained (Indeed has no public SDL); regenerate with:
+#   go generate ./internal/provider/indeed/
+schema: schema.graphql
+operations:
+  - operations.graphql
+generated: generated.go
+package: indeed
+bindings:
+  Long:
+    type: int64
