@@ -22,11 +22,15 @@ var _ Adapter = (*ICIMSAdapter)(nil)
 // www.icims.com are rejected after the match — they are not job boards.
 // Host labels must start and end alphanumeric (stricter than a bare
 // HasSuffix check); intentional, since iCIMS has no roster gate and the
-// host is the slug.
+// host is the slug. Go's RE2 has no negative lookahead.
 //
 // Examples (hostname):
 //   - careers-peraton.icims.com
 //   - uscareers-example.icims.com
+//
+// Rejected:
+//   - login.icims.com
+//   - www.icims.com
 var icimsCareersHostRE = regexp.MustCompile(
 	`(?i)^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.icims\.com$`,
 )
@@ -63,10 +67,8 @@ func (a *ICIMSAdapter) Roster() []CompanyInfo {
 // callers can pass a careers URL directly.
 func (a *ICIMSAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
-	if !icimsCareersHostRE.MatchString(host) {
-		return "", false
-	}
-	if strings.HasPrefix(host, "login") || strings.HasPrefix(host, "cdn") ||
+	if !icimsCareersHostRE.MatchString(host) ||
+		strings.HasPrefix(host, "login") || strings.HasPrefix(host, "cdn") ||
 		strings.HasPrefix(host, "api.") || host == "www.icims.com" {
 		return "", false
 	}

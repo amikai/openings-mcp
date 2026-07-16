@@ -18,15 +18,18 @@ var _ Adapter = (*TeamtailorAdapter)(nil)
 
 // teamtailorCareersHostRE matches *.teamtailor.com hosts (including regional
 // labels like .na / .eu / .au). Reserved product hosts are rejected after
-// the match; curated custom domains are recognized via the roster.
+// the match — Go's RE2 has no negative lookahead. Curated custom domains
+// are recognized via the roster.
 //
 // Examples (hostname):
 //   - career.teamtailor.com
 //   - acme.na.teamtailor.com
 //   - acme.au.teamtailor.com
-var teamtailorCareersHostRE = regexp.MustCompile(
-	`(?i)^[a-z0-9.-]+\.teamtailor\.com$`,
-)
+//
+// Rejected:
+//   - www.teamtailor.com
+//   - api.na.teamtailor.com
+var teamtailorCareersHostRE = regexp.MustCompile(`(?i)^[a-z0-9.-]+\.teamtailor\.com$`)
 
 // TeamtailorAdapter serves Teamtailor career sites. The public /jobs.json
 // endpoint returns the complete board with full descriptions, so all search,
