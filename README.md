@@ -10,7 +10,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 - **Job boards**: **[104](https://www.104.com.tw)**, **[Cake](https://www.cake.me)**,
   **[LinkedIn](https://www.linkedin.com)**, and **[Indeed](https://www.indeed.com)**
   (public search).
-- **Company career sites**: 2,800+ companies hosted on the
+- **Company career sites**: 3,500+ companies hosted on the
   **[Workday](https://www.workday.com)**, **[Ashby](https://www.ashbyhq.com)**,
   **[Greenhouse](https://www.greenhouse.com)**, **[Lever](https://www.lever.co)**,
   **[Teamtailor](https://www.teamtailor.com)**, **[Recruitee](https://recruitee.com)**,
