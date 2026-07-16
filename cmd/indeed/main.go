@@ -46,11 +46,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	radiusMiles := *radius
 	req := &indeed.JobsRequest{
 		Keywords:    *keywords,
 		Location:    *location,
 		Country:     *country,
-		RadiusMiles: *radius,
+		RadiusMiles: &radiusMiles,
 		Limit:       *limit,
 		Cursor:      *cursor,
 		HoursOld:    *hoursOld,
@@ -130,7 +131,7 @@ func writeReport(w io.Writer, d reportData) {
 		}
 		if job.Compensation != nil {
 			c := job.Compensation
-			fmt.Fprintf(w, "Compensation: %d-%d %s (%s)\n", c.MinAmount, c.MaxAmount, c.Currency, c.Interval)
+			fmt.Fprintf(w, "Compensation: %g-%g %s (%s)\n", c.MinAmount, c.MaxAmount, c.Currency, c.Interval)
 		}
 		if detail := d.details[job.Key]; detail != nil {
 			writeDetail(w, detail)

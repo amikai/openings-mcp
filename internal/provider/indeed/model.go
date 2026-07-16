@@ -27,10 +27,13 @@ type JobsRequest struct {
 	// Location is free-text, e.g. "Taipei". Must correspond to Country —
 	// see API.md's Key Behaviors on what a mismatch does.
 	Location string
-	// RadiusMiles defaults to 25 (python-jobspy's default distance) when 0.
-	RadiusMiles int
+	// RadiusMiles is the search radius around Location. nil defaults to 25
+	// (python-jobspy's default); 0 is exact-location (Indeed accepts it).
+	// A plain int cannot distinguish "omitted" from "zero".
+	RadiusMiles *int
 	// Country selects the indeed-co catalogue and the job_url domain via
-	// CountryByName; empty defaults to DefaultCountryName.
+	// CountryByName; empty defaults to DefaultCountryName for search only.
+	// JobDetail requires an explicit country — jobData is country-scoped.
 	Country string
 	// Cursor pages through results: pass the previous JobsResponse's
 	// NextCursor. Empty starts from the first page.
@@ -49,10 +52,11 @@ type JobsRequest struct {
 }
 
 // Compensation mirrors Indeed's compensation.{baseSalary,estimated} shape;
-// nil when the posting doesn't disclose one (the common case).
+// nil when the posting doesn't disclose one (the common case). Amounts are
+// float64 because Indeed returns fractional hourly ranges (e.g. 22.5–27.5).
 type Compensation struct {
-	MinAmount int
-	MaxAmount int
+	MinAmount float64
+	MaxAmount float64
 	Currency  string
 	// Interval is the raw unitOfWork value (YEAR, MONTH, WEEK, DAY, HOUR),
 	// uppercased; left as Indeed sends it rather than remapped, since
@@ -68,6 +72,11 @@ type Job struct {
 	Company    string
 	CompanyURL string
 	Location   string
+	// Country is the country name used for the search that produced this
+	// row (DefaultCountryName when the caller omitted it). Pass it back
+	// to JobDetail — jobData is country-scoped and an omitted/wrong
+	// country yields a false empty result.
+	Country string
 	// JobURL is the Indeed-hosted posting page, built from the search
 	// request's Country domain.
 	JobURL string

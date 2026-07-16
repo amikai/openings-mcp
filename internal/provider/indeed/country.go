@@ -23,28 +23,27 @@ const DefaultCountryName = "taiwan"
 // Taiwan's is "tw" (tw.indeed.com), Malaysia's is "malaysia"
 // (malaysia.indeed.com), and the US's is "www" (www.indeed.com) — each
 // taken verbatim from jobspy's Country.indeed_domain_value.
+// Only countries that map to a real Indeed site. Entries accepted by
+// python-jobspy but rejected live with BAD_USER_INPUT ("does not correspond
+// to a valid Indeed site") are omitted: Bangladesh, Bulgaria, Croatia,
+// Cyprus, Estonia, Latvia, Lithuania, Malta, Slovakia, Slovenia.
 var countries = map[string]Country{
 	"argentina":            {"ar", "AR"},
 	"australia":            {"au", "AU"},
 	"austria":              {"at", "AT"},
 	"bahrain":              {"bh", "BH"},
-	"bangladesh":           {"bd", "BD"},
 	"belgium":              {"be", "BE"},
-	"bulgaria":             {"bg", "BG"},
 	"brazil":               {"br", "BR"},
 	"canada":               {"ca", "CA"},
 	"chile":                {"cl", "CL"},
 	"china":                {"cn", "CN"},
 	"colombia":             {"co", "CO"},
 	"costa rica":           {"cr", "CR"},
-	"croatia":              {"hr", "HR"},
-	"cyprus":               {"cy", "CY"},
 	"czech republic":       {"cz", "CZ"},
 	"czechia":              {"cz", "CZ"},
 	"denmark":              {"dk", "DK"},
 	"ecuador":              {"ec", "EC"},
 	"egypt":                {"eg", "EG"},
-	"estonia":              {"ee", "EE"},
 	"finland":              {"fi", "FI"},
 	"france":               {"fr", "FR"},
 	"germany":              {"de", "DE"},
@@ -58,11 +57,8 @@ var countries = map[string]Country{
 	"italy":                {"it", "IT"},
 	"japan":                {"jp", "JP"},
 	"kuwait":               {"kw", "KW"},
-	"latvia":               {"lv", "LV"},
-	"lithuania":            {"lt", "LT"},
 	"luxembourg":           {"lu", "LU"},
 	"malaysia":             {"malaysia", "MY"},
-	"malta":                {"malta", "MT"},
 	"mexico":               {"mx", "MX"},
 	"morocco":              {"ma", "MA"},
 	"netherlands":          {"nl", "NL"},
@@ -80,8 +76,6 @@ var countries = map[string]Country{
 	"romania":              {"ro", "RO"},
 	"saudi arabia":         {"sa", "SA"},
 	"singapore":            {"sg", "SG"},
-	"slovakia":             {"sk", "SK"},
-	"slovenia":             {"sl", "SL"},
 	"south africa":         {"za", "ZA"},
 	"south korea":          {"kr", "KR"},
 	"spain":                {"es", "ES"},

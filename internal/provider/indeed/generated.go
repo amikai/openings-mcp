@@ -258,9 +258,60 @@ func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensation
 	return v.Max
 }
 
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast includes the requested fields of the GraphQL type AtLeast.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast struct {
+	Typename string  `json:"__typename"`
+	Min      float64 `json:"min"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast) GetTypename() string {
+	return v.Typename
+}
+
+// GetMin returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast.Min, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast) GetMin() float64 {
+	return v.Min
+}
+
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost includes the requested fields of the GraphQL type AtMost.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost struct {
+	Typename string  `json:"__typename"`
+	Max      float64 `json:"max"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost) GetTypename() string {
+	return v.Typename
+}
+
+// GetMax returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost.Max, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost) GetMax() float64 {
+	return v.Max
+}
+
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly includes the requested fields of the GraphQL type Exactly.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly struct {
+	Typename string  `json:"__typename"`
+	Value    float64 `json:"value"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly) GetTypename() string {
+	return v.Typename
+}
+
+// GetValue returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly.Value, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly) GetValue() float64 {
+	return v.Value
+}
+
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType includes the requested fields of the GraphQL interface RangeType.
 //
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType is implemented by the following types:
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRange
 type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType interface {
 	implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType()
@@ -268,6 +319,12 @@ type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBase
 	GetTypename() string
 }
 
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType() {
+}
 func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRange) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeRangeType() {
 }
 
@@ -285,6 +342,15 @@ func __unmarshalGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompe
 	}
 
 	switch tn.TypeName {
+	case "AtLeast":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast)
+		return json.Unmarshal(b, *v)
+	case "AtMost":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost)
+		return json.Unmarshal(b, *v)
+	case "Exactly":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly)
+		return json.Unmarshal(b, *v)
 	case "Range":
 		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRange)
 		return json.Unmarshal(b, *v)
@@ -301,6 +367,30 @@ func __marshalGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompens
 
 	var typename string
 	switch v := (*v).(type) {
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast:
+		typename = "AtLeast"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtLeast
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost:
+		typename = "AtMost"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeAtMost
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly:
+		typename = "Exactly"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRangeExactly
+		}{typename, v}
+		return json.Marshal(result)
 	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationBaseSalaryRange:
 		typename = "Range"
 
@@ -437,9 +527,60 @@ func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensation
 	return v.Max
 }
 
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast includes the requested fields of the GraphQL type AtLeast.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast struct {
+	Typename string  `json:"__typename"`
+	Min      float64 `json:"min"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) GetTypename() string {
+	return v.Typename
+}
+
+// GetMin returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast.Min, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) GetMin() float64 {
+	return v.Min
+}
+
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost includes the requested fields of the GraphQL type AtMost.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost struct {
+	Typename string  `json:"__typename"`
+	Max      float64 `json:"max"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) GetTypename() string {
+	return v.Typename
+}
+
+// GetMax returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost.Max, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) GetMax() float64 {
+	return v.Max
+}
+
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly includes the requested fields of the GraphQL type Exactly.
+type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly struct {
+	Typename string  `json:"__typename"`
+	Value    float64 `json:"value"`
+}
+
+// GetTypename returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) GetTypename() string {
+	return v.Typename
+}
+
+// GetValue returns GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly.Value, and is useful for accessing the field via an interface.
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) GetValue() float64 {
+	return v.Value
+}
+
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType includes the requested fields of the GraphQL interface RangeType.
 //
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType is implemented by the following types:
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost
+// GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly
 // GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange
 type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType interface {
 	implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType()
@@ -447,6 +588,12 @@ type GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEsti
 	GetTypename() string
 }
 
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
 func (v *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange) implementsGraphQLInterfaceGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
 }
 
@@ -464,6 +611,15 @@ func __unmarshalGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompe
 	}
 
 	switch tn.TypeName {
+	case "AtLeast":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast)
+		return json.Unmarshal(b, *v)
+	case "AtMost":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost)
+		return json.Unmarshal(b, *v)
+	case "Exactly":
+		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly)
+		return json.Unmarshal(b, *v)
 	case "Range":
 		*v = new(GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange)
 		return json.Unmarshal(b, *v)
@@ -480,6 +636,30 @@ func __marshalGetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompens
 
 	var typename string
 	switch v := (*v).(type) {
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast:
+		typename = "AtLeast"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost:
+		typename = "AtMost"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly:
+		typename = "Exactly"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly
+		}{typename, v}
+		return json.Marshal(result)
 	case *GetJobDetailJobDataJobDataConnectionResultsJobDataResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange:
 		typename = "Range"
 
@@ -954,9 +1134,60 @@ func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompen
 	return v.Max
 }
 
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast includes the requested fields of the GraphQL type AtLeast.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast struct {
+	Typename string  `json:"__typename"`
+	Min      float64 `json:"min"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast) GetTypename() string {
+	return v.Typename
+}
+
+// GetMin returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast.Min, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast) GetMin() float64 {
+	return v.Min
+}
+
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost includes the requested fields of the GraphQL type AtMost.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost struct {
+	Typename string  `json:"__typename"`
+	Max      float64 `json:"max"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost) GetTypename() string {
+	return v.Typename
+}
+
+// GetMax returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost.Max, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost) GetMax() float64 {
+	return v.Max
+}
+
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly includes the requested fields of the GraphQL type Exactly.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly struct {
+	Typename string  `json:"__typename"`
+	Value    float64 `json:"value"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly) GetTypename() string {
+	return v.Typename
+}
+
+// GetValue returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly.Value, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly) GetValue() float64 {
+	return v.Value
+}
+
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType includes the requested fields of the GraphQL interface RangeType.
 //
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType is implemented by the following types:
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRange
 type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType interface {
 	implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType()
@@ -964,6 +1195,12 @@ type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensati
 	GetTypename() string
 }
 
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType() {
+}
 func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRange) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeRangeType() {
 }
 
@@ -981,6 +1218,15 @@ func __unmarshalGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJo
 	}
 
 	switch tn.TypeName {
+	case "AtLeast":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast)
+		return json.Unmarshal(b, *v)
+	case "AtMost":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost)
+		return json.Unmarshal(b, *v)
+	case "Exactly":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly)
+		return json.Unmarshal(b, *v)
 	case "Range":
 		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRange)
 		return json.Unmarshal(b, *v)
@@ -997,6 +1243,30 @@ func __marshalGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobC
 
 	var typename string
 	switch v := (*v).(type) {
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast:
+		typename = "AtLeast"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtLeast
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost:
+		typename = "AtMost"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeAtMost
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly:
+		typename = "Exactly"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRangeExactly
+		}{typename, v}
+		return json.Marshal(result)
 	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationBaseSalaryRange:
 		typename = "Range"
 
@@ -1133,9 +1403,60 @@ func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompen
 	return v.Max
 }
 
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast includes the requested fields of the GraphQL type AtLeast.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast struct {
+	Typename string  `json:"__typename"`
+	Min      float64 `json:"min"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) GetTypename() string {
+	return v.Typename
+}
+
+// GetMin returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast.Min, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) GetMin() float64 {
+	return v.Min
+}
+
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost includes the requested fields of the GraphQL type AtMost.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost struct {
+	Typename string  `json:"__typename"`
+	Max      float64 `json:"max"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) GetTypename() string {
+	return v.Typename
+}
+
+// GetMax returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost.Max, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) GetMax() float64 {
+	return v.Max
+}
+
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly includes the requested fields of the GraphQL type Exactly.
+type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly struct {
+	Typename string  `json:"__typename"`
+	Value    float64 `json:"value"`
+}
+
+// GetTypename returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly.Typename, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) GetTypename() string {
+	return v.Typename
+}
+
+// GetValue returns GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly.Value, and is useful for accessing the field via an interface.
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) GetValue() float64 {
+	return v.Value
+}
+
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType includes the requested fields of the GraphQL interface RangeType.
 //
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType is implemented by the following types:
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost
+// GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly
 // GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange
 type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType interface {
 	implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType()
@@ -1143,6 +1464,12 @@ type GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensati
 	GetTypename() string
 }
 
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
+func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
+}
 func (v *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange) implementsGraphQLInterfaceGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeRangeType() {
 }
 
@@ -1160,6 +1487,15 @@ func __unmarshalGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJo
 	}
 
 	switch tn.TypeName {
+	case "AtLeast":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast)
+		return json.Unmarshal(b, *v)
+	case "AtMost":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost)
+		return json.Unmarshal(b, *v)
+	case "Exactly":
+		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly)
+		return json.Unmarshal(b, *v)
 	case "Range":
 		*v = new(GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange)
 		return json.Unmarshal(b, *v)
@@ -1176,6 +1512,30 @@ func __marshalGetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobC
 
 	var typename string
 	switch v := (*v).(type) {
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast:
+		typename = "AtLeast"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtLeast
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost:
+		typename = "AtMost"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeAtMost
+		}{typename, v}
+		return json.Marshal(result)
+	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly:
+		typename = "Exactly"
+
+		result := struct {
+			TypeName string `json:"__typename"`
+			*GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRangeExactly
+		}{typename, v}
+		return json.Marshal(result)
 	case *GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJobCompensationEstimatedEstimatedCompensationBaseSalaryRange:
 		typename = "Range"
 
@@ -1389,6 +1749,15 @@ query GetJobDetail ($jobKeys: [ID!]!) {
 									min
 									max
 								}
+								... on AtLeast {
+									min
+								}
+								... on AtMost {
+									max
+								}
+								... on Exactly {
+									value
+								}
 							}
 						}
 					}
@@ -1399,6 +1768,15 @@ query GetJobDetail ($jobKeys: [ID!]!) {
 							... on Range {
 								min
 								max
+							}
+							... on AtLeast {
+								min
+							}
+							... on AtMost {
+								max
+							}
+							... on Exactly {
+								value
 							}
 						}
 					}
@@ -1501,6 +1879,15 @@ query GetJobSearch ($what: String, $location: JobSearchLocationInput, $limit: In
 									min
 									max
 								}
+								... on AtLeast {
+									min
+								}
+								... on AtMost {
+									max
+								}
+								... on Exactly {
+									value
+								}
 							}
 						}
 					}
@@ -1511,6 +1898,15 @@ query GetJobSearch ($what: String, $location: JobSearchLocationInput, $limit: In
 							... on Range {
 								min
 								max
+							}
+							... on AtLeast {
+								min
+							}
+							... on AtMost {
+								max
+							}
+							... on Exactly {
+								value
 							}
 						}
 					}

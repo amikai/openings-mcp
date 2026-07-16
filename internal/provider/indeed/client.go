@@ -65,17 +65,22 @@ func (t *indeedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return t.base.RoundTrip(req)
 }
 
-// resolveCountry looks up r's Country (defaulting to DefaultCountryName),
-// reporting an error for a name CountryByName doesn't recognize.
-func resolveCountry(name string) (Country, error) {
+// resolveCountry looks up name via CountryByName. When defaultIfEmpty is
+// true (search), an empty name becomes DefaultCountryName; when false
+// (detail), empty is an error — jobData is country-scoped and silently
+// defaulting to Taiwan produces false not-found for non-TW keys.
+func resolveCountry(name string, defaultIfEmpty bool) (Country, string, error) {
 	if name == "" {
+		if !defaultIfEmpty {
+			return Country{}, "", errors.New("country is required")
+		}
 		name = DefaultCountryName
 	}
 	c, ok := CountryByName(name)
 	if !ok {
-		return Country{}, fmt.Errorf("unknown country %q", name)
+		return Country{}, "", fmt.Errorf("unknown country %q", name)
 	}
-	return c, nil
+	return c, name, nil
 }
 
 // siteBaseURL builds the country-specific Indeed website's base URL, used
@@ -91,16 +96,17 @@ func withCountry(ctx context.Context, co string) context.Context {
 
 // Jobs searches jobSearch with r's criteria.
 func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error) {
-	country, err := resolveCountry(r.Country)
+	country, countryName, err := resolveCountry(r.Country, true)
 	if err != nil {
 		return nil, err
 	}
 	what := r.Keywords
 	var location *JobSearchLocationInput
 	if r.Location != "" {
-		radius := r.RadiusMiles
-		if radius == 0 {
-			radius = 25
+		// nil → default 25; explicit 0 is exact-location (Indeed accepts it).
+		radius := 25
+		if r.RadiusMiles != nil {
+			radius = *r.RadiusMiles
 		}
 		location = &JobSearchLocationInput{
 			Where:      r.Location,
@@ -131,7 +137,7 @@ func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error
 	base := siteBaseURL(country)
 	jobs := make([]Job, 0, len(wire.JobSearch.Results))
 	for _, result := range wire.JobSearch.Results {
-		jobs = append(jobs, jobFromSearch(result.Job, base))
+		jobs = append(jobs, jobFromSearch(result.Job, base, countryName))
 	}
 	resp := &JobsResponse{Jobs: jobs}
 	if wire.JobSearch.PageInfo.NextCursor != nil {
@@ -185,6 +191,8 @@ func searchFilters(r *JobsRequest) []JobSearchFilterInput {
 }
 
 // JobDetail looks up one job by its key (Job.Key from a prior Jobs call).
+// country is required: jobData is country-scoped (a US key with indeed-co
+// TW returns an empty list). Pass Job.Country from a prior search result.
 // A key with no matching job (removed, expired, or never valid) returns
 // (nil, nil) rather than an error — see API.md's Key Behaviors on
 // jobData's empty-list-not-404 shape.
@@ -192,7 +200,7 @@ func (c *Client) JobDetail(ctx context.Context, country, jobKey string) (*JobDet
 	if jobKey == "" {
 		return nil, errors.New("empty job key")
 	}
-	resolved, err := resolveCountry(country)
+	resolved, _, err := resolveCountry(country, false)
 	if err != nil {
 		return nil, err
 	}

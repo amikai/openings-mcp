@@ -66,9 +66,25 @@ type Range {
   max: Float
 }
 
+# One-sided / exact salary shapes confirmed live (2026-07-16):
+# AtLeast { min }, AtMost { max }, Exactly { value }. Without these
+# members genqlient aborts the whole response on __typename mismatch.
+type AtLeast {
+  min: Float
+}
+
+type AtMost {
+  max: Float
+}
+
+type Exactly {
+  value: Float
+}
+
 # Live error: "Cannot query field min on type RangeType" when selecting
-# min/max without a fragment — range is RangeType, concrete type is Range.
-union RangeType = Range
+# min/max without a fragment — range is RangeType; concrete types are
+# Range | AtLeast | AtMost | Exactly.
+union RangeType = Range | AtLeast | AtMost | Exactly
 
 # Live error: 'Field "range" of type "Salary" must have a selection...'
 type Salary {

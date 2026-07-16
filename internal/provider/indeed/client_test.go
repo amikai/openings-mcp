@@ -29,8 +29,28 @@ func TestJobs(t *testing.T) {
 	assert.Equal(t, "https://tw.indeed.com/cmp/Infineon-Technologies", first.CompanyURL)
 	assert.Equal(t, "https://tw.indeed.com/viewjob?jk=9d503ca7fe211430", first.JobURL)
 	assert.Equal(t, "2026-06-04", first.PostedDate)
+	assert.Equal(t, "Taiwan", first.Country)
 	assert.Contains(t, first.JobTypes, "Full-time")
 	assert.Nil(t, first.Compensation)
+
+	// RangeType variants in jobs_rsp.json: unmarshaling any of these used
+	// to abort the whole search with "unexpected concrete type ... AtLeast".
+	require.NotNil(t, got.Jobs[1].Compensation)
+	assert.Equal(t, 22.5, got.Jobs[1].Compensation.MinAmount)
+	assert.Equal(t, 27.5, got.Jobs[1].Compensation.MaxAmount)
+	assert.Equal(t, "HOUR", got.Jobs[1].Compensation.Interval)
+
+	require.NotNil(t, got.Jobs[2].Compensation)
+	assert.Equal(t, 15.0, got.Jobs[2].Compensation.MinAmount)
+	assert.Equal(t, 0.0, got.Jobs[2].Compensation.MaxAmount)
+
+	require.NotNil(t, got.Jobs[3].Compensation)
+	assert.Equal(t, 17.5, got.Jobs[3].Compensation.MinAmount)
+	assert.Equal(t, 17.5, got.Jobs[3].Compensation.MaxAmount)
+
+	require.NotNil(t, got.Jobs[4].Compensation)
+	assert.Equal(t, 0.0, got.Jobs[4].Compensation.MinAmount)
+	assert.Equal(t, 30.0, got.Jobs[4].Compensation.MaxAmount)
 }
 
 func TestJobsFiltered(t *testing.T) {
@@ -56,6 +76,7 @@ func TestJobsDefaultsCountry(t *testing.T) {
 	got, err := c.Jobs(t.Context(), &JobsRequest{Keywords: "software engineer"})
 	require.NoError(t, err)
 	assert.NotEmpty(t, got.Jobs)
+	assert.Equal(t, DefaultCountryName, got.Jobs[0].Country)
 }
 
 func TestJobsUnknownCountry(t *testing.T) {
@@ -65,6 +86,38 @@ func TestJobsUnknownCountry(t *testing.T) {
 
 	_, err := c.Jobs(t.Context(), &JobsRequest{Keywords: "x", Country: "Narnia"})
 	assert.Error(t, err)
+}
+
+func TestJobsUnsupportedIndeedCountry(t *testing.T) {
+	// Formerly accepted via the jobspy table; live API rejects as invalid site.
+	_, ok := CountryByName("Slovenia")
+	assert.False(t, ok)
+	_, ok = CountryByName("Bangladesh")
+	assert.False(t, ok)
+}
+
+func TestJobsZeroRadius(t *testing.T) {
+	// Explicit 0 must not be rewritten to the 25-mile default. The mock does
+	// not assert request variables, but the client path must accept *int(0).
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(srv.URL+"/graphql", srv.Client())
+	zero := 0
+	got, err := c.Jobs(t.Context(), &JobsRequest{
+		Keywords:    "software engineer",
+		Location:    "Taipei",
+		Country:     "Taiwan",
+		RadiusMiles: &zero,
+	})
+	require.NoError(t, err)
+	assert.NotEmpty(t, got.Jobs)
+}
+
+func TestJobDetailRequiresCountry(t *testing.T) {
+	c := NewClient("https://example.invalid", nil)
+	_, err := c.JobDetail(t.Context(), "", "9d503ca7fe211430")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "country is required")
 }
 
 func TestJobDetail(t *testing.T) {

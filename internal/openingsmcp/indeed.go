@@ -21,11 +21,11 @@ var indeedSearchInputRawSchema = []byte(`{
 		},
 		"country": {
 			"type": "string",
-			"description": "Country name selecting Indeed's country catalogue and site domain, e.g. 'Taiwan', 'United States', 'Japan'. Defaults to Taiwan when omitted."
+			"description": "Country name selecting Indeed's country catalogue and site domain, e.g. 'Taiwan', 'United States', 'Japan'. Defaults to Taiwan when omitted. Echoed on each result for indeed_get_job_detail."
 		},
 		"radius_miles": {
 			"type": "integer",
-			"description": "Search radius in miles around location. Defaults to 25.",
+			"description": "Search radius in miles around location. Omit to default to 25; set to 0 for exact-location search.",
 			"minimum": 0
 		},
 		"cursor": {
@@ -63,7 +63,7 @@ type indeedSearchInput struct {
 	Keyword     string `json:"keyword,omitempty"`
 	Location    string `json:"location,omitempty"`
 	Country     string `json:"country,omitempty"`
-	RadiusMiles int    `json:"radius_miles,omitempty"`
+	RadiusMiles *int   `json:"radius_miles,omitempty"`
 	Cursor      string `json:"cursor,omitempty"`
 	HoursOld    int    `json:"hours_old,omitempty"`
 	JobType     string `json:"job_type,omitempty"`
@@ -93,10 +93,10 @@ func indeedMCPToHTTPRequest(in *indeedSearchInput) (*indeed.JobsRequest, error) 
 }
 
 type indeedCompensation struct {
-	MinAmount int    `json:"min_amount,omitempty"`
-	MaxAmount int    `json:"max_amount,omitempty"`
-	Currency  string `json:"currency,omitempty"`
-	Interval  string `json:"interval,omitempty"`
+	MinAmount float64 `json:"min_amount,omitempty"`
+	MaxAmount float64 `json:"max_amount,omitempty"`
+	Currency  string  `json:"currency,omitempty"`
+	Interval  string  `json:"interval,omitempty"`
 }
 
 func indeedCompensationFromHTTP(c *indeed.Compensation) *indeedCompensation {
@@ -112,6 +112,7 @@ type indeedJobSummary struct {
 	Company    string   `json:"company,omitempty"`
 	CompanyURL string   `json:"company_url,omitempty"`
 	Location   string   `json:"location,omitempty"`
+	Country    string   `json:"country,omitempty" jsonschema:"Country name used for this search; pass to indeed_get_job_detail's country param (required there)."`
 	URL        string   `json:"url,omitempty" jsonschema:"Public job posting URL."`
 	PostedDate string   `json:"posted_date,omitempty"`
 	JobTypes   []string `json:"job_types,omitempty" jsonschema:"Indeed's own labels, e.g. 'Full-time', 'Permanent'; not filtered to a fixed enum."`
@@ -133,6 +134,7 @@ func indeedHTTPToMCPResponse(resp *indeed.JobsResponse) *indeedSearchOutput {
 			Company:      j.Company,
 			CompanyURL:   j.CompanyURL,
 			Location:     j.Location,
+			Country:      j.Country,
 			URL:          j.JobURL,
 			PostedDate:   j.PostedDate,
 			JobTypes:     j.JobTypes,
@@ -142,9 +144,27 @@ func indeedHTTPToMCPResponse(resp *indeed.JobsResponse) *indeedSearchOutput {
 	return out
 }
 
+var indeedDetailInputRawSchema = []byte(`{
+	"type": "object",
+	"properties": {
+		"job_key": {
+			"type": "string",
+			"description": "Opaque Indeed job key (key from indeed_search_jobs results)."
+		},
+		"country": {
+			"type": "string",
+			"description": "Country used for the original search (country field on each search result). Required: jobData is country-scoped; omitting it or using the wrong country returns a false not-found."
+		}
+	},
+	"required": ["job_key", "country"],
+	"additionalProperties": false
+}`)
+
+var indeedDetailInputSchema = mustSchema(indeedDetailInputRawSchema)
+
 type indeedDetailInput struct {
-	JobKey  string `json:"job_key" jsonschema:"Opaque Indeed job key (key from indeed_search_jobs results)."`
-	Country string `json:"country,omitempty" jsonschema:"Country used to resolve the job's site domain for its URL; should match the country used in the original search. Defaults to Taiwan."`
+	JobKey  string `json:"job_key"`
+	Country string `json:"country"`
 }
 
 type indeedLocation struct {
@@ -195,6 +215,7 @@ type indeedDetailOutput struct {
 	CompanyEmployees   string   `json:"company_employees,omitempty"`
 	CompanyRevenue     string   `json:"company_revenue,omitempty"`
 	CompanyDescription string   `json:"company_description,omitempty"`
+	CompanyLogo        string   `json:"company_logo,omitempty" jsonschema:"Employer's square logo URL."`
 	CompanyAddresses   []string `json:"company_addresses,omitempty" jsonschema:"Employer's disclosed office addresses, when available (rare)."`
 	CompanyCEO         string   `json:"company_ceo,omitempty"`
 	CompanyCEOPhoto    string   `json:"company_ceo_photo,omitempty"`
@@ -224,6 +245,7 @@ func indeedHTTPToMCPDetail(d *indeed.JobDetail) *indeedDetailOutput {
 		CompanyEmployees:   d.CompanyEmployees,
 		CompanyRevenue:     d.CompanyRevenue,
 		CompanyDescription: d.CompanyDescription,
+		CompanyLogo:        d.CompanyLogo,
 		CompanyAddresses:   d.CompanyAddresses,
 		CompanyCEO:         d.CompanyCEO,
 		CompanyCEOPhoto:    d.CompanyCEOPhoto,
@@ -255,8 +277,9 @@ func RegisterIndeed(s *mcp.Server, c *indeed.Client) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "indeed_get_job_detail",
-		Description: "Get the full job description by Indeed job key (key from indeed_search_jobs results).",
+		Description: "Get the full job description by Indeed job key (key from indeed_search_jobs results). country is required and must match the search that produced the key.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Indeed job details", ReadOnlyHint: true},
+		InputSchema: indeedDetailInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *indeedDetailInput) (*mcp.CallToolResult, *indeedDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.Country, in.JobKey)
 		if err != nil {

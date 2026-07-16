@@ -60,6 +60,15 @@ query GetJobSearch(
                   min
                   max
                 }
+                ... on AtLeast {
+                  min
+                }
+                ... on AtMost {
+                  max
+                }
+                ... on Exactly {
+                  value
+                }
               }
             }
           }
@@ -70,6 +79,15 @@ query GetJobSearch(
               ... on Range {
                 min
                 max
+              }
+              ... on AtLeast {
+                min
+              }
+              ... on AtMost {
+                max
+              }
+              ... on Exactly {
+                value
               }
             }
           }
@@ -126,6 +144,15 @@ query GetJobDetail($jobKeys: [ID!]!) {
                   min
                   max
                 }
+                ... on AtLeast {
+                  min
+                }
+                ... on AtMost {
+                  max
+                }
+                ... on Exactly {
+                  value
+                }
               }
             }
           }
@@ -136,6 +163,15 @@ query GetJobDetail($jobKeys: [ID!]!) {
               ... on Range {
                 min
                 max
+              }
+              ... on AtLeast {
+                min
+              }
+              ... on AtMost {
+                max
+              }
+              ... on Exactly {
+                value
               }
             }
           }

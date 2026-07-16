@@ -14,9 +14,9 @@
                         "location": {
                             "countryCode": "TW",
                             "admin1Code": "TPE",
-                            "city": "\u53f0\u5317\u5e02",
+                            "city": "台北市",
                             "formatted": {
-                                "long": "\u53f0\u5317\u5e02"
+                                "long": "台北市"
                             }
                         },
                         "compensation": {
@@ -49,15 +49,22 @@
                         "location": {
                             "countryCode": "TW",
                             "admin1Code": "TPE",
-                            "city": "\u4fe1\u7fa9\u5340",
+                            "city": "信義區",
                             "formatted": {
-                                "long": "110 \u4fe1\u7fa9\u5340"
+                                "long": "110 信義區"
                             }
                         },
                         "compensation": {
                             "estimated": null,
-                            "baseSalary": null,
-                            "currencyCode": null
+                            "baseSalary": {
+                                "unitOfWork": "HOUR",
+                                "range": {
+                                    "__typename": "Range",
+                                    "min": 22.5,
+                                    "max": 27.5
+                                }
+                            },
+                            "currencyCode": "USD"
                         },
                         "attributes": [],
                         "employer": {
@@ -70,20 +77,26 @@
                     "trackingKey": "5-nrt1-0-1jtgr4ag1ht6f800-5aec093a991f69f0",
                     "job": {
                         "key": "5aec093a991f69f0",
-                        "title": "\u5168\u7aef\u5de5\u7a0b\u5e2b Full-Stack Engineer",
+                        "title": "全端工程師 Full-Stack Engineer",
                         "datePublished": 1784005200000,
                         "location": {
                             "countryCode": "TW",
                             "admin1Code": "TPE",
-                            "city": "\u53f0\u5317\u5e02",
+                            "city": "台北市",
                             "formatted": {
-                                "long": "\u53f0\u5317\u5e02"
+                                "long": "台北市"
                             }
                         },
                         "compensation": {
                             "estimated": null,
-                            "baseSalary": null,
-                            "currencyCode": null
+                            "baseSalary": {
+                                "unitOfWork": "HOUR",
+                                "range": {
+                                    "__typename": "AtLeast",
+                                    "min": 15.0
+                                }
+                            },
+                            "currencyCode": "USD"
                         },
                         "attributes": [
                             {
@@ -93,7 +106,7 @@
                         ],
                         "employer": {
                             "relativeCompanyPageUrl": "/cmp/Webcomm-%E5%81%89%E5%BA%B7%E7%A7%91%E6%8A%80",
-                            "name": "WebComm \u5049\u5eb7\u79d1\u6280"
+                            "name": "WebComm 偉康科技"
                         }
                     }
                 },
@@ -106,15 +119,21 @@
                         "location": {
                             "countryCode": "TW",
                             "admin1Code": "TPE",
-                            "city": "\u53f0\u5317\u5e02",
+                            "city": "台北市",
                             "formatted": {
-                                "long": "\u53f0\u5317\u5e02"
+                                "long": "台北市"
                             }
                         },
                         "compensation": {
                             "estimated": null,
-                            "baseSalary": null,
-                            "currencyCode": null
+                            "baseSalary": {
+                                "unitOfWork": "HOUR",
+                                "range": {
+                                    "__typename": "Exactly",
+                                    "value": 17.5
+                                }
+                            },
+                            "currencyCode": "USD"
                         },
                         "attributes": [],
                         "employer": {
@@ -132,15 +151,21 @@
                         "location": {
                             "countryCode": "TW",
                             "admin1Code": "TPE",
-                            "city": "\u53f0\u5317\u5e02",
+                            "city": "台北市",
                             "formatted": {
-                                "long": "\u53f0\u5317\u5e02"
+                                "long": "台北市"
                             }
                         },
                         "compensation": {
                             "estimated": null,
-                            "baseSalary": null,
-                            "currencyCode": null
+                            "baseSalary": {
+                                "unitOfWork": "HOUR",
+                                "range": {
+                                    "__typename": "AtMost",
+                                    "max": 30.0
+                                }
+                            },
+                            "currencyCode": "USD"
                         },
                         "attributes": [],
                         "employer": {

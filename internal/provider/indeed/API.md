@@ -31,7 +31,7 @@ with Khan/genqlient against a reverse-engineered `schema.graphql` (Indeed
 has no public SDL). Live-validated type names (via GraphQL validation
 errors and the `cmd/indeed` CLI): `JobSearchSortOrder`,
 `filters: [JobSearchFilterInput!]!`, `JobSearchLocationInput`,
-`jobData(jobKeys: [ID!])`, `Salary.range` → `RangeType` / `Range`.
+`jobData(jobKeys: [ID!])`, `Salary.range` → `RangeType` (`Range` | `AtLeast` | `AtMost` | `Exactly`).
 
 ## Headers
 
@@ -107,7 +107,7 @@ query GetJobData {
         title
         datePublished
         location { countryCode admin1Code city formatted { long } }
-        compensation { estimated { currencyCode baseSalary { unitOfWork range { ... on Range { min max } } } } baseSalary { unitOfWork range { ... on Range { min max } } } currencyCode }
+        compensation { estimated { currencyCode baseSalary { unitOfWork range { ... on Range { min max } ... on AtLeast { min } ... on AtMost { max } ... on Exactly { value } } } } baseSalary { unitOfWork range { ... on Range { min max } ... on AtLeast { min } ... on AtMost { max } ... on Exactly { value } } } currencyCode }
         attributes { key label }
         employer { relativeCompanyPageUrl name }
       }

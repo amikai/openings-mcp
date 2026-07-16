@@ -29,10 +29,10 @@ func compensationFromParts(base *baseSalary, estimated *baseSalary, currency, es
 	}
 	comp := &Compensation{Currency: cur, Interval: strings.ToUpper(bs.UnitOfWork)}
 	if bs.Range.Min != 0 {
-		comp.MinAmount = int(bs.Range.Min)
+		comp.MinAmount = bs.Range.Min
 	}
 	if bs.Range.Max != 0 {
-		comp.MaxAmount = int(bs.Range.Max)
+		comp.MaxAmount = bs.Range.Max
 	}
 	// Still expose a Compensation when only unit/currency is set and min/max
 	// are zero — callers treat zero amounts as "not disclosed" the same way
@@ -66,22 +66,42 @@ func jobURL(siteBase, key string) string {
 }
 
 // rangeMinMax reads min/max from a genqlient RangeType interface value.
-// Concrete type is always *...Range when the fragment matched; nil otherwise.
+// Concrete types: Range (min+max), AtLeast (min), AtMost (max), Exactly (value→both).
 func rangeMinMax(r any) salaryRange {
 	if r == nil {
 		return salaryRange{}
 	}
+	// Order matters: Range implements both GetMin and GetMax; check that
+	// before the one-sided interfaces so Range is not misread as AtLeast.
 	type minMax interface {
 		GetMin() float64
 		GetMax() float64
 	}
-	if mm, ok := r.(minMax); ok {
-		return salaryRange{Min: mm.GetMin(), Max: mm.GetMax()}
+	type exact interface {
+		GetValue() float64
 	}
-	return salaryRange{}
+	type minOnly interface {
+		GetMin() float64
+	}
+	type maxOnly interface {
+		GetMax() float64
+	}
+	switch v := r.(type) {
+	case minMax:
+		return salaryRange{Min: v.GetMin(), Max: v.GetMax()}
+	case exact:
+		val := v.GetValue()
+		return salaryRange{Min: val, Max: val}
+	case minOnly:
+		return salaryRange{Min: v.GetMin()}
+	case maxOnly:
+		return salaryRange{Max: v.GetMax()}
+	default:
+		return salaryRange{}
+	}
 }
 
-func jobFromSearch(j GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJob, siteBase string) Job {
+func jobFromSearch(j GetJobSearchJobSearchJobSearchConnectionResultsJobSearchResultJob, siteBase, country string) Job {
 	company, companyURL := "", ""
 	if j.Employer != nil {
 		company = j.Employer.Name
@@ -117,6 +137,7 @@ func jobFromSearch(j GetJobSearchJobSearchJobSearchConnectionResultsJobSearchRes
 		Company:      company,
 		CompanyURL:   companyURL,
 		Location:     j.Location.Formatted.Long,
+		Country:      country,
 		JobURL:       jobURL(siteBase, j.Key),
 		PostedDate:   dateFromEpochMillis(j.DatePublished),
 		JobTypes:     types,

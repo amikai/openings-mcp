@@ -11,11 +11,12 @@ import (
 )
 
 func TestIndeedMCPToHTTPRequest(t *testing.T) {
+	radius := 50
 	in := indeedSearchInput{
 		Keyword:     "software engineer",
 		Location:    "Taipei",
 		Country:     "Taiwan",
-		RadiusMiles: 50,
+		RadiusMiles: &radius,
 		Cursor:      "cur1",
 		JobType:     "Full-time",
 		Remote:      true,
@@ -27,7 +28,7 @@ func TestIndeedMCPToHTTPRequest(t *testing.T) {
 		Keywords:    "software engineer",
 		Location:    "Taipei",
 		Country:     "Taiwan",
-		RadiusMiles: 50,
+		RadiusMiles: &radius,
 		Cursor:      "cur1",
 		JobType:     indeed.JobTypeFullTime,
 		Remote:      true,
@@ -41,6 +42,14 @@ func TestIndeedMCPToHTTPRequestMinimal(t *testing.T) {
 	assert.Equal(t, &indeed.JobsRequest{}, got)
 }
 
+func TestIndeedMCPToHTTPRequestZeroRadius(t *testing.T) {
+	zero := 0
+	got, err := indeedMCPToHTTPRequest(&indeedSearchInput{RadiusMiles: &zero})
+	require.NoError(t, err)
+	require.NotNil(t, got.RadiusMiles)
+	assert.Equal(t, 0, *got.RadiusMiles)
+}
+
 func TestIndeedMCPToHTTPRequestInvalidJobType(t *testing.T) {
 	_, err := indeedMCPToHTTPRequest(&indeedSearchInput{JobType: "Volunteer"})
 	require.Error(t, err)
@@ -50,7 +59,7 @@ func TestIndeedMCPToHTTPRequestInvalidJobType(t *testing.T) {
 func TestIndeedHTTPToMCPResponse(t *testing.T) {
 	in := indeed.JobsResponse{
 		Jobs: []indeed.Job{
-			{Key: "1", Title: "t1", Company: "c1", CompanyURL: "cu1", Location: "l1", JobURL: "u1", PostedDate: "d1", JobTypes: []string{"Full-time"}, Compensation: &indeed.Compensation{MinAmount: 1, MaxAmount: 2, Currency: "USD", Interval: "YEAR"}},
+			{Key: "1", Title: "t1", Company: "c1", CompanyURL: "cu1", Location: "l1", Country: "Taiwan", JobURL: "u1", PostedDate: "d1", JobTypes: []string{"Full-time"}, Compensation: &indeed.Compensation{MinAmount: 22.5, MaxAmount: 27.5, Currency: "USD", Interval: "HOUR"}},
 			{Key: "2", Title: "t2"},
 		},
 		NextCursor: "next1",
@@ -59,7 +68,7 @@ func TestIndeedHTTPToMCPResponse(t *testing.T) {
 
 	want := &indeedSearchOutput{
 		Data: []indeedJobSummary{
-			{Key: "1", Title: "t1", Company: "c1", CompanyURL: "cu1", Location: "l1", URL: "u1", PostedDate: "d1", JobTypes: []string{"Full-time"}, Compensation: &indeedCompensation{MinAmount: 1, MaxAmount: 2, Currency: "USD", Interval: "YEAR"}},
+			{Key: "1", Title: "t1", Company: "c1", CompanyURL: "cu1", Location: "l1", Country: "Taiwan", URL: "u1", PostedDate: "d1", JobTypes: []string{"Full-time"}, Compensation: &indeedCompensation{MinAmount: 22.5, MaxAmount: 27.5, Currency: "USD", Interval: "HOUR"}},
 			{Key: "2", Title: "t2"},
 		},
 		NextCursor: "next1",
@@ -97,8 +106,6 @@ func TestIndeedHTTPToMCPDetail(t *testing.T) {
 	}
 	got := indeedHTTPToMCPDetail(&in)
 
-	// CompanyLogo has no corresponding output field: it's intentionally
-	// dropped, so it must not appear anywhere in want.
 	want := &indeedDetailOutput{
 		Key:                "7",
 		URL:                "u",
@@ -117,6 +124,7 @@ func TestIndeedHTTPToMCPDetail(t *testing.T) {
 		CompanyEmployees:   "10,000+",
 		CompanyRevenue:     "rev",
 		CompanyDescription: "cdesc",
+		CompanyLogo:        "logo-url",
 		CompanyAddresses:   []string{"addr1"},
 		CompanyCEO:         "ceo",
 		CompanyCEOPhoto:    "ceo-photo",
@@ -189,8 +197,17 @@ func TestIndeedSearchJobsE2E(t *testing.T) {
 	assert.Equal(t, "9d503ca7fe211430", first.Key)
 	assert.Equal(t, "Senior Staff Engineer System Application Engineering", first.Title)
 	assert.Equal(t, "Infineon Technologies", first.Company)
+	assert.Equal(t, "Taiwan", first.Country)
 	assert.Equal(t, "https://tw.indeed.com/viewjob?jk=9d503ca7fe211430", first.URL)
 	assert.NotEmpty(t, got.NextCursor)
+
+	// Fractional Range + one-sided variants must survive end-to-end.
+	assert.Equal(t, 22.5, got.Data[1].Compensation.MinAmount)
+	assert.Equal(t, 27.5, got.Data[1].Compensation.MaxAmount)
+	assert.Equal(t, 15.0, got.Data[2].Compensation.MinAmount)
+	assert.Equal(t, 17.5, got.Data[3].Compensation.MinAmount)
+	assert.Equal(t, 17.5, got.Data[3].Compensation.MaxAmount)
+	assert.Equal(t, 30.0, got.Data[4].Compensation.MaxAmount)
 }
 
 func TestIndeedSearchJobsInvalidEnumE2E(t *testing.T) {
@@ -240,6 +257,7 @@ func TestIndeedGetJobDetailE2E(t *testing.T) {
 		CompanyEmployees:   "10,000+",
 		CompanyRevenue:     "more than $10B (USD)",
 		CompanyDescription: "Infineon designs, develops, manufactures, and markets a broad range of semiconductors and semiconductor-based solutions, focusing on key markets in the automotive, industrial, and consumer sectors.",
+		CompanyLogo:        "https://d2q79iu7y748jz.cloudfront.net/s/_squarelogo/256x256/d6d998121efc1f38f34bb1678e486bcb",
 		CompanyAddresses:   []string{"Neubiberg"},
 		CompanyCEO:         "Jochen Hanebeck",
 		CompanyCEOPhoto:    "https://d2q79iu7y748jz.cloudfront.net/s/_ceophoto/512x512/e164f653df3541221b0c25a3f6610e5c",
@@ -250,12 +268,23 @@ func TestIndeedGetJobDetailE2E(t *testing.T) {
 	assert.Contains(t, description, "Your Role")
 }
 
+func TestIndeedGetJobDetailRequiresCountryE2E(t *testing.T) {
+	clientSession, _ := testIndeedMCPClientServer(t)
+
+	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      "indeed_get_job_detail",
+		Arguments: map[string]any{"job_key": "9d503ca7fe211430"},
+	})
+	require.NoError(t, err)
+	require.True(t, callRes.IsError)
+}
+
 func TestIndeedGetJobDetailNotFoundE2E(t *testing.T) {
 	clientSession, _ := testIndeedMCPClientServer(t)
 
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
 		Name:      "indeed_get_job_detail",
-		Arguments: map[string]any{"job_key": indeed.MockNotFoundJobKey},
+		Arguments: map[string]any{"job_key": indeed.MockNotFoundJobKey, "country": "Taiwan"},
 	})
 	require.NoError(t, err)
 	require.True(t, callRes.IsError)
