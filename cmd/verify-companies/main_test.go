@@ -120,6 +120,21 @@ func TestCheckSkipsDetailWhenZeroJobs(t *testing.T) {
 	assert.Zero(t, fake.detailCalls)
 }
 
+func TestCheckReportsUnprobeablePage(t *testing.T) {
+	// TotalCount > 0 with an empty page 1: the adapter dropped every
+	// summary (e.g. Workday entries without externalPath), so the detail
+	// path cannot be verified and must not pass silently.
+	fake := &fakeAdapter{searchRes: searchResult(42)}
+	c := check{adapter: fake, company: "Acme", slug: "acme"}
+
+	r := c.do(t.Context(), time.Minute)
+
+	assert.Equal(t, statusDetailError, r.Status)
+	assert.Equal(t, 42, r.Jobs)
+	assert.NotEmpty(t, r.Detail)
+	assert.Zero(t, fake.detailCalls)
+}
+
 func TestCheckSkipsDetailWhenSearchFails(t *testing.T) {
 	fake := &fakeAdapter{searchErr: errors.New("boom")}
 	c := check{adapter: fake, company: "Acme", slug: "acme"}

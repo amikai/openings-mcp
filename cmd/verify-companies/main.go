@@ -235,8 +235,10 @@ func runChecks(ctx context.Context, checks []check, timeout time.Duration, concu
 // do searches page 1 for the entry, follows up with one Detail probe on
 // the first job, and classifies the outcome. The probe catches
 // detail-template divergence (e.g. issue #196) that the search path never
-// exercises; zero-job boards have nothing to probe and stay OK. Each of
-// the two requests gets its own timeout.
+// exercises; zero-job boards have nothing to probe and stay OK. A nonzero
+// total with an empty page 1 (the adapter dropped every summary, e.g.
+// Workday entries without externalPath) is DETAIL_ERROR too: the detail
+// path cannot be verified. Each of the two requests gets its own timeout.
 func (c check) do(ctx context.Context, timeout time.Duration) result {
 	r := result{Provider: c.adapter.Name(), Company: c.company, Slug: c.slug}
 
@@ -248,13 +250,16 @@ func (c check) do(ctx context.Context, timeout time.Duration) result {
 	r.Status = statusOK
 	r.Jobs = res.TotalCount
 
-	if len(res.Jobs) == 0 {
-		return r
-	}
-	jobID := res.Jobs[0].JobID
-	if err := c.probeDetail(ctx, timeout, jobID); err != nil {
+	switch {
+	case len(res.Jobs) > 0:
+		jobID := res.Jobs[0].JobID
+		if err := c.probeDetail(ctx, timeout, jobID); err != nil {
+			r.Status = statusDetailError
+			r.Detail = fmt.Sprintf("detail %s: %s", jobID, err)
+		}
+	case res.TotalCount > 0:
 		r.Status = statusDetailError
-		r.Detail = fmt.Sprintf("detail %s: %s", jobID, err)
+		r.Detail = fmt.Sprintf("search reported %d jobs but page 1 carried no probeable job", res.TotalCount)
 	}
 	return r
 }
