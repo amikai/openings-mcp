@@ -41,7 +41,9 @@ func serverURLByTenant(tenant string) (serverURL *url.URL, err error) {
 }
 
 // JobsByTenant searches jobs for tenant, a confirmed Workday tenant slug
-// (see CompaniesByTenant). It errors if tenant isn't confirmed.
+// (see [CompaniesByTenant]). A posting's [JobSummary.ExternalPath] can be
+// split by [JobDetailKeyFromPath] for [TenantClient.JobDetailByTenant].
+// JobsByTenant errors if tenant isn't confirmed.
 func (c *TenantClient) JobsByTenant(ctx context.Context, tenant string, request *JobsRequest) (*JobsResponse, error) {
 	serverURL, err := serverURLByTenant(tenant)
 	if err != nil {
@@ -51,10 +53,11 @@ func (c *TenantClient) JobsByTenant(ctx context.Context, tenant string, request 
 	return c.client.SearchJobs(ctx, request)
 }
 
-// ToGetJobDetailParams returns GetJobDetailParams for the first posting in
-// rsp.JobPostings whose ExternalPath is set and splits into a valid
-// {location}/{titleSlug} pair (see JobDetailKeyFromPath), skipping any that
-// aren't. It reports false if no posting qualifies.
+// ToGetJobDetailParams returns [GetJobDetailParams] for the first posting in
+// [JobsResponse.JobPostings] whose [JobSummary.ExternalPath] is set and
+// splits into a valid {location}/{titleSlug} pair via
+// [JobDetailKeyFromPath], skipping any that do not. It reports false if no
+// posting qualifies.
 func (rsp *JobsResponse) ToGetJobDetailParams() (GetJobDetailParams, bool) {
 	for _, posting := range rsp.JobPostings {
 		externalPath, ok := posting.ExternalPath.Get()
@@ -71,8 +74,9 @@ func (rsp *JobsResponse) ToGetJobDetailParams() (GetJobDetailParams, bool) {
 }
 
 // JobDetailByTenant fetches a single job posting for tenant, a confirmed
-// Workday tenant slug (see [CompaniesByTenant]). It errors if tenant isn't
-// confirmed.
+// Workday tenant slug (see [CompaniesByTenant]). location and titleSlug come
+// from [JobDetailKeyFromPath] applied to [JobSummary.ExternalPath].
+// JobDetailByTenant errors if tenant isn't confirmed.
 func (c *TenantClient) JobDetailByTenant(ctx context.Context, tenant, location, titleSlug string) (*JobDetailResponse, error) {
 	serverURL, err := serverURLByTenant(tenant)
 	if err != nil {

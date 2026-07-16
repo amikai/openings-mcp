@@ -33,6 +33,7 @@ type Client struct {
 	baseURL    string
 }
 
+// NewClient uses [http.DefaultClient] when httpClient is nil.
 func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
@@ -98,6 +99,7 @@ type FacetOption struct {
 	Count      int
 }
 
+// Search returns summaries whose [Job.ID] values are accepted by [Client.JobDetail].
 func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchResponse, error) {
 	u, err := url.Parse(c.baseURL)
 	if err != nil {
@@ -125,8 +127,8 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 	return &SearchResponse{Jobs: jobs, TotalCount: total}, nil
 }
 
-// JobDetail fetches the detail page for id. The slug half of the
-// /job/{slug}/{id}/ path is cosmetic (see openapi.yaml); this always
+// JobDetail expects a [Job.ID] returned by [Client.Search]. The slug half
+// of the /job/{slug}/{id}/ path is cosmetic (see openapi.yaml); this always
 // repeats id in its place.
 func (c *Client) JobDetail(ctx context.Context, id string) (*JobDetailResponse, error) {
 	if id == "" {

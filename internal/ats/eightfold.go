@@ -71,7 +71,7 @@ func (a *EightfoldAdapter) Roster() []CompanyInfo {
 
 // ParseCareersURL recognizes <tenant>.eightfold.ai career pages, but only
 // resolves tenants already on the roster — see the domain-derivation note
-// on EightfoldAdapter.
+// on [EightfoldAdapter].
 func (a *EightfoldAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
 	if !strings.HasSuffix(host, ".eightfold.ai") {

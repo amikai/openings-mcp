@@ -20,7 +20,7 @@ const (
 	jobDetailPath  = "/zh_TW/careers/JobDetail"
 )
 
-// Query parameter field IDs
+// Query parameter field IDs.
 const (
 	ParamLocation       = "1277"
 	ParamCategory       = "558"
@@ -28,7 +28,7 @@ const (
 	ParamEmploymentType = "542"
 )
 
-// Location (field 1277)
+// Location values for field 1277.
 const (
 	LocTaiwan           = "13209"
 	LocCanada           = "13210"
@@ -49,7 +49,7 @@ const (
 	LocUSAWashingtonDC  = "13223"
 )
 
-// Category (field 558)
+// Category values for field 558.
 const (
 	CatRD                      = "38617"
 	CatSpecialtyTechnology     = "38618"
@@ -74,7 +74,7 @@ const (
 	CatAccessibilityInclusion  = "38636"
 )
 
-// JobType (field 147)
+// Job type values for field 147.
 const (
 	JobTypeTechnician        = "5710"
 	JobTypeAssociateEngineer = "39075"
@@ -83,7 +83,7 @@ const (
 	JobTypeOthers            = "39076"
 )
 
-// EmploymentType (field 542)
+// Employment type values for field 542.
 const (
 	EmployRegular        = "5701"
 	EmployTemporary      = "5702"
@@ -96,6 +96,8 @@ type Client struct {
 	baseURL    string
 }
 
+// JobsRequest treats Page as one-based. PerPage values below 1 use the
+// default page size of 10.
 type JobsRequest struct {
 	Keyword         string
 	Locations       []string
@@ -135,6 +137,7 @@ type JobDetailResponse struct {
 	Qualifications   string
 }
 
+// NewClient uses [http.DefaultClient] when httpClient is nil.
 func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
@@ -197,6 +200,7 @@ func (c *Client) jobsURL(p *JobsRequest) (string, error) {
 	return u.String(), nil
 }
 
+// Jobs returns summaries whose [Job.ID] values are accepted by [Client.JobDetail].
 func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	rawURL, err := c.jobsURL(p)
 	if err != nil {
@@ -213,6 +217,7 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	return &JobsResponse{Total: total, Jobs: jobs}, nil
 }
 
+// JobDetail expects a [Job.ID] returned by [Client.Jobs].
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	if jobID == "" {
 		return nil, errors.New("job detail: empty job id")

@@ -62,8 +62,8 @@ type JobsRequest struct {
 	// CountryByName; empty defaults to DefaultCountryName for search only.
 	// JobDetail requires an explicit country — jobData is country-scoped.
 	Country string
-	// Cursor pages through results: pass the previous JobsResponse's
-	// NextCursor. Empty starts from the first page.
+	// Cursor pages through results: pass the previous
+	// [JobsResponse.NextCursor]. Empty starts from the first page.
 	Cursor string
 	// Limit caps results per call, max 100 (the reference implementation's
 	// jobs_per_page); defaults to 25 when 0.
@@ -94,14 +94,14 @@ type Compensation struct {
 
 // Job is a jobSearch result: a lean summary, no full description.
 type Job struct {
-	Key        string // Indeed's opaque job key; pass to Client.JobDetail.
+	Key        string // Indeed's opaque job key; pass to [Client.JobDetail].
 	Title      string
 	Company    string
 	CompanyURL string
 	Location   string
 	// Country is the country name used for the search that produced this
 	// row (DefaultCountryName when the caller omitted it). Pass it back
-	// to JobDetail — jobData is country-scoped and an omitted/wrong
+	// to [Client.JobDetail] — jobData is country-scoped and an omitted/wrong
 	// country yields a false empty result.
 	Country string
 	// JobURL is the Indeed-hosted posting page, built from the search
@@ -119,7 +119,7 @@ type Job struct {
 // JobsResponse is one page of jobSearch results.
 type JobsResponse struct {
 	Jobs []Job
-	// NextCursor feeds JobsRequest.Cursor for the next page; empty means no
+	// NextCursor feeds [JobsRequest.Cursor] for the next page; empty means no
 	// more results.
 	NextCursor string
 }

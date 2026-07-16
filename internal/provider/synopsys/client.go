@@ -22,6 +22,7 @@ type Client struct {
 	baseURL    string
 }
 
+// NewClient uses [http.DefaultClient] when httpClient is nil.
 func NewClient(httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
@@ -38,6 +39,8 @@ func newRequest(ctx context.Context, method, rawURL string) (*http.Request, erro
 	return req, nil
 }
 
+// Jobs returns summaries whose [Job.City], [Job.Slug], and [Job.JobID]
+// values identify postings for [Client.JobDetail].
 func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error) {
 	q := buildSearchQuery(p)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/results?"+q.Encode())
@@ -100,6 +103,8 @@ func (c *Client) resolveLocation(ctx context.Context, term string) ([]locationSu
 	return suggestions, nil
 }
 
+// JobDetail expects city, slug, and jobID from one [Job] returned by
+// [Client.Jobs].
 func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobDetailResponse, error) {
 	path := fmt.Sprintf("/job/%s/%s/%s/%s", city, slug, orgID, jobID)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+path)
