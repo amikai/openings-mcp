@@ -180,7 +180,7 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "get_filters_by_company",
-		Description: "Discover a company's currently valid job-search filter dimensions and values (e.g. job family, employment type). Optional: only call it when a search needs precise narrowing beyond query and location.",
+		Description: "Get company-specific filters when a job search needs narrowing beyond query and location.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get company job filters", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companyFiltersInput) (*mcp.CallToolResult, *companyFiltersOutput, error) {
 		out, err := companyFilters(ctx, reg, in)

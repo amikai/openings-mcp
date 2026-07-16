@@ -94,6 +94,7 @@ func TestServerListsJobTools(t *testing.T) {
 
 	companyTool := got["search_jobs_by_company"]
 	assert.Equal(t, "Search official job postings for a specific company.", companyTool.Description)
+	assert.Equal(t, "Get company-specific filters when a job search needs narrowing beyond query and location.", got["get_filters_by_company"].Description)
 
 	companyInput, ok := companyTool.InputSchema.(map[string]any)
 	require.True(t, ok)
