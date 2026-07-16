@@ -94,15 +94,27 @@ func parseResultsTotal(doc *goquery.Document) int {
 // guaranteed present across tenants (see openapi.yaml); location, employer,
 // and posted date are read best-effort and left empty when the tenant's
 // template omits them.
+//
+// Templates vary per tenant: the title element is usually a <span> but some
+// tenants (e.g. jobs.telefonica.com) render an <h1>, and those same tenants
+// put the jobdescription class on the itemprop="description" element itself
+// rather than on a nested span, so both selectors match on itemprop alone.
 func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, bool) {
-	title := strings.TrimSpace(doc.Find(`span[itemprop="title"]`).First().Text())
+	title := strings.TrimSpace(doc.Find(`[itemprop="title"]`).First().Text())
 	if title == "" {
 		return nil, false
 	}
 
-	descriptionHTML, _ := doc.Find(`span[itemprop="description"] span.jobdescription`).First().Html()
+	description := doc.Find(`[itemprop="description"]`).First()
+	if nested := description.Find(".jobdescription").First(); nested.Length() > 0 {
+		description = nested
+	}
+	descriptionHTML, _ := description.Html()
 
 	location, _ := doc.Find(`meta[itemprop="streetAddress"]`).First().Attr("content")
+	if strings.TrimSpace(location) == "" {
+		location = joinAddressMetas(doc)
+	}
 	employer, _ := doc.Find(`meta[itemprop="hiringOrganization"]`).First().Attr("content")
 	postedAt, _ := doc.Find(`meta[itemprop="datePosted"]`).First().Attr("content")
 
@@ -114,6 +126,21 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 		PostedAtRaw:     strings.TrimSpace(postedAt),
 		DescriptionHTML: strings.TrimSpace(descriptionHTML),
 	}, true
+}
+
+// joinAddressMetas builds a location from the addressLocality/addressRegion/
+// addressCountry metas used by tenants whose template has no streetAddress
+// meta (e.g. jobs.telefonica.com). The comma-joined form matches what those
+// pages display in their visible jobGeoLocation span.
+func joinAddressMetas(doc *goquery.Document) string {
+	var parts []string
+	for _, prop := range []string{"addressLocality", "addressRegion", "addressCountry"} {
+		v, _ := doc.Find(`meta[itemprop="` + prop + `"]`).First().Attr("content")
+		if v = strings.TrimSpace(v); v != "" {
+			parts = append(parts, v)
+		}
+	}
+	return strings.Join(parts, ", ")
 }
 
 // facetValuesJSON mirrors the facetValues response body; see

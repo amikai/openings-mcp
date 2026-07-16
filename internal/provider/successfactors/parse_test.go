@@ -139,6 +139,33 @@ func TestParseJobDetailHTMLMinimalTemplate(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
+// Some tenants (e.g. jobs.telefonica.com, issue #196) render the title as
+// <h1 itemprop="title"> instead of a span, put the jobdescription class on
+// the itemprop="description" element itself instead of a nested span, and
+// carry the address in addressLocality/addressRegion/addressCountry metas
+// with no streetAddress.
+func TestParseJobDetailHTMLH1TitleTemplate(t *testing.T) {
+	const page = `<html><body><div class="jobDisplayShell" itemscope="itemscope" itemtype="http://schema.org/JobPosting"><span itemprop="jobLocation" itemscope itemtype="http://schema.org/Place"><span itemprop="address" itemscope itemtype="http://schema.org/PostalAddress"><meta itemprop="addressLocality" content="LIMA"><meta itemprop="addressRegion" content="LIM"><meta itemprop="addressCountry" content="PE"></span></span><meta itemprop="datePosted" content="Thu Jul 16 02:01:00 UTC 2026"><meta itemprop="hiringOrganization" content="Telefónica">
+<h1 id="job-title" itemprop="title">Ejecutivo Asociado de Nómina</h1>
+<span itemprop="description" class="jobdescription"><p><strong>Misión del puesto:</strong></p></span>
+</div></body></html>`
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(page))
+	require.NoError(t, err)
+
+	got, ok := parseJobDetailHTML(doc, "1395282033")
+	require.True(t, ok)
+
+	want := &JobDetailResponse{
+		ID:              "1395282033",
+		Title:           "Ejecutivo Asociado de Nómina",
+		Location:        "LIMA, LIM, PE",
+		Employer:        "Telefónica",
+		PostedAtRaw:     "Thu Jul 16 02:01:00 UTC 2026",
+		DescriptionHTML: "<p><strong>Misión del puesto:</strong></p>",
+	}
+	assert.Equal(t, want, got)
+}
+
 func TestFacetValuesJSON(t *testing.T) {
 	f, err := os.Open("testdata/facet_values_rsp.json")
 	require.NoError(t, err)
