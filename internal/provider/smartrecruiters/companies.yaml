@@ -1,104 +1,348 @@
+- company: A Good Company
+  company_identifier: AGoodCompany
 - company: AbbVie
   company_identifier: AbbVie
 - company: Abercrombie and Fitch Co.
   company_identifier: AbercrombieAndFitchCo
+- company: ABFE
+  company_identifier: ABFE1
+- company: Accor
+  company_identifier: Accor
 - company: AccorHotel
   company_identifier: AccorHotel
+- company: Acumen Solutions
+  company_identifier: AcumenSolutions
 - company: AECOM
   company_identifier: AECOM2
+- company: Agile Delivery Services LLC
+  company_identifier: AgileDeliveryServicesLLC
+- company: "Alegis, A MedData Company"
+  company_identifier: AlegisAMedDataCompany
+- company: Allegis Global Solutions
+  company_identifier: AllegisGlobalSolutions
+- company: Alliance Animal Health
+  company_identifier: AllianceAnimalHealth
 - company: Alphabe Insight Inc
   company_identifier: AlphabeInsightInc
+- company: Amber
+  company_identifier: Amber2
 - company: Anglo American / De Beers Group
   company_identifier: AngloAmericanDeBeersGroup
 - company: Arista Networks
   company_identifier: AristaNetworks
+- company: ASOS
+  company_identifier: ASOS
+- company: ATSER
+  company_identifier: ATSER
+- company: Auberge Collection
+  company_identifier: AubergeCollection
+- company: Avery Dennison
+  company_identifier: AveryDennison
+- company: Banyan Tree
+  company_identifier: BanyanTree
+- company: Bertelsmann
+  company_identifier: Bertelsmann-Jobs
 - company: Best10
   company_identifier: Best10
+- company: BETSOL
+  company_identifier: BETSOL
+- company: BioQ Pharma
+  company_identifier: BioQPharma
+- company: "Blancas Sandoval & Associates"
+  company_identifier: BlancasSandovalAssociatesPA
+- company: Blend360
+  company_identifier: Blend360
+- company: Blockville
+  company_identifier: blockville
 - company: Bosch Group
   company_identifier: BoschGroup
 - company: BOULANGER
   company_identifier: Boulanger
+- company: ByteDance
+  company_identifier: ByteDance
+- company: California Closets
+  company_identifier: CaliforniaClosets
+- company: California ISO
+  company_identifier: CaliforniaISO
+- company: Canva
+  company_identifier: Canva
+- company: Care Partners
+  company_identifier: CarePartners1
+- company: Catch22
+  company_identifier: Catch22
+- company: CCI Consulting
+  company_identifier: CCIConsulting
 - company: Cermati.com
   company_identifier: Cermaticom
+- company: CGLRS
+  company_identifier: CGLRS1
 - company: Check Point Software Technologies
   company_identifier: CheckPointSoftwareTechnologies2
+- company: Christian Brothers Automotive
+  company_identifier: ChristianBrothersAutomotive
+- company: Cint
+  company_identifier: Cint
 - company: CityFibre
   company_identifier: CityFibre
+- company: CocuSocial
+  company_identifier: CocuSocial
+- company: Coface
+  company_identifier: Coface
 - company: Colisée France
   company_identifier: ColiseeFrance
+- company: Dairy Queen
+  company_identifier: DairyQueen1
 - company: Delivery Hero
   company_identifier: DeliveryHero
+- company: Deloitte
+  company_identifier: Deloitte6
+- company: Deloitte NZ
+  company_identifier: DeloitteNZ
 - company: Delta Electronics
   company_identifier: DeltaElectronics
-- company: Domino's
+- company: Dev
+  company_identifier: Dev2
+- company: DocuSign
+  company_identifier: DocuSign
+- company: "Domino's"
   company_identifier: Dominos
-- company: Dr Reddy's Laboratories Limited
+- company: "Dr Reddy's Laboratories Limited"
   company_identifier: DrReddysLaboratoriesLimited
+- company: Dungarvin
+  company_identifier: Dungarvin
+- company: EDP Biotech Corporation
+  company_identifier: EDPBiotechCorporation
+- company: Endeavour Group
+  company_identifier: EndeavourGroupCareers
+- company: Entertainment Benefits Group
+  company_identifier: EntertainmentBenefitsGroup
 - company: Equinox
   company_identifier: Equinox
+- company: Eurofins
+  company_identifier: Eurofins
+- company: EVERSANA
+  company_identifier: EVERSANA1
+- company: Expeditors
+  company_identifier: Expeditors
 - company: Experian
   company_identifier: Experian
-- company: Express Oil Change & Tire Engineers
+- company: "Express Oil Change & Tire Engineers"
   company_identifier: EOCTEBP
+- company: Farmers Insurance in the Pointes
+  company_identifier: FarmersInsuranceInThePointes
 - company: Flywire
   company_identifier: Flywire1
 - company: Frasers Group
   company_identifier: FrasersGroup
+- company: Freshworks
+  company_identifier: Freshworks
+- company: Fusion Consulting
+  company_identifier: FusionConsulting
+- company: Gem
+  company_identifier: Gem1
+- company: Gemini
+  company_identifier: Gemini1
 - company: Genomics England
   company_identifier: GenomicsEngland
+- company: GoldenOne Healthcare Staffing
+  company_identifier: GoldenOneHealthcareStaffing
+- company: Gong
+  company_identifier: GONG
 - company: Greene King
   company_identifier: GreeneKing
 - company: Groupement Mousquetaires
   company_identifier: GroupementMousquetaires
-- company: H&M Group
+- company: Guzman y Gomez
+  company_identifier: GuzmanYGomez
+- company: "H&M Group"
   company_identifier: HMGroup
 - company: Ikano-Retail
   company_identifier: IkanoRetail
+- company: Informa Group Plc.
+  company_identifier: InformaGroupPlc
+- company: Intuit
+  company_identifier: Intuit1
+- company: INX International Ink Co.
+  company_identifier: INXInternationalInkCo
+- company: Jitterbit
+  company_identifier: Jitterbit
+- company: JLGOV
+  company_identifier: JLGov
+- company: Job Mobz
+  company_identifier: JobMobz1
+- company: Jobs for Humanity
+  company_identifier: JobsForHumanity
 - company: JYSK
   company_identifier: JYSK
 - company: Kiabi
   company_identifier: KIABI
+- company: Konecranes
+  company_identifier: Konecranes
+- company: La Scuola International School
+  company_identifier: LaScuolaInternationalSchool
+- company: Lendi Group
+  company_identifier: LendiGroup1
 - company: LEONI
   company_identifier: LEONI1
 - company: LinkedIn
   company_identifier: LinkedIn3
-- company: McDonald's Corporation
+- company: M3USA
+  company_identifier: M3USA
+- company: Mackenzie Health Care
+  company_identifier: MackenzieSearchGroup
+- company: "McDonald's Corporation"
   company_identifier: McDonaldsCorporation
+- company: "McDonald's Österreich"
+  company_identifier: McDonaldsOesterreich
+- company: Measured Insurance
+  company_identifier: MeasuredInsurance
+- company: MedHealth
+  company_identifier: MedHealth3
+- company: MicroStrategy
+  company_identifier: MicroStrategy1
+- company: Minor International
+  company_identifier: MinorInternational
+- company: Miratech
+  company_identifier: Miratech1
 - company: Much Prosperity Trading International Inc.
   company_identifier: MuchProsperityTradingInternationalInc
 - company: Nagarro
   company_identifier: Nagarro1
+- company: NAVANTIA UK
+  company_identifier: NAVANTIAUK
+- company: NBCUniversal
+  company_identifier: NBCUniversal3
+- company: Nearmap
+  company_identifier: Nearmap
+- company: Netcompany
+  company_identifier: Netcompany1
+- company: Nexthink
+  company_identifier: Nexthink
+- company: NielsenIQ
+  company_identifier: NielsenIQ
+- company: North40 Outfitters
+  company_identifier: North40Outfitters
+- company: Northwestern Memorial Healthcare
+  company_identifier: NorthwesternMedicine
+- company: OceanaGold
+  company_identifier: OceanaGold
+- company: OECD
+  company_identifier: OECD
+- company: Optimity Advisors
+  company_identifier: OptimityAdvisors
 - company: OTTO FUCHS KG
   company_identifier: OTTOFUCHSKG
+- company: Partnered Staffing - Kelly Services
+  company_identifier: PartneredStaffing-KellyServices
 - company: Pilot Company
   company_identifier: PilotCompany
 - company: PortmanDentex
   company_identifier: PortmanDentex
+- company: Preparis
+  company_identifier: B2BCamp
 - company: Primark
   company_identifier: Primark
+- company: Primo Water Corporation
+  company_identifier: PrimoWaterCorporation
+- company: Privia Health
+  company_identifier: PriviaHealth
+- company: Public Storage
+  company_identifier: PublicStorage
+- company: "QAD, Inc."
+  company_identifier: QADInc
 - company: Radisson Hotel Group
   company_identifier: RHG
-- company: Relais & Châteaux
+- company: "Radon Solutions, Inc."
+  company_identifier: RadonSolutionsInc
+- company: "Raising Cane's"
+  company_identifier: RaisingCanes
+- company: Red Bull
+  company_identifier: RedBull
+- company: Redcare Pharmacy
+  company_identifier: Redcare-Pharmacy
+- company: "Relais & Châteaux"
   company_identifier: RelaisChateaux
+- company: Resultant
+  company_identifier: Resultant
+- company: RR Donnelley
+  company_identifier: RRDonnelley
+- company: Samsung
+  company_identifier: Samsung1
 - company: Sana Commerce
   company_identifier: SanaCommerce
+- company: Scalable GmbH
+  company_identifier: ScalableGmbH
+- company: Securitas
+  company_identifier: Securitas
+- company: Senior Lifestyle
+  company_identifier: SeniorLifestyle1
+- company: "Senior Resource Group, LLC"
+  company_identifier: SeniorResourceGroupLLC
 - company: ServiceNow
   company_identifier: ServiceNow
 - company: SGS
   company_identifier: SGS
+- company: Shangri-La
+  company_identifier: ShangriLa1
 - company: Silvaco
   company_identifier: Silvaco1
 - company: Smiths Group
   company_identifier: SmithsGroup2
+- company: Sodexo
+  company_identifier: Sodexo
+- company: Sonic Automotive
+  company_identifier: SonicAutomotive
+- company: "SPARK SIGNS & GRAPHICS"
+  company_identifier: SPARKSIGNSGRAPHICS
 - company: SPHEREA
   company_identifier: SPHEREA
+- company: Standard Bank Group
+  company_identifier: StandardBankGroup
+- company: Syngenta Group
+  company_identifier: SyngentaGroup
+- company: Taylor Stitch
+  company_identifier: TaylorStitch
+- company: The Nielsen Company
+  company_identifier: TheNielsenCompany
+- company: The Ward Law Group
+  company_identifier: TheWardLawGroupPL
+- company: The Warehouse Group
+  company_identifier: TheWarehouseGroup1
+- company: The Wonderful Company
+  company_identifier: TheWonderfulCompany
 - company: Tipico
   company_identifier: Tipico
+- company: Travoom
+  company_identifier: Travoom
+- company: Tri-Cities Restaurant Group
+  company_identifier: Tri-CitiesRestaurantGroup
+- company: "Turner & Townsend"
+  company_identifier: TurnerTownsend
+- company: "Turnitin, LLC"
+  company_identifier: TurnitinLLC
 - company: Ubisoft
   company_identifier: Ubisoft2
+- company: University of Auckland
+  company_identifier: TheUniversityOfAuckland
 - company: VAM Systems
   company_identifier: VAMSystems
+- company: Vattenfall
+  company_identifier: Vattenfall
+- company: Veolia Environnement SA
+  company_identifier: VeoliaEnvironnementSA
+- company: Versant
+  company_identifier: Versant3
+- company: VIVIO Health
+  company_identifier: VIVIOHealth
+- company: "Vuori, Inc"
+  company_identifier: VuoriInc
+- company: Wavestone
+  company_identifier: Wavestone1
+- company: Western Digital
+  company_identifier: WesternDigital
 - company: Wix
   company_identifier: Wix2
+- company: "Woongjin, Inc"
+  company_identifier: WJCompany
 - company: 株式会社FFL
   company_identifier: ZhuShiHuiSheFFL
