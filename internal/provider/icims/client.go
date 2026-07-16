@@ -214,8 +214,8 @@ func (c *Client) doSearch(ctx context.Context, req *SearchRequest) (*SearchRespo
 	return res, nil
 }
 
-// JobDetail fetches one posting. The path slug is cosmetic (see openapi.yaml);
-// this always uses "job" as the slug segment.
+// JobDetail expects a [Job.ID] returned by [Client.Search]. The path slug is
+// cosmetic (see openapi.yaml); this always uses "job" as the slug segment.
 func (c *Client) JobDetail(ctx context.Context, id string) (*JobDetailResponse, error) {
 	id = strings.TrimSpace(id)
 	if id == "" {

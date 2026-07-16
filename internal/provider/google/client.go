@@ -19,6 +19,7 @@ type Client struct {
 	baseURL    string
 }
 
+// JobsRequest treats Page as one-based; zero leaves pagination to the site default.
 type JobsRequest struct {
 	Query          string
 	Locations      []string
@@ -57,6 +58,7 @@ type JobDetailResponse struct {
 	Responsibilities string
 }
 
+// NewClient uses [http.DefaultClient] when httpClient is nil.
 func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
@@ -96,6 +98,7 @@ func (c *Client) jobsRawURL(req *JobsRequest) (string, error) {
 	return u.String(), nil
 }
 
+// Jobs returns summaries whose [Job.ID] values are accepted by [Client.JobDetail].
 func (c *Client) Jobs(ctx context.Context, req *JobsRequest) (*JobsResponse, error) {
 	u, err := c.jobsRawURL(req)
 	if err != nil {
@@ -112,6 +115,8 @@ func (c *Client) Jobs(ctx context.Context, req *JobsRequest) (*JobsResponse, err
 	return &JobsResponse{Jobs: jobs}, nil
 }
 
+// JobDetail expects a [Job.ID] returned by [Client.Jobs].
+// It returns an error for an empty ID or an unrecognized detail page.
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	if jobID == "" {
 		return nil, errors.New("empty job id")

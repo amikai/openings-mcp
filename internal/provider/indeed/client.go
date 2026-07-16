@@ -94,7 +94,8 @@ func withCountry(ctx context.Context, co string) context.Context {
 	return context.WithValue(ctx, countryCtxKey{}, co)
 }
 
-// Jobs searches jobSearch with r's criteria.
+// Jobs returns summaries whose [Job.Key] and [Job.Country] values identify
+// postings for [Client.JobDetail].
 func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error) {
 	country, countryName, err := resolveCountry(r.Country, true)
 	if err != nil {
@@ -190,9 +191,9 @@ func searchFilters(r *JobsRequest) []JobSearchFilterInput {
 	}
 }
 
-// JobDetail looks up one job by its key (Job.Key from a prior Jobs call).
-// country is required: jobData is country-scoped (a US key with indeed-co
-// TW returns an empty list). Pass Job.Country from a prior search result.
+// JobDetail looks up a posting using [Job.Key] and [Job.Country] from the
+// same [Client.Jobs] result. country is required because jobData is
+// country-scoped: a US key with indeed-co TW returns an empty list.
 // A key with no matching job (removed, expired, or never valid) returns
 // (nil, nil) rather than an error — see API.md's Key Behaviors on
 // jobData's empty-list-not-404 shape.

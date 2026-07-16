@@ -94,7 +94,7 @@ func slugFromEmailHref(href string) (string, bool) {
 
 // parseDetailHTML parses a job detail page.
 // Field labels (zh_TW): "公司名稱", "工作地點", "專業領域", "職別", "職務類型", "職務張貼日"
-// Field labels (zh_TW): "職務說明" (Responsibilities), "職務要求" (Qualifications) → multiline div children
+// Field labels (zh_TW): "職務說明" (Responsibilities), "職務要求" (Qualifications) → multiline div children.
 func parseDetailHTML(doc *goquery.Document) (JobDetailResponse, bool) {
 	var detail JobDetailResponse
 

@@ -48,6 +48,7 @@ type Client struct {
 // browser session would already have loaded before ever reaching this call.
 const DefaultStart = 25
 
+// JobsRequest expects WorkplaceType and JobType values declared by this package.
 type JobsRequest struct {
 	Keywords            string
 	Location            string
@@ -141,6 +142,7 @@ func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	return u.String(), nil
 }
 
+// Jobs returns summaries whose [Job.ID] values are accepted by [Client.JobDetail].
 func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error) {
 	rawURL, err := c.jobsURL(r)
 	if err != nil {
@@ -157,6 +159,9 @@ func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error
 	return &JobsResponse{Jobs: jobs}, nil
 }
 
+// JobDetail expects a [Job.ID] returned by [Client.Jobs] and warms a cold
+// session before fetching the posting.
+// It returns an error for an empty ID, a blocked request, or an unrecognized page.
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	if jobID == "" {
 		return nil, errors.New("empty job id")

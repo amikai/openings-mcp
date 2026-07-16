@@ -6,8 +6,8 @@ import (
 	"strings"
 )
 
-// JobDetailKeyFromPath extracts the two GetJobDetail path parameters out of
-// a JobSummary.ExternalPath (e.g.
+// JobDetailKeyFromPath extracts the two [GetJobDetailParams] values from
+// [JobSummary.ExternalPath] (e.g.
 // "/job/US-CA-Remote/Software-Engineer--CUDA_JR12345"). The API rejects a
 // single combined path parameter because standard URI encoders escape the
 // "/" between them, so callers need the segments split apart.
