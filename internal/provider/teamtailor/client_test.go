@@ -77,6 +77,22 @@ func TestGetJobsNotFound(t *testing.T) {
 	assert.True(t, ok, "want *GetJobsNotFound, got %T", res)
 }
 
+func TestGetJobsMissingJobLocation(t *testing.T) {
+	srv := NewMissingLocationMockServer()
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+	res, err := client.GetJobs(t.Context())
+	require.NoError(t, err)
+
+	feed, ok := res.(*CareerFeed)
+	require.True(t, ok, "want *CareerFeed, got %T", res)
+	require.Len(t, feed.Items, 2)
+	assert.Empty(t, feed.Items[0].Jobposting.JobLocation)
+	assert.NotEmpty(t, feed.Items[1].Jobposting.JobLocation)
+}
+
 func TestGetJobsNullAddressFields(t *testing.T) {
 	srv := NewNullMockServer()
 	defer srv.Close()

@@ -157,6 +157,7 @@ func (*GetJobsNotFound) getJobsRes() {}
 // Minimal subset of the embedded Schema.org JobPosting object.
 // Ref: #/components/schemas/JobPosting
 type JobPosting struct {
+	// Omitted entirely for postings without a tagged location, e.g. fully-remote roles.
 	JobLocation []Place `json:"jobLocation"`
 }
 

@@ -80,6 +80,24 @@ func TestTeamtailorSearchAll(t *testing.T) {
 	}
 }
 
+func TestTeamtailorSearchMissingJobLocation(t *testing.T) {
+	srv := teamtailor.NewMissingLocationMockServer()
+	t.Cleanup(srv.Close)
+	a := NewTeamtailorAdapter(&http.Client{Timeout: 5 * time.Second})
+	a.baseURL = func(string) string { return srv.URL }
+
+	res, err := a.Search(t.Context(), "carrtalent.na.teamtailor.com", SearchParams{})
+	require.NoError(t, err)
+	require.Equal(t, 2, res.TotalCount)
+
+	byTitle := make(map[string]JobSummary, len(res.Jobs))
+	for _, j := range res.Jobs {
+		byTitle[j.Title] = j
+	}
+	assert.Empty(t, byTitle["Experienced Real Estate Investment Professionals (Nationwide)"].Location)
+	assert.Equal(t, "Miami", byTitle["Home Buying Specialist"].Location)
+}
+
 func TestTeamtailorSearchQueryLocationAndFilters(t *testing.T) {
 	a, _ := testTeamtailorAdapter(t)
 

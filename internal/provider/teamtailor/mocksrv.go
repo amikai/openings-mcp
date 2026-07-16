@@ -20,6 +20,9 @@ var mockJobsRsp []byte
 //go:embed testdata/jobs_nulls_rsp.json
 var mockJobsNullsRsp []byte
 
+//go:embed testdata/jobs_missing_location_rsp.json
+var mockJobsMissingLocationRsp []byte
+
 // NewMockServer returns a fixture-replaying Teamtailor career site. The
 // caller owns the server and must close it.
 func NewMockServer() *httptest.Server {
@@ -36,6 +39,14 @@ func NewMockServer() *httptest.Server {
 func NewNullMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/jobs.json", serveMockFeed(mockJobsNullsRsp))
+	return httptest.NewServer(mux)
+}
+
+// NewMissingLocationMockServer returns a fixture-replaying career site whose
+// first posting omits the jobLocation field entirely.
+func NewMissingLocationMockServer() *httptest.Server {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/jobs.json", serveMockFeed(mockJobsMissingLocationRsp))
 	return httptest.NewServer(mux)
 }
 

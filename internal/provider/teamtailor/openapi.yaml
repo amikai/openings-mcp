@@ -107,10 +107,12 @@ components:
     JobPosting:
       type: object
       description: Minimal subset of the embedded Schema.org JobPosting object.
-      required: [jobLocation]
       properties:
         jobLocation:
           type: array
+          description: >
+            Omitted entirely for postings without a tagged location, e.g.
+            fully-remote roles.
           items:
             $ref: "#/components/schemas/Place"
 
