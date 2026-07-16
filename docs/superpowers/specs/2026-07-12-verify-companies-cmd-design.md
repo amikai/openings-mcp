@@ -62,3 +62,24 @@ board is live but currently lists no jobs). JSON format: one object
 each result carries provider, company, slug, status, job count, and detail.
 
 Exit codes: any ERROR → 1; all OK → 0.
+
+## Addendum (2026-07-17): Detail probe
+
+Issue: #196 — search-only verification let a tenant pass the sweep while
+every `JobDetail` call failed on a divergent detail template.
+
+Each successful Search is now followed by one `Detail` probe on the first
+job of page 1, with the same slug. Classification gains a third status,
+`DETAIL_ERROR`: search succeeded but the probe failed — adapter code to
+fix, not the roster. It keeps the job count, carries the probed job ID
+plus error in the detail column, and counts toward exit code 1.
+
+- `TotalCount == 0` is the only zero-job case; no probe, stays OK.
+- `TotalCount > 0` with an empty page 1 (the adapter dropped every
+  summary, e.g. Workday entries without `externalPath`) is DETAIL_ERROR:
+  the detail path cannot be verified.
+- Search and probe each get their own `--timeout`, keeping the flag's
+  per-request meaning. Cost: at most one extra request per entry.
+
+This addendum supersedes "Classification is binary" and "No test file"
+above: `main_test.go` covers the probe classification with a fake adapter.
