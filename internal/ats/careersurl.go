@@ -30,6 +30,12 @@ func parseCareersInput(s string) (*url.URL, bool) {
 
 // matchCareersSlug matches re against lowercase(host)+escapedPath and
 // returns the URL-decoded first capture group.
+//
+// Example:
+//
+//	re := regexp.MustCompile(`(?i)^jobs\.ashbyhq\.com/([^/]+)`)
+//	u, _ := url.Parse("https://jobs.ashbyhq.com/Acme%20Inc")
+//	slug, ok := matchCareersSlug(re, u) // "Acme Inc", true
 func matchCareersSlug(re *regexp.Regexp, u *url.URL) (string, bool) {
 	m := re.FindStringSubmatch(strings.ToLower(u.Hostname()) + u.EscapedPath())
 	if m == nil {
