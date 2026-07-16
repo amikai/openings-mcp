@@ -445,8 +445,11 @@ func printDetail(d eightfold.PositionDetail, format string) error {
 		fmt.Printf("Department: %s\n", d.Department.Value)
 	}
 	fmt.Printf("Posted: %s\n", time.Unix(int64(d.PostedTs), 0).UTC().Format("2006-01-02"))
-	if d.PublicUrl != "" {
-		fmt.Printf("URL: %s\n", d.PublicUrl)
+	if u, ok := d.PublicUrl.Get(); ok && u != "" {
+		fmt.Printf("URL: %s\n", u)
+	} else if d.PositionUrl != "" {
+		// Some tenants send publicUrl: null; positionUrl is site-relative.
+		fmt.Printf("URL: %s\n", d.PositionUrl)
 	}
 
 	if d.JobDescription != "" {
