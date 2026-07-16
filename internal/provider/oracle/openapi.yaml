@@ -1,0 +1,353 @@
+openapi: 3.1.0
+
+info:
+  title: Oracle Recruiting Cloud Candidate Experience
+  version: "1.0.0"
+  description: |
+    Minimal anonymous job-search surface for Oracle Recruiting Cloud external
+    Candidate Experience sites.
+
+    This specification is trimmed from Oracle's official Fusion Cloud HCM
+    OpenAPI document:
+    https://docs.oracle.com/en/cloud/saas/human-resources/farws/openapi.json
+
+    Oracle documents these Candidate Experience resources as intended for
+    internal use, but its public external career sites call them anonymously.
+    The trimmed schemas and nullability were verified against live public
+    traffic on 2026-07-17.
+
+    Each career site has an Oracle Fusion API origin and an internal site
+    number such as `CX_1`. Both operations use Oracle ADF "finder" syntax:
+    a structured comma-separated argument list embedded in one `finder` query
+    parameter. Callers are responsible for constructing that value.
+
+servers:
+  - url: https://fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com
+    description: Example Oracle Fusion production origin; replace per career site
+
+tags:
+  - name: Jobs
+    description: Public external Candidate Experience jobs
+
+paths:
+  /hcmRestApi/resources/latest/recruitingCEJobRequisitions:
+    get:
+      tags: [Jobs]
+      operationId: searchJobs
+      summary: Search publicly posted requisitions
+      parameters:
+        - name: onlyData
+          in: query
+          required: true
+          description: Omit Oracle ADF link metadata from resource items.
+          schema:
+            type: boolean
+            enum: [true]
+        - name: expand
+          in: query
+          required: false
+          description: Child resources to inline in each search result.
+          schema:
+            type: string
+          example: requisitionList.secondaryLocations
+        - name: fields
+          in: query
+          required: false
+          description: |
+            Oracle ADF field projection. This cannot be combined with
+            `expand`; child fields use semicolon-separated resource clauses.
+          schema:
+            type: string
+          example: TotalJobsCount,Limit,Offset;requisitionList:Id,Title
+        - name: finder
+          in: query
+          required: true
+          description: |
+            Oracle ADF finder expression. Public career sites use `findReqs`
+            with at least `siteNumber`, `limit`, and absolute `offset`.
+            Keyword values are quoted; selected facet values are
+            semicolon-separated IDs.
+          schema:
+            type: string
+          example: 'findReqs;siteNumber=CX_1,facetsList=NONE,limit=20,offset=0,keyword="analyst"'
+        - name: Accept-Language
+          in: header
+          required: false
+          schema:
+            type: string
+          example: en
+        - name: Ora-Irc-Language
+          in: header
+          required: false
+          description: Oracle Recruiting content locale.
+          schema:
+            type: string
+          example: en
+      responses:
+        "200":
+          description: One search-state item with postings and requested facets.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchCollection"
+
+  /hcmRestApi/resources/latest/recruitingCEJobRequisitionDetails:
+    get:
+      tags: [Jobs]
+      operationId: getJobDetail
+      summary: Get one publicly posted requisition
+      parameters:
+        - name: onlyData
+          in: query
+          required: true
+          schema:
+            type: boolean
+            enum: [true]
+        - name: expand
+          in: query
+          required: false
+          description: Use `all` to include public description and location children.
+          schema:
+            type: string
+            enum: [all]
+        - name: fields
+          in: query
+          required: false
+          description: |
+            Oracle ADF field projection. This cannot be combined with
+            `expand`; child fields use semicolon-separated resource clauses.
+          schema:
+            type: string
+          example: Id,Title,ExternalDescriptionStr;secondaryLocations:Name
+        - name: finder
+          in: query
+          required: true
+          description: |
+            `ById` finder containing the quoted public job ID and internal
+            site number. Unknown or expired IDs return HTTP 200 with an empty
+            `items` array.
+          schema:
+            type: string
+          example: 'ById;Id="386920",siteNumber=CX_1'
+        - name: Accept-Language
+          in: header
+          required: false
+          schema:
+            type: string
+          example: en
+        - name: Ora-Irc-Language
+          in: header
+          required: false
+          schema:
+            type: string
+          example: en
+      responses:
+        "200":
+          description: A one-item collection, or an empty collection when missing.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DetailCollection"
+
+components:
+  schemas:
+    SearchCollection:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchPage"
+
+    SearchPage:
+      type: object
+      required:
+        - TotalJobsCount
+        - Limit
+        - Offset
+        - requisitionList
+        - titlesFacet
+        - locationsFacet
+        - categoriesFacet
+        - postingDatesFacet
+        - workLocationsFacet
+        - organizationsFacet
+        - workplaceTypesFacet
+      properties:
+        TotalJobsCount:
+          type: integer
+          minimum: 0
+        Limit:
+          type: integer
+          minimum: 0
+        Offset:
+          type: integer
+          minimum: 0
+        requisitionList:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequisitionSummary"
+        titlesFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/StringFacet"
+        locationsFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntegerFacet"
+        categoriesFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntegerFacet"
+        postingDatesFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntegerFacet"
+        workLocationsFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntegerFacet"
+        organizationsFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/IntegerFacet"
+        workplaceTypesFacet:
+          type: array
+          items:
+            $ref: "#/components/schemas/StringFacet"
+
+    RequisitionSummary:
+      type: object
+      required:
+        - Id
+        - Title
+        - PostedDate
+        - PrimaryLocation
+        - WorkplaceType
+        - WorkplaceTypeCode
+        - secondaryLocations
+      properties:
+        Id:
+          type: string
+          nullable: true
+          description: Public job ID; not necessarily numeric.
+        Title:
+          type: string
+          nullable: true
+        PostedDate:
+          type: string
+          format: date
+          nullable: true
+        PrimaryLocation:
+          type: string
+          nullable: true
+        WorkplaceType:
+          type: string
+          nullable: true
+          description: Display label such as On-site, Hybrid, or Remote.
+        WorkplaceTypeCode:
+          type: string
+          nullable: true
+          description: Oracle code such as ORA_ON_SITE.
+        secondaryLocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SecondaryLocation"
+
+    SecondaryLocation:
+      type: object
+      required: [Name]
+      properties:
+        Name:
+          type: string
+          nullable: true
+
+    StringFacet:
+      type: object
+      required: [Id, Name, TotalCount]
+      properties:
+        Id:
+          type: string
+          nullable: true
+        Name:
+          type: string
+          nullable: true
+        TotalCount:
+          type: integer
+          nullable: true
+
+    IntegerFacet:
+      type: object
+      required: [Id, Name, TotalCount]
+      properties:
+        Id:
+          type: integer
+          format: int64
+          nullable: true
+        Name:
+          type: string
+          nullable: true
+        TotalCount:
+          type: integer
+          nullable: true
+
+    DetailCollection:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobDetail"
+
+    JobDetail:
+      type: object
+      required:
+        - Id
+        - Title
+        - ExternalPostedStartDate
+        - PrimaryLocation
+        - WorkplaceType
+        - ExternalDescriptionStr
+        - CorporateDescriptionStr
+        - ExternalResponsibilitiesStr
+        - ExternalQualificationsStr
+        - secondaryLocations
+      properties:
+        Id:
+          type: string
+          nullable: true
+        Title:
+          type: string
+          nullable: true
+        ExternalPostedStartDate:
+          type: string
+          format: date-time
+          nullable: true
+        PrimaryLocation:
+          type: string
+          nullable: true
+        WorkplaceType:
+          type: string
+          nullable: true
+        ExternalDescriptionStr:
+          type: string
+          nullable: true
+          description: Main public job description HTML.
+        CorporateDescriptionStr:
+          type: string
+          nullable: true
+          description: Employer/corporate description HTML.
+        ExternalResponsibilitiesStr:
+          type: string
+          nullable: true
+          description: Public responsibilities HTML or text.
+        ExternalQualificationsStr:
+          type: string
+          nullable: true
+          description: Public qualifications HTML or text.
+        secondaryLocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/SecondaryLocation"
