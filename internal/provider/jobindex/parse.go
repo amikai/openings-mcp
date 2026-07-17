@@ -61,7 +61,7 @@ func parseSearchHTML(r io.Reader, pageNum int) (*SearchResponse, error) {
 }
 
 // slimJobResult keeps upstream keys with light renames for LLM clarity:
-//   - firstdate → posted_at, lastdate → expired_at
+//   - firstdate → posted_at, lastdate → expired_at (ISO 8601 dates YYYY-MM-DD)
 //   - single url for open/apply (prefer apply_url, app_apply_url, share_url)
 //
 // Drops: html, tracking url, share_url/apply_url twins, company profile links.
