@@ -68,13 +68,9 @@ func parseSearchHTML(r io.Reader, pageNum int) (*SearchResponse, error) {
 }
 
 // extractStash scans the search HTML stream for the `var Stash = ` marker and
-// decodes the JSON object that follows. Port of extractStash in:
-//
-//	https://github.com/MadsLorentzen/ai-job-search/blob/dd6d7efea6c9d0c0d439871c5fc323e57b6a1f58/.agents/skills/jobindex-search/cli/src/helpers.ts#L86-L115
-//
-// json.Decoder stops at the closing brace (its own string/brace handling
-// replaces the helpers' manual walk), so the trailing `;</script>` and the
-// rendered page tail are never read.
+// decodes the JSON object that follows. json.Decoder stops at the closing
+// brace, so the trailing `;</script>` and the rendered page tail are never
+// read.
 func extractStash(r io.Reader) (map[string]any, error) {
 	br := bufio.NewReader(r)
 	if err := skipToMarker(br, stashMarker); err != nil {
@@ -111,8 +107,7 @@ func skipToMarker(br *bufio.Reader, marker string) error {
 	}
 }
 
-// findSearchResponse walks the Stash tree for searchResponse.results, matching
-// findSearchResponse in helpers.ts (same GitHub blob as extractStash above).
+// findSearchResponse walks the Stash tree for searchResponse.results.
 func findSearchResponse(node any) map[string]any {
 	switch n := node.(type) {
 	case map[string]any:
