@@ -18,6 +18,15 @@ var (
 
 // parseSearchHTML extracts Stash searchResponse and returns it with upstream
 // field names. Only the per-result "html" card markup is removed.
+//
+// Stash extraction (marker + brace-balanced JSON + nested searchResponse walk)
+// follows the Jobindex skill in ai-job-search:
+//
+//	case-study/ai-job-search/.agents/skills/jobindex-search/cli/src/helpers.ts
+//	https://github.com/MadsLorentzen/ai-job-search/blob/dd6d7efea6c9d0c0d439871c5fc323e57b6a1f58/.agents/skills/jobindex-search/cli/src/helpers.ts
+//
+// (extractStash / parseSearchPage / findSearchResponse; see comments there on
+// /jobsoegning.json returning 204 and results living in var Stash.)
 func parseSearchHTML(page string, pageNum int) (*SearchResponse, error) {
 	stash, err := extractStash(page)
 	if err != nil {
@@ -61,6 +70,11 @@ func parseSearchHTML(page string, pageNum int) (*SearchResponse, error) {
 	}, nil
 }
 
+// extractStash pulls the `var Stash = {...}` blob out of the search HTML.
+// Port of extractStash in:
+//
+//	case-study/ai-job-search/.agents/skills/jobindex-search/cli/src/helpers.ts
+//	https://github.com/MadsLorentzen/ai-job-search/blob/dd6d7efea6c9d0c0d439871c5fc323e57b6a1f58/.agents/skills/jobindex-search/cli/src/helpers.ts#L86-L115
 func extractStash(page string) (map[string]any, error) {
 	idx := strings.Index(page, string(reStashMarker))
 	if idx < 0 {
@@ -79,7 +93,8 @@ func extractStash(page string) (map[string]any, error) {
 }
 
 // endOfJSONObject returns the index just past a balanced {...} starting at open,
-// respecting JSON string escapes.
+// respecting JSON string escapes. Same brace/string walk as extractStash in
+// the ai-job-search helpers.ts linked above.
 func endOfJSONObject(s string, open int) (int, error) {
 	if open >= len(s) || s[open] != '{' {
 		return 0, fmt.Errorf("jobindex: Stash does not start with '{'")
@@ -114,6 +129,8 @@ func endOfJSONObject(s string, open int) (int, error) {
 	return 0, fmt.Errorf("jobindex: unterminated Stash blob")
 }
 
+// findSearchResponse walks the Stash tree for searchResponse.results, matching
+// findSearchResponse in helpers.ts (same GitHub blob as extractStash above).
 func findSearchResponse(node any) map[string]any {
 	switch n := node.(type) {
 	case map[string]any:
