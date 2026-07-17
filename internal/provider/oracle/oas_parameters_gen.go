@@ -352,7 +352,10 @@ type SearchJobsParams struct {
 	Fields OptString `json:",omitempty,omitzero"`
 	// Oracle ADF finder expression. Public career sites use `findReqs` with at least `siteNumber`,
 	// `limit`, and absolute `offset`. Keyword values are quoted; selected facet values are
-	// semicolon-separated IDs.
+	// semicolon-separated IDs. Known optional tokens, verified live against public career sites:
+	//
+	//  - `sortBy=POSTING_DATES_DESC` — newest requisitions first. Without it, result order is Oracle's
+	//    unspecified default and is not stable across paginated offsets.
 	Finder         string
 	AcceptLanguage OptString `json:",omitempty,omitzero"`
 	// Oracle Recruiting content locale.

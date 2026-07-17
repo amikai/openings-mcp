@@ -66,10 +66,14 @@ paths:
             Oracle ADF finder expression. Public career sites use `findReqs`
             with at least `siteNumber`, `limit`, and absolute `offset`.
             Keyword values are quoted; selected facet values are
-            semicolon-separated IDs.
+            semicolon-separated IDs. Known optional tokens, verified live
+            against public career sites:
+              - `sortBy=POSTING_DATES_DESC` — newest requisitions first.
+                Without it, result order is Oracle's unspecified default and
+                is not stable across paginated offsets.
           schema:
             type: string
-          example: 'findReqs;siteNumber=CX_1,facetsList=NONE,limit=20,offset=0,keyword="analyst"'
+          example: 'findReqs;siteNumber=CX_1,facetsList=NONE,limit=20,offset=0,sortBy=POSTING_DATES_DESC,keyword="analyst"'
         - name: Accept-Language
           in: header
           required: false
