@@ -41,6 +41,7 @@ var providerOrder = []string{
 	"smartrecruiters",
 	"successfactors",
 	"teamtailor",
+	"ultipro",
 	"workday",
 }
 
@@ -196,6 +197,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a = ats.NewSuccessFactorsAdapter(hc)
 		case "teamtailor":
 			a = ats.NewTeamtailorAdapter(hc)
+		case "ultipro":
+			a = ats.NewUltiProAdapter(hc)
 		case "workday":
 			a = ats.NewWorkdayAdapter(hc)
 		}

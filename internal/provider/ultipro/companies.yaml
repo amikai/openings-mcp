@@ -1,0 +1,27 @@
+# Curated UltiPro (UKG Pro Recruiting) career boards. Each entry was
+# verified live: JobBoardView/LoadSearchResults returns HTTP 200 with
+# opportunities present. Host varies per tenant (recruiting.ultipro.com vs
+# recruiting2.ultipro.com) — there is no derivable pattern, so it is stored
+# explicitly alongside the company code and board id.
+# Display names must stay unique across all ATS rosters.
+
+- company: "TechnoServe"
+  host: "recruiting.ultipro.com"
+  company_code: "TEC1006TESER"
+  board_id: "18180d88-ced0-4361-bd09-d5eef66dab24"
+- company: "Idaho Central Credit Union"
+  host: "recruiting.ultipro.com"
+  company_code: "IDA1000"
+  board_id: "26bbbd4e-7790-a471-7482-a40a1f3f8f25"
+- company: "Macmillan"
+  host: "recruiting.ultipro.com"
+  company_code: "HOL1002HPHM"
+  board_id: "be27b89b-3cb9-491f-a1b0-42f8b077a9dd"
+- company: "SoftWriters"
+  host: "recruiting.ultipro.com"
+  company_code: "ROP1001ROPER"
+  board_id: "cf088029-453b-46f8-bcab-46ffb10fdf54"
+- company: "The Salvation Army"
+  host: "recruiting2.ultipro.com"
+  company_code: "SAL1002"
+  board_id: "bcc2e2d1-d94c-2041-4126-28086417eb0a"

@@ -19,6 +19,7 @@ OPENAPI_SPECS := \
 	internal/provider/synopsys/openapi.yaml \
 	internal/provider/teamtailor/openapi.yaml \
 	internal/provider/tsmc/openapi.yaml \
+	internal/provider/ultipro/openapi.yaml \
 	internal/provider/workday/openapi.yaml
 
 validate-openapi: $(OPENAPI_SPECS)

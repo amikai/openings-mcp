@@ -1,0 +1,1241 @@
+{
+  "locations": [
+    {
+      "Id": "5ecf86c9-004a-4e04-953b-0c3f1db188d7",
+      "LocalizedName": "Abuja, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": null,
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 8.905543473197,
+        "Longitude": 7.187087954545
+      }
+    },
+    {
+      "Id": "3848f5e9-ccc1-46a0-919e-0aac9a04a072",
+      "LocalizedName": "Aguascalientes",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Aguascalientes",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "a87694bc-697c-42b8-b676-379adeef4216",
+      "LocalizedName": "Anambra, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": null,
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 6.22701937514,
+        "Longitude": 6.93559911272
+      }
+    },
+    {
+      "Id": "92592e3f-9ba0-47ff-9a56-2000435e4611",
+      "LocalizedName": "Arequipa, PER",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Arequipa",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "PER",
+          "Name": "Peru"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": -16.39889,
+        "Longitude": -71.535
+      }
+    },
+    {
+      "Id": "2730a7b8-46f4-4def-871f-84a86adc075d",
+      "LocalizedName": "Benin",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": null,
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "BEN",
+          "Name": "Benin"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "d96f87eb-097d-4f7b-9a88-9459703e103f",
+      "LocalizedName": "Campeche",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Campeche",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "b4fbd5bd-8b31-4220-86d8-5ce3065a51d5",
+      "LocalizedName": "Colima",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": null,
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "bdacc4c9-e8bb-47fd-8183-ada8930d8ebf",
+      "LocalizedName": "Durango",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Durango",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "8d66d379-4c9c-5f3f-afb4-a5571b08de4e",
+      "LocalizedName": "Ghana, Accra",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Ghana",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Accra",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "GHA",
+          "Name": "Ghana"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "3cfc23ed-9de2-485a-aa14-1f5c38c08d8a",
+      "LocalizedName": "Guanajuato",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Guanajuato",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "51b7352a-f12c-42ab-83d5-331f707ed4ad",
+      "LocalizedName": "Jalisco",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Jalisco",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "a1bd02fd-6901-4398-89b4-ab8fa49efee0",
+      "LocalizedName": "Kaduna, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Kaduna",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 10.5318542,
+        "Longitude": 7.4294702
+      }
+    },
+    {
+      "Id": "9442e362-4c08-4d6a-94d4-8ec3b5906a95",
+      "LocalizedName": "Kano, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Kano",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 12.00012,
+        "Longitude": 8.51672
+      }
+    },
+    {
+      "Id": "b014fa0c-f344-486a-9d38-92b21305b9d5",
+      "LocalizedName": "Lagos, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Lagos",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 6.4931107,
+        "Longitude": 3.3841634
+      }
+    },
+    {
+      "Id": "35d87bda-ba8c-4c84-bf6c-a6970b14d727",
+      "LocalizedName": "Mexico",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Oaxaca",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "11064cea-35a6-4ed1-a732-8404381d8e7a",
+      "LocalizedName": "Mexico City",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Mexico City",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "f3888162-f701-4ea4-8219-37ef172d8754",
+      "LocalizedName": "Michoacán",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Michoacán",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "339d0263-1dc9-4482-a2ba-db1296ca478f",
+      "LocalizedName": "Morelos",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Morelos",
+        "PostalCode": null,
+        "State": {
+          "Code": "MX",
+          "Name": "Mexico"
+        },
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "f2cdb156-c1c2-5c14-87fe-358090bab70b",
+      "LocalizedName": "Mozambique Main Office/Ma",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Mozambique Main Office",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Maputo",
+        "PostalCode": null,
+        "State": {
+          "Code": "MO",
+          "Name": "Mozambique"
+        },
+        "Country": {
+          "Code": "MOZ",
+          "Name": "Mozambique"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "6b96d434-7215-4aa3-88bb-cd1fea524368",
+      "LocalizedName": "Mozambique/Chimoio",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Chimoio",
+        "PostalCode": null,
+        "State": {
+          "Code": "CHI",
+          "Name": "Chimoio"
+        },
+        "Country": {
+          "Code": "MOZ",
+          "Name": "Mozambique"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "6ae84937-0c51-47f2-a007-0f47b37579a2",
+      "LocalizedName": "Nuevo León",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Nuevo León",
+        "PostalCode": null,
+        "State": {
+          "Code": "MX",
+          "Name": "Mexico"
+        },
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "b9996d26-622d-4e1e-8795-e57dcd9e80ed",
+      "LocalizedName": "Oyo, NGA",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": null,
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 8.156842671353,
+        "Longitude": 3.618646103453
+      }
+    },
+    {
+      "Id": "f6474032-5df0-473f-a5f2-c78b965ffad3",
+      "LocalizedName": "Parakou, Benin",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Parakou",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "BEN",
+          "Name": "Benin"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "3e797237-8583-4a4d-8f03-8d65dbb028a3",
+      "LocalizedName": "Puebla",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Puebla",
+        "PostalCode": null,
+        "State": {
+          "Code": "MX",
+          "Name": "Mexico"
+        },
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "693bbbf3-0792-4399-97d1-31b991f47178",
+      "LocalizedName": "Remote",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Arlington",
+        "PostalCode": "22209",
+        "State": {
+          "Code": "VA",
+          "Name": "Virginia"
+        },
+        "Country": {
+          "Code": "USA",
+          "Name": "United States"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": false,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 38.89366000000007,
+        "Longitude": -77.07546499999995
+      }
+    },
+    {
+      "Id": "5371c71d-884f-4103-84a5-4fd67ad5ef4c",
+      "LocalizedName": "Remote US",
+      "LocalizedLocationId": "Remote for US Only",
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Arlington",
+        "PostalCode": "22209",
+        "State": {
+          "Code": "VA",
+          "Name": "Virginia"
+        },
+        "Country": {
+          "Code": "USA",
+          "Name": "United States"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 38.89366000000007,
+        "Longitude": -77.07546499999995
+      }
+    },
+    {
+      "Id": "167b9e52-d5e4-4cdd-b4ea-bb9b3abc6480",
+      "LocalizedName": "TechnoServe Headquarters",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Arlington",
+        "PostalCode": "22209",
+        "State": {
+          "Code": "VA",
+          "Name": "Virginia"
+        },
+        "Country": {
+          "Code": "USA",
+          "Name": "United States"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 38.89297871301469,
+        "Longitude": -77.07460733149458
+      }
+    },
+    {
+      "Id": "ae5c0254-9ea4-493b-98e5-702ccda2aa6d",
+      "LocalizedName": "Veracruz",
+      "LocalizedLocationId": null,
+      "LocalizedDescription": null,
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Veracruz",
+        "PostalCode": null,
+        "State": {
+          "Code": "MX",
+          "Name": "Mexico"
+        },
+        "Country": {
+          "Code": "MEX",
+          "Name": "Mexico"
+        }
+      },
+      "DisplayName": true,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 0,
+      "Coordinates": {
+        "Latitude": 29.94124006106256,
+        "Longitude": -85.40837960985195
+      }
+    },
+    {
+      "Id": "1de3aa05-a46d-5a9b-b751-a85622623032",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Rwanda Main Office",
+      "Address": {
+        "Line1": "Umoja House 2nd Floor",
+        "Line2": "Plot 0079",
+        "City": "Kigali",
+        "PostalCode": "P.Obox7108",
+        "State": null,
+        "Country": {
+          "Code": "RWA",
+          "Name": "Rwanda"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "d332c572-757f-5e43-9bbe-d0004e88b417",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Uganda/Kampala",
+      "Address": {
+        "Line1": "KAMPALA HEAD OFFICE",
+        "Line2": "Ntinda II Road",
+        "City": "KAMPALA",
+        "PostalCode": "1707,KAMPALA",
+        "State": null,
+        "Country": {
+          "Code": "UGA",
+          "Name": "Uganda"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "da791f80-9673-5654-bfa2-db01560eb587",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Ethiopia/Aleta Wondo",
+      "Address": {
+        "Line1": "Aleta Wondo",
+        "Line2": null,
+        "City": "Aleta Wondo",
+        "PostalCode": "AletaWondo",
+        "State": {
+          "Code": "AW",
+          "Name": "Aleta Wondo"
+        },
+        "Country": {
+          "Code": "ETH",
+          "Name": "Ethiopia"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "d6f532af-669d-5335-a80a-a8cfbb557295",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Hondura/El Paraíso",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "El Paraíso",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "HND",
+          "Name": "Honduras"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 44.54776029027956,
+        "Longitude": -99.00495116951495
+      }
+    },
+    {
+      "Id": "055877ca-d7eb-5b4b-a036-319283e06d67",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "El Salvador",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "El Salvador",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "SLV",
+          "Name": "El Salvador"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "11d950f8-915c-5a69-8674-0f70cf096bc9",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Kenya Main Office",
+      "Address": {
+        "Line1": "House 39 | Apple Cross Road | James Gichuru Road| Lavington",
+        "Line2": "P.O Box 14821",
+        "City": "Nairobi",
+        "PostalCode": "00800",
+        "State": {
+          "Code": "NA",
+          "Name": "Nairobi"
+        },
+        "Country": {
+          "Code": "KEN",
+          "Name": "Kenya"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 38.064170980625065,
+        "Longitude": -102.32670920779145
+      }
+    },
+    {
+      "Id": "91dcd5ca-00d5-577b-b96f-57c3966a57f6",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Botswana",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Gaborone",
+        "PostalCode": null,
+        "State": {
+          "Code": "BA",
+          "Name": "Botswana"
+        },
+        "Country": {
+          "Code": "BWA",
+          "Name": "Botswana"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "bfe13387-6266-5742-8ec7-96113179efab",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Guatemala",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Guatemala City",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "GTM",
+          "Name": "Guatemala"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "6a2b438c-c7ce-5f03-85ce-da8e3c751620",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Tanzania/Dar Es Salaam",
+      "Address": {
+        "Line1": "A.S. Mwamba Building, 6th Floor",
+        "Line2": "Plot 80, Cocacola Road",
+        "City": "Mikocheni",
+        "PostalCode": "78375",
+        "State": {
+          "Code": "DR",
+          "Name": "Dar Es Salaam"
+        },
+        "Country": {
+          "Code": "TZA",
+          "Name": "United Republic of Tanzania"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "1d9724e3-d7f0-5f16-bf65-101db2e0f2a2",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "South Africa/Johannesburg",
+      "Address": {
+        "Line1": "1st Floor",
+        "Line2": "54 On Bath Hotel",
+        "City": "Johannesburg",
+        "PostalCode": "2196",
+        "State": {
+          "Code": "SA",
+          "Name": "South Africa"
+        },
+        "Country": {
+          "Code": "ZAF",
+          "Name": "South Africa"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 47.291856071204066,
+        "Longitude": -101.92460940074444
+      }
+    },
+    {
+      "Id": "480986e8-fccc-5f3b-8b13-db08733ed2ee",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Nigeria",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Abuja, Enugu, Kano, Lagos",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "NGA",
+          "Name": "Nigeria"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": false,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 39.759999,
+        "Longitude": -98.499997
+      }
+    },
+    {
+      "Id": "b09585f3-1ccd-55d8-a5f8-41eb439c8c40",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Colombia/Bogotá",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Bogotá",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "COL",
+          "Name": "Colombia"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 38.887674017338064,
+        "Longitude": -121.00999937223095
+      }
+    },
+    {
+      "Id": "564120b1-88b0-53d9-909f-e9e3d94e152f",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "India/Mumbai",
+      "Address": {
+        "Line1": "B1-201, Centre Point, Opp. Bawla Masjid",
+        "Line2": "243- A, N M Joshi Marg, Lower Parel",
+        "City": "Mumbai",
+        "PostalCode": "400013",
+        "State": {
+          "Code": "MH",
+          "Name": "Maharashtra"
+        },
+        "Country": {
+          "Code": "IND",
+          "Name": "India"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 47.765527918956565,
+        "Longitude": -122.15365825336696
+      }
+    },
+    {
+      "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Benin/Cotonou",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Cotonou, Littoral",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "BEN",
+          "Name": "Benin"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 47.34297768720956,
+        "Longitude": -94.20873973909094
+      }
+    },
+    {
+      "Id": "4016cefe-606d-5c2b-91b2-a6929926cb76",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Virginia HQ",
+      "Address": {
+        "Line1": "1777 N. Kent Street",
+        "Line2": null,
+        "City": "Arlington",
+        "PostalCode": "22209",
+        "State": {
+          "Code": "VA",
+          "Name": "Virginia"
+        },
+        "Country": {
+          "Code": "USA",
+          "Name": "United States"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": true,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 38.896802714937316,
+        "Longitude": -77.06947562647915
+      }
+    },
+    {
+      "Id": "5a176f77-bcae-5716-a396-b2319123f383",
+      "LocalizedName": null,
+      "LocalizedLocationId": null,
+      "LocalizedDescription": "Colombia/Barranquilla",
+      "Address": {
+        "Line1": null,
+        "Line2": null,
+        "City": "Barranquilla",
+        "PostalCode": null,
+        "State": null,
+        "Country": {
+          "Code": "COL",
+          "Name": "Colombia"
+        }
+      },
+      "DisplayName": false,
+      "DisplayLocationId": false,
+      "DisplayAddress": true,
+      "DisplayStreetAddress": false,
+      "DisplayDescription": false,
+      "SourceOfTruth": 1,
+      "Coordinates": {
+        "Latitude": 38.887674017338064,
+        "Longitude": -121.00999937223095
+      }
+    }
+  ],
+  "totalCount": 44
+}

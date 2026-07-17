@@ -1,0 +1,148 @@
+{
+  "opportunities": [
+    {
+      "Id": "015f6d1c-4d62-40dc-8b8c-1bd4646fd4d7",
+      "Featured": false,
+      "Title": "Finance Assistant- Maternity Cover (4 months)",
+      "RequisitionNumber": "FINAN005464",
+      "FullTime": true,
+      "JobCategoryName": "Finance",
+      "Locations": [
+        {
+          "Id": "da791f80-9673-5654-bfa2-db01560eb587",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Ethiopia/Aleta Wondo",
+          "Address": {
+            "Line1": "Aleta Wondo",
+            "Line2": null,
+            "City": "Aleta Wondo",
+            "PostalCode": "AletaWondo",
+            "State": {
+              "Code": "AW",
+              "Name": "Aleta Wondo"
+            },
+            "Country": {
+              "Code": "ETH",
+              "Name": "Ethiopia"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-17T11:59:56.932Z",
+      "BriefDescription": "Title: \t\tFinance Assistant -Maternity cover (4 months)\nReports to: \tSr. Finance and Admin Officer\nLocation: \tAleta Wondo\nGrade: \t\t5",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "1085c9a0-9f1d-40c6-80cb-168f5c7fc4b8",
+      "Featured": false,
+      "Title": "Senior Cost and Pricing Manager",
+      "RequisitionNumber": "SENIO005414",
+      "FullTime": true,
+      "JobCategoryName": "Finance",
+      "Locations": [
+        {
+          "Id": "167b9e52-d5e4-4cdd-b4ea-bb9b3abc6480",
+          "LocalizedName": "TechnoServe Headquarters",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Arlington",
+            "PostalCode": "22209",
+            "State": {
+              "Code": "VA",
+              "Name": "Virginia"
+            },
+            "Country": {
+              "Code": "USA",
+              "Name": "United States"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 38.89297871301469,
+            "Longitude": -77.07460733149458
+          }
+        }
+      ],
+      "PostedDate": "2026-06-04T01:06:01.708Z",
+      "BriefDescription": "Reporting to the Director of Budget and Pricing, the Senior Manager of Cost and Pricing is responsible for ensuring TechnoServe develops cost-effective, competitive cost proposals that fully cover TechnoServe’s direct and indirect costs. The Senior Manager leads the cost proposal function of new business development, assisting the business development teams to secure large-scale, multi-million dollar grants and contracts. The Senior Manager of Cost and Pricing also reviews and approves smaller cost proposals and budget realignments developed by other TechnoServe personnel.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 2,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "5a1039bf-5aec-4ce4-a1df-45897c825f3f",
+      "Featured": true,
+      "Title": "Assistant Manager",
+      "RequisitionNumber": "ASSIS005067",
+      "FullTime": true,
+      "JobCategoryName": "Finance",
+      "Locations": [
+        {
+          "Id": "564120b1-88b0-53d9-909f-e9e3d94e152f",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "India/Mumbai",
+          "Address": {
+            "Line1": "B1-201, Centre Point, Opp. Bawla Masjid",
+            "Line2": "243- A, N M Joshi Marg, Lower Parel",
+            "City": "Mumbai",
+            "PostalCode": "400013",
+            "State": {
+              "Code": "MH",
+              "Name": "Maharashtra"
+            },
+            "Country": {
+              "Code": "IND",
+              "Name": "India"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.765527918956565,
+            "Longitude": -122.15365825336696
+          }
+        }
+      ],
+      "PostedDate": "2025-07-31T14:13:48.462Z",
+      "BriefDescription": "The Financial Analyst will be responsible to support the following tasks in Agriculture programs for TechnoServe’s India operations. The position will report to the Country Director. The role would contribute majorly to support on new and existing program budgets and spends and to new program development.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    }
+  ],
+  "totalCount": 3,
+  "initialTotalOpportunitiesCount": 90,
+  "locations": []
+}

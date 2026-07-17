@@ -48,6 +48,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"icims":           "careers-<slug>.icims.com/jobs/search",
 	"oracle":          "<fusion>.oraclecloud.com/hcmUI/CandidateExperience/<lang>/sites/<site>/jobs",
 	"join":            "join.com/companies/<company> (roster companies only)",
+	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
 }
 
 // NewRegistry unions the adapters' rosters. A slug or normalized display

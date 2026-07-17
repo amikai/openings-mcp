@@ -1,0 +1,1154 @@
+{
+  "opportunities": [
+    {
+      "Id": "015f6d1c-4d62-40dc-8b8c-1bd4646fd4d7",
+      "Featured": false,
+      "Title": "Finance Assistant- Maternity Cover (4 months)",
+      "RequisitionNumber": "FINAN005464",
+      "FullTime": true,
+      "JobCategoryName": "Finance",
+      "Locations": [
+        {
+          "Id": "da791f80-9673-5654-bfa2-db01560eb587",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Ethiopia/Aleta Wondo",
+          "Address": {
+            "Line1": "Aleta Wondo",
+            "Line2": null,
+            "City": "Aleta Wondo",
+            "PostalCode": "AletaWondo",
+            "State": {
+              "Code": "AW",
+              "Name": "Aleta Wondo"
+            },
+            "Country": {
+              "Code": "ETH",
+              "Name": "Ethiopia"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-17T11:59:56.932Z",
+      "BriefDescription": "Title: \t\tFinance Assistant -Maternity cover (4 months)\nReports to: \tSr. Finance and Admin Officer\nLocation: \tAleta Wondo\nGrade: \t\t5",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "27ff07dc-68f8-4450-8573-700c1a3513f3",
+      "Featured": false,
+      "Title": "Voluntários para Aconselhamento de Negócios para Macate e Bárue",
+      "RequisitionNumber": "VOLUN005460",
+      "FullTime": true,
+      "JobCategoryName": "Intern",
+      "Locations": [
+        {
+          "Id": "6b96d434-7215-4aa3-88bb-cd1fea524368",
+          "LocalizedName": "Mozambique/Chimoio",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Chimoio",
+            "PostalCode": null,
+            "State": {
+              "Code": "CHI",
+              "Name": "Chimoio"
+            },
+            "Country": {
+              "Code": "MOZ",
+              "Name": "Mozambique"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-17T10:56:28.64Z",
+      "BriefDescription": "A TechnoServe é líder no aproveitamento do poder do sector privado para ajudar as pessoas a saírem da pobreza. Uma organização sem fins lucrativos que opera em 29 países, trabalhamos com homens e mulheres empreendedores no mundo em desenvolvimento para construir fazendas, negócios e indústrias competitivas. Ao ligar as pessoas à informação, ao capital e aos mercados, ajudámos milhões de pessoas a criar prosperidade duradoura para as suas famílias e comunidades.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": null,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "8c636159-2314-4fb3-807c-efe91de7f821",
+      "Featured": false,
+      "Title": "Large Scale Private Sector & Investment Development Manager, Mozambique GV4G Program",
+      "RequisitionNumber": "LARGE005459",
+      "FullTime": true,
+      "JobCategoryName": "Programs",
+      "Locations": [
+        {
+          "Id": "f2cdb156-c1c2-5c14-87fe-358090bab70b",
+          "LocalizedName": "Mozambique Main Office/Ma",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Mozambique Main Office",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Maputo",
+            "PostalCode": null,
+            "State": {
+              "Code": "MO",
+              "Name": "Mozambique"
+            },
+            "Country": {
+              "Code": "MOZ",
+              "Name": "Mozambique"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-16T09:12:42.939Z",
+      "BriefDescription": "TechnoServe is seeking an experienced private sector development professional to lead enterprise growth and investment-readiness activities under the Green Value for Growth (GV4G) programme.\nThe Large Scale Private Sector & Investment Development Manager will oversee a team delivering business advisory and technical assistance services to small, medium, and large agribusinesses. The role will focus on helping businesses strengthen operations, improve investment readiness, access finance, and expand inclusive business models that create economic opportunities for smallholder farmers and rural entrepreneurs.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "895a1988-503a-4b58-89d0-166dd523bd0b",
+      "Featured": false,
+      "Title": "Program Director, Mozambique GV4G Program",
+      "RequisitionNumber": "PROGR005458",
+      "FullTime": true,
+      "JobCategoryName": "Programs",
+      "Locations": [
+        {
+          "Id": "f2cdb156-c1c2-5c14-87fe-358090bab70b",
+          "LocalizedName": "Mozambique Main Office/Ma",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Mozambique Main Office",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Maputo",
+            "PostalCode": null,
+            "State": {
+              "Code": "MO",
+              "Name": "Mozambique"
+            },
+            "Country": {
+              "Code": "MOZ",
+              "Name": "Mozambique"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-16T09:11:59.464Z",
+      "BriefDescription": "TechnoServe seeks a dynamic and highly collaborative Programme Director to support the effective implementation and coordination of the anticipated €54 million Green Value for Growth (GV4G) programme in Mozambique. The Programme Director will serve as the central coordination and programme management focal point for the consortium, ensuring effective alignment, communication, governance, accountability, and operational coordination across consortium partners, value chain teams, programme support units, and geographic implementation areas.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "54768ffe-89da-4241-a0a7-73836bbaf277",
+      "Featured": false,
+      "Title": "Admin & Logistics Intern (Various Locations)",
+      "RequisitionNumber": "HUMAN005461",
+      "FullTime": true,
+      "JobCategoryName": "Intern",
+      "Locations": [
+        {
+          "Id": "5ecf86c9-004a-4e04-953b-0c3f1db188d7",
+          "LocalizedName": "Abuja, NGA",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": null,
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "NGA",
+              "Name": "Nigeria"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 8.905543473197,
+            "Longitude": 7.187087954545
+          }
+        },
+        {
+          "Id": "b014fa0c-f344-486a-9d38-92b21305b9d5",
+          "LocalizedName": "Lagos, NGA",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Lagos",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "NGA",
+              "Name": "Nigeria"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 6.4931107,
+            "Longitude": 3.3841634
+          }
+        },
+        {
+          "Id": "9442e362-4c08-4d6a-94d4-8ec3b5906a95",
+          "LocalizedName": "Kano, NGA",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Kano",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "NGA",
+              "Name": "Nigeria"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 12.00012,
+            "Longitude": 8.51672
+          }
+        }
+      ],
+      "PostedDate": "2026-07-16T08:41:50.813Z",
+      "BriefDescription": "The Admin & Logistics Intern will support the Operations team in Nigeria with administrative and operational tasks to help ensure the efficient functioning of Operations processes and adherence to established office protocols.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "33cf6015-4bd7-47c9-89dc-99e927297202",
+      "Featured": false,
+      "Title": "Gerente de Operaciones de Proyectos (Colombia)",
+      "RequisitionNumber": "GEREN005462",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "b09585f3-1ccd-55d8-a5f8-41eb439c8c40",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Colombia/Bogotá",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Bogotá",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "COL",
+              "Name": "Colombia"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 38.887674017338064,
+            "Longitude": -121.00999937223095
+          }
+        },
+        {
+          "Id": "5a176f77-bcae-5716-a396-b2319123f383",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Colombia/Barranquilla",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Barranquilla",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "COL",
+              "Name": "Colombia"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 38.887674017338064,
+            "Longitude": -121.00999937223095
+          }
+        }
+      ],
+      "PostedDate": "2026-07-15T22:00:34.277Z",
+      "BriefDescription": "TechnoServe es una organización sin ánimo de lucro con más de 55 años de experiencia, presente en más de 35 países, que impulsa el desarrollo económico mediante el fortalecimiento del sector privado y el emprendimiento. En Colombia lidera proyectos como Potencia tu Agroempresa 2.0 (PTA 2.0), VerdeXcelerate y Crece Academy, orientados al crecimiento de pequeñas y medianas agroempresas y startups AgrifoodTech. Estas iniciativas fortalecen capacidades empresariales, financieras y de innovación, facilitan el acceso a mercados y financiamiento, promueven la transformación de los sistemas alimentarios y apoyan el desarrollo de emprendimientos, con un enfoque en la inclusión de empresas lideradas por mujeres y el fortalecimiento del ecosistema emprendedor en América Latina.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 0,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "3d8498a4-7cdd-489b-a24e-b1ae4a21aa2f",
+      "Featured": false,
+      "Title": "Human Resources Intern",
+      "RequisitionNumber": "HUMAN005452",
+      "FullTime": true,
+      "JobCategoryName": "Intern",
+      "Locations": [
+        {
+          "Id": "5ecf86c9-004a-4e04-953b-0c3f1db188d7",
+          "LocalizedName": "Abuja, NGA",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": null,
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "NGA",
+              "Name": "Nigeria"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 8.905543473197,
+            "Longitude": 7.187087954545
+          }
+        }
+      ],
+      "PostedDate": "2026-07-14T14:33:21.95Z",
+      "BriefDescription": "The HR Intern will support the HR team in Nigeria with administrative and operational tasks to help ensure the efficient functioning of HR processes and adherence to established office protocols.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "02b842cb-d5ba-4fc6-b388-041eb40aeeb7",
+      "Featured": false,
+      "Title": "Project Driver (Various Locations)",
+      "RequisitionNumber": "PROJE005456",
+      "FullTime": true,
+      "JobCategoryName": "Programs",
+      "Locations": [
+        {
+          "Id": "480986e8-fccc-5f3b-8b13-db08733ed2ee",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Nigeria",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Abuja, Enugu, Kano, Lagos",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "NGA",
+              "Name": "Nigeria"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": false,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-14T14:32:47.913Z",
+      "BriefDescription": "The Project Driver will work under the supervision of the Operations Specialist and ensure smooth, seamless, and safe movement of the project team and visitors during field monitoring activities. S/he will ensure that the car is in excellent condition and performs optimally at all times.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "ec0d3b25-2cae-4403-b228-4e03d2396714",
+      "Featured": true,
+      "Title": "Coordinador/a de M&E",
+      "RequisitionNumber": "COORD005453",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "11064cea-35a6-4ed1-a732-8404381d8e7a",
+          "LocalizedName": "Mexico City",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Mexico City",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        }
+      ],
+      "PostedDate": "2026-07-13T13:46:49.904Z",
+      "BriefDescription": "Apoyar en la ejecución operativa de la estrategia de monitoreo y evaluación del proyecto, asegurando que la información del impacto social se capture correctamente en campo y se organice de forma útil para la toma de decisiones.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 2,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "8eaa40cc-3d81-435f-81ad-ad649765208e",
+      "Featured": false,
+      "Title": "Spécialiste RH, Chargé(e) des opérations RH et expérience employé",
+      "RequisitionNumber": "SPÉCI005454",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Benin/Cotonou",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Cotonou, Littoral",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.34297768720956,
+            "Longitude": -94.20873973909094
+          }
+        }
+      ],
+      "PostedDate": "2026-07-10T16:16:03.203Z",
+      "BriefDescription": "Sous la supervision du Responsable des Ressources Humaines, le/la Spécialiste RH chargé(e) des Opérations RH et de l'Expérience Employé soutient la mise en œuvre des initiatives visant à renforcer l'engagement, le développement des talents, la performance et l'expérience collaborateur. Il/Elle accompagne les managers dans l’application des politiques RH et contribue activement à l'amélioration continue des pratiques RH afin de soutenir les performances de l'organisation.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "a85e1eb1-7d44-42d5-ae3c-292468f909d9",
+      "Featured": false,
+      "Title": "Senior Program Manager - TIIP",
+      "RequisitionNumber": "SENIO005451",
+      "FullTime": true,
+      "JobCategoryName": "Programs",
+      "Locations": [
+        {
+          "Id": "d332c572-757f-5e43-9bbe-d0004e88b417",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Uganda/Kampala",
+          "Address": {
+            "Line1": "KAMPALA HEAD OFFICE",
+            "Line2": "Ntinda II Road",
+            "City": "KAMPALA",
+            "PostalCode": "1707,KAMPALA",
+            "State": null,
+            "Country": {
+              "Code": "UGA",
+              "Name": "Uganda"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-10T09:06:36.776Z",
+      "BriefDescription": "This role involves managing the end-to-end execution of field data collection activities for 10,051 farmers, ensuring rigorous quality assurance, and fostering strong stakeholder relationships with Nile Breweries Limited (NBL), AB InBev, and implementation partners. The Project Manager will oversee the phased transition of data collection responsibilities to NBL, managing operational workflows, training, and troubleshooting to ensure sustainable, high-quality data management and impact monitoring. The Project Manager will serve as a key liaison between NBL and the technical team, proactively sourcing stakeholder input to configure the data platform and dashboards, and acting as a bridge to ensure smooth development, testing, and rollout of features and products.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "d73960fb-9182-473a-aea3-308b1bcb1474",
+      "Featured": true,
+      "Title": "Entrenador de Campo Santa Rosa / Jalapa",
+      "RequisitionNumber": "ENTRE005448",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "bfe13387-6266-5742-8ec7-96113179efab",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Guatemala",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Guatemala City",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "GTM",
+              "Name": "Guatemala"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-06T16:31:45.084Z",
+      "BriefDescription": "El entrenador de Campo es responsable de Facilitar el proceso de creación y reforzamiento de conocimientos y habilidades en las personas productoras beneficiarias del proyecto, que permitan incrementar la productividad y rentabilidad de sus fincas cafetaleras con un enfoque empresarial y climáticamente inteligente. Cualidades: Es una persona joven del territorio/comunidad, motivada, dispuesta, dinámica, abierta al cambio, con capacidad de enseñanza, con compromiso de trabajar, convencida de que todo se puede y que la educación es base para las transformaciones sociales, económicas, productivas y ambientales.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "ccbaaaf5-f687-4650-8741-d7217dd57e9f",
+      "Featured": false,
+      "Title": "Recepcionador/a y gestor/a de información",
+      "RequisitionNumber": "RECEP005446",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "92592e3f-9ba0-47ff-9a56-2000435e4611",
+          "LocalizedName": "Arequipa, PER",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Arequipa",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "PER",
+              "Name": "Peru"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": -16.39889,
+            "Longitude": -71.535
+          }
+        }
+      ],
+      "PostedDate": "2026-07-06T13:02:31.006Z",
+      "BriefDescription": "El/La Recepcionador/a y Gestor/a de Información brindará soporte operativo y técnico al proyecto Empleos Verdes Arequipa. Su rol principal es organizar, actualizar, revisar y consolidar la información generada en campo, reportes y herramientas digitales para optimizar el seguimiento operativo y asegurar la calidad de los datos.\n\nEs una posición junior que requiere dominio de Excel/Google Sheets, atención al detalle, orden y precisión. Se valora el conocimiento o disposición para aprender herramientas como AppSheet, Looker Studio, Power BI o BigQuery.\n\nAsimismo, validará en campo el sistema del proyecto (registros, formularios y bases de datos) en las actividades con recicladores, microempresas y otros actores del ecosistema.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "c2592667-2da1-4b46-ae65-3ec9dd449af7",
+      "Featured": false,
+      "Title": "Coordinador Senior en Operaciones de Reciclaje y SSOMA",
+      "RequisitionNumber": "COORD005447",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "92592e3f-9ba0-47ff-9a56-2000435e4611",
+          "LocalizedName": "Arequipa, PER",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Arequipa",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "PER",
+              "Name": "Peru"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": -16.39889,
+            "Longitude": -71.535
+          }
+        }
+      ],
+      "PostedDate": "2026-07-06T12:57:49.938Z",
+      "BriefDescription": "El/la Coordinador/a Senior en Operaciones de Reciclaje y SSOMA brindará acompañamiento técnico a asociaciones, empresas de reciclaje y emprendimientos circulares. Su objetivo es mejorar sus procesos productivos, condiciones de operación y estándares de salud y seguridad en el trabajo (SST) para garantizar entornos eficientes, seguros y sostenibles.\n\nAsimismo, impulsará la mejora continua, el monitoreo operativo y el fortalecimiento logístico del proyecto. Desde su especialidad, aportará al ordenamiento de espacios, buenas prácticas en campo y la consolidación de registros operativos y evidencias de avance.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "d9cf9f75-9505-4aa0-a54f-694d760f3d5a",
+      "Featured": false,
+      "Title": "Responsable de la planification budgétaire pays",
+      "RequisitionNumber": "RESPO005445",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Benin/Cotonou",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Cotonou, Littoral",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.34297768720956,
+            "Longitude": -94.20873973909094
+          }
+        }
+      ],
+      "PostedDate": "2026-07-03T17:55:40.296Z",
+      "BriefDescription": "Sous la responsabilité directe du Contrôleur Financier le/la Responsable de la Planification Budgétaire est responsable de la préparation, du suivi et de la projection des budgets des projets et de la plateforme pays. Il/elle fournit des analyses budgétaires en temps opportun et accompagne les Chefs de Projet afin d'assurer une exécution budgétaire conforme aux exigences des bailleurs de fonds.Le titulaire est responsable de l'ensemble du cycle de planification budgétaire, sans toutefois disposer d'un pouvoir d'approbation des budgets ou des états financiers.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": null,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "2af98e6f-09a3-4651-b68f-1ada54b999c0",
+      "Featured": false,
+      "Title": "Spécialiste Contrats et Partenariats - intérim",
+      "RequisitionNumber": "SPÉCI005444",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Benin/Cotonou",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Cotonou, Littoral",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.34297768720956,
+            "Longitude": -94.20873973909094
+          }
+        }
+      ],
+      "PostedDate": "2026-07-03T17:13:11.462Z",
+      "BriefDescription": "TechnoServe recherche un(e) Spécialiste Contrats et Partenariats pour assurer quotidiennement la préparation et le suivi des contrats liés aux partenaires de BeniBiz- principalement des entreprises du secteur privé qui reçoivent un cofinancement du programme BeniBiz afin de contribuer à subventionner leurs propres investissements dans de nouvelles initiatives de solutions écosystémiques. . Le/la Spécialiste Contrats et Partenariats intérimaire aura pour fonction de s'assurer que les besoins du projet sont satisfaits tout en veillant au respect minutieux des règles et procédures de l’organisation. Il/Elle sera responsable de la préparation des contrats selon les procédures internes et en conformité avec les dispositions légales au Bénin. Le/la Spécialiste Contrats et Partenariats intérim se",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": null,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "1456601e-29c5-415c-b035-f99066d08cc8",
+      "Featured": false,
+      "Title": "Spécialiste Suivi Evaluation- BeniBiz",
+      "RequisitionNumber": "SPÉCI005442",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Benin/Cotonou",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Cotonou, Littoral",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.34297768720956,
+            "Longitude": -94.20873973909094
+          }
+        }
+      ],
+      "PostedDate": "2026-07-01T17:41:06.156Z",
+      "BriefDescription": "TechnoServe met en œuvre au Bénin le projet BeniBiz, ‘’ un accélérateur de croissance d’entreprise’’ avec l’appui financier des Coopérations Suisse et Néerlandaise et de l’Union Européenne. Pendant sa première phase (2017-2022), le projet a recruté et accompagné environ 6,000 entrepreneur(e)s au Bénin qui ont enregistré une croissance moyenne de +130 % de chiffre d'affaires et + de 10.000 emplois créés. BeniBiz a offert aux entrepreneur(e)s les compétences et l’accompagnement dont ils ont besoin pour développer des entreprises prospères.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": null,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "25740717-f7c9-4a52-85b6-5b792187ea26",
+      "Featured": false,
+      "Title": "Chargé(e) Inclusion Femmes et Jeunes",
+      "RequisitionNumber": "CHARG005443",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "f6474032-5df0-473f-a5f2-c78b965ffad3",
+          "LocalizedName": "Parakou, Benin",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Parakou",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 39.759999,
+            "Longitude": -98.499997
+          }
+        }
+      ],
+      "PostedDate": "2026-07-01T17:36:05.443Z",
+      "BriefDescription": "Le/la Chargé(e) Inclusion Femmes et Jeunes  contribue à la mise en œuvre des activités d’intégration du genre et de promotion de l’autonomisation économique des femmes et des jeunes. Sa mission principale est de contribuer à la mise en œuvre efficace de la stratégie genre du projet, en fournissant un appui technique, logistique et opérationnel à la Responsable Genre, tout en favorisant une participation accrue des femmes aux activités du programme. À ce titre, il ou elle participe à la mise en œuvre opérationnelle des actions prévues dans la stratégie genre, notamment en matière de mobilisation des bénéficiaires, d’animation communautaire, de communication et de suivi des activités. Le poste de Chargé(e) Inclusion Femmes et Jeunes  est un poste d’appui et de soutien au rôle stratégique de",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": null,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "8f876457-b926-4b19-bc67-9bd229389e74",
+      "Featured": false,
+      "Title": "Entrenador/Entrenadora de Calidad e Inocuidad",
+      "RequisitionNumber": "ENTRE005436",
+      "FullTime": true,
+      "JobCategoryName": "Operations",
+      "Locations": [
+        {
+          "Id": "11064cea-35a6-4ed1-a732-8404381d8e7a",
+          "LocalizedName": "Mexico City",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Mexico City",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "339d0263-1dc9-4482-a2ba-db1296ca478f",
+          "LocalizedName": "Morelos",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Morelos",
+            "PostalCode": null,
+            "State": {
+              "Code": "MX",
+              "Name": "Mexico"
+            },
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "3e797237-8583-4a4d-8f03-8d65dbb028a3",
+          "LocalizedName": "Puebla",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Puebla",
+            "PostalCode": null,
+            "State": {
+              "Code": "MX",
+              "Name": "Mexico"
+            },
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "f3888162-f701-4ea4-8219-37ef172d8754",
+          "LocalizedName": "Michoacán",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Michoacán",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "ae5c0254-9ea4-493b-98e5-702ccda2aa6d",
+          "LocalizedName": "Veracruz",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Veracruz",
+            "PostalCode": null,
+            "State": {
+              "Code": "MX",
+              "Name": "Mexico"
+            },
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "bdacc4c9-e8bb-47fd-8183-ada8930d8ebf",
+          "LocalizedName": "Durango",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Durango",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        },
+        {
+          "Id": "6ae84937-0c51-47f2-a007-0f47b37579a2",
+          "LocalizedName": "Nuevo León",
+          "LocalizedLocationId": null,
+          "LocalizedDescription": null,
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Nuevo León",
+            "PostalCode": null,
+            "State": {
+              "Code": "MX",
+              "Name": "Mexico"
+            },
+            "Country": {
+              "Code": "MEX",
+              "Name": "Mexico"
+            }
+          },
+          "DisplayName": true,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": false,
+          "SourceOfTruth": 0,
+          "Coordinates": {
+            "Latitude": 29.94124006106256,
+            "Longitude": -85.40837960985195
+          }
+        }
+      ],
+      "PostedDate": "2026-06-30T17:49:21.956Z",
+      "BriefDescription": "El/la entrenador/a de calidad brinda seguimiento a agro empresas dedicadas a la producción y comercialización de frutas sobre cosecha, manejo poscosecha y transporte del campo al empaque de frutas.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    },
+    {
+      "Id": "5fedc337-052d-42ba-9f65-1cb187095c1f",
+      "Featured": false,
+      "Title": "Spécialiste Suivi Evaluation",
+      "RequisitionNumber": "SPÉCI005431",
+      "FullTime": true,
+      "JobCategoryName": "Human Resources",
+      "Locations": [
+        {
+          "Id": "97363f9d-aa9f-5bb8-9553-f8d468bb3ddd",
+          "LocalizedName": null,
+          "LocalizedLocationId": null,
+          "LocalizedDescription": "Benin/Cotonou",
+          "Address": {
+            "Line1": null,
+            "Line2": null,
+            "City": "Cotonou, Littoral",
+            "PostalCode": null,
+            "State": null,
+            "Country": {
+              "Code": "BEN",
+              "Name": "Benin"
+            }
+          },
+          "DisplayName": false,
+          "DisplayLocationId": false,
+          "DisplayAddress": true,
+          "DisplayStreetAddress": false,
+          "DisplayDescription": true,
+          "SourceOfTruth": 1,
+          "Coordinates": {
+            "Latitude": 47.34297768720956,
+            "Longitude": -94.20873973909094
+          }
+        }
+      ],
+      "PostedDate": "2026-06-22T08:24:56.085Z",
+      "BriefDescription": "La/le Spécialiste Suivi Evaluation  travaillera en étroite collaboration avec le Responsable Suivi Evaluation et l’appuiera pour la mise en œuvre de toutes les activités au quotidien.",
+      "MatchScore": 1.0,
+      "MatchedLocations": [],
+      "Distance": null,
+      "JobLocationType": 1,
+      "OpportunityType": 0
+    }
+  ],
+  "totalCount": 90,
+  "initialTotalOpportunitiesCount": 90,
+  "locations": []
+}

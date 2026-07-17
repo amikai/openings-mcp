@@ -1,0 +1,395 @@
+openapi: 3.1.0
+
+info:
+  title: UKG Pro (UltiPro) Public Career Portal
+  version: "1"
+  description: |
+    UltiPro (now branded UKG Pro Recruiting) has no public, self-service
+    jobs API. developer.ukg.com documents an OAuth-gated Recruiting API
+    under the tenant's own UKG Pro subscription — it requires Partner/
+    customer credentials scoped to one tenant's HCM data and cannot address
+    arbitrary public career sites. This spec is hand-derived from live
+    traffic on public career portals (`recruiting.ultipro.com` and
+    `recruiting2.ultipro.com` are the two hosts observed; both serve the
+    same platform) captured on 2026-07-18, cross-checked against five
+    tenants (TechnoServe, Idaho Central Credit Union, Macmillan, SoftWriters,
+    The Salvation Army).
+
+    ## Architecture
+
+    Every tenant is addressed by a company code and a job-board GUID, both
+    embedded in the URL path: `/{companyCode}/JobBoard/{boardId}/...`. The
+    host is NOT derived from the company code — `recruiting.ultipro.com`
+    and `recruiting2.ultipro.com` both host live tenants with no visible
+    pattern distinguishing which host a given company uses, so callers must
+    carry the host alongside companyCode and boardId (the roster stores all
+    three).
+
+    Search and filter-catalog endpoints are clean anonymous JSON POSTs, no
+    session or auth headers required. Job detail is the one exception:
+    there is no JSON detail endpoint. `OpportunityDetail` is a
+    server-rendered HTML page that embeds the full posting as a JSON object
+    literal inside a `new US.Opportunity.CandidateOpportunityDetail({...})`
+    call in a `<script>` block — the same "JSON smuggled inside HTML"
+    pattern as iCIMS's JSON-LD (`internal/provider/icims`), just without
+    the schema.org wrapper. This spec documents its shape for reference,
+    but response bodies stay `text/html` and this provider hand-parses
+    them (via balanced-brace extraction + `encoding/json`) rather than
+    generating a client with `ogen`, the same choice made for
+    `internal/provider/icims` and `internal/provider/successfactors`.
+
+    ## Key Behaviors
+
+    - **Pagination**: `Top`/`Skip` nest under `opportunitySearch` on
+      `LoadSearchResults` (result count / offset), but sit at the request's
+      top level on the `JobBoardViewMore/*` catalog endpoints — verified
+      live; nesting `Top`/`Skip` under `opportunitySearch` on a ViewMore
+      call is silently ignored and always returns the first 20 rows.
+    - **Sorting**: an empty `OrderBy` defaults to `PostedDate` descending
+      (matches the UI's "By Newest" default). The `manager`/free-text
+      search in the browser UI switches to `{PropertyName: "MatchScore",
+      Ascending: false}`, but this client always sorts by `PostedDate` for
+      predictable pagination.
+    - **Filters array**: `LoadSearchResults` takes a flat `Filters` list of
+      `{t: "TermsSearchFilterDto", fieldName, extra, values}`. Known
+      `fieldName` codes (from `GetFilters`): `4` = physical location id,
+      `5` = job category id, `6` = schedule, `37` = job location type
+      (Hybrid/On-site/Remote). Only `4`, `5`, and `37` were confirmed to
+      actually narrow results in live testing — every value tried for `6`
+      (`"FullTime"`, `true`, `1`, `"Full-time"`) either no-op'd back to the
+      unfiltered count or zeroed it, so this client does not expose a
+      schedule filter.
+    - **Location (4) and category (5) filter values are catalog ids, not
+      display labels** — resolve them via `JobBoardViewMore/
+      ViewMorePhysicalLocations` / `ViewMoreJobCategories` first (mirrors
+      SmartRecruiters' `department` id resolution,
+      `internal/provider/smartrecruiters`).
+    - **Job location type (37) values are the static enum** `0` = Hybrid,
+      `1` = On-site, `2` = Remote (from the client-side translation
+      bundle, not a live catalog call).
+    - **Unknown company code is HTTP 404** on every JobBoardView /
+      JobBoardViewMore endpoint (unlike SmartRecruiters' empty-200).
+    - **Unknown opportunityId is HTTP 200**, not 404/410: the response is
+      the bare client-side app shell with no `CandidateOpportunityDetail`
+      payload. Callers must treat a 200 lacking the marker as not-found,
+      the same shape iCIMS solves with its 410 status (here there is no
+      status signal at all).
+    - **postingId is not required** on `OpportunityDetail` — `opportunityId`
+      alone resolves the posting; `postingId` (seen in some captured URLs)
+      only disambiguates which job board reused an opportunity.
+
+paths:
+  /{companyCode}/JobBoard/{boardId}/JobBoardView/LoadSearchResults:
+    post:
+      operationId: loadSearchResults
+      summary: Search a tenant's public job board.
+      parameters:
+        - name: companyCode
+          in: path
+          required: true
+          schema: { type: string }
+        - name: boardId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opportunitySearch, matchCriteria]
+              properties:
+                opportunitySearch:
+                  type: object
+                  required: [Top, Skip, QueryString, OrderBy, Filters]
+                  properties:
+                    Top: { type: integer, description: Page size. }
+                    Skip: { type: integer, description: Zero-based offset. }
+                    QueryString: { type: string, description: Free-text keyword; empty string for none. }
+                    OrderBy:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Value: { type: string }
+                          PropertyName: { type: string }
+                          Ascending: { type: boolean }
+                    Filters:
+                      type: array
+                      items: { $ref: "#/components/schemas/SearchFilter" }
+                matchCriteria:
+                  description: |
+                    Candidate-matching criteria the public portal always
+                    sends but never populates for an anonymous caller; every
+                    field is an empty array or false.
+                  type: object
+                  properties:
+                    PreferredJobs: { type: array, items: {} }
+                    Educations: { type: array, items: {} }
+                    LicenseAndCertifications: { type: array, items: {} }
+                    Skills: { type: array, items: {} }
+                    hasNoLicenses: { type: boolean }
+                    SkippedSkills: { type: array, items: {} }
+      responses:
+        "200":
+          description: Search results page.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SearchResponse" }
+        "404":
+          description: Unknown companyCode or boardId.
+
+  /{companyCode}/JobBoard/{boardId}/JobBoardView/GetFilters:
+    post:
+      operationId: getFilters
+      summary: List the board's filter dimensions (not their values).
+      parameters:
+        - name: companyCode
+          in: path
+          required: true
+          schema: { type: string }
+        - name: boardId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        "200":
+          description: Filter dimension metadata.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Filters:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        T: { type: string }
+                        FieldName: { type: integer, description: "4=location, 5=category, 6=schedule (unsupported), 37=locationType" }
+                        FilterType: { type: integer }
+                        ViewMoreUrl: { type: string, nullable: true }
+                        TranslationKey: { type: string, nullable: true }
+
+  /{companyCode}/JobBoard/{boardId}/JobBoardViewMore/ViewMorePhysicalLocations:
+    post:
+      operationId: viewMorePhysicalLocations
+      summary: Full catalog of the board's physical-location filter values.
+      parameters:
+        - name: companyCode
+          in: path
+          required: true
+          schema: { type: string }
+        - name: boardId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Top/Skip are top-level here, unlike LoadSearchResults.
+              properties:
+                Top: { type: integer }
+                Skip: { type: integer }
+      responses:
+        "200":
+          description: Location catalog page.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  locations:
+                    type: array
+                    items: { $ref: "#/components/schemas/Location" }
+                  totalCount: { type: integer }
+
+  /{companyCode}/JobBoard/{boardId}/JobBoardViewMore/ViewMoreJobCategories:
+    post:
+      operationId: viewMoreJobCategories
+      summary: Full catalog of the board's job-category filter values.
+      parameters:
+        - name: companyCode
+          in: path
+          required: true
+          schema: { type: string }
+        - name: boardId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                Top: { type: integer }
+                Skip: { type: integer }
+      responses:
+        "200":
+          description: Category catalog page.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  categories:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        Id: { type: string }
+                        DisplayName: { type: string, nullable: true }
+                        Active: { type: boolean, nullable: true }
+                  totalCount: { type: integer }
+
+  /{companyCode}/JobBoard/{boardId}/OpportunityDetail:
+    get:
+      operationId: getOpportunityDetail
+      summary: |
+        Job detail page (HTML). The full posting is embedded as a JSON
+        object literal, not returned as its own JSON resource — see the
+        architecture note above. Documented here for reference; this
+        provider parses it by hand rather than through a generated client.
+      parameters:
+        - name: companyCode
+          in: path
+          required: true
+          schema: { type: string }
+        - name: boardId
+          in: path
+          required: true
+          schema: { type: string, format: uuid }
+        - name: opportunityId
+          in: query
+          required: true
+          schema: { type: string, format: uuid }
+      responses:
+        "200":
+          description: |
+            HTML detail page. Embeds `CandidateOpportunityDetail` JSON when
+            opportunityId resolves to a live posting; otherwise the bare
+            app shell with no embedded posting (not-found case — see the
+            architecture note above).
+          content:
+            text/html:
+              schema: { type: string }
+
+components:
+  schemas:
+    SearchFilter:
+      type: object
+      required: [t, fieldName, values]
+      properties:
+        t: { type: string, enum: ["TermsSearchFilterDto"] }
+        fieldName: { type: integer }
+        extra: { nullable: true }
+        values:
+          type: array
+          items: {}
+
+    SearchResponse:
+      type: object
+      properties:
+        opportunities:
+          type: array
+          items: { $ref: "#/components/schemas/Opportunity" }
+        totalCount: { type: integer }
+        initialTotalOpportunitiesCount:
+          type: integer
+          description: Total for the board with no filters applied, regardless of this response's own filters.
+        locations:
+          type: array
+          items: {}
+
+    Opportunity:
+      type: object
+      required: [Id, Title]
+      properties:
+        Id: { type: string, format: uuid }
+        Featured: { type: boolean, nullable: true }
+        Title: { type: string }
+        RequisitionNumber: { type: string, nullable: true }
+        FullTime: { type: boolean, nullable: true }
+        JobCategoryName: { type: string, nullable: true }
+        Locations:
+          type: array
+          items: { $ref: "#/components/schemas/Location" }
+        PostedDate: { type: string, format: date-time, nullable: true }
+        BriefDescription: { type: string, nullable: true }
+        MatchScore: { type: number, nullable: true }
+        Distance: { type: number, nullable: true }
+        JobLocationType:
+          type: integer
+          nullable: true
+          description: "0=Hybrid, 1=On-site, 2=Remote; absent for some postings."
+        OpportunityType: { type: integer, nullable: true }
+
+    Location:
+      type: object
+      properties:
+        Id: { type: string, nullable: true }
+        LocalizedName: { type: string, nullable: true }
+        LocalizedDescription: { type: string, nullable: true }
+        Address:
+          type: object
+          nullable: true
+          properties:
+            Line1: { type: string, nullable: true }
+            Line2: { type: string, nullable: true }
+            City: { type: string, nullable: true }
+            PostalCode: { type: string, nullable: true }
+            State:
+              type: object
+              nullable: true
+              properties:
+                Code: { type: string, nullable: true }
+                Name: { type: string, nullable: true }
+            Country:
+              type: object
+              nullable: true
+              properties:
+                Code: { type: string, nullable: true }
+                Name: { type: string, nullable: true }
+        DisplayName: { type: boolean, nullable: true }
+        DisplayAddress: { type: boolean, nullable: true }
+        DisplayDescription: { type: boolean, nullable: true }
+        Coordinates:
+          type: object
+          nullable: true
+          properties:
+            Latitude: { type: number, nullable: true }
+            Longitude: { type: number, nullable: true }
+
+    OpportunityDetail:
+      description: |
+        The object literal embedded in OpportunityDetail's HTML after
+        `new US.Opportunity.CandidateOpportunityDetail(`. A superset of
+        Opportunity — carries the same identifying/location/date fields
+        plus the full Description and candidate-portal-only fields
+        (HasApplied, ApplicationId, Assessments, ...) this client ignores.
+      type: object
+      required: [Id, Title]
+      properties:
+        Id: { type: string, format: uuid }
+        Title: { type: string }
+        RequisitionNumber: { type: string, nullable: true }
+        JobCategoryName: { type: string, nullable: true }
+        Locations:
+          type: array
+          items: { $ref: "#/components/schemas/Location" }
+        PostedDate: { type: string, format: date-time, nullable: true }
+        UpdatedDate: { type: string, format: date-time, nullable: true }
+        Description: { type: string, nullable: true, description: HTML. }
+        JobLocationType: { type: integer, nullable: true }
+        OpportunityIsClosed: { type: boolean, nullable: true }

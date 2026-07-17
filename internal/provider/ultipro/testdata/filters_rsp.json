@@ -1,0 +1,60 @@
+{
+  "Filters": [
+    {
+      "T": "TermsSearchFilterDto",
+      "FieldName": 4,
+      "Extra": null,
+      "FilterType": 1,
+      "ViewMoreUrl": "/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24/JobBoardViewMore/ViewMorePhysicalLocations",
+      "ViewMoreLabelTranslationKey": "Opportunity.Opportunities.Filters.PhysicalLocationViewMoreLabel",
+      "OptionsLimit": 10,
+      "DisplayName": null,
+      "SelectedDisplayName": null,
+      "TranslationKey": "Opportunity.Opportunities.Filters.PhysicalLocationLabelIgnite",
+      "SelectedTranslationKey": null,
+      "HeaderTextTranslationKey": null
+    },
+    {
+      "T": "TermsSearchFilterDto",
+      "FieldName": 5,
+      "Extra": null,
+      "FilterType": 1,
+      "ViewMoreUrl": "/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24/JobBoardViewMore/ViewMoreJobCategories",
+      "ViewMoreLabelTranslationKey": "Opportunity.Opportunities.Filters.JobCategoryViewMoreLabel",
+      "OptionsLimit": 10,
+      "DisplayName": null,
+      "SelectedDisplayName": null,
+      "TranslationKey": "Opportunity.Opportunities.Filters.JobCategoryLabelIgnite",
+      "SelectedTranslationKey": null,
+      "HeaderTextTranslationKey": null
+    },
+    {
+      "T": "TermsSearchFilterDto",
+      "FieldName": 6,
+      "Extra": null,
+      "FilterType": 2,
+      "ViewMoreUrl": null,
+      "ViewMoreLabelTranslationKey": null,
+      "OptionsLimit": null,
+      "DisplayName": null,
+      "SelectedDisplayName": null,
+      "TranslationKey": "Opportunity.Opportunities.Filters.ScheduleLabel",
+      "SelectedTranslationKey": null,
+      "HeaderTextTranslationKey": null
+    },
+    {
+      "T": "TermsSearchFilterDto",
+      "FieldName": 37,
+      "Extra": null,
+      "FilterType": 2,
+      "ViewMoreUrl": null,
+      "ViewMoreLabelTranslationKey": null,
+      "OptionsLimit": null,
+      "DisplayName": null,
+      "SelectedDisplayName": null,
+      "TranslationKey": "Opportunity.Opportunities.Filters.JobLocationTypeLabelIgnite",
+      "SelectedTranslationKey": null,
+      "HeaderTextTranslationKey": null
+    }
+  ]
+}

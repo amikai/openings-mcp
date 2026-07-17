@@ -1,0 +1,125 @@
+{
+  "categories": [
+    {
+      "Id": "33c6fe4c-5e8e-4187-9aa6-1bcc24513b85",
+      "Tag": null,
+      "DisplayName": "Executive",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "d3bcb1ec-cbcc-4681-8111-cbd37e2f7ae6",
+      "Tag": null,
+      "DisplayName": "Finance",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "1d984fae-1686-4cf0-8366-995924e2616f",
+      "Tag": null,
+      "DisplayName": "Human Resources",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "6d8eb6ed-a27f-4f8f-8566-fb1412cf6a84",
+      "Tag": null,
+      "DisplayName": "Information Technology",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "11e7feb8-7078-4fcc-91ef-367e254b0e6d",
+      "Tag": null,
+      "DisplayName": "Intern",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "2e13188c-e77d-4d75-ad18-1ea26086d67f",
+      "Tag": null,
+      "DisplayName": "Marketing & Communications",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "3dd82102-f9b5-4c2a-a371-091fc0586dab",
+      "Tag": null,
+      "DisplayName": "Operations",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "9743955c-def5-4b4a-baff-aeda95677e2b",
+      "Tag": null,
+      "DisplayName": "Program Development",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "cdc48540-7ec0-4330-b6a5-3f82cf09fb10",
+      "Tag": null,
+      "DisplayName": "Programs",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    },
+    {
+      "Id": "53109ee1-62ea-4d30-b041-c8056129bb57",
+      "Tag": null,
+      "DisplayName": "Volunteer",
+      "EmailAddress": null,
+      "Active": false,
+      "TranslationKey": null,
+      "TranslationParams": null,
+      "Count": null,
+      "NestedOptions": null,
+      "InformationLabel": null
+    }
+  ],
+  "totalCount": 10
+}
