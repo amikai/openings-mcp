@@ -1,0 +1,174 @@
+openapi: 3.1.0
+
+info:
+  title: Jobindex Public Job Search
+  version: "1.0.0"
+  description: |
+    Client-side API specification for Jobindex.dk's unauthenticated job search
+    surface. Reverse-engineered from the public search UI at
+    https://www.jobindex.dk/jobsoegning and from the jobindex-search skill in
+    https://github.com/MadsLorentzen/ai-job-search
+    (helpers:
+    https://github.com/MadsLorentzen/ai-job-search/blob/dd6d7efea6c9d0c0d439871c5fc323e57b6a1f58/.agents/skills/jobindex-search/cli/src/helpers.ts).
+
+    ## Architecture
+
+    Jobindex no longer serves search results as a standalone JSON API:
+    `GET /jobsoegning.json` returns **HTTP 204 No Content**. The search HTML
+    page embeds the full payload in a `var Stash = {...}` script blob under
+    `jobsearch/result_app → storeData → searchResponse → { hitcount, results[] }`.
+
+    **Output fidelity:** the client returns Stash `searchResponse` field names
+    and result object keys as Jobindex embeds them (`tid`, `headline`,
+    `company`, `area`, `apply_deadline_asap`, …), with light slimming.
+
+    **Why not a fixed result schema / fullcard HTML parse:**
+    Stash is reverse-engineered and incomplete (keys appear/disappear per
+    posting). A closed struct would drop unknown fields or churn constantly.
+    Each result's `html` is UI fullcard markup — large, brittle, and redundant
+    with structured keys — so it is dropped rather than re-parsed. Results are
+    therefore open objects (`map`) pass-through, not a thin card DTO.
+
+    Intentional shaping: drop each result's `html` card markup; rename
+    `firstdate`→`posted_at` and `lastdate`→`expired_at` as ISO 8601 dates
+    (`YYYY-MM-DD`, same as ats.JobSummary.PostedAt); expose a single `url`
+    for open/apply (prefer `apply_url` / `app_apply_url`, else `share_url`);
+    drop tracking `/c?t=…` links and company profile URLs.
+
+    Two independent endpoints, both **server-side rendered HTML**:
+
+    - `GET /jobsoegning` — search page with Stash-embedded results (~20 per page)
+    - `GET /vis-job/{tid}` — Jobindex-hosted posting page (always 200 on-site).
+      Note: `GET /jobannonce/{tid}` often **302-redirects off-site** to the
+      employer's ATS; prefer `/vis-job/` for detail scraping. Detail has no
+      JSON API; scraped fields use the same names as search where concepts match.
+
+    Neither endpoint requires authentication.
+
+    ## Key Behaviors
+
+    - **Browser User-Agent recommended.** Default Go UA may still work, but
+      matching a browser Accept/Accept-Language reduces edge friction.
+    - **Pagination:** `page` is 1-indexed; page size is fixed at ~20 results.
+      `searchResponse.hitcount` is the total matching postings;
+      `total_pages` is passed through when present in Stash and omitted when
+      absent (the client does not synthesize it).
+    - **Job ID (`tid`):** string with a letter prefix, e.g. `h1683131` (hosted)
+      or `r13911770` (robot/aggregated). Pass it as-is to `/vis-job/{tid}`.
+    - **Recency:** `jobage` is max age in days (`1`, `7`, `14`, `30`, or omit /
+      `9999` for all). Observed live.
+    - **Sort:** `sort=score` (relevance, default) or `sort=date` (newest first).
+    - **Area path segment (optional):** e.g. `/jobsoegning/storkoebenhavn?q=…`.
+      Free-text city names can also go in `q` (e.g. `q=python+aarhus`).
+    - **Detail body** is an appetizer snippet on Jobindex; many postings deep-link
+      to an external apply URL (`seejobdesktop` / employer career site).
+
+servers:
+  - url: https://www.jobindex.dk
+    description: Jobindex (unauthenticated)
+
+paths:
+  /jobsoegning:
+    get:
+      operationId: searchJobs
+      summary: Search job listings (HTML page with embedded Stash JSON)
+      parameters:
+        - name: q
+          in: query
+          required: false
+          description: Free-text keyword (title, skill, company, city).
+          schema:
+            type: string
+          example: backend
+        - name: page
+          in: query
+          required: false
+          description: 1-based page number. Default 1. ~20 results per page.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: jobage
+          in: query
+          required: false
+          description: Max posting age in days (1, 7, 14, 30). Omit or 9999 for all.
+          schema:
+            type: integer
+          example: 14
+        - name: sort
+          in: query
+          required: false
+          description: score (relevance) or date (newest first).
+          schema:
+            type: string
+            enum: [score, date]
+            default: score
+      responses:
+        "200":
+          description: HTML document containing `var Stash = {...}` with searchResponse.
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /jobsoegning/{area}:
+    get:
+      operationId: searchJobsInArea
+      summary: Search jobs restricted to a Jobindex area slug
+      parameters:
+        - name: area
+          in: path
+          required: true
+          description: Area slug, e.g. storkoebenhavn, midtjylland, fyn.
+          schema:
+            type: string
+        - name: q
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: jobage
+          in: query
+          required: false
+          schema:
+            type: integer
+        - name: sort
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [score, date]
+      responses:
+        "200":
+          description: Same Stash HTML shape as /jobsoegning.
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /vis-job/{tid}:
+    get:
+      operationId: getJobDetail
+      summary: Fetch Jobindex-hosted job posting HTML
+      parameters:
+        - name: tid
+          in: path
+          required: true
+          description: Job ID from search (e.g. h1683131).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Full Jobindex job page (may deep-link off-site for apply).
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          description: Unknown or removed posting.
