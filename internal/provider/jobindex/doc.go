@@ -14,6 +14,5 @@
 // invented merged deadline fields. Detail is a typed struct because we own
 // that scrape surface; search is a map because we do not own Stash's shape.
 //
-// Credit: Stash-based search extraction was informed by the jobindex-search
-// skill in https://github.com/MadsLorentzen/ai-job-search (helpers.ts).
+// See also: https://github.com/MadsLorentzen/ai-job-search
 package jobindex
