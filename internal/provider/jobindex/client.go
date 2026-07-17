@@ -47,10 +47,29 @@ type JobsRequest struct {
 // request page. Field names mostly match Jobindex's embedded JSON (hitcount,
 // total_pages, results).
 //
-// Each Results element is an upstream result object with light renames:
-//   - firstdate → posted_at, lastdate → expired_at (ISO 8601 dates YYYY-MM-DD)
-//   - single "url" for open/apply (prefer direct apply, else Jobindex page)
-//   - company name-only; html and tracking URLs dropped
+// Why Results is []map[string]any (not a typed struct):
+//
+//   - Jobindex has no public JSON search API; /jobsoegning.json is 204. Results
+//     are reverse-engineered from the HTML-embedded Stash blob. Key sets are
+//     incomplete and unstable (optional nulls, occasional geojson/source/…),
+//     so a fixed DTO would either drop unknown fields or churn on every Stash
+//     tweak. A map is a pass-through bag: decode path is already map[string]any.
+//   - We deliberately avoid re-shaping into a thin "card" schema. Mapping to
+//     id/title/company loses Jobindex-native keys (tid, apply_deadline_asap)
+//     that MCP agents and debug CLI callers need for detail lookup and fidelity.
+//   - MCP documents typical keys in the tool jsonschema description instead of
+//     encoding a closed Go type into the schema.
+//
+// Why only light renames / drops per result (see slimJobResult):
+//
+//   - firstdate→posted_at, lastdate→expired_at: same ISO date names as
+//     ats.JobSummary.PostedAt so agents do not relearn Jobindex-only names.
+//   - single url: tracking /c?t=… and share/apply twins confuse "open this job";
+//     one apply/open destination is enough.
+//   - drop html card markup: it is UI fullcard HTML, redundant with structured
+//     fields and huge/brittle to re-parse; structured Stash keys already carry
+//     tid/headline/company/area/dates.
+//   - company name-only: homeurl is employer marketing, not the job apply link.
 type SearchResponse struct {
 	Hitcount   int              `json:"hitcount"`
 	TotalPages int              `json:"total_pages,omitempty"`

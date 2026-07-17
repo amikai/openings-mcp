@@ -20,7 +20,15 @@ info:
 
     **Output fidelity:** the client returns Stash `searchResponse` field names
     and result object keys as Jobindex embeds them (`tid`, `headline`,
-    `company`, `area`, `firstdate`, `lastdate`, `apply_deadline_asap`, …).
+    `company`, `area`, `apply_deadline_asap`, …), with light slimming.
+
+    **Why not a fixed result schema / fullcard HTML parse:**
+    Stash is reverse-engineered and incomplete (keys appear/disappear per
+    posting). A closed struct would drop unknown fields or churn constantly.
+    Each result's `html` is UI fullcard markup — large, brittle, and redundant
+    with structured keys — so it is dropped rather than re-parsed. Results are
+    therefore open objects (`map`) pass-through, not a thin card DTO.
+
     Intentional shaping: drop each result's `html` card markup; rename
     `firstdate`→`posted_at` and `lastdate`→`expired_at` as ISO 8601 dates
     (`YYYY-MM-DD`, same as ats.JobSummary.PostedAt); expose a single `url`

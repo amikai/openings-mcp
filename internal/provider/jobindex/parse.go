@@ -60,11 +60,21 @@ func parseSearchHTML(r io.Reader, pageNum int) (*SearchResponse, error) {
 	}, nil
 }
 
-// slimJobResult keeps upstream keys with light renames for LLM clarity:
+// slimJobResult keeps upstream keys with light renames.
+//
+// Why pass-through + slim instead of a typed JobResult or HTML-card parse:
+//   - Prefer Stash structured fields over parsing result[].html / DOM cards:
+//     card markup is for rendering, changes with CSS, and duplicates data
+//     already present as tid/headline/company/….
+//   - Keep unknown keys so a Stash field we do not model yet still reaches MCP
+//     without a client release that only adds a struct field.
+//   - Rename only dates that collide with our cross-provider vocabulary;
+//     collapse URL variants so callers do not pick a tracking link by mistake.
+//
+// What changes:
 //   - firstdate → posted_at, lastdate → expired_at (ISO 8601 dates YYYY-MM-DD)
 //   - single url for open/apply (prefer apply_url, app_apply_url, share_url)
-//
-// Drops: html, tracking url, share_url/apply_url twins, company profile links.
+//   - Drops: html, tracking url, share_url/apply_url twins, company profile links
 func slimJobResult(m map[string]any) map[string]any {
 	out := make(map[string]any, len(m))
 	for k, v := range m {
