@@ -8,6 +8,7 @@ OPENAPI_SPECS := \
 	internal/provider/greenhouse/openapi.yaml \
 	internal/provider/icims/openapi.yaml \
 	internal/provider/job104/openapi.yaml \
+	internal/provider/jobindex/openapi.yaml \
 	internal/provider/lever/openapi.yaml \
 	internal/provider/linkedin/openapi.yaml \
 	internal/provider/nvidia/openapi.yaml \
