@@ -11,7 +11,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/indeed"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
-	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
 	"github.com/amikai/openings-mcp/internal/provider/nvidia"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
@@ -38,7 +37,6 @@ func TestServerListsJobTools(t *testing.T) {
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
 	cIndeed := indeed.NewClient("https://apis.indeed.com/graphql", http.DefaultClient)
-	cJobindex := jobindex.NewClient("https://www.jobindex.dk", http.DefaultClient)
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 	server := newServer(providerClients{
@@ -49,7 +47,6 @@ func TestServerListsJobTools(t *testing.T) {
 		google:   cGoogle,
 		linkedin: cLinkedin,
 		indeed:   cIndeed,
-		jobindex: cJobindex,
 	}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
@@ -81,8 +78,6 @@ func TestServerListsJobTools(t *testing.T) {
 		"linkedin_get_job_detail",
 		"indeed_search_jobs",
 		"indeed_get_job_detail",
-		"jobindex_search_jobs",
-		"jobindex_get_job_detail",
 		"search_jobs_by_company",
 		"get_filters_by_company",
 		"get_job_detail_by_company",
