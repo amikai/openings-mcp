@@ -18,6 +18,9 @@ func TestExtractStashAndSearch(t *testing.T) {
 	assert.Equal(t, "h1683131", resp.Results[0]["tid"])
 	_, hasHTML := resp.Results[0]["html"]
 	assert.False(t, hasHTML)
+	assert.Equal(t, "https://www.jobindex.dk/vis-job/h1683131", resp.Results[0]["url"])
+	_, hasShare := resp.Results[0]["share_url"]
+	assert.False(t, hasShare)
 }
 
 func TestExtractStashMissing(t *testing.T) {

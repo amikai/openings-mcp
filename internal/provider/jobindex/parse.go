@@ -16,7 +16,8 @@ const stashMarker = "var Stash = "
 var reJobID = regexp.MustCompile(`(?i)^[a-z]\d+$`)
 
 // parseSearchHTML extracts Stash searchResponse and returns it with upstream
-// field names. Only the per-result "html" card markup is removed.
+// field names. Per result we drop card "html" and collapse job links to a
+// single "url" (apply destination); see slimJobResult.
 //
 // Stash extraction (marker scan + JSON decode + nested searchResponse walk)
 // follows the Jobindex skill helpers in:
@@ -46,15 +47,7 @@ func parseSearchHTML(r io.Reader, pageNum int) (*SearchResponse, error) {
 		if !ok {
 			continue
 		}
-		// Drop card HTML only; keep every other upstream key as-is.
-		out := make(map[string]any, len(m))
-		for k, v := range m {
-			if k == "html" {
-				continue
-			}
-			out[k] = v
-		}
-		results = append(results, out)
+		results = append(results, slimJobResult(m))
 	}
 	if pageNum < 1 {
 		pageNum = 1
@@ -65,6 +58,45 @@ func parseSearchHTML(r io.Reader, pageNum int) (*SearchResponse, error) {
 		Results:    results,
 		Page:       pageNum,
 	}, nil
+}
+
+// slimJobResult keeps upstream keys but exposes only one job URL for applying
+// or opening the posting. Preference: apply_url, app_apply_url, share_url.
+// Tracking redirects (url=/c?t=…), logo links, and company profile URLs are dropped.
+func slimJobResult(m map[string]any) map[string]any {
+	out := make(map[string]any, len(m))
+	for k, v := range m {
+		switch k {
+		case "html", "url", "share_url", "apply_url", "app_apply_url":
+			continue
+		case "company", "workplace_company":
+			if cm, ok := v.(map[string]any); ok {
+				if name, _ := cm["name"].(string); name != "" {
+					out[k] = map[string]any{"name": name}
+				}
+			}
+		default:
+			out[k] = v
+		}
+	}
+	if u := jobApplyURL(m); u != "" {
+		out["url"] = u
+	}
+	return out
+}
+
+// jobApplyURL picks the URL a client should open to apply for / view the job.
+func jobApplyURL(m map[string]any) string {
+	for _, key := range []string{"apply_url", "app_apply_url", "share_url"} {
+		if s, _ := m[key].(string); strings.TrimSpace(s) != "" {
+			return strings.TrimSpace(s)
+		}
+	}
+	// Last resort: construct vis-job from tid when Stash omitted share_url.
+	if tid, _ := m["tid"].(string); tid != "" {
+		return "https://www.jobindex.dk/vis-job/" + tid
+	}
+	return ""
 }
 
 // extractStash scans the search HTML stream for the `var Stash = ` marker and
@@ -143,9 +175,6 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 	if t := og["og:title"]; t != "" {
 		d.Headline = t
 	}
-	if u := og["og:url"]; u != "" {
-		d.ShareURL = u
-	}
 	if desc := og["og:description"]; desc != "" {
 		d.Description = desc
 	}
@@ -160,40 +189,37 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 		return nil, fmt.Errorf("jobindex: could not parse job headline (not a job page?)")
 	}
 
-	company := map[string]any{}
+	// Company name only — no profile/home URLs.
 	if el := doc.Find(".jix-toolbar-top__company").First(); el.Length() > 0 {
+		name := ""
 		if a := el.Find("a").First(); a.Length() > 0 {
-			if name := strings.TrimSpace(a.Text()); name != "" {
-				company["name"] = name
-			}
-			if href, ok := a.Attr("href"); ok && href != "" {
-				company["homeurl"] = href
-			}
-		} else if name := strings.TrimSpace(el.Text()); name != "" {
-			// Employers without a Jobindex profile render as plain text, no link.
-			company["name"] = name
+			name = strings.TrimSpace(a.Text())
+		} else {
+			name = strings.TrimSpace(el.Text())
 		}
-	}
-	if len(company) > 0 {
-		d.Company = company
+		if name != "" {
+			d.Company = map[string]any{"name": name}
+		}
 	}
 
 	d.Area = strings.TrimSpace(doc.Find("span.jix_robotjob--area").First().Text())
 	if t := doc.Find("time[datetime]").First(); t.Length() > 0 {
 		if dt, ok := t.Attr("datetime"); ok {
 			d.Firstdate = strings.TrimSpace(dt)
-			// Keep full attribute value; if ISO datetime, leave as-is (upstream
-			// search firstdate is often YYYY-MM-DD only).
 			if len(d.Firstdate) >= 10 && d.Firstdate[4] == '-' {
 				d.Firstdate = d.Firstdate[:10]
 			}
 		}
 	}
 
+	// Single apply/open URL: prefer "Se jobbet" deep link, else og:url / vis-job.
 	if a := doc.Find("a.seejobdesktop, a.seejobmobil").First(); a.Length() > 0 {
 		if href, ok := a.Attr("href"); ok {
-			d.ApplyURL = href
+			d.URL = strings.TrimSpace(href)
 		}
+	}
+	if d.URL == "" {
+		d.URL = strings.TrimSpace(og["og:url"])
 	}
 
 	var paras []string
@@ -224,12 +250,14 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 	})
 
 	if d.Tid == "" || !reJobID.MatchString(d.Tid) {
-		if extracted := tidFromURL(d.ShareURL); extracted != "" {
+		if extracted := tidFromURL(d.URL); extracted != "" {
+			d.Tid = extracted
+		} else if extracted := tidFromURL(og["og:url"]); extracted != "" {
 			d.Tid = extracted
 		}
 	}
-	if d.ShareURL == "" && d.Tid != "" {
-		d.ShareURL = "https://www.jobindex.dk/vis-job/" + d.Tid
+	if d.URL == "" && d.Tid != "" {
+		d.URL = "https://www.jobindex.dk/vis-job/" + d.Tid
 	}
 	return d, nil
 }

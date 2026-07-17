@@ -20,9 +20,10 @@ info:
 
     **Output fidelity:** the client returns Stash `searchResponse` field names
     and result object keys as Jobindex embeds them (`tid`, `headline`,
-    `company`, `area`, `firstdate`, `lastdate`, `apply_deadline_asap`,
-    `share_url`, `url`, …). It does **not** rename into a thin card schema.
-    The only intentional drop is each result's `html` field (full card markup).
+    `company`, `area`, `firstdate`, `lastdate`, `apply_deadline_asap`, …).
+    Intentional shaping: drop each result's `html` card markup; expose a
+    single `url` for open/apply (prefer `apply_url` / `app_apply_url`, else
+    `share_url`); drop tracking `/c?t=…` links and company profile URLs.
 
     Two independent endpoints, both **server-side rendered HTML**:
 

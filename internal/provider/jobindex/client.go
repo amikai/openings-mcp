@@ -44,12 +44,14 @@ type JobsRequest struct {
 }
 
 // SearchResponse is the Stash searchResponse object from /jobsoegning, plus the
-// request page. Field names match Jobindex's embedded JSON (hitcount,
-// total_pages, results), not an ai-job-search style card schema.
+// request page. Field names mostly match Jobindex's embedded JSON (hitcount,
+// total_pages, results).
 //
-// Each element of Results is one upstream result object. The only deliberate
-// drop is the per-result "html" field (full card markup); every other key is
-// preserved as returned by Jobindex.
+// Each Results element is an upstream result object with:
+//   - "html" card markup dropped
+//   - a single "url": where to open/apply for the job (prefer direct apply
+//     link, else Jobindex vis-job page); tracking /c?t=… and other URLs removed
+//   - company kept as name-only (no homeurl / profile links)
 type SearchResponse struct {
 	Hitcount   int              `json:"hitcount"`
 	TotalPages int              `json:"total_pages,omitempty"`
@@ -58,24 +60,19 @@ type SearchResponse struct {
 	Page int `json:"page"`
 }
 
-// JobDetail is scraped from the /vis-job/{tid} HTML page. Jobindex does not
-// expose a JSON detail API for that view; field names mirror the Stash search
-// result keys where the same concept exists (tid, headline, area, firstdate,
-// share_url, apply_url, company). No fields are synthesized by merging
-// deadlines (e.g. we never invent "ASAP").
+// JobDetail is scraped from the /vis-job/{tid} HTML page. Field names mirror
+// Stash search keys where concepts match. No deadline synthesis (e.g. ASAP).
+// URL is the single link for applying/opening the job (prefer "Se jobbet"
+// deep link, else the Jobindex vis-job page).
 type JobDetail struct {
 	Tid       string         `json:"tid"`
 	Headline  string         `json:"headline"`
-	Company   map[string]any `json:"company,omitempty"`
+	Company   map[string]any `json:"company,omitempty"` // name only
 	Area      string         `json:"area,omitempty"`
 	Firstdate string         `json:"firstdate,omitempty"`
-	// ShareURL is og:url / canonical on the vis-job page (same role as
-	// search's share_url).
-	ShareURL string `json:"share_url,omitempty"`
-	// ApplyURL is the "Se jobbet" deep link when present (search's apply_url).
-	ApplyURL string `json:"apply_url,omitempty"`
-	// Description is plain text from og:description and/or the PaidJob body
-	// appetizer — not a Stash search field name, but the page's description.
+	// URL is where to open/apply for this job.
+	URL string `json:"url,omitempty"`
+	// Description is plain text from og:description and/or the body appetizer.
 	Description string `json:"description,omitempty"`
 	// EmploymentType / Hours / ApplyDeadline are only set when the page's
 	// jix-info labels expose them; values are the page text, unnormalized.

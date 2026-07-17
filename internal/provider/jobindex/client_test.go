@@ -29,14 +29,15 @@ func TestJobsPreservesUpstreamKeys(t *testing.T) {
 	assert.Equal(t, "2026-07-15", first["firstdate"])
 	assert.Equal(t, true, first["apply_deadline_asap"])
 	assert.Equal(t, "2026-08-12", first["lastdate"])
-	// share_url / url stay as upstream, not rewritten to a synthetic path only.
-	assert.Equal(t, "https://www.jobindex.dk/vis-job/h1683131", first["share_url"])
-	assert.Contains(t, first["url"], "jobindex.dk/c?t=h1683131")
+	// Single apply/open URL only (no tracking /c?t=, no share_url twin).
+	assert.Equal(t, "https://www.jobindex.dk/vis-job/h1683131", first["url"])
+	_, hasShare := first["share_url"]
+	assert.False(t, hasShare)
 
 	company, ok := first["company"].(map[string]any)
 	require.True(t, ok)
 	assert.Equal(t, "Whiteaway Group", company["name"])
-	assert.Equal(t, "https://whiteawaygroup.career.emply.com/career-site", company["homeurl"])
+	assert.NotContains(t, company, "homeurl")
 
 	// Card HTML must not be present.
 	_, hasHTML := first["html"]
@@ -85,8 +86,9 @@ func TestJobDetail(t *testing.T) {
 	assert.Equal(t, "Aarhus N", got.Area)
 	assert.Equal(t, "2026-07-15", got.Firstdate)
 	assert.Contains(t, got.Description, "Whiteaway Group")
-	assert.Equal(t, "https://career.whiteawaygroup.com/ad/senior-backend-engineer/t0ta4w/en", got.ApplyURL)
-	assert.Equal(t, "https://www.jobindex.dk/vis-job/h1683131", got.ShareURL)
+	// Prefer "Se jobbet" deep link as the single apply/open URL.
+	assert.Equal(t, "https://career.whiteawaygroup.com/ad/senior-backend-engineer/t0ta4w/en", got.URL)
+	assert.NotContains(t, got.Company, "homeurl")
 	// Must not invent ASAP when the HTML page has no deadline label.
 	assert.Empty(t, got.ApplyDeadline)
 }
@@ -114,7 +116,8 @@ func TestJobDetailRobot(t *testing.T) {
 	assert.NotEmpty(t, got.Company["name"])
 	assert.Equal(t, "København", got.Area)
 	assert.NotEmpty(t, got.Description)
-	assert.NotEmpty(t, got.ApplyURL)
+	assert.NotEmpty(t, got.URL)
+	assert.NotContains(t, got.Company, "homeurl")
 }
 
 func TestJobDetailRobotNoCompanyLink(t *testing.T) {

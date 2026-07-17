@@ -148,7 +148,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		headline, _ := r["headline"].(string)
 		area, _ := r["area"].(string)
 		firstdate, _ := r["firstdate"].(string)
-		share, _ := r["share_url"].(string)
+		jobURL, _ := r["url"].(string)
 		companyName := ""
 		if c, ok := r["company"].(map[string]any); ok {
 			companyName, _ = c["name"].(string)
@@ -166,8 +166,8 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		if firstdate != "" {
 			fmt.Printf("   firstdate: %s\n", firstdate)
 		}
-		if share != "" {
-			fmt.Printf("   share_url: %s\n", share)
+		if jobURL != "" {
+			fmt.Printf("   url: %s\n", jobURL)
 		}
 		fmt.Println()
 	}
@@ -202,9 +202,6 @@ func runDetail(ctx context.Context, f detailFlags) error {
 		if name, _ := d.Company["name"].(string); name != "" {
 			fmt.Printf("company.name: %s\n", name)
 		}
-		if home, _ := d.Company["homeurl"].(string); home != "" {
-			fmt.Printf("company.homeurl: %s\n", home)
-		}
 	}
 	if d.Area != "" {
 		fmt.Printf("area: %s\n", d.Area)
@@ -215,11 +212,8 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	if d.ApplyDeadline != "" {
 		fmt.Printf("apply_deadline: %s\n", d.ApplyDeadline)
 	}
-	if d.ShareURL != "" {
-		fmt.Printf("share_url: %s\n", d.ShareURL)
-	}
-	if d.ApplyURL != "" {
-		fmt.Printf("apply_url: %s\n", d.ApplyURL)
+	if d.URL != "" {
+		fmt.Printf("url: %s\n", d.URL)
 	}
 	if d.Description != "" {
 		fmt.Printf("\n%s\n", d.Description)

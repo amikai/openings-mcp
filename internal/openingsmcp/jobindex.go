@@ -54,12 +54,12 @@ type jobindexSearchInput struct {
 
 // jobindexSearchOutput mirrors Jobindex Stash searchResponse field names
 // (hitcount, total_pages, results). page is the requested page (not a Stash
-// field). results are upstream result objects with only card "html" stripped.
+// field). Each result keeps upstream keys plus a single url for apply/open.
 type jobindexSearchOutput struct {
 	Hitcount   int              `json:"hitcount"`
 	TotalPages int              `json:"total_pages,omitempty"`
 	Page       int              `json:"page"`
-	Results    []map[string]any `json:"results" jsonschema:"Upstream search result objects (tid, headline, company, area, firstdate, lastdate, apply_deadline_asap, share_url, url, …). Per-result html card markup is omitted."`
+	Results    []map[string]any `json:"results" jsonschema:"Jobindex result objects (tid, headline, company{name}, area, firstdate, …). url is the only link: open/apply for the job (direct apply when known, else Jobindex page). Tracking and company profile URLs are omitted."`
 }
 
 func jobindexMCPToHTTPRequest(in *jobindexSearchInput) (*jobindex.JobsRequest, error) {
@@ -88,16 +88,15 @@ type jobindexDetailInput struct {
 	Tid string `json:"tid" jsonschema:"Jobindex tid from search results (e.g. h1683131), or a /vis-job/ or /jobannonce/ URL."`
 }
 
-// jobindexDetailOutput uses the same key names as search Stash where concepts
-// match. Values are scraped from /vis-job HTML (no JSON detail API).
+// jobindexDetailOutput uses the same key names as search where concepts match.
+// Values are scraped from /vis-job HTML (no JSON detail API).
 type jobindexDetailOutput struct {
 	Tid            string         `json:"tid"`
 	Headline       string         `json:"headline"`
 	Company        map[string]any `json:"company,omitempty"`
 	Area           string         `json:"area,omitempty"`
 	Firstdate      string         `json:"firstdate,omitempty"`
-	ShareURL       string         `json:"share_url,omitempty"`
-	ApplyURL       string         `json:"apply_url,omitempty"`
+	URL            string         `json:"url,omitempty" jsonschema:"Open/apply URL for this job (employer apply link when present, else Jobindex page)."`
 	Description    string         `json:"description,omitempty" jsonschema:"Appetizer text from the vis-job page (og:description / body). Full JD may be on the employer site."`
 	EmploymentType string         `json:"employment_type,omitempty"`
 	Hours          string         `json:"hours,omitempty"`
@@ -111,8 +110,7 @@ func jobindexHTTPToMCPDetail(d *jobindex.JobDetail) *jobindexDetailOutput {
 		Company:        d.Company,
 		Area:           d.Area,
 		Firstdate:      d.Firstdate,
-		ShareURL:       d.ShareURL,
-		ApplyURL:       d.ApplyURL,
+		URL:            d.URL,
 		Description:    d.Description,
 		EmploymentType: d.EmploymentType,
 		Hours:          d.Hours,
