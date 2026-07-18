@@ -201,6 +201,10 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create SmartRecruiters ATS adapter: %w", err)
 	}
+	workableAdapter, err := ats.NewWorkableAdapter("https://apply.workable.com", hc)
+	if err != nil {
+		return nil, fmt.Errorf("create Workable ATS adapter: %w", err)
+	}
 
 	return ats.NewRegistry(
 		ats.NewWorkdayAdapter(hc),
@@ -212,6 +216,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		ats.NewEightfoldAdapter(hcEightfold),
 		ats.NewSuccessFactorsAdapter(hc),
 		smartrecruitersAdapter,
+		workableAdapter,
 		ats.NewICIMSAdapter(hc),
 		ats.NewOracleAdapter(hc),
 		ats.NewJoinAdapter("https://join.com", hc),
