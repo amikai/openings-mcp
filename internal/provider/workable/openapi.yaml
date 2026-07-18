@@ -1,0 +1,345 @@
+openapi: 3.1.0
+
+info:
+  title: Workable public job board API
+  version: "3"
+  contact:
+    name: Workable
+    url: https://www.workable.com/developers
+  description: >
+    The unauthenticated API behind Workable-hosted careers pages
+    (apply.workable.com/{account}/), hand-derived from traffic the careers
+    SPA fires (captured live against the blueground account, 2026-07-18).
+    Workable's official documented API ({subdomain}.workable.com/spi/v3)
+    requires an account Bearer token and is a different surface; it does not
+    cover these endpoints.
+
+    ## Behavior grounded in live traffic
+
+    * Search is `POST /api/v3/accounts/{account}/jobs` with a JSON body.
+      Every body field is optional; unknown body fields are rejected with a
+      per-field error object (e.g. `{"bogus": "Not allowed"}`), and there is
+      no `limit` field — the page size is a fixed 10.
+
+    * Pagination is cursor-only: a page carrying more results returns
+      `nextPage`, an opaque token passed back in the next request's `token`
+      body field. The final page omits `nextPage` entirely. Tokens encode a
+      (published-timestamp, id) sort cursor; there is no random page access.
+
+    * `query` is a real server-side keyword filter over title and posting
+      body text (blueground: total narrows 29 → 9 for "engineer").
+
+    * `location` filters take objects, not strings: any subset of
+      country/countryCode/region/city, matched against the values listed by
+      the filters endpoint. `department` takes the numeric ids from the
+      filters endpoint, not names. `remote` takes the strings "true"/"false".
+
+    * The posting body on the detail endpoint is split across three HTML
+      fields: `description`, `requirements`, and `benefits`.
+
+    * Error shapes are text/plain, not JSON: an unknown account 404s with
+      "Not Found" (search and filters), an unknown shortcode 404s with
+      "Job not found" (detail).
+
+    * Cloudflare fronts the API and 403-blocks some client User-Agents
+      (Python-urllib observed); Go's default User-Agent and curl pass.
+
+servers:
+  - url: https://apply.workable.com
+
+paths:
+  /api/v3/accounts/{account}/jobs:
+    post:
+      summary: Search an account's published jobs
+      operationId: searchJobs
+      parameters:
+        - $ref: "#/components/parameters/Account"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: One cursor page of matching jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v3/accounts/{account}/jobs/filters:
+    get:
+      summary: List the account's search facets
+      description: >
+        The value domains for SearchRequest's filter fields, including the
+        numeric department ids that the `department` filter requires.
+      operationId: listJobFilters
+      parameters:
+        - $ref: "#/components/parameters/Account"
+      responses:
+        "200":
+          description: Facet values for every filterable dimension.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FiltersResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/v2/accounts/{account}/jobs/{shortcode}:
+    get:
+      summary: Get one published job with its full posting body
+      operationId: getJob
+      parameters:
+        - $ref: "#/components/parameters/Account"
+        - in: path
+          name: shortcode
+          description: A job's shortcode from a search result.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The full posting.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    Account:
+      in: path
+      name: account
+      description: >
+        The account subdomain — the slug from its careers URL, e.g.
+        "blueground" in apply.workable.com/blueground.
+      required: true
+      schema:
+        type: string
+
+  responses:
+    NotFound:
+      description: >
+        Unknown account ("Not Found") or unknown shortcode ("Job not
+        found"). The body is text/plain, not JSON.
+      content:
+        text/plain:
+          schema:
+            type: string
+
+  schemas:
+    SearchRequest:
+      type: object
+      properties:
+        query:
+          description: Server-side keyword filter over title and body text.
+          type: string
+        location:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationFilter"
+        department:
+          description: Numeric department ids from the filters endpoint.
+          type: array
+          items:
+            type: integer
+        remote:
+          description: The strings "true" and/or "false", not booleans.
+          type: array
+          items:
+            type: string
+        workplace:
+          type: array
+          items:
+            type: string
+            enum: [on_site, hybrid, remote]
+        worktype:
+          type: array
+          items:
+            type: string
+        token:
+          description: The previous page's nextPage cursor.
+          type: string
+
+    LocationFilter:
+      description: >
+        Any subset of fields; values come from the filters endpoint's
+        locations. Multiple entries OR together.
+      type: object
+      properties:
+        country:
+          type: string
+        countryCode:
+          type: string
+        region:
+          type: string
+        city:
+          type: string
+
+    SearchResponse:
+      type: object
+      required: [total, results]
+      properties:
+        total:
+          description: Matches across all pages, not this page's count.
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobSummary"
+        nextPage:
+          description: Cursor for the next page; absent on the last page.
+          type: string
+
+    JobSummary:
+      type: object
+      required: [id, shortcode, title]
+      properties:
+        id:
+          type: integer
+        shortcode:
+          type: string
+        title:
+          type: string
+        remote:
+          type: boolean
+        location:
+          $ref: "#/components/schemas/Location"
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Location"
+        state:
+          type: string
+        isInternal:
+          type: boolean
+        code:
+          description: The account's own requisition code; null when unset.
+          type: [string, "null"]
+        published:
+          description: ISO 8601 timestamp.
+          type: string
+        type:
+          description: Worktype (full, part, contract, temporary).
+          type: string
+        language:
+          type: string
+        department:
+          description: Department names; ids only exist on the filters endpoint.
+          type: array
+          items:
+            type: string
+        accountUid:
+          type: string
+        approvalStatus:
+          type: string
+        workplace:
+          type: string
+          enum: [on_site, hybrid, remote]
+
+    JobDetail:
+      description: >
+        A JobSummary plus the posting body, which Workable splits across
+        three HTML fields.
+      allOf:
+        - $ref: "#/components/schemas/JobSummary"
+        - type: object
+          properties:
+            description:
+              type: string
+            requirements:
+              type: string
+            benefits:
+              type: string
+
+    Location:
+      type: object
+      properties:
+        country:
+          type: [string, "null"]
+        countryCode:
+          type: [string, "null"]
+        region:
+          description: >
+            Null when the posting has no region (observed live on persado
+            and zego; city/country still set).
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        display:
+          description: Only on the primary `location` object, not `locations[]`.
+          type: [string, "null"]
+        hidden:
+          description: Only on `locations[]` entries, not `location`.
+          type: boolean
+
+    FiltersResponse:
+      type: object
+      required: [locations, departments, worktypes, remotes, workplaces]
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacetLocation"
+        departments:
+          type: array
+          items:
+            $ref: "#/components/schemas/FacetDepartment"
+        worktypes:
+          type: array
+          items:
+            type: string
+        remotes:
+          type: array
+          items:
+            type: boolean
+        workplaces:
+          type: array
+          items:
+            type: string
+
+    FacetLocation:
+      description: >
+        Hierarchical: an account lists country-, region-, and city-level
+        entries. `display` (joining the fields the entry carries) is
+        account-inconsistent — present for blueground, absent on every zego
+        entry — so build a label from the structured fields when it's missing.
+        Structured fields can also be null/empty on some accounts.
+      type: object
+      properties:
+        country:
+          type: [string, "null"]
+        countryCode:
+          type: [string, "null"]
+        region:
+          type: [string, "null"]
+        city:
+          type: [string, "null"]
+        display:
+          type: [string, "null"]
+
+    FacetDepartment:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        filter:
+          description: >
+            The id set (self plus descendants) the search body's
+            `department` filter should send to cover this department.
+          type: array
+          items:
+            type: integer
+        count:
+          type: integer
+        parent_id:
+          type: [integer, "null"]

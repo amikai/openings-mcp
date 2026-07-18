@@ -45,6 +45,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"eightfold":       "<tenant>.eightfold.ai/careers (roster tenants only)",
 	"successfactors":  "jobs.<company>.com/search (roster tenants only)",
 	"smartrecruiters": "jobs.smartrecruiters.com/<company>",
+	"workable":        "apply.workable.com/<company>",
 	"icims":           "careers-<slug>.icims.com/jobs/search",
 	"oracle":          "<fusion>.oraclecloud.com/hcmUI/CandidateExperience/<lang>/sites/<site>/jobs",
 	"join":            "join.com/companies/<company> (roster companies only)",
