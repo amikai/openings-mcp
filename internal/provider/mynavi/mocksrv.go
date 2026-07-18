@@ -20,7 +20,7 @@ var mockJobDetailRsp []byte
 // exercising the expired/unknown-posting path.
 const MockNotFoundJobID = "999999-1-1-1"
 
-// NewMockServer returns an httptest.Server that mimics マイナビ転職 with canned
+// NewMockServer returns an httptest.Server that mimics Mynavi Tenshoku with canned
 // fixture responses, so tests never hit the real site. A /list/ URL whose kw
 // token matches the zero-hit fixture's keyword serves the empty results
 // page; any other /list/ URL serves the 50-card Python search. The caller

@@ -1,7 +1,7 @@
-# Salary floor + keyword + pagination combined. min0700 = 初年度年収700万円
-# 以上; valid values are the fixed steps of the search form's srIncomeMin
-# pulldown (0150-0550 in 50s, 0600, 0650, 0700, then 0800-1500 in 100s) —
-# an off-step value like min0720 is HTTP 404.
+# Salary floor + keyword + pagination combined. min0700 = first-year income
+# (初年度年収) of at least 7,000,000 JPY; valid values are the fixed steps of
+# the search form's srIncomeMin pulldown (0150-0550 in 50s, 0600, 0650,
+# 0700, then 0800-1500 in 100s) — an off-step value like min0720 is HTTP 404.
 GET https://tenshoku.mynavi.jp/list/min0700/kwPython/pg2/
 accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 accept-language: ja,en;q=0.9

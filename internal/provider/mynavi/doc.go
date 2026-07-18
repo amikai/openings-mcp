@@ -1,4 +1,4 @@
-// Package mynavi reads public マイナビ転職 (Mynavi Tenshoku) job listings and
+// Package mynavi reads public Mynavi Tenshoku (マイナビ転職) job listings and
 // posting details from https://tenshoku.mynavi.jp. Mynavi publishes no
 // official API; this surface was reverse-engineered from live traffic
 // (2026-07-18). Both endpoints are server-side rendered HTML with no
@@ -14,9 +14,10 @@
 //     Japanese and Latin terms both work. A literal "/" cannot be
 //     expressed: its escaped form is HTTP 404 upstream, so the client
 //     rejects it with a clearer error first.
-//   - min{NNNN} — 初年度年収 floor in 万円, zero-padded to 4 digits. Only
-//     the fixed steps in [MinSalaries] are valid; anything else is HTTP
-//     404 upstream (also rejected client-side).
+//   - min{NNNN} — first-year-income (初年度年収) floor in units of 10,000
+//     JPY, zero-padded to 4 digits. Only the fixed steps in [MinSalaries]
+//     are valid; anything else is HTTP 404 upstream (also rejected
+//     client-side).
 //   - pg{N} — 1-based page. Page 1 is expressed by omitting the segment.
 //     A page past the last one is HTTP 200 with zero cassettes, not an
 //     error.

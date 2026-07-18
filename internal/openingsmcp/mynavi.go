@@ -60,13 +60,13 @@ type mynaviJobSummary struct {
 	CatchCopy        string   `json:"catch_copy,omitempty" jsonschema:"The employer's own tagline shown beside its name."`
 	EmploymentStatus string   `json:"employment_status,omitempty"` // e.g. 正社員 (permanent), 契約社員 (contract)
 	Conditions       []string `json:"conditions,omitempty" jsonschema:"Condition tags, e.g. 転勤なし (no relocation), リモートワーク可 (remote OK), 未経験OK (no experience needed)."`
-	Description      string   `json:"description,omitempty" jsonschema:"仕事内容 summary, truncated by the site; fetch the detail for the full text."`
-	Target           string   `json:"target,omitempty" jsonschema:"対象となる方 (who they're looking for) summary, truncated by the site."`
+	Description      string   `json:"description,omitempty" jsonschema:"Job-description (仕事内容) summary, truncated by the site; fetch the detail for the full text."`
+	Target           string   `json:"target,omitempty" jsonschema:"Target-applicant (対象となる方) summary, truncated by the site."`
 	Location         string   `json:"location,omitempty"`
 	Salary           string   `json:"salary,omitempty"`
-	FirstYearIncome  string   `json:"first_year_income,omitempty" jsonschema:"初年度年収 range, e.g. 420万円～1000万円."`
+	FirstYearIncome  string   `json:"first_year_income,omitempty" jsonschema:"First-year income (初年度年収) range, e.g. 420万円～1000万円."`
 	UpdatedDate      string   `json:"updated_date,omitempty" jsonschema:"YYYY/MM/DD."`
-	EndDate          string   `json:"end_date,omitempty" jsonschema:"掲載終了予定日 (listing end date), YYYY/MM/DD; the posting 404s after this."`
+	EndDate          string   `json:"end_date,omitempty" jsonschema:"Listing end date (掲載終了予定日), YYYY/MM/DD; the posting 404s after this."`
 	URL              string   `json:"url,omitempty" jsonschema:"Public job posting URL."`
 }
 
@@ -105,8 +105,8 @@ type mynaviDetailInput struct {
 }
 
 type mynaviLocation struct {
-	Region   string `json:"region"`             // 都道府県, e.g. 東京都
-	Locality string `json:"locality,omitempty"` // 市区町村, e.g. 渋谷区
+	Region   string `json:"region"`             // prefecture, e.g. 東京都
+	Locality string `json:"locality,omitempty"` // city or ward, e.g. 渋谷区
 }
 
 type mynaviDetailOutput struct {
@@ -126,7 +126,7 @@ type mynaviDetailOutput struct {
 	SalaryMax              string           `json:"salary_max,omitempty"`
 	SalaryUnit             string           `json:"salary_unit,omitempty" jsonschema:"e.g. YEAR."`
 	Description            string           `json:"description,omitempty" jsonschema:"Full job description as plain text (Japanese)."`
-	ExperienceRequirements string           `json:"experience_requirements,omitempty" jsonschema:"応募条件 as plain text."`
+	ExperienceRequirements string           `json:"experience_requirements,omitempty" jsonschema:"Application requirements (応募条件) as plain text."`
 	WorkHours              string           `json:"work_hours,omitempty"`
 	JobBenefits            string           `json:"job_benefits,omitempty"`
 }
@@ -161,7 +161,7 @@ func mynaviHTTPToMCPDetail(detail *mynavi.JobDetailResponse) *mynaviDetailOutput
 	return out
 }
 
-// RegisterMynavi registers the マイナビ転職 search and job-detail tools.
+// RegisterMynavi registers the Mynavi Tenshoku search and job-detail tools.
 func RegisterMynavi(s *mcp.Server, c *mynavi.Client) {
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "mynavi_search_jobs",

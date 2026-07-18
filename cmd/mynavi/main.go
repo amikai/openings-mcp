@@ -19,7 +19,7 @@ const defaultBaseURL = "https://tenshoku.mynavi.jp"
 func main() {
 	rootFlags := ff.NewFlagSet("mynavi")
 	var (
-		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "マイナビ転職 base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Mynavi Tenshoku base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)
@@ -32,7 +32,7 @@ func main() {
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
 		keywords  = searchFS.StringLong("keywords", "", "free text; space-separated terms AND together (Japanese OK)")
-		minSalary = searchFS.IntLong("min-salary", 0, "初年度年収 floor in 万円, e.g. 700; only the site's fixed steps are valid; 0 = no filter")
+		minSalary = searchFS.IntLong("min-salary", 0, "first-year income (初年度年収) floor in units of 10,000 JPY, e.g. 700; only the site's fixed steps are valid; 0 = no filter")
 		page      = searchFS.IntLong("page", 1, "1-based page of 50 results")
 	)
 	searchCmd := &ff.Command{

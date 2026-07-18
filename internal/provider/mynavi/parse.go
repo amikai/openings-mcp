@@ -42,7 +42,7 @@ func parseJobsHTML(doc *goquery.Document) (*JobsResponse, error) {
 func parseJobCard(card *goquery.Selection) (Job, bool) {
 	var job Job
 
-	// h3.cassetteRecruit__name reads "会社名 | キャッチコピー".
+	// h3.cassetteRecruit__name reads "{company name} | {catch copy}".
 	name := strings.TrimSpace(card.Find("h3.cassetteRecruit__name").First().Text())
 	job.Company, job.CatchCopy, _ = strings.Cut(name, " | ")
 	job.Company = strings.TrimSpace(job.Company)

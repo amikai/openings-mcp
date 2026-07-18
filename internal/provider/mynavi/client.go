@@ -13,9 +13,10 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// MinSalaries are the annual-salary floors (初年度年収, in 万円) the search
-// accepts — the fixed steps of the site's own salary pulldown. Any other
-// value is HTTP 404 upstream, so [Client.Jobs] rejects it client-side.
+// MinSalaries are the first-year annual-salary floors (初年度年収) the
+// search accepts, in units of 10,000 JPY (万円) — the fixed steps of the
+// site's own salary pulldown. Any other value is HTTP 404 upstream, so
+// [Client.Jobs] rejects it client-side.
 var MinSalaries = []int{
 	150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700,
 	800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
@@ -38,11 +39,11 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 	}
 }
 
-// JobsRequest describes one search-results page. Filters map to マイナビ転職's
-// URL path-token DSL (see the package documentation).
+// JobsRequest describes one search-results page. Filters map to Mynavi
+// Tenshoku's URL path-token DSL (see the package documentation).
 type JobsRequest struct {
 	Keywords  string // free text; space-separated terms AND together
-	MinSalary int    // annual floor in 万円, one of MinSalaries; 0 = no filter
+	MinSalary int    // annual floor in units of 10,000 JPY, one of MinSalaries; 0 = no filter
 	Page      int    // 1-based page of 50; 0 means page 1
 }
 
@@ -53,13 +54,13 @@ type Job struct {
 	CatchCopy        string   // employer's tagline shown next to the company name
 	EmploymentStatus string   // e.g. 正社員
 	Conditions       []string // condition tags, e.g. 転勤なし, リモートワーク可
-	Description      string   // 仕事内容 summary, server-truncated
-	Target           string   // 対象となる方 summary, server-truncated
-	Location         string   // 勤務地 summary, server-truncated
-	Salary           string   // 給与 summary, server-truncated
-	FirstYearIncome  string   // 初年度年収, absent on some postings
-	UpdatedDate      string   // 情報更新日, YYYY/MM/DD
-	EndDate          string   // 掲載終了予定日, YYYY/MM/DD
+	Description      string   // job-description (仕事内容) summary, server-truncated
+	Target           string   // target-applicant (対象となる方) summary, server-truncated
+	Location         string   // work-location (勤務地) summary, server-truncated
+	Salary           string   // salary (給与) summary, server-truncated
+	FirstYearIncome  string   // first-year income (初年度年収) range, absent on some postings
+	UpdatedDate      string   // last-updated date (情報更新日), YYYY/MM/DD
+	EndDate          string   // listing end date (掲載終了予定日), YYYY/MM/DD
 }
 
 type JobsResponse struct {
@@ -70,8 +71,8 @@ type JobsResponse struct {
 // Location is one posting work location (a prefecture, optionally narrowed
 // to a city or ward).
 type Location struct {
-	Region   string // 都道府県, e.g. 東京都
-	Locality string // 市区町村, e.g. 渋谷区; often empty
+	Region   string // prefecture, e.g. 東京都
+	Locality string // city or ward, e.g. 渋谷区; often empty
 }
 
 // JobDetailResponse carries every field of the detail page's schema.org
@@ -152,8 +153,8 @@ func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error
 }
 
 // JobDetail expects a [Job.ID] returned by [Client.Jobs]. An unknown or
-// expired ID is an error (the site serves a clean 404 once a posting passes
-// its 掲載終了 date).
+// expired ID is an error (the site serves a clean 404 once a posting
+// passes its listing end date).
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	if !jobIDPattern.MatchString(jobID) {
 		return nil, fmt.Errorf("job id %q: want four numbers separated by hyphens, e.g. 348855-1-29-1", jobID)

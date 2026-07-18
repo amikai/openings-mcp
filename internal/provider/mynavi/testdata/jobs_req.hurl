@@ -1,7 +1,7 @@
 # Keyword search, page 1 of the national /list/ surface. 50 cards per full
 # page; the total lives in p.result__num. Path segments are the query DSL:
 # kw{keywords} (space-separated terms AND together), min{NNNN} (annual-salary
-# floor in 万円, fixed steps only), pg{N} (1-based page). Segment order is
+# floor in units of 10,000 JPY, fixed steps only), pg{N} (1-based page). Segment order is
 # free; unknown segments 404 — except unknown *prefix* paths like
 # /tokyo/list/, which soft-fall back to an unfiltered legacy Shift_JIS page,
 # so only build URLs from verified tokens.
