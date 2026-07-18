@@ -1,0 +1,259 @@
+openapi: 3.0.3
+info:
+  title: Rippling Job Board API
+  description: >
+    Public, unauthenticated read-only API for Rippling-hosted job boards
+    (ats.rippling.com/<board_slug>/jobs).
+    Source: https://developer.rippling.com/documentation/job-board-api
+  version: "1.0"
+servers:
+  - url: https://api.rippling.com/platform/api/ats/v1
+
+paths:
+  /board/{board_slug}/jobs:
+    get:
+      summary: List all job postings for a board
+      operationId: listJobs
+      description: >
+        Full-board dump; no pagination or query parameters. Quirk: the array
+        carries one entry per (job, workLocation) pair, so a multi-location
+        job repeats once per location under the same uuid — consumers must
+        dedupe by uuid and merge the per-entry workLocation values.
+      parameters:
+        - name: board_slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Board slug, e.g. "pythian" in ats.rippling.com/pythian/jobs
+      responses:
+        "200":
+          description: One entry per (job, workLocation) pair on the board
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/JobListEntry"
+        "404":
+          description: Unknown board_slug
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BoardNotFoundError"
+
+  /board/{board_slug}/jobs/{job_uuid}:
+    get:
+      summary: Retrieve a single job posting
+      operationId: getJob
+      parameters:
+        - name: board_slug
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: job_uuid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Job posting uuid as returned by the list endpoint
+      responses:
+        "200":
+          description: Full job posting
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetail"
+        "404":
+          description: >
+            Unknown or malformed job_uuid. Unlike the board endpoint's
+            structured error, this is a generic {"ok": false, "error": ...}
+            validation-error body either way.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobNotFoundError"
+
+components:
+  schemas:
+    LabeledValue:
+      type: object
+      description: A display label with its identifier; observed identical on every board.
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    JobListEntry:
+      type: object
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+          description: Posting title.
+        department:
+          $ref: "#/components/schemas/LabeledValue"
+        url:
+          type: string
+          format: uri
+          description: Human-clickable posting page on ats.rippling.com.
+        workLocation:
+          description: >
+            One location of the posting. A job offered in several locations
+            appears as several list entries sharing a uuid, one per location.
+          allOf:
+            - $ref: "#/components/schemas/LabeledValue"
+
+    Description:
+      type: object
+      description: JD body, split into a company blurb and the role text. Both HTML.
+      properties:
+        company:
+          type: string
+        role:
+          type: string
+
+    Department:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Leaf department, e.g. "Channel Sales Account Executives".
+        base_department:
+          type: string
+          description: Root of the department tree, e.g. "Sales".
+        department_tree:
+          type: array
+          description: Path from root to leaf, inclusive.
+          items:
+            type: string
+
+    EmploymentType:
+      type: object
+      description: >
+        Quirk — semantics are swapped relative to the field names: label
+        carries the machine enum (e.g. "SALARIED_FT") and id carries the
+        human-readable, tenant-editable label (e.g. "Salaried, full-time" or
+        "Employee (Full-Time)").
+      properties:
+        label:
+          type: string
+          nullable: true
+          description: Null for tenant-defined types with no machine enum.
+        id:
+          type: string
+
+    PayRangeDetail:
+      type: object
+      description: One pay-transparency band. Empty array when the posting has none.
+      properties:
+        location:
+          type: string
+          description: Per-band label — a location, work mode, or role level.
+        currency:
+          type: string
+        frequency:
+          type: string
+          description: Pay period, e.g. "YEAR" or "HOUR".
+        rangeStart:
+          type: number
+        rangeEnd:
+          type: number
+        isRemote:
+          type: boolean
+
+    JobDetail:
+      type: object
+      properties:
+        uuid:
+          type: string
+        name:
+          type: string
+          description: Posting title.
+        description:
+          $ref: "#/components/schemas/Description"
+        workLocations:
+          type: array
+          description: Every location of the posting, as display strings.
+          items:
+            type: string
+        department:
+          $ref: "#/components/schemas/Department"
+        employmentType:
+          $ref: "#/components/schemas/EmploymentType"
+        createdOn:
+          type: string
+          format: date-time
+          description: Posting creation time; the only timestamp the API exposes.
+        activeJobApplication:
+          type: object
+          description: Application form structure (basic and additional questions); unconsumed.
+        eeocQuestionnaireEnabled:
+          type: boolean
+        eeocQuestionnaireEnabledForJobPost:
+          type: boolean
+        url:
+          type: string
+          format: uri
+          description: Human-clickable posting page on ats.rippling.com.
+        board:
+          type: object
+          description: Board branding and display configuration; unconsumed.
+        payRangeDetails:
+          type: array
+          items:
+            $ref: "#/components/schemas/PayRangeDetail"
+        applicationConfirmationTemplate:
+          type: string
+        hasAIEvaluationsEnabled:
+          type: boolean
+        companyName:
+          type: string
+        unlistedFromSearch:
+          type: boolean
+        jsonLd:
+          nullable: true
+          description: >
+            schema.org JobPosting markup. Null on most boards; only observed
+            populated on Rippling's own board.
+          allOf:
+            - $ref: "#/components/schemas/JsonLd"
+
+    JsonLd:
+      type: object
+      description: >
+        schema.org JobPosting markup; unconsumed, so only its stable core
+        fields are modeled.
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        datePosted:
+          type: string
+        url:
+          type: string
+          format: uri
+
+    BoardNotFoundError:
+      type: object
+      properties:
+        error_code:
+          type: string
+          example: RESOURCE_NOT_FOUND
+        message:
+          type: string
+        resource:
+          type: string
+          nullable: true
+
+    JobNotFoundError:
+      type: object
+      properties:
+        ok:
+          type: boolean
+        error:
+          type: string

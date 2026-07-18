@@ -46,6 +46,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"successfactors":  "jobs.<company>.com/search (roster tenants only)",
 	"smartrecruiters": "jobs.smartrecruiters.com/<company>",
 	"workable":        "apply.workable.com/<company>",
+	"rippling":        "ats.rippling.com/<board>/jobs",
 	"icims":           "careers-<slug>.icims.com/jobs/search",
 	"oracle":          "<fusion>.oraclecloud.com/hcmUI/CandidateExperience/<lang>/sites/<site>/jobs",
 	"join":            "join.com/companies/<company> (roster companies only)",

@@ -20,6 +20,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[SAP SuccessFactors](https://www.sap.com/products/hcm/recruiting-software.html)**,
   **[SmartRecruiters](https://www.smartrecruiters.com)**,
   **[Workable](https://www.workable.com)**,
+  **[Rippling](https://www.rippling.com/recruiting)**,
   **[iCIMS](https://www.icims.com)**,
   **[Oracle Recruiting Cloud](https://www.oracle.com/human-capital-management/recruiting/)**,
   **[JOIN](https://join.com)**,

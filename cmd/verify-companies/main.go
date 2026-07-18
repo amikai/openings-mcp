@@ -38,6 +38,7 @@ var providerOrder = []string{
 	"lever",
 	"oracle",
 	"recruitee",
+	"rippling",
 	"smartrecruiters",
 	"successfactors",
 	"teamtailor",
@@ -192,6 +193,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a = ats.NewOracleAdapter(hc)
 		case "recruitee":
 			a = ats.NewRecruiteeAdapter(hc)
+		case "rippling":
+			a, err = ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc)
 		case "smartrecruiters":
 			a, err = ats.NewSmartRecruitersAdapter("https://api.smartrecruiters.com", hc)
 		case "successfactors":
