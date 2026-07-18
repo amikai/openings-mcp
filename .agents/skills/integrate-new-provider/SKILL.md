@@ -119,9 +119,13 @@ has a stable, roster-able feed URL and multi-company routing is worth it.
    - **GraphQL, HTML, SSR blob, RSS/Atom, JSON Feed** — hand-written
      client (`client.go` / `parse.go`). Document the surface and quirks in
      `doc.go` and, when reverse-engineering is non-obvious, `API.md`.
-     Use `encoding/xml` for RSS/Atom; goquery for HTML / `__NEXT_DATA__`.
-     Skip ogen and `OPENAPI_SPECS` unless you later gain a true REST
-     OpenAPI surface.
+     For RSS/Atom, default to
+     [`github.com/mmcdole/gofeed`](https://github.com/mmcdole/gofeed) (one
+     API for RSS and Atom, including common real-world feed variations).
+     Reserve direct `encoding/xml` for unsupported vendor extensions or
+     provider-specific fields gofeed does not surface. Use goquery for
+     HTML / `__NEXT_DATA__`. Skip ogen and `OPENAPI_SPECS` unless you
+     later gain a true REST OpenAPI surface.
 
 4. **Provider package** — `mocksrv.go` replays the testdata fixtures;
    `client_test.go` exercises the client against it. Roster-based
@@ -197,6 +201,8 @@ has a stable, roster-able feed URL and multi-company routing is worth it.
   `make validate-openapi` silently skips it.
 - Forcing ogen / OpenAPI onto GraphQL, HTML, RSS, or SSR-embedded blobs —
   those stay hand-written clients.
+- Hand-rolling RSS/Atom with `encoding/xml` when `gofeed` already parses
+  the feed; only drop to raw XML for fields gofeed cannot expose.
 - Picking RSS (or HTML scrape) when a stable public JSON API exists on
   the same site.
 - Adopting an RSS feed without stable item ids, or with title+link only
