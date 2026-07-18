@@ -138,11 +138,20 @@ type job104DetailOutput struct {
 	Edu            string   `json:"edu,omitempty"`                                                                                         // condition.edu
 	Major          []string `json:"major,omitempty"`                                                                                       // condition.major
 	Specialty      []string `json:"specialty,omitempty"`                                                                                   // condition.specialty[].description
-	ManageResp     string   `json:"manageResp,omitempty"`                                                                                  // jobDetail.manageResp
-	NeedEmp        string   `json:"needEmp,omitempty"`                                                                                     // jobDetail.needEmp
-	Welfare        string   `json:"welfare,omitempty"`                                                                                     // welfare.welfare
-	Industry       string   `json:"industry,omitempty"`
-	Employees      string   `json:"employees,omitempty"`
+	Skill          []string `json:"skill,omitempty"`                                                                                       // condition.skill[].description
+	Certificate    []string `json:"certificate,omitempty"`                                                                                 // condition.certificate[].name
+	DriverLicense  []string `json:"driverLicense,omitempty"`                                                                               // condition.driverLicense
+	Language       []string `json:"language,omitempty"`                                                                                    // condition.language, flattened to 語言 — 聽:…、說:…、讀:…、寫:…
+	LocalLanguage  []string `json:"localLanguage,omitempty"`                                                                               // condition.localLanguage, flattened to 語言 — 能力
+	Other          string   `json:"other,omitempty" jsonschema:"其他條件 — free-text requirements such as shift work or cleanroom duty."`      // condition.other
+	AcceptRole     []string `json:"acceptRole,omitempty" jsonschema:"接受身份 — identity groups the posting accepts."`                         // condition.acceptRole.role[].description
+	// condition.acceptRole.disRole.needHandicapCompendium; false is omitted
+	NeedHandicapCompendium bool   `json:"needHandicapCompendium,omitempty" jsonschema:"True when applying requires a disability handbook (身心障礙手冊)."`
+	ManageResp             string `json:"manageResp,omitempty"` // jobDetail.manageResp
+	NeedEmp                string `json:"needEmp,omitempty"`    // jobDetail.needEmp
+	Welfare                string `json:"welfare,omitempty"`    // welfare.welfare
+	Industry               string `json:"industry,omitempty"`
+	Employees              string `json:"employees,omitempty"`
 }
 
 func job104MCPToHTTPRequest(in *job104SearchInput) (*job104.SearchJobsParams, error) {
@@ -346,6 +355,12 @@ func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job1
 		Edu:            d.Condition.Edu.Or(""),
 		Major:          d.Condition.Major,
 		Specialty:      job104Descriptions(d.Condition.Specialty),
+		Skill:          job104Descriptions(d.Condition.Skill),
+		Certificate:    job104CertificateNames(d.Condition.Certificate),
+		DriverLicense:  d.Condition.DriverLicense,
+		Language:       job104LanguageLabels(d.Condition.Language),
+		LocalLanguage:  job104LocalLanguageLabels(d.Condition.LocalLanguage),
+		Other:          d.Condition.Other.Or(""),
 		ManageResp:     d.JobDetail.ManageResp.Or(""),
 		NeedEmp:        d.JobDetail.NeedEmp.Or(""),
 		Welfare:        d.Welfare.Welfare.Or(""),
@@ -354,6 +369,14 @@ func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job1
 	}
 	if rw, ok := d.JobDetail.RemoteWork.Get(); ok {
 		out.Remote = job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
+	}
+	if ar, ok := d.Condition.AcceptRole.Get(); ok {
+		for _, r := range ar.Role {
+			out.AcceptRole = append(out.AcceptRole, r.Description.Or(""))
+		}
+		if dr, ok := ar.DisRole.Get(); ok {
+			out.NeedHandicapCompendium = dr.NeedHandicapCompendium.Or(false)
+		}
 	}
 	return out
 }
@@ -365,6 +388,52 @@ func job104Descriptions(in []job104.CodeDescription) []string {
 	out := make([]string, 0, len(in))
 	for _, cd := range in {
 		out = append(out, cd.Description.Or(""))
+	}
+	return out
+}
+
+func job104CertificateNames(in []job104.JobDetailConditionCertificateItem) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, c := range in {
+		out = append(out, c.Name.Or(""))
+	}
+	return out
+}
+
+// job104LanguageLabels flattens foreign-language requirements to
+// "語言 — 聽:…、說:…、讀:…、寫:…" strings.
+func job104LanguageLabels(in []job104.JobDetailConditionLanguageItem) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, l := range in {
+		label := l.Language.Or("")
+		if a, ok := l.Ability.Get(); ok {
+			label += " — 聽:" + a.Listening.Or("") + "、說:" + a.Speaking.Or("") + "、讀:" + a.Reading.Or("") + "、寫:" + a.Writing.Or("")
+		}
+		out = append(out, label)
+	}
+	return out
+}
+
+// job104LocalLanguageLabels flattens local-language (本國語言) requirements
+// to "語言 — 能力" strings; unlike foreign languages, the 104 API reports a
+// single proficiency per language.
+func job104LocalLanguageLabels(in []job104.JobDetailConditionLocalLanguageItem) []string {
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, len(in))
+	for _, l := range in {
+		label := l.Language.Or("")
+		if a := l.Ability.Or(""); a != "" {
+			label += " — " + a
+		}
+		out = append(out, label)
 	}
 	return out
 }

@@ -471,13 +471,82 @@ func (s *JobDetailCondition) encodeFields(e *jx.Encoder) {
 			e.ArrEnd()
 		}
 	}
+	{
+		if s.Skill != nil {
+			e.FieldStart("skill")
+			e.ArrStart()
+			for _, elem := range s.Skill {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Certificate != nil {
+			e.FieldStart("certificate")
+			e.ArrStart()
+			for _, elem := range s.Certificate {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.DriverLicense != nil {
+			e.FieldStart("driverLicense")
+			e.ArrStart()
+			for _, elem := range s.DriverLicense {
+				e.Str(elem)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Language != nil {
+			e.FieldStart("language")
+			e.ArrStart()
+			for _, elem := range s.Language {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.LocalLanguage != nil {
+			e.FieldStart("localLanguage")
+			e.ArrStart()
+			for _, elem := range s.LocalLanguage {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.Other.Set {
+			e.FieldStart("other")
+			s.Other.Encode(e)
+		}
+	}
+	{
+		if s.AcceptRole.Set {
+			e.FieldStart("acceptRole")
+			s.AcceptRole.Encode(e)
+		}
+	}
 }
 
-var jsonFieldsNameOfJobDetailCondition = [4]string{
-	0: "workExp",
-	1: "edu",
-	2: "major",
-	3: "specialty",
+var jsonFieldsNameOfJobDetailCondition = [11]string{
+	0:  "workExp",
+	1:  "edu",
+	2:  "major",
+	3:  "specialty",
+	4:  "skill",
+	5:  "certificate",
+	6:  "driverLicense",
+	7:  "language",
+	8:  "localLanguage",
+	9:  "other",
+	10: "acceptRole",
 }
 
 // Decode decodes JobDetailCondition from json.
@@ -544,6 +613,113 @@ func (s *JobDetailCondition) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"specialty\"")
 			}
+		case "skill":
+			if err := func() error {
+				s.Skill = make([]CodeDescription, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem CodeDescription
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Skill = append(s.Skill, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"skill\"")
+			}
+		case "certificate":
+			if err := func() error {
+				s.Certificate = make([]JobDetailConditionCertificateItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem JobDetailConditionCertificateItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Certificate = append(s.Certificate, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"certificate\"")
+			}
+		case "driverLicense":
+			if err := func() error {
+				s.DriverLicense = make([]string, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem string
+					v, err := d.Str()
+					elem = string(v)
+					if err != nil {
+						return err
+					}
+					s.DriverLicense = append(s.DriverLicense, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"driverLicense\"")
+			}
+		case "language":
+			if err := func() error {
+				s.Language = make([]JobDetailConditionLanguageItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem JobDetailConditionLanguageItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Language = append(s.Language, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"language\"")
+			}
+		case "localLanguage":
+			if err := func() error {
+				s.LocalLanguage = make([]JobDetailConditionLocalLanguageItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem JobDetailConditionLocalLanguageItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.LocalLanguage = append(s.LocalLanguage, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"localLanguage\"")
+			}
+		case "other":
+			if err := func() error {
+				s.Other.Reset()
+				if err := s.Other.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"other\"")
+			}
+		case "acceptRole":
+			if err := func() error {
+				s.AcceptRole.Reset()
+				if err := s.AcceptRole.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"acceptRole\"")
+			}
 		default:
 			return d.Skip()
 		}
@@ -564,6 +740,628 @@ func (s *JobDetailCondition) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *JobDetailCondition) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionAcceptRole) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionAcceptRole) encodeFields(e *jx.Encoder) {
+	{
+		if s.Role != nil {
+			e.FieldStart("role")
+			e.ArrStart()
+			for _, elem := range s.Role {
+				elem.Encode(e)
+			}
+			e.ArrEnd()
+		}
+	}
+	{
+		if s.DisRole.Set {
+			e.FieldStart("disRole")
+			s.DisRole.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionAcceptRole = [2]string{
+	0: "role",
+	1: "disRole",
+}
+
+// Decode decodes JobDetailConditionAcceptRole from json.
+func (s *JobDetailConditionAcceptRole) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionAcceptRole to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "role":
+			if err := func() error {
+				s.Role = make([]JobDetailConditionAcceptRoleRoleItem, 0)
+				if err := d.Arr(func(d *jx.Decoder) error {
+					var elem JobDetailConditionAcceptRoleRoleItem
+					if err := elem.Decode(d); err != nil {
+						return err
+					}
+					s.Role = append(s.Role, elem)
+					return nil
+				}); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"role\"")
+			}
+		case "disRole":
+			if err := func() error {
+				s.DisRole.Reset()
+				if err := s.DisRole.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"disRole\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionAcceptRole")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionAcceptRole) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionAcceptRole) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionAcceptRoleDisRole) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionAcceptRoleDisRole) encodeFields(e *jx.Encoder) {
+	{
+		if s.NeedHandicapCompendium.Set {
+			e.FieldStart("needHandicapCompendium")
+			s.NeedHandicapCompendium.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionAcceptRoleDisRole = [1]string{
+	0: "needHandicapCompendium",
+}
+
+// Decode decodes JobDetailConditionAcceptRoleDisRole from json.
+func (s *JobDetailConditionAcceptRoleDisRole) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionAcceptRoleDisRole to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "needHandicapCompendium":
+			if err := func() error {
+				s.NeedHandicapCompendium.Reset()
+				if err := s.NeedHandicapCompendium.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"needHandicapCompendium\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionAcceptRoleDisRole")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionAcceptRoleDisRole) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionAcceptRoleDisRole) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionAcceptRoleRoleItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionAcceptRoleRoleItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Code.Set {
+			e.FieldStart("code")
+			s.Code.Encode(e)
+		}
+	}
+	{
+		if s.Description.Set {
+			e.FieldStart("description")
+			s.Description.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionAcceptRoleRoleItem = [2]string{
+	0: "code",
+	1: "description",
+}
+
+// Decode decodes JobDetailConditionAcceptRoleRoleItem from json.
+func (s *JobDetailConditionAcceptRoleRoleItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionAcceptRoleRoleItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			if err := func() error {
+				s.Code.Reset()
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "description":
+			if err := func() error {
+				s.Description.Reset()
+				if err := s.Description.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"description\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionAcceptRoleRoleItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionAcceptRoleRoleItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionAcceptRoleRoleItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionCertificateItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionCertificateItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Code.Set {
+			e.FieldStart("code")
+			s.Code.Encode(e)
+		}
+	}
+	{
+		if s.Name.Set {
+			e.FieldStart("name")
+			s.Name.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionCertificateItem = [2]string{
+	0: "code",
+	1: "name",
+}
+
+// Decode decodes JobDetailConditionCertificateItem from json.
+func (s *JobDetailConditionCertificateItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionCertificateItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			if err := func() error {
+				s.Code.Reset()
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "name":
+			if err := func() error {
+				s.Name.Reset()
+				if err := s.Name.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"name\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionCertificateItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionCertificateItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionCertificateItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionLanguageItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionLanguageItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Code.Set {
+			e.FieldStart("code")
+			s.Code.Encode(e)
+		}
+	}
+	{
+		if s.Language.Set {
+			e.FieldStart("language")
+			s.Language.Encode(e)
+		}
+	}
+	{
+		if s.Ability.Set {
+			e.FieldStart("ability")
+			s.Ability.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionLanguageItem = [3]string{
+	0: "code",
+	1: "language",
+	2: "ability",
+}
+
+// Decode decodes JobDetailConditionLanguageItem from json.
+func (s *JobDetailConditionLanguageItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionLanguageItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			if err := func() error {
+				s.Code.Reset()
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "language":
+			if err := func() error {
+				s.Language.Reset()
+				if err := s.Language.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"language\"")
+			}
+		case "ability":
+			if err := func() error {
+				s.Ability.Reset()
+				if err := s.Ability.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ability\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionLanguageItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionLanguageItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionLanguageItem) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionLanguageItemAbility) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionLanguageItemAbility) encodeFields(e *jx.Encoder) {
+	{
+		if s.Listening.Set {
+			e.FieldStart("listening")
+			s.Listening.Encode(e)
+		}
+	}
+	{
+		if s.Speaking.Set {
+			e.FieldStart("speaking")
+			s.Speaking.Encode(e)
+		}
+	}
+	{
+		if s.Reading.Set {
+			e.FieldStart("reading")
+			s.Reading.Encode(e)
+		}
+	}
+	{
+		if s.Writing.Set {
+			e.FieldStart("writing")
+			s.Writing.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionLanguageItemAbility = [4]string{
+	0: "listening",
+	1: "speaking",
+	2: "reading",
+	3: "writing",
+}
+
+// Decode decodes JobDetailConditionLanguageItemAbility from json.
+func (s *JobDetailConditionLanguageItemAbility) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionLanguageItemAbility to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "listening":
+			if err := func() error {
+				s.Listening.Reset()
+				if err := s.Listening.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"listening\"")
+			}
+		case "speaking":
+			if err := func() error {
+				s.Speaking.Reset()
+				if err := s.Speaking.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"speaking\"")
+			}
+		case "reading":
+			if err := func() error {
+				s.Reading.Reset()
+				if err := s.Reading.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"reading\"")
+			}
+		case "writing":
+			if err := func() error {
+				s.Writing.Reset()
+				if err := s.Writing.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"writing\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionLanguageItemAbility")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionLanguageItemAbility) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionLanguageItemAbility) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode implements json.Marshaler.
+func (s *JobDetailConditionLocalLanguageItem) Encode(e *jx.Encoder) {
+	e.ObjStart()
+	s.encodeFields(e)
+	e.ObjEnd()
+}
+
+// encodeFields encodes fields.
+func (s *JobDetailConditionLocalLanguageItem) encodeFields(e *jx.Encoder) {
+	{
+		if s.Code.Set {
+			e.FieldStart("code")
+			s.Code.Encode(e)
+		}
+	}
+	{
+		if s.Language.Set {
+			e.FieldStart("language")
+			s.Language.Encode(e)
+		}
+	}
+	{
+		if s.Ability.Set {
+			e.FieldStart("ability")
+			s.Ability.Encode(e)
+		}
+	}
+}
+
+var jsonFieldsNameOfJobDetailConditionLocalLanguageItem = [3]string{
+	0: "code",
+	1: "language",
+	2: "ability",
+}
+
+// Decode decodes JobDetailConditionLocalLanguageItem from json.
+func (s *JobDetailConditionLocalLanguageItem) Decode(d *jx.Decoder) error {
+	if s == nil {
+		return errors.New("invalid: unable to decode JobDetailConditionLocalLanguageItem to nil")
+	}
+
+	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
+		switch string(k) {
+		case "code":
+			if err := func() error {
+				s.Code.Reset()
+				if err := s.Code.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"code\"")
+			}
+		case "language":
+			if err := func() error {
+				s.Language.Reset()
+				if err := s.Language.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"language\"")
+			}
+		case "ability":
+			if err := func() error {
+				s.Ability.Reset()
+				if err := s.Ability.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"ability\"")
+			}
+		default:
+			return d.Skip()
+		}
+		return nil
+	}); err != nil {
+		return errors.Wrap(err, "decode JobDetailConditionLocalLanguageItem")
+	}
+
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s *JobDetailConditionLocalLanguageItem) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *JobDetailConditionLocalLanguageItem) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -2189,6 +2987,156 @@ func (s NilString) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *NilString) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobDetailConditionAcceptRole as json.
+func (o OptJobDetailConditionAcceptRole) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobDetailConditionAcceptRole from json.
+func (o *OptJobDetailConditionAcceptRole) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJobDetailConditionAcceptRole to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJobDetailConditionAcceptRole) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJobDetailConditionAcceptRole) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobDetailConditionAcceptRoleDisRole as json.
+func (o OptJobDetailConditionAcceptRoleDisRole) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobDetailConditionAcceptRoleDisRole from json.
+func (o *OptJobDetailConditionAcceptRoleDisRole) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJobDetailConditionAcceptRoleDisRole to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJobDetailConditionAcceptRoleDisRole) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJobDetailConditionAcceptRoleDisRole) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes JobDetailConditionLanguageItemAbility as json.
+func (o OptJobDetailConditionLanguageItemAbility) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	o.Value.Encode(e)
+}
+
+// Decode decodes JobDetailConditionLanguageItemAbility from json.
+func (o *OptJobDetailConditionLanguageItemAbility) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptJobDetailConditionLanguageItemAbility to nil")
+	}
+	o.Set = true
+	if err := o.Value.Decode(d); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptJobDetailConditionLanguageItemAbility) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptJobDetailConditionLanguageItemAbility) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes bool as json.
+func (o OptNilBool) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.Bool(bool(o.Value))
+}
+
+// Decode decodes bool from json.
+func (o *OptNilBool) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilBool to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v bool
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	v, err := d.Bool()
+	if err != nil {
+		return err
+	}
+	o.Value = bool(v)
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilBool) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilBool) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

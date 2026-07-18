@@ -525,6 +525,99 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/CodeDescription"
+            skill:
+              type: array
+              items:
+                $ref: "#/components/schemas/CodeDescription"
+            certificate:
+              type: array
+              description: >-
+                Unlike CodeDescription, the label field is `name` and `code`
+                is an integer (confirmed live, e.g. job 85tm8).
+              items:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+            driverLicense:
+              type: array
+              items:
+                type: string
+            language:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    nullable: true
+                  language:
+                    type: string
+                    nullable: true
+                  ability:
+                    type: object
+                    properties:
+                      listening:
+                        type: string
+                        nullable: true
+                      speaking:
+                        type: string
+                        nullable: true
+                      reading:
+                        type: string
+                        nullable: true
+                      writing:
+                        type: string
+                        nullable: true
+            localLanguage:
+              type: array
+              description: >-
+                `ability` is a single proficiency string (e.g. "精通"),
+                unlike language's per-skill ability object (confirmed live,
+                e.g. job 6tdvl).
+              items:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    nullable: true
+                  language:
+                    type: string
+                    nullable: true
+                  ability:
+                    type: string
+                    nullable: true
+            other:
+              type: string
+              nullable: true
+            acceptRole:
+              type: object
+              properties:
+                role:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      code:
+                        type: integer
+                        nullable: true
+                      description:
+                        type: string
+                        nullable: true
+                disRole:
+                  type: object
+                  # disability is left undeclared: it is [] in every observed
+                  # response (fixture + live sampling of 身心障礙 postings), so
+                  # its element shape is unknown and a guessed schema could
+                  # break decoding. ogen ignores undeclared properties.
+                  properties:
+                    needHandicapCompendium:
+                      type: boolean
+                      nullable: true
         welfare:
           type: object
           properties:

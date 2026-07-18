@@ -120,7 +120,13 @@
           }
         }
       ],
-      "localLanguage": [],
+      "localLanguage": [
+        {
+          "code": 1,
+          "language": "台語",
+          "ability": "精通"
+        }
+      ],
       "specialty": [
         {
           "code": "12001003009",
@@ -165,8 +171,16 @@
           "description": "AI"
         }
       ],
-      "certificate": [],
-      "driverLicense": [],
+      "certificate": [
+        {
+          "name": "丙級會計事務技術士",
+          "code": 4006001025
+        }
+      ],
+      "driverLicense": [
+        "普通重型機車",
+        "普通小型車"
+      ],
       "other": "高度邏輯思考能力、善於溝通系統需求與設計取捨、具備獨立軟體開發能力\n具 Azure DevOps、Docker、Kubernetes 經驗者優先\n\n- 熟悉現代軟體系統研發流程與版本控制\n- 熟悉至少一種指令式程式設計語言（C#、JavaScript、Python、PHP 尤佳）\n- 具 ASP.NET、SQL、Vue.js、Laravel、Unity、GIS、IoT、Revit等開發經驗\n- 具軟體設計、開發、運營、開發、機器學習、AI 模型訓練 (Finetuning)、 AI 應用設計（OCR、RAG、LLM、Agentic 等）開發、導入經驗\n"
     },
     "welfare": {
