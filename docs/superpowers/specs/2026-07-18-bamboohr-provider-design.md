@@ -53,6 +53,11 @@ The slug is the lowercased careers-site subdomain.
 `Search` and `Filters` call `ListJobs`, map each row into a `dumpJob`, then
 delegate to the shared `searchDump` / `distinctFilters` engine.
 
+When `Search` receives a non-empty `Query`, the adapter fans out concurrent
+`GetJobDetail` calls (cap 8) to fill each dumpJob's description so tier-3
+skill/technology matching works. Filters and empty-query Search skip that
+fan-out and stay list-only.
+
 Filter keys emitted from the dump:
 
 | Key | Source |
@@ -64,8 +69,6 @@ Filter keys emitted from the dump:
 List-feed limitations the adapter exposes:
 
 - No posting date on summaries (`PostedAt` empty; detail carries `datePosted`).
-- No description on the dump, so query tier-3 description matching is a no-op;
-  query covers titles and departments only.
 - Display location prefers structured `location` (city/state) and falls back
   to `atsLocation` (city/state/country) when `location` is all-null.
 - Search location strings also include the work-mode label so "remote" /
@@ -77,7 +80,8 @@ List-feed limitations the adapter exposes:
 `Detail` calls `GetJobDetail` and maps:
 
 - title ← `jobOpeningName`
-- location ← city/state/country join from detail `location`
+- location ← city/state/country from detail `location`, falling back to
+  `atsLocation` when `location` is all-null (same rule as the list path)
 - postedAt ← `datePosted`
 - URL ← `jobOpeningShareUrl` or constructed `https://{slug}.bamboohr.com/careers/{id}`
 - description ← HTML-stripped `description` via html2text

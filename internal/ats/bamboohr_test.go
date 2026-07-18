@@ -2,6 +2,7 @@ package ats
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 	"time"
@@ -95,6 +96,13 @@ func TestBambooHRSearchQueryLocationAndFilters(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, deptQueried.Jobs)
 
+	// Description-only skill match: "concrete" appears in job 167's detail
+	// body (detail_nulls_rsp.json) but not in any list-row field.
+	descQueried, err := a.Search(t.Context(), bamboohr.MockSlug, SearchParams{Query: "concrete"})
+	require.NoError(t, err)
+	require.NotEmpty(t, descQueried.Jobs)
+	assert.Equal(t, bamboohr.MockNullsJobID, descQueried.Jobs[0].JobID)
+
 	located, err := a.Search(t.Context(), bamboohr.MockSlug, SearchParams{Location: "Ottawa"})
 	require.NoError(t, err)
 	assert.NotEmpty(t, located.Jobs)
@@ -156,6 +164,50 @@ func TestBambooHRDetail(t *testing.T) {
 	assert.Equal(t, "https://curtinmaritime.bamboohr.com/careers/201", detail.URL)
 	assert.Contains(t, detail.Description, "Curtin Maritime")
 	assert.NotContains(t, detail.Description, "<p>")
+}
+
+// TestBambooHRDetailAtsLocationFallback covers postings that leave
+// jobOpening.location all-null and put the only usable locality on
+// atsLocation (observed live on Ashtead job 35).
+func TestBambooHRDetailAtsLocationFallback(t *testing.T) {
+	const body = `{
+  "meta": {"totalCount": 1},
+  "result": {
+    "jobOpening": {
+      "jobOpeningShareUrl": "https://ashteadtechnology.bamboohr.com/careers/35",
+      "jobOpeningName": "Workshop Technician",
+      "jobOpeningStatus": "Open",
+      "jobCategoryId": null,
+      "departmentId": null,
+      "departmentLabel": "",
+      "employmentStatusLabel": "Full-Time",
+      "location": {"city": null, "state": null, "postalCode": null, "addressCountry": null},
+      "atsLocation": {"country": "United Kingdom", "countryId": "GB", "state": null, "city": null},
+      "description": "<p>Workshop role</p>",
+      "compensation": null,
+      "datePosted": "2025-01-15",
+      "minimumExperience": null,
+      "locationType": "0",
+      "seekPromoted": false
+    },
+    "formFields": {}
+  }
+}`
+	mux := http.NewServeMux()
+	mux.HandleFunc("/careers/35/detail", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(body))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a.baseURL = func(string) string { return srv.URL }
+
+	detail, err := a.Detail(t.Context(), "ashteadtechnology", "35")
+	require.NoError(t, err)
+	assert.Equal(t, "United Kingdom", detail.Location)
+	assert.Equal(t, "Workshop Technician", detail.Title)
 }
 
 // TestBambooHRDetailNonRoster covers a URL-resolved tenant outside the
