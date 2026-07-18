@@ -31,7 +31,7 @@ func TestServerListsJobTools(t *testing.T) {
 	ctx := t.Context()
 	c104, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(http.DefaultClient))
 	require.NoError(t, err)
-	cApple, err := apple.NewClient("https://jobs.apple.com", http.DefaultClient)
+	cApple, err := apple.NewJobsClient("https://jobs.apple.com", http.DefaultClient)
 	require.NoError(t, err)
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(http.DefaultClient))
 	require.NoError(t, err)

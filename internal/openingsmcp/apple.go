@@ -161,7 +161,7 @@ func appleLocationLabel(name, country string) string {
 }
 
 // RegisterApple registers the Apple Careers search and job-detail tools.
-func RegisterApple(server *mcp.Server, client *apple.Client) {
+func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        appleSearchToolName,
 		Description: "Search jobs on Apple Careers by keyword and ISO alpha-3 country code.",

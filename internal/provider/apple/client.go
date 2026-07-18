@@ -9,27 +9,25 @@ import (
 	"net/url"
 	"strings"
 	"sync"
-
-	"github.com/amikai/openings-mcp/internal/provider/apple/api"
 )
 
 const (
-	defaultLocale    = api.SearchRequestLocaleEnUs
-	longDateFormat   = api.DateFormatLongDateMMMMDYYYY
-	mediumDateFormat = api.DateFormatMediumDateMMMDYYYY
+	defaultLocale    = SearchJobsRequestLocaleEnUs
+	longDateFormat   = DateFormatLongDateMMMMDYYYY
+	mediumDateFormat = DateFormatMediumDateMMMDYYYY
 )
 
 // ErrJobNotFound marks an Apple position ID that has no active public posting.
 var ErrJobNotFound = errors.New("apple: job not found")
 
 // Sort is an Apple search-result ordering.
-type Sort = api.SearchRequestSort
+type Sort = SearchJobsRequestSort
 
 const (
 	// SortRelevance ranks results against the keyword query.
-	SortRelevance Sort = api.SearchRequestSortRelevance
+	SortRelevance Sort = SearchJobsRequestSortRelevance
 	// SortNewest orders results by posting date, newest first.
-	SortNewest Sort = api.SearchRequestSortNewest
+	SortNewest Sort = SearchJobsRequestSortNewest
 )
 
 // SearchRequest contains the stable, caller-facing Apple search parameters.
@@ -41,31 +39,21 @@ type SearchRequest struct {
 	Page        int
 }
 
-// Generated API response aliases keep callers independent of the generated
-// subpackage while preserving ogen's exact wire types.
-type (
-	SearchResponse    = api.SearchResponse
-	SearchResult      = api.SearchResult
-	JobSummary        = api.JobSummary
-	SearchLocation    = api.SearchLocation
-	Team              = api.Team
-	JobDetailResponse = api.JobDetailResponse
-	JobDetail         = api.JobDetail
-	DetailLocation    = api.DetailLocation
-)
-
-// Client composes the generated API client with Apple's anonymous search
+// JobsClient composes the generated OAS [Client] with Apple's anonymous search
 // session protocol. Search calls are serialized because each CSRF token is
 // bound to the session cookie set by the immediately preceding token request.
-type Client struct {
-	api      *api.Client
+//
+// The wrapper is named JobsClient (not Client) so it can share this package
+// with ogen-generated types, matching peers such as workday.TenantClient.
+type JobsClient struct {
+	api      *Client
 	searchMu sync.Mutex
 }
 
-// NewClient creates an Apple Jobs client. The supplied HTTP client is cloned
-// before a private cookie jar is attached, so other providers can safely share
-// its transport and timeout without sharing Apple session state.
-func NewClient(baseURL string, httpClient *http.Client) (*Client, error) {
+// NewJobsClient creates a session-aware Apple Jobs client. The supplied HTTP
+// client is cloned before a private cookie jar is attached, so other providers
+// can safely share its transport and timeout without sharing Apple session state.
+func NewJobsClient(baseURL string, httpClient *http.Client) (*JobsClient, error) {
 	if httpClient == nil {
 		httpClient = &http.Client{}
 	}
@@ -77,17 +65,17 @@ func NewClient(baseURL string, httpClient *http.Client) (*Client, error) {
 	}
 	sessionHTTPClient.Jar = jar
 
-	generated, err := api.NewClient(baseURL, api.WithClient(&sessionHTTPClient))
+	generated, err := NewClient(baseURL, WithClient(&sessionHTTPClient))
 	if err != nil {
 		return nil, fmt.Errorf("create apple api client: %w", err)
 	}
-	return &Client{api: generated}, nil
+	return &JobsClient{api: generated}, nil
 }
 
 // SearchJobs initializes an anonymous session and returns one 20-item page of
 // Apple job summaries. Zero Page and Sort values default to page 1 and
 // relevance; Keyword and CountryCode are required.
-func (c *Client) SearchJobs(ctx context.Context, request SearchRequest) (*SearchResponse, error) {
+func (c *JobsClient) SearchJobs(ctx context.Context, request SearchRequest) (*SearchResponse, error) {
 	apiRequest, err := searchAPIRequest(request)
 	if err != nil {
 		return nil, err
@@ -105,7 +93,7 @@ func (c *Client) SearchJobs(ctx context.Context, request SearchRequest) (*Search
 		return nil, errors.New("initialize apple search session: missing csrf token")
 	}
 
-	response, err := c.api.PostSearchJobs(ctx, apiRequest, api.PostSearchJobsParams{
+	response, err := c.api.PostSearchJobs(ctx, apiRequest, PostSearchJobsParams{
 		XAppleCsrfToken: token,
 	})
 	if err != nil {
@@ -113,9 +101,9 @@ func (c *Client) SearchJobs(ctx context.Context, request SearchRequest) (*Search
 	}
 
 	switch response := response.(type) {
-	case *api.SearchResponse:
+	case *SearchResponse:
 		return response, nil
-	case *api.ErrorResponse:
+	case *ErrorResponse:
 		return nil, fmt.Errorf("search apple jobs: upstream rejected session: %s", response.Error)
 	default:
 		return nil, fmt.Errorf("search apple jobs: unexpected response type %T", response)
@@ -124,23 +112,23 @@ func (c *Client) SearchJobs(ctx context.Context, request SearchRequest) (*Search
 
 // JobDetail returns the complete public posting for a numeric Apple position
 // ID returned by SearchJobs.
-func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
+func (c *JobsClient) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
 	if !isASCIIInteger(jobID) {
 		return nil, fmt.Errorf("job id must contain only digits, got %q", jobID)
 	}
 
-	response, err := c.api.GetJobDetail(ctx, api.GetJobDetailParams{
+	response, err := c.api.GetJobDetail(ctx, GetJobDetailParams{
 		JobId:  jobID,
-		Locale: api.GetJobDetailLocaleEnUs,
+		Locale: GetJobDetailLocaleEnUs,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("get apple job detail: %w", err)
 	}
 
 	switch response := response.(type) {
-	case *api.JobDetailResponse:
+	case *JobDetailResponse:
 		return response, nil
-	case *api.ErrorResponse:
+	case *ErrorResponse:
 		return nil, fmt.Errorf("%w: %s", ErrJobNotFound, jobID)
 	default:
 		return nil, fmt.Errorf("get apple job detail: unexpected response type %T", response)
@@ -156,7 +144,7 @@ func JobURL(positionID, titleSlug string) string {
 	)
 }
 
-func searchAPIRequest(request SearchRequest) (*api.SearchRequest, error) {
+func searchAPIRequest(request SearchRequest) (*SearchJobsRequest, error) {
 	keyword := strings.TrimSpace(request.Keyword)
 	if keyword == "" {
 		return nil, errors.New("keyword is required")
@@ -183,15 +171,15 @@ func searchAPIRequest(request SearchRequest) (*api.SearchRequest, error) {
 		return nil, fmt.Errorf("invalid sort %q: %w", sort, err)
 	}
 
-	return &api.SearchRequest{
+	return &SearchJobsRequest{
 		Query: keyword,
-		Filters: api.SearchFilters{
+		Filters: SearchFilters{
 			Locations: []string{locationID},
 		},
 		Page:   page,
 		Locale: defaultLocale,
 		Sort:   sort,
-		Format: api.DateFormat{
+		Format: DateFormat{
 			LongDate:   longDateFormat,
 			MediumDate: mediumDateFormat,
 		},

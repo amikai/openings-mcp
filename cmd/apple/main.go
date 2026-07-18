@@ -122,7 +122,7 @@ func runSearch(ctx context.Context, flags searchFlags, out io.Writer) error {
 		return fmt.Errorf("--page must be >= 1, got %d", flags.page)
 	}
 
-	client, err := apple.NewClient(flags.baseURL, nil)
+	client, err := apple.NewJobsClient(flags.baseURL, nil)
 	if err != nil {
 		return fmt.Errorf("create apple client: %w", err)
 	}
@@ -181,7 +181,7 @@ func runDetail(ctx context.Context, flags detailFlags, out io.Writer) error {
 		return errors.New("--job-id is required")
 	}
 
-	client, err := apple.NewClient(flags.baseURL, nil)
+	client, err := apple.NewJobsClient(flags.baseURL, nil)
 	if err != nil {
 		return fmt.Errorf("create apple client: %w", err)
 	}

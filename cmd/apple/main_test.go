@@ -39,7 +39,7 @@ func TestRunDetailRequiresJobID(t *testing.T) {
 func TestWriteSearch(t *testing.T) {
 	server := apple.NewMockServer()
 	t.Cleanup(server.Close)
-	client, err := apple.NewClient(server.URL, server.Client())
+	client, err := apple.NewJobsClient(server.URL, server.Client())
 	require.NoError(t, err)
 	response, err := client.SearchJobs(t.Context(), apple.SearchRequest{
 		Keyword:     "software engineer",
@@ -57,7 +57,7 @@ func TestWriteSearch(t *testing.T) {
 func TestWriteDetail(t *testing.T) {
 	server := apple.NewMockServer()
 	t.Cleanup(server.Close)
-	client, err := apple.NewClient(server.URL, server.Client())
+	client, err := apple.NewJobsClient(server.URL, server.Client())
 	require.NoError(t, err)
 	response, err := client.JobDetail(t.Context(), apple.MockJobID)
 	require.NoError(t, err)

@@ -56,7 +56,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SearchRequest"
+              $ref: "#/components/schemas/SearchJobsRequest"
       responses:
         "200":
           description: One page of Apple job summaries.
@@ -108,7 +108,7 @@ paths:
 
 components:
   schemas:
-    SearchRequest:
+    SearchJobsRequest:
       type: object
       additionalProperties: false
       required: [query, filters, page, locale, sort, format]

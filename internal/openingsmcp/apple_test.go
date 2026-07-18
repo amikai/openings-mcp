@@ -27,7 +27,7 @@ func testAppleMCPClientServer(t *testing.T) *mcp.ClientSession {
 	server := mcp.NewServer(&mcp.Implementation{Name: appleTestServerName, Version: "v0"}, nil)
 	mock := apple.NewMockServer()
 	t.Cleanup(mock.Close)
-	client, err := apple.NewClient(mock.URL, mock.Client())
+	client, err := apple.NewJobsClient(mock.URL, mock.Client())
 	require.NoError(t, err)
 	RegisterApple(server, client)
 
@@ -45,7 +45,7 @@ func testAppleMCPClientServer(t *testing.T) *mcp.ClientSession {
 
 func TestRegisterApple(t *testing.T) {
 	server := mcp.NewServer(&mcp.Implementation{Name: appleTestServerName, Version: "v0"}, nil)
-	client, err := apple.NewClient("https://jobs.apple.com", nil)
+	client, err := apple.NewJobsClient("https://jobs.apple.com", nil)
 	require.NoError(t, err)
 	RegisterApple(server, client)
 	assertTools(t, server, appleSearchToolName, appleDetailToolName)

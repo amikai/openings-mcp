@@ -13,7 +13,7 @@ const testCountryCode = "TWN"
 func TestSearchJobs(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
-	client, err := NewClient(srv.URL, srv.Client())
+	client, err := NewJobsClient(srv.URL, srv.Client())
 	require.NoError(t, err)
 
 	response, err := client.SearchJobs(t.Context(), SearchRequest{
@@ -35,7 +35,7 @@ func TestSearchJobs(t *testing.T) {
 func TestSearchJobsPageAndSort(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
-	client, err := NewClient(srv.URL, srv.Client())
+	client, err := NewJobsClient(srv.URL, srv.Client())
 	require.NoError(t, err)
 
 	response, err := client.SearchJobs(t.Context(), SearchRequest{
@@ -51,7 +51,7 @@ func TestSearchJobsPageAndSort(t *testing.T) {
 }
 
 func TestSearchJobsValidation(t *testing.T) {
-	client, err := NewClient("https://jobs.apple.com", http.DefaultClient)
+	client, err := NewJobsClient("https://jobs.apple.com", http.DefaultClient)
 	require.NoError(t, err)
 
 	tests := []struct {
@@ -76,7 +76,7 @@ func TestSearchJobsValidation(t *testing.T) {
 func TestJobDetail(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
-	client, err := NewClient(srv.URL, srv.Client())
+	client, err := NewJobsClient(srv.URL, srv.Client())
 	require.NoError(t, err)
 
 	response, err := client.JobDetail(t.Context(), MockJobID)
@@ -90,7 +90,7 @@ func TestJobDetail(t *testing.T) {
 func TestJobDetailNotFound(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
-	client, err := NewClient(srv.URL, srv.Client())
+	client, err := NewJobsClient(srv.URL, srv.Client())
 	require.NoError(t, err)
 
 	_, err = client.JobDetail(t.Context(), MockNotFoundJobID)
@@ -99,7 +99,7 @@ func TestJobDetailNotFound(t *testing.T) {
 }
 
 func TestJobDetailRejectsInvalidID(t *testing.T) {
-	client, err := NewClient("https://jobs.apple.com", http.DefaultClient)
+	client, err := NewJobsClient("https://jobs.apple.com", http.DefaultClient)
 	require.NoError(t, err)
 
 	for _, jobID := range []string{"", "PIPE-200624996", "200624996-3950"} {

@@ -149,7 +149,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", hc)
 
-	cApple, err := apple.NewClient("https://jobs.apple.com", hc)
+	cApple, err := apple.NewJobsClient("https://jobs.apple.com", hc)
 	if err != nil {
 		return fmt.Errorf("create Apple client: %w", err)
 	}
@@ -241,7 +241,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 // newServer's signature doesn't grow with every provider added.
 type providerClients struct {
 	job104   *job104.Client
-	apple    *apple.Client
+	apple    *apple.JobsClient
 	cake     *cake.Client
 	nvidia   *nvidia.Client
 	tsmc     *tsmc.Client
