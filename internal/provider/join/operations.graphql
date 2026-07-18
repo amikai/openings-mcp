@@ -1,0 +1,44 @@
+# One page can hold every job a curated company has: JOIN's SMB-focused
+# customers rarely exceed a few dozen open postings, and the client loops
+# pages regardless (see client.go) rather than trusting a single call.
+query GetCompanyJobs($companyId: Int!, $page: Float!, $pageSize: Float!) {
+  publicJobs(
+    input: {
+      companyId: $companyId
+      paginationPage: { page: $page, pageSize: $pageSize }
+    }
+  ) {
+    items {
+      id
+      idParam
+      title
+      status
+      workplaceType
+      remoteType
+      createdAt
+      updatedAt
+      city {
+        cityName
+        countryName
+      }
+      country {
+        iso3166
+        name
+      }
+      category {
+        id
+        name
+      }
+      employmentType {
+        id
+        name
+      }
+    }
+    pageInfo {
+      page
+      pageCount
+      pageSize
+      rowCount
+    }
+  }
+}

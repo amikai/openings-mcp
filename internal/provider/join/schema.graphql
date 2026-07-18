@@ -1,0 +1,89 @@
+# Reverse-engineered subset of JOIN's public candidate GraphQL API
+# (https://join.com/candidate-api/graphql). JOIN has no public SDL and
+# introspection is disabled in production ("GraphQL introspection is not
+# allowed by Apollo Server"). Field and type names below are confirmed
+# live via GRAPHQL_VALIDATION_FAILED "Did you mean" suggestions and
+# successful queries (2026-07-18):
+#   - PublicJobsQueryInput: companyId (required Int!), paginationPage.
+#   - PublicJob: confirmed via the singular publicJob(input: {id: ...})
+#     query, which shares the same field set as publicJobs' items.
+#   - PaginationPageInput: {page, pageSize}, both required and typed
+#     Float, not Int — confirmed by a real GRAPHQL_VALIDATION_FAILED
+#     ("Variable of type Int! used in position expecting type Float")
+#     when a typed Int! variable was tried; an inline Int literal
+#     coerces into a Float field silently, which is why this only
+#     surfaced once real GraphQL variables (not inlined literals) were
+#     used end to end.
+#
+# Only the fields this package's operations.graphql actually selects are
+# declared. Notably absent: PublicJobsQueryInput.filters (categoryIds,
+# placeIds, excludedIds) and .aggregateBy — JOIN's public API has no
+# server-side keyword search, so this client fetches every job for a
+# company in one dump-style call and lets internal/ats.searchDump filter
+# client-side, the same shape as the Greenhouse/Lever/Ashby adapters.
+#
+# publicJobs never populates descriptionHtml regardless of which fields
+# are requested — confirmed on both the plural and singular queries. Full
+# job descriptions come from the SSR job detail page instead (see
+# parse.go), not from this schema.
+
+input PublicJobsQueryInput {
+  companyId: Int!
+  paginationPage: PaginationPageInput
+}
+
+input PaginationPageInput {
+  page: Float!
+  pageSize: Float!
+}
+
+type PublicJobsResult {
+  items: [PublicJob!]!
+  pageInfo: PageInfo!
+}
+
+type PageInfo {
+  page: Int!
+  pageCount: Int!
+  pageSize: Int!
+  rowCount: Int!
+}
+
+type PublicJob {
+  id: Int!
+  idParam: String!
+  title: String!
+  status: String!
+  workplaceType: String
+  remoteType: String
+  createdAt: String!
+  updatedAt: String!
+  city: JobCity
+  country: JobCountry
+  category: JobCategory
+  employmentType: JobEmploymentType
+}
+
+type JobCity {
+  cityName: String!
+  countryName: String!
+}
+
+type JobCountry {
+  iso3166: String!
+  name: String!
+}
+
+type JobCategory {
+  id: Int!
+  name: String!
+}
+
+type JobEmploymentType {
+  id: Int!
+  name: String!
+}
+
+type Query {
+  publicJobs(input: PublicJobsQueryInput!): PublicJobsResult!
+}

@@ -1,0 +1,13 @@
+{
+    "data": {
+        "publicJobs": {
+            "items": [],
+            "pageInfo": {
+                "page": 1,
+                "pageCount": 0,
+                "pageSize": 0,
+                "rowCount": 0
+            }
+        }
+    }
+}

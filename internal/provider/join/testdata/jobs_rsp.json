@@ -1,0 +1,92 @@
+{
+    "data": {
+        "publicJobs": {
+            "items": [
+                {
+                    "id": 15393396,
+                    "idParam": "16397229-senior-software-engineer-backend-llm-infrastructure",
+                    "title": "Senior Software Engineer (Backend/LLM Infrastructure)",
+                    "status": "ONLINE",
+                    "workplaceType": "ONSITE",
+                    "remoteType": null,
+                    "createdAt": "2025-12-18T15:37:26.494Z",
+                    "updatedAt": "2026-07-03T14:30:43.201Z",
+                    "city": {
+                        "cityName": "Berlin",
+                        "countryName": "Germany"
+                    },
+                    "country": {
+                        "iso3166": "DE",
+                        "name": "Germany"
+                    },
+                    "category": {
+                        "id": 170,
+                        "name": "Software Development"
+                    },
+                    "employmentType": {
+                        "id": 6,
+                        "name": "Employee"
+                    }
+                },
+                {
+                    "id": 15845909,
+                    "idParam": "16446736-intern-working-student-sales-and-gtm",
+                    "title": "Intern / Working Student (Sales & GTM)",
+                    "status": "ONLINE",
+                    "workplaceType": "ONSITE",
+                    "remoteType": null,
+                    "createdAt": "2026-03-13T09:55:47.752Z",
+                    "updatedAt": "2026-07-14T15:00:47.409Z",
+                    "city": {
+                        "cityName": "Berlin",
+                        "countryName": "Germany"
+                    },
+                    "country": {
+                        "iso3166": "DE",
+                        "name": "Germany"
+                    },
+                    "category": {
+                        "id": 404,
+                        "name": "Other"
+                    },
+                    "employmentType": {
+                        "id": 5,
+                        "name": "Internship"
+                    }
+                },
+                {
+                    "id": 15846120,
+                    "idParam": "16426194-founders-associate-intern-working-student",
+                    "title": "Founders Associate Intern / Working Student",
+                    "status": "ONLINE",
+                    "workplaceType": "ONSITE",
+                    "remoteType": null,
+                    "createdAt": "2026-03-13T10:02:15.614Z",
+                    "updatedAt": "2026-07-10T10:30:35.965Z",
+                    "city": {
+                        "cityName": "Berlin",
+                        "countryName": "Germany"
+                    },
+                    "country": {
+                        "iso3166": "DE",
+                        "name": "Germany"
+                    },
+                    "category": {
+                        "id": 404,
+                        "name": "Other"
+                    },
+                    "employmentType": {
+                        "id": 5,
+                        "name": "Internship"
+                    }
+                }
+            ],
+            "pageInfo": {
+                "page": 1,
+                "pageCount": 1,
+                "pageSize": 3,
+                "rowCount": 3
+            }
+        }
+    }
+}

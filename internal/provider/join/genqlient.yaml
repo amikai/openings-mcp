@@ -1,0 +1,15 @@
+# genqlient config for the reverse-engineered JOIN public candidate GraphQL
+# surface. Schema is hand-maintained (JOIN has no public SDL); regenerate with:
+#   go generate ./internal/provider/join/
+schema: schema.graphql
+operations:
+  - operations.graphql
+generated: generated.go
+package: join
+bindings:
+  # Server-side page/pageSize are typed Float (see schema.graphql), but
+  # every real value sent or received is a whole number — bind to Go int
+  # so client.go doesn't have to carry float64 for integer pagination.
+  Float:
+    type: int
+

@@ -20,10 +20,11 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[SAP SuccessFactors](https://www.sap.com/products/hcm/recruiting-software.html)**,
   **[SmartRecruiters](https://www.smartrecruiters.com)**,
   **[iCIMS](https://www.icims.com)**,
-  and **[Oracle Recruiting Cloud](https://www.oracle.com/human-capital-management/recruiting/)**
+  **[Oracle Recruiting Cloud](https://www.oracle.com/human-capital-management/recruiting/)**,
+  and **[JOIN](https://join.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms
-  except Eightfold and SAP SuccessFactors, which support roster companies only.
+  except Eightfold, SAP SuccessFactors, and JOIN, which support roster companies only.
 - **Dedicated sites**: **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
   **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
   **[TSMC careers](https://careers.tsmc.com)**.

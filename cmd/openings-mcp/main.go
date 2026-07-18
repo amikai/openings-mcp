@@ -214,6 +214,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		smartrecruitersAdapter,
 		ats.NewICIMSAdapter(hc),
 		ats.NewOracleAdapter(hc),
+		ats.NewJoinAdapter("https://join.com", hc),
 	)
 }
 

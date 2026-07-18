@@ -226,3 +226,18 @@ func TestATSRegistryIncludesOracle(t *testing.T) {
 		slug,
 	)
 }
+
+func TestATSRegistryIncludesJoin(t *testing.T) {
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+
+	adapter, slug, err := registry.Resolve("Routine Labs")
+	require.NoError(t, err)
+	assert.Equal(t, "join", adapter.Name())
+	assert.Equal(t, "routinelabs", slug)
+
+	adapter, slug, err = registry.Resolve("https://join.com/companies/routinelabs")
+	require.NoError(t, err)
+	assert.Equal(t, "join", adapter.Name())
+	assert.Equal(t, "routinelabs", slug)
+}
