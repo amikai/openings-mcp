@@ -108,10 +108,29 @@ func TestGetJobDetail(t *testing.T) {
 				Email:  NewOptNilString("personnel@maaconsultants.com,cj.yu@maaconsultants.com,eugene.shen@maaconsultants.com,fred.chou@maaconsultants.com"),
 				Reply:  NewOptNilString(""),
 			},
+			// The fixture's certificate, driverLicense, and localLanguage
+			// values were spliced in from live captures (jobs 85tm8 and
+			// 6tdvl) — the original capture had them empty, which would
+			// leave those decode paths untested.
 			Condition: JobDetailCondition{
 				WorkExp: NewOptNilString("不拘"),
 				Edu:     NewOptNilString("大學以上"),
 				Major:   []string{"資訊工程相關"},
+				Language: []JobDetailConditionLanguageItem{
+					{
+						Code:     NewOptNilInt(1),
+						Language: NewOptNilString("英文"),
+						Ability: NewOptJobDetailConditionLanguageItemAbility(JobDetailConditionLanguageItemAbility{
+							Listening: NewOptNilString("中等"),
+							Speaking:  NewOptNilString("略懂"),
+							Reading:   NewOptNilString("中等"),
+							Writing:   NewOptNilString("略懂"),
+						}),
+					},
+				},
+				LocalLanguage: []JobDetailConditionLocalLanguageItem{
+					{Code: NewOptNilInt(1), Language: NewOptNilString("台語"), Ability: NewOptNilString("精通")},
+				},
 				Specialty: []CodeDescription{
 					{Code: NewOptNilString("12001003009"), Description: NewOptNilString("C#")},
 					{Code: NewOptNilString("12001003006"), Description: NewOptNilString("ASP.NET")},
@@ -121,6 +140,24 @@ func TestGetJobDetail(t *testing.T) {
 					{Code: NewOptNilString("12001003094"), Description: NewOptNilString("IoT")},
 					{Code: NewOptNilString("12002003010"), Description: NewOptNilString("Revit")},
 				},
+				Skill: []CodeDescription{
+					{Code: NewOptNilString("11009005001"), Description: NewOptNilString("軟體程式設計")},
+					{Code: NewOptNilString("11009002008"), Description: NewOptNilString("軟體工程系統開發")},
+					{Code: NewOptNilString("11009005012"), Description: NewOptNilString("AI")},
+				},
+				Certificate: []JobDetailConditionCertificateItem{
+					{Code: NewOptNilInt(4006001025), Name: NewOptNilString("丙級會計事務技術士")},
+				},
+				DriverLicense: []string{"普通重型機車", "普通小型車"},
+				Other:         NewOptNilString("高度邏輯思考能力、善於溝通系統需求與設計取捨、具備獨立軟體開發能力\n具 Azure DevOps、Docker、Kubernetes 經驗者優先\n\n- 熟悉現代軟體系統研發流程與版本控制\n- 熟悉至少一種指令式程式設計語言（C#、JavaScript、Python、PHP 尤佳）\n- 具 ASP.NET、SQL、Vue.js、Laravel、Unity、GIS、IoT、Revit等開發經驗\n- 具軟體設計、開發、運營、開發、機器學習、AI 模型訓練 (Finetuning)、 AI 應用設計（OCR、RAG、LLM、Agentic 等）開發、導入經驗\n"),
+				AcceptRole: NewOptJobDetailConditionAcceptRole(JobDetailConditionAcceptRole{
+					Role: []JobDetailConditionAcceptRoleRoleItem{
+						{Code: NewOptNilInt(64), Description: NewOptNilString("原住民")},
+					},
+					DisRole: NewOptJobDetailConditionAcceptRoleDisRole(JobDetailConditionAcceptRoleDisRole{
+						NeedHandicapCompendium: NewOptNilBool(false),
+					}),
+				}),
 			},
 			Welfare: JobDetailWelfare{
 				Welfare: NewOptNilString("在亞新，我們重視同仁的職涯成長與友善職場，透過全方位的福利與支持，推動以人為本、永續發展的職場環境，實現工作與生活的和諧平衡。\n\n【薪酬與獎金】\n  •  具市場競爭力的薪資水準\n  •  年節獎金與專案獎金，共享成果回饋\n\n【健康與保障】\n  •  勞健保及完整團體保險(意外、醫療、重大疾病、職災保障)\n  •  定期健康檢查、健康講座與員工關懷方案\n\n【休假與彈性】\n  •  彈性上下班、育兒友善措施，兼顧生活平衡\n\n【教育訓練與發展】\n  •  完善新人培訓與師徒制\n  •  E-learning 線上學習資源\n  •  專業證照補助（如 PMP、專業技師等）\n  •  外部訓練與國際研討會，拓展國際視野\n  •  參與國家級重大工程，累積獨特專業經驗\n\n【生活與休閒】\n  •  福委會關懷：生日禮金、節慶禮品或禮券、婚喪喜慶、傷病住院慰問與生育補助\n  •  部門聚餐、咖啡分享日、社團活動、Happy Hour，促進交流與凝聚力\n  •  舒適職場環境：明亮開放空間、零食吧、茶包與自助研磨咖啡機\n\n【招募流程】\n  1. 投遞履歷\n  2. HR初審履歷 → 部門主管面試\n  3. Final面談（含專案介紹與Q&A）\n  4. 錄取通知\n （流程清楚透明，讓你安心應徵!)"),

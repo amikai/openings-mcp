@@ -199,6 +199,17 @@ type JobDetailCondition struct {
 	Edu       OptNilString      `json:"edu"`
 	Major     []string          `json:"major"`
 	Specialty []CodeDescription `json:"specialty"`
+	Skill     []CodeDescription `json:"skill"`
+	// Unlike CodeDescription, the label field is `name` and `code` is an integer (confirmed live, e.g. job
+	// 85tm8).
+	Certificate   []JobDetailConditionCertificateItem `json:"certificate"`
+	DriverLicense []string                            `json:"driverLicense"`
+	Language      []JobDetailConditionLanguageItem    `json:"language"`
+	// `ability` is a single proficiency string (e.g. "精通"), unlike language's per-skill ability object
+	// (confirmed live, e.g. job 6tdvl).
+	LocalLanguage []JobDetailConditionLocalLanguageItem `json:"localLanguage"`
+	Other         OptNilString                          `json:"other"`
+	AcceptRole    OptJobDetailConditionAcceptRole       `json:"acceptRole"`
 }
 
 // GetWorkExp returns the value of WorkExp.
@@ -221,6 +232,41 @@ func (s *JobDetailCondition) GetSpecialty() []CodeDescription {
 	return s.Specialty
 }
 
+// GetSkill returns the value of Skill.
+func (s *JobDetailCondition) GetSkill() []CodeDescription {
+	return s.Skill
+}
+
+// GetCertificate returns the value of Certificate.
+func (s *JobDetailCondition) GetCertificate() []JobDetailConditionCertificateItem {
+	return s.Certificate
+}
+
+// GetDriverLicense returns the value of DriverLicense.
+func (s *JobDetailCondition) GetDriverLicense() []string {
+	return s.DriverLicense
+}
+
+// GetLanguage returns the value of Language.
+func (s *JobDetailCondition) GetLanguage() []JobDetailConditionLanguageItem {
+	return s.Language
+}
+
+// GetLocalLanguage returns the value of LocalLanguage.
+func (s *JobDetailCondition) GetLocalLanguage() []JobDetailConditionLocalLanguageItem {
+	return s.LocalLanguage
+}
+
+// GetOther returns the value of Other.
+func (s *JobDetailCondition) GetOther() OptNilString {
+	return s.Other
+}
+
+// GetAcceptRole returns the value of AcceptRole.
+func (s *JobDetailCondition) GetAcceptRole() OptJobDetailConditionAcceptRole {
+	return s.AcceptRole
+}
+
 // SetWorkExp sets the value of WorkExp.
 func (s *JobDetailCondition) SetWorkExp(val OptNilString) {
 	s.WorkExp = val
@@ -239,6 +285,249 @@ func (s *JobDetailCondition) SetMajor(val []string) {
 // SetSpecialty sets the value of Specialty.
 func (s *JobDetailCondition) SetSpecialty(val []CodeDescription) {
 	s.Specialty = val
+}
+
+// SetSkill sets the value of Skill.
+func (s *JobDetailCondition) SetSkill(val []CodeDescription) {
+	s.Skill = val
+}
+
+// SetCertificate sets the value of Certificate.
+func (s *JobDetailCondition) SetCertificate(val []JobDetailConditionCertificateItem) {
+	s.Certificate = val
+}
+
+// SetDriverLicense sets the value of DriverLicense.
+func (s *JobDetailCondition) SetDriverLicense(val []string) {
+	s.DriverLicense = val
+}
+
+// SetLanguage sets the value of Language.
+func (s *JobDetailCondition) SetLanguage(val []JobDetailConditionLanguageItem) {
+	s.Language = val
+}
+
+// SetLocalLanguage sets the value of LocalLanguage.
+func (s *JobDetailCondition) SetLocalLanguage(val []JobDetailConditionLocalLanguageItem) {
+	s.LocalLanguage = val
+}
+
+// SetOther sets the value of Other.
+func (s *JobDetailCondition) SetOther(val OptNilString) {
+	s.Other = val
+}
+
+// SetAcceptRole sets the value of AcceptRole.
+func (s *JobDetailCondition) SetAcceptRole(val OptJobDetailConditionAcceptRole) {
+	s.AcceptRole = val
+}
+
+type JobDetailConditionAcceptRole struct {
+	Role    []JobDetailConditionAcceptRoleRoleItem `json:"role"`
+	DisRole OptJobDetailConditionAcceptRoleDisRole `json:"disRole"`
+}
+
+// GetRole returns the value of Role.
+func (s *JobDetailConditionAcceptRole) GetRole() []JobDetailConditionAcceptRoleRoleItem {
+	return s.Role
+}
+
+// GetDisRole returns the value of DisRole.
+func (s *JobDetailConditionAcceptRole) GetDisRole() OptJobDetailConditionAcceptRoleDisRole {
+	return s.DisRole
+}
+
+// SetRole sets the value of Role.
+func (s *JobDetailConditionAcceptRole) SetRole(val []JobDetailConditionAcceptRoleRoleItem) {
+	s.Role = val
+}
+
+// SetDisRole sets the value of DisRole.
+func (s *JobDetailConditionAcceptRole) SetDisRole(val OptJobDetailConditionAcceptRoleDisRole) {
+	s.DisRole = val
+}
+
+type JobDetailConditionAcceptRoleDisRole struct {
+	NeedHandicapCompendium OptNilBool `json:"needHandicapCompendium"`
+}
+
+// GetNeedHandicapCompendium returns the value of NeedHandicapCompendium.
+func (s *JobDetailConditionAcceptRoleDisRole) GetNeedHandicapCompendium() OptNilBool {
+	return s.NeedHandicapCompendium
+}
+
+// SetNeedHandicapCompendium sets the value of NeedHandicapCompendium.
+func (s *JobDetailConditionAcceptRoleDisRole) SetNeedHandicapCompendium(val OptNilBool) {
+	s.NeedHandicapCompendium = val
+}
+
+type JobDetailConditionAcceptRoleRoleItem struct {
+	Code        OptNilInt    `json:"code"`
+	Description OptNilString `json:"description"`
+}
+
+// GetCode returns the value of Code.
+func (s *JobDetailConditionAcceptRoleRoleItem) GetCode() OptNilInt {
+	return s.Code
+}
+
+// GetDescription returns the value of Description.
+func (s *JobDetailConditionAcceptRoleRoleItem) GetDescription() OptNilString {
+	return s.Description
+}
+
+// SetCode sets the value of Code.
+func (s *JobDetailConditionAcceptRoleRoleItem) SetCode(val OptNilInt) {
+	s.Code = val
+}
+
+// SetDescription sets the value of Description.
+func (s *JobDetailConditionAcceptRoleRoleItem) SetDescription(val OptNilString) {
+	s.Description = val
+}
+
+type JobDetailConditionCertificateItem struct {
+	Code OptNilInt    `json:"code"`
+	Name OptNilString `json:"name"`
+}
+
+// GetCode returns the value of Code.
+func (s *JobDetailConditionCertificateItem) GetCode() OptNilInt {
+	return s.Code
+}
+
+// GetName returns the value of Name.
+func (s *JobDetailConditionCertificateItem) GetName() OptNilString {
+	return s.Name
+}
+
+// SetCode sets the value of Code.
+func (s *JobDetailConditionCertificateItem) SetCode(val OptNilInt) {
+	s.Code = val
+}
+
+// SetName sets the value of Name.
+func (s *JobDetailConditionCertificateItem) SetName(val OptNilString) {
+	s.Name = val
+}
+
+type JobDetailConditionLanguageItem struct {
+	Code     OptNilInt                                `json:"code"`
+	Language OptNilString                             `json:"language"`
+	Ability  OptJobDetailConditionLanguageItemAbility `json:"ability"`
+}
+
+// GetCode returns the value of Code.
+func (s *JobDetailConditionLanguageItem) GetCode() OptNilInt {
+	return s.Code
+}
+
+// GetLanguage returns the value of Language.
+func (s *JobDetailConditionLanguageItem) GetLanguage() OptNilString {
+	return s.Language
+}
+
+// GetAbility returns the value of Ability.
+func (s *JobDetailConditionLanguageItem) GetAbility() OptJobDetailConditionLanguageItemAbility {
+	return s.Ability
+}
+
+// SetCode sets the value of Code.
+func (s *JobDetailConditionLanguageItem) SetCode(val OptNilInt) {
+	s.Code = val
+}
+
+// SetLanguage sets the value of Language.
+func (s *JobDetailConditionLanguageItem) SetLanguage(val OptNilString) {
+	s.Language = val
+}
+
+// SetAbility sets the value of Ability.
+func (s *JobDetailConditionLanguageItem) SetAbility(val OptJobDetailConditionLanguageItemAbility) {
+	s.Ability = val
+}
+
+type JobDetailConditionLanguageItemAbility struct {
+	Listening OptNilString `json:"listening"`
+	Speaking  OptNilString `json:"speaking"`
+	Reading   OptNilString `json:"reading"`
+	Writing   OptNilString `json:"writing"`
+}
+
+// GetListening returns the value of Listening.
+func (s *JobDetailConditionLanguageItemAbility) GetListening() OptNilString {
+	return s.Listening
+}
+
+// GetSpeaking returns the value of Speaking.
+func (s *JobDetailConditionLanguageItemAbility) GetSpeaking() OptNilString {
+	return s.Speaking
+}
+
+// GetReading returns the value of Reading.
+func (s *JobDetailConditionLanguageItemAbility) GetReading() OptNilString {
+	return s.Reading
+}
+
+// GetWriting returns the value of Writing.
+func (s *JobDetailConditionLanguageItemAbility) GetWriting() OptNilString {
+	return s.Writing
+}
+
+// SetListening sets the value of Listening.
+func (s *JobDetailConditionLanguageItemAbility) SetListening(val OptNilString) {
+	s.Listening = val
+}
+
+// SetSpeaking sets the value of Speaking.
+func (s *JobDetailConditionLanguageItemAbility) SetSpeaking(val OptNilString) {
+	s.Speaking = val
+}
+
+// SetReading sets the value of Reading.
+func (s *JobDetailConditionLanguageItemAbility) SetReading(val OptNilString) {
+	s.Reading = val
+}
+
+// SetWriting sets the value of Writing.
+func (s *JobDetailConditionLanguageItemAbility) SetWriting(val OptNilString) {
+	s.Writing = val
+}
+
+type JobDetailConditionLocalLanguageItem struct {
+	Code     OptNilInt    `json:"code"`
+	Language OptNilString `json:"language"`
+	Ability  OptNilString `json:"ability"`
+}
+
+// GetCode returns the value of Code.
+func (s *JobDetailConditionLocalLanguageItem) GetCode() OptNilInt {
+	return s.Code
+}
+
+// GetLanguage returns the value of Language.
+func (s *JobDetailConditionLocalLanguageItem) GetLanguage() OptNilString {
+	return s.Language
+}
+
+// GetAbility returns the value of Ability.
+func (s *JobDetailConditionLocalLanguageItem) GetAbility() OptNilString {
+	return s.Ability
+}
+
+// SetCode sets the value of Code.
+func (s *JobDetailConditionLocalLanguageItem) SetCode(val OptNilInt) {
+	s.Code = val
+}
+
+// SetLanguage sets the value of Language.
+func (s *JobDetailConditionLocalLanguageItem) SetLanguage(val OptNilString) {
+	s.Language = val
+}
+
+// SetAbility sets the value of Ability.
+func (s *JobDetailConditionLocalLanguageItem) SetAbility(val OptNilString) {
+	s.Ability = val
 }
 
 type JobDetailContact struct {
@@ -1028,6 +1317,212 @@ func (o OptInt) Get() (v int, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptInt) Or(d int) int {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobDetailConditionAcceptRole returns new OptJobDetailConditionAcceptRole with value set to v.
+func NewOptJobDetailConditionAcceptRole(v JobDetailConditionAcceptRole) OptJobDetailConditionAcceptRole {
+	return OptJobDetailConditionAcceptRole{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobDetailConditionAcceptRole is optional JobDetailConditionAcceptRole.
+type OptJobDetailConditionAcceptRole struct {
+	Value JobDetailConditionAcceptRole
+	Set   bool
+}
+
+// IsSet returns true if OptJobDetailConditionAcceptRole was set.
+func (o OptJobDetailConditionAcceptRole) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobDetailConditionAcceptRole) Reset() {
+	var v JobDetailConditionAcceptRole
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobDetailConditionAcceptRole) SetTo(v JobDetailConditionAcceptRole) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobDetailConditionAcceptRole) Get() (v JobDetailConditionAcceptRole, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobDetailConditionAcceptRole) Or(d JobDetailConditionAcceptRole) JobDetailConditionAcceptRole {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobDetailConditionAcceptRoleDisRole returns new OptJobDetailConditionAcceptRoleDisRole with value set to v.
+func NewOptJobDetailConditionAcceptRoleDisRole(v JobDetailConditionAcceptRoleDisRole) OptJobDetailConditionAcceptRoleDisRole {
+	return OptJobDetailConditionAcceptRoleDisRole{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobDetailConditionAcceptRoleDisRole is optional JobDetailConditionAcceptRoleDisRole.
+type OptJobDetailConditionAcceptRoleDisRole struct {
+	Value JobDetailConditionAcceptRoleDisRole
+	Set   bool
+}
+
+// IsSet returns true if OptJobDetailConditionAcceptRoleDisRole was set.
+func (o OptJobDetailConditionAcceptRoleDisRole) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobDetailConditionAcceptRoleDisRole) Reset() {
+	var v JobDetailConditionAcceptRoleDisRole
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobDetailConditionAcceptRoleDisRole) SetTo(v JobDetailConditionAcceptRoleDisRole) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobDetailConditionAcceptRoleDisRole) Get() (v JobDetailConditionAcceptRoleDisRole, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobDetailConditionAcceptRoleDisRole) Or(d JobDetailConditionAcceptRoleDisRole) JobDetailConditionAcceptRoleDisRole {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptJobDetailConditionLanguageItemAbility returns new OptJobDetailConditionLanguageItemAbility with value set to v.
+func NewOptJobDetailConditionLanguageItemAbility(v JobDetailConditionLanguageItemAbility) OptJobDetailConditionLanguageItemAbility {
+	return OptJobDetailConditionLanguageItemAbility{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptJobDetailConditionLanguageItemAbility is optional JobDetailConditionLanguageItemAbility.
+type OptJobDetailConditionLanguageItemAbility struct {
+	Value JobDetailConditionLanguageItemAbility
+	Set   bool
+}
+
+// IsSet returns true if OptJobDetailConditionLanguageItemAbility was set.
+func (o OptJobDetailConditionLanguageItemAbility) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptJobDetailConditionLanguageItemAbility) Reset() {
+	var v JobDetailConditionLanguageItemAbility
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptJobDetailConditionLanguageItemAbility) SetTo(v JobDetailConditionLanguageItemAbility) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptJobDetailConditionLanguageItemAbility) Get() (v JobDetailConditionLanguageItemAbility, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptJobDetailConditionLanguageItemAbility) Or(d JobDetailConditionLanguageItemAbility) JobDetailConditionLanguageItemAbility {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilBool returns new OptNilBool with value set to v.
+func NewOptNilBool(v bool) OptNilBool {
+	return OptNilBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilBool is optional nullable bool.
+type OptNilBool struct {
+	Value bool
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilBool was set.
+func (o OptNilBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilBool) SetTo(v bool) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilBool) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilBool) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v bool
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilBool) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilBool) Get() (v bool, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilBool) Or(d bool) bool {
 	if v, ok := o.Get(); ok {
 		return v
 	}
