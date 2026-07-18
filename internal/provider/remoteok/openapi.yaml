@@ -1,0 +1,151 @@
+openapi: 3.1.0
+
+info:
+  title: Remote OK Public Job Feed
+  version: "1.0.0"
+  description: >
+    The single public, unauthenticated endpoint behind remoteok.com's data
+    feed. There is no official spec; this contract is derived from captured
+    live traffic (2026-07-19).
+
+    The feed is a full dump: one GET returns the ~100 most recent jobs,
+    each already carrying its full HTML description. There is no
+    pagination and no detail-by-id endpoint — "detail" means re-fetching
+    the dump and picking the id out of it.
+
+    The response array is heterogeneous: element 0 is always a
+    legal/attribution notice, the remaining elements are jobs. The
+    notice's terms require consumers to credit Remote OK by name and link
+    back to the job's `url` directly (no redirects).
+
+    No User-Agent requirement: Go's default UA gets 200.
+
+servers:
+  - url: https://remoteok.com
+
+paths:
+  /api:
+    get:
+      operationId: getJobs
+      summary: Fetch the job feed, optionally filtered by tags
+      description: >
+        Without `tags`, the window is the ~100 most recent jobs overall.
+        With `tags`, it is the ~100 most recent jobs matching the tag
+        set, which can include jobs older than the unfiltered window —
+        so a job found via a tag search is not guaranteed to appear in
+        the plain dump.
+      parameters:
+        - name: tags
+          in: query
+          required: false
+          style: form
+          explode: false
+          description: >
+            Tag filter; multiple values are comma-joined and AND-ed
+            (a job must carry every tag). Unknown tags are not an
+            error: the response is just the legal element alone.
+          schema:
+            type: array
+            items:
+              type: string
+          example: ["golang", "react"]
+      responses:
+        "200":
+          description: Legal notice followed by the matching jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Feed"
+
+components:
+  schemas:
+    Feed:
+      type: array
+      items:
+        $ref: "#/components/schemas/Element"
+
+    Element:
+      oneOf:
+        - $ref: "#/components/schemas/LegalNotice"
+        - $ref: "#/components/schemas/Job"
+
+    LegalNotice:
+      type: object
+      description: >
+        Always the first array element. Carries the API terms of
+        service: credit Remote OK as the source and link back to the
+        job's `url` with a direct link.
+      required: [last_updated, legal]
+      properties:
+        last_updated:
+          type: integer
+          format: int64
+          description: Feed generation time, epoch seconds.
+        legal:
+          type: string
+          description: API terms-of-service text.
+
+    Job:
+      type: object
+      description: >
+        All fields below were present on every observed job, but only
+        the identity pair is marked required so a single upstream
+        omission cannot fail decoding of the whole dump. Absent values
+        are empty strings / 0, never null.
+      required: [id, slug]
+      properties:
+        id:
+          type: string
+          description: Job id; a numeric string, e.g. "1134996".
+        slug:
+          type: string
+          description: URL slug of the posting.
+        epoch:
+          type: integer
+          format: int64
+          description: Posting time, epoch seconds.
+        date:
+          type: string
+          description: Posting time, ISO 8601 with offset.
+        company:
+          type: string
+        company_logo:
+          type: string
+          description: Logo URL; often empty.
+        position:
+          type: string
+          description: Job title.
+        tags:
+          type: array
+          items:
+            type: string
+        description:
+          type: string
+          description: >
+            Full posting body as HTML. Every description ends with an
+            anti-spam "Please mention the word …" blurb, and on some
+            jobs the blurb is the entire description.
+        location:
+          type: string
+          description: >
+            Free text; may be empty and often carries a trailing ", ".
+        apply_url:
+          type: string
+          description: Equal to `url` on every observed job.
+        salary_min:
+          type: integer
+          description: Annual salary lower bound; 0 when unknown.
+        salary_max:
+          type: integer
+          description: Annual salary upper bound; 0 when unknown.
+        logo:
+          type: string
+          description: Logo URL; often empty.
+        url:
+          type: string
+          description: >
+            Remote OK posting page. The ToS require linking to this URL
+            directly when republishing.
+        original:
+          type: boolean
+          description: Present only on rare elements; meaning undocumented.
