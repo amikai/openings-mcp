@@ -17,7 +17,8 @@ adapter: Mynavi is a single job board, not a multi-tenant ATS.
 
 ## Search scope: national /list/ only
 
-Verified live (see openapi.yaml for the full DSL):
+Verified live (the full DSL contract lives in the package doc comment,
+internal/provider/mynavi/doc.go):
 
 - `kw{keywords}` — space-separated AND terms; `min{NNNN}` — fixed-step
   salary floor; `pg{N}` — 1-based pages of 50. Segment order free.

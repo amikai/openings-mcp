@@ -11,7 +11,6 @@ OPENAPI_SPECS := \
 	internal/provider/jobindex/openapi.yaml \
 	internal/provider/lever/openapi.yaml \
 	internal/provider/linkedin/openapi.yaml \
-	internal/provider/mynavi/openapi.yaml \
 	internal/provider/nvidia/openapi.yaml \
 	internal/provider/oracle/openapi.yaml \
 	internal/provider/recruitee/openapi.yaml \

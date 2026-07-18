@@ -29,9 +29,9 @@ var mynaviSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-// mynaviSearchInputSchema is hand-written JSON kept aligned with
-// openapi.yaml's searchJobs path-token DSL (kw/min/pg); min_salary's enum
-// mirrors mynavi.MinSalaries.
+// mynaviSearchInputSchema is hand-written JSON kept aligned with the
+// mynavi package's path-token DSL (kw/min/pg); min_salary's enum mirrors
+// mynavi.MinSalaries.
 var mynaviSearchInputSchema = mustSchema(mynaviSearchInputRawSchema)
 
 type mynaviSearchInput struct {

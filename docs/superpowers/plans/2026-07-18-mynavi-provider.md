@@ -10,8 +10,11 @@ pipeline:
    min-salary steps, multi-keyword, zero-hit, 404s, the /tokyo/ legacy-page
    trap, `?soff=` no-op); captured jobs/empty/detail fixtures + five hurl
    files; `hurl --test` green.
-3. ~~openapi.yaml~~ — documentation-grade spec of the DSL and both pages;
-   added to `OPENAPI_SPECS`; validates.
+3. ~~API contract~~ — no generated client (hand-written goquery scraper),
+   so no openapi.yaml: the DSL and page contract are documented in the
+   package doc comment (`internal/provider/mynavi/doc.go`) instead. (A
+   doc-grade openapi.yaml was written first and folded into doc.go on
+   review — nothing consumed it.)
 4. ~~Provider package~~ — client/parse/mocksrv + tests.
 5. ~~Debug CLI~~ — `cmd/mynavi` search/detail (jobindex shape); verified
    live including error paths.

@@ -39,7 +39,7 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 }
 
 // JobsRequest describes one search-results page. Filters map to マイナビ転職's
-// URL path-token DSL (see openapi.yaml).
+// URL path-token DSL (see the package documentation).
 type JobsRequest struct {
 	Keywords  string // free text; space-separated terms AND together
 	MinSalary int    // annual floor in 万円, one of MinSalaries; 0 = no filter
