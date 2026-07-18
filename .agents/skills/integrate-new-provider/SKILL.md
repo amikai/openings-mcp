@@ -127,6 +127,11 @@ is the most recent worked example.
 - Brainstorm and plan each stage under `docs/superpowers/{plans,specs}`;
   the ashby documents there are the template (openapi → provider → cli).
 - Never hand-edit `oas_*_gen.go`; change `openapi.yaml` and regenerate.
+- Document provider-specific quirks (e.g. opaque params, odd value
+  domains, soft filters) in `openapi.yaml` (then regenerate) when
+  the provider has a spec, otherwise in the package's `doc.go`. A quirk
+  scoped to a single operation in a spec-less provider may go in that
+  method's godoc instead of `doc.go`.
 - Fixtures are captured real responses, never hand-written JSON.
 
 ## Common Mistakes
