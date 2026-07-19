@@ -79,11 +79,21 @@ func TestSearchAPIRequestMultipleLocations(t *testing.T) {
 	request, err := searchAPIRequest(SearchRequest{
 		Keyword:     "go",
 		CountryCode: testCountryCode,
-		Locations:   []string{"TPEI", "ntc9"},
+		Locations:   []string{"TPEI", "state953"},
 	})
 	require.NoError(t, err)
-	assert.Equal(t, []string{"postLocation-TWN", "postLocation-TPEI", "postLocation-NTC9"}, request.Filters.Locations,
-		"CountryCode and Locations combine into one OR'd list")
+	assert.Equal(t, []string{"postLocation-TWN", "postLocation-TPEI", "postLocation-state953"}, request.Filters.Locations,
+		"CountryCode and Locations combine into one OR'd list, preserving location-code case")
+}
+
+func TestLocationFilterCodePreservesCase(t *testing.T) {
+	// Apple location codes are case-sensitive: postLocation-state953 and
+	// postLocation-STATE953 are different filters, and only the correctly
+	// cased one returns live matches. Unlike team, sub-team, and product
+	// codes, location codes must never be uppercased.
+	request, err := searchAPIRequest(SearchRequest{Keyword: "go", Locations: []string{"state953"}})
+	require.NoError(t, err)
+	assert.Equal(t, []string{"postLocation-state953"}, request.Filters.Locations)
 }
 
 func TestSearchJobsMultipleLocationsWithoutCountry(t *testing.T) {
@@ -94,7 +104,7 @@ func TestSearchJobsMultipleLocationsWithoutCountry(t *testing.T) {
 
 	response, err := client.SearchJobs(t.Context(), SearchRequest{
 		Keyword:   mockMultiLocationKeyword,
-		Locations: []string{"tpei", "NTC9"},
+		Locations: []string{"TPEI", "NTC9"},
 	})
 	require.NoError(t, err, "Locations alone, without CountryCode, must reach the search endpoint")
 	assert.Equal(t, 11, response.Res.TotalRecords)

@@ -231,7 +231,7 @@ func (s *SearchFilters) Validate() error {
 					MaxLengthSet:  false,
 					Email:         false,
 					Hostname:      false,
-					Regex:         regexMap["^postLocation-[A-Z0-9]+$"],
+					Regex:         regexMap["^postLocation-[A-Za-z0-9]+$"],
 					MinNumeric:    0,
 					MinNumericSet: false,
 					MaxNumeric:    0,

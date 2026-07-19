@@ -22,7 +22,10 @@ info:
     - location filters are Apple IDs at any granularity: country
       (`postLocation-TWN`), state (`postLocation-TPEI`), metro area
       (`postLocation-TAIP`), or city (`postLocation-NTC9`); several may be
-      combined and match any listed location. The public typeahead
+      combined and match any listed location. Location IDs are
+      case-sensitive — `postLocation-state953` and `postLocation-STATE953`
+      are different filters, and only one returns matches — so callers must
+      use the exact ID returned by the typeahead. The public typeahead
       `GET /api/v1/refData/postlocation?input=…` resolves names to IDs;
     - team and language IDs come from the public
       `GET /api/v1/refData/teamsofinterest` and
@@ -169,7 +172,7 @@ components:
           minItems: 1
           items:
             type: string
-            pattern: '^postLocation-[A-Z0-9]+$'
+            pattern: '^postLocation-[A-Za-z0-9]+$'
         homeOffice:
           type: boolean
         keywords:

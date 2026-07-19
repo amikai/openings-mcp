@@ -39,7 +39,7 @@ func main() {
 	var (
 		keyword        = searchFS.StringLong("keyword", "", "keyword query (required)")
 		country        = searchFS.StringLong("country", "", "ISO 3166-1 alpha-3 country code, e.g. TWN or USA (required unless --location is set)")
-		locations      = searchFS.StringListLong("location", "location code at any granularity, e.g. TPEI or NTC9, OR'd with --country (repeatable)")
+		locations      = searchFS.StringListLong("location", "case-sensitive location code at any granularity, e.g. TPEI or state953, OR'd with --country (repeatable)")
 		sort           = searchFS.StringEnumLong("sort", "result order", "relevance", "newest", "teamAsc", "teamDesc", "locationAsc", "locationDesc")
 		page           = searchFS.IntLong("page", 1, "1-based page of 20 results")
 		homeOffice     = searchFS.BoolLong("home-office", "only remote-eligible postings")

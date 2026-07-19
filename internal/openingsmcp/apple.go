@@ -26,7 +26,7 @@ var appleSearchInputRawSchema = []byte(`{
 		},
 		"locations": {
 			"type": "array",
-			"description": "Location codes at any granularity (state, metro, or city), e.g. TPEI or NTC9, OR'd with country_code. Required unless country_code is set.",
+			"description": "Case-sensitive location codes at any granularity (state, metro, or city), e.g. TPEI or state953, OR'd with country_code. Required unless country_code is set.",
 			"items": {"type": "string", "pattern": "^[A-Za-z0-9]+$"}
 		},
 		"sort": {

@@ -55,10 +55,12 @@ func ParseTeamFilter(value string) (TeamFilter, error) {
 // SearchRequest contains the stable, caller-facing Apple search parameters.
 // Keyword is required, and at least one of CountryCode or Locations must be
 // set; every other filter narrows the result set. CountryCode is an ISO
-// 3166-1 alpha-3 code such as TWN or USA. Locations are bare Apple location
-// codes at any granularity (state, metro, or city, such as TPEI, TAIP, or
-// NTC9), listed by jobs.apple.com's location typeahead. CountryCode and
-// Locations combine into one OR'd location filter when both are set.
+// 3166-1 alpha-3 code such as TWN or USA. Locations are bare, case-sensitive
+// Apple location codes at any granularity (state, metro, or city, such as
+// TPEI or state953), listed by jobs.apple.com's location typeahead; passing
+// the wrong case (e.g. STATE953) resolves to a different, usually empty,
+// filter. CountryCode and Locations combine into one OR'd location filter
+// when both are set.
 type SearchRequest struct {
 	Keyword     string
 	CountryCode string
@@ -253,11 +255,11 @@ func locationFilterIDs(request SearchRequest) ([]string, error) {
 		ids = append(ids, locationID)
 	}
 	for _, location := range request.Locations {
-		locationCode, err := filterCode("location", location)
+		code, err := locationFilterCode(location)
 		if err != nil {
 			return nil, err
 		}
-		ids = append(ids, "postLocation-"+locationCode)
+		ids = append(ids, "postLocation-"+code)
 	}
 	if len(ids) == 0 {
 		return nil, errors.New("at least one of country code or locations is required")
@@ -324,7 +326,9 @@ func teamSearchFilters(teams []TeamFilter) ([]SearchTeamFilter, error) {
 }
 
 // filterCode validates a bare Apple filter code such as SFTWR or IPHN and
-// returns its canonical uppercase form.
+// returns its canonical uppercase form. Team, sub-team, and product codes
+// are uppercase-only, so coercing case here is safe and forgiving of
+// caller input.
 func filterCode(kind, code string) (string, error) {
 	code = strings.ToUpper(strings.TrimSpace(code))
 	if code == "" {
@@ -333,6 +337,24 @@ func filterCode(kind, code string) (string, error) {
 	for _, char := range code {
 		if (char < 'A' || char > 'Z') && (char < '0' || char > '9') {
 			return "", fmt.Errorf("%s code must contain only ascii letters and digits, got %q", kind, code)
+		}
+	}
+	return code, nil
+}
+
+// locationFilterCode validates a bare Apple location code such as TPEI or
+// state953 and preserves its case. Unlike team, sub-team, and product
+// codes, location codes are case-sensitive: postLocation-state953 and
+// postLocation-STATE953 are different filters, and only the correctly
+// cased one returns matches.
+func locationFilterCode(code string) (string, error) {
+	code = strings.TrimSpace(code)
+	if code == "" {
+		return "", errors.New("location code must not be blank")
+	}
+	for _, char := range code {
+		if (char < 'A' || char > 'Z') && (char < 'a' || char > 'z') && (char < '0' || char > '9') {
+			return "", fmt.Errorf("location code must contain only ascii letters and digits, got %q", code)
 		}
 	}
 	return code, nil
