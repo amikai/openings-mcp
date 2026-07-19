@@ -21,6 +21,15 @@ type Handler interface {
 	//
 	// GET /api/v1/CSRFToken
 	InitSession(ctx context.Context) (*InitSessionOK, error)
+	// ListTeams implements listTeams operation.
+	//
+	// Anonymous reference-data endpoint behind the search page's Teams filter; it needs no search session.
+	// Sibling refData endpoints: `postlocation?input=…` and `languagesByInput?input=…` are public
+	// typeaheads, while `products` rejects anonymous sessions (the product list is embedded in the
+	// server-rendered search page).
+	//
+	// GET /api/v1/refData/teamsofinterest
+	ListTeams(ctx context.Context) (*TeamsResponse, error)
 	// PostSearchJobs implements postSearchJobs operation.
 	//
 	// Search Apple job postings.

@@ -22,7 +22,7 @@ func TestRunSearchValidation(t *testing.T) {
 		{name: "keyword", flags: searchFlags{country: cliTestCountryCode, page: 1}, want: "--keyword is required"},
 		{name: "country", flags: searchFlags{keyword: "camera", page: 1}, want: "--country is required"},
 		{name: "page", flags: searchFlags{keyword: "sensor", country: cliTestCountryCode}, want: "--page must be >= 1"},
-		{name: "team", flags: searchFlags{keyword: "sensor", country: cliTestCountryCode, page: 1, teams: []string{"HRDWR"}}, want: "--team must be TEAM/SUBTEAM"},
+		{name: "team", flags: searchFlags{keyword: "sensor", country: cliTestCountryCode, page: 1, teams: []string{"HRDWR"}}, want: "team filter must be TEAM/SUBTEAM"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -68,6 +68,20 @@ func TestWriteDetail(t *testing.T) {
 	assert.Contains(t, output.String(), "[200624996] SoC Packaging Engineer")
 	assert.Contains(t, output.String(), "Responsibilities")
 	assert.Contains(t, output.String(), "Minimum qualifications")
+}
+
+func TestWriteFilters(t *testing.T) {
+	server := apple.NewMockServer()
+	t.Cleanup(server.Close)
+	client, err := apple.NewJobsClient(server.URL, server.Client())
+	require.NoError(t, err)
+	teams, err := client.ListTeams(t.Context())
+	require.NoError(t, err)
+
+	var output bytes.Buffer
+	require.NoError(t, writeFilters(&output, "text", teams))
+	assert.Contains(t, output.String(), "HRDWR/CAM\tHardware: Camera Technologies")
+	assert.Contains(t, output.String(), "IPHN\tiPhone")
 }
 
 func TestLocationLabel(t *testing.T) {

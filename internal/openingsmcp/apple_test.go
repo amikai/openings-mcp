@@ -48,7 +48,53 @@ func TestRegisterApple(t *testing.T) {
 	client, err := apple.NewJobsClient("https://jobs.apple.com", nil)
 	require.NoError(t, err)
 	RegisterApple(server, client)
-	assertTools(t, server, appleSearchToolName, appleDetailToolName)
+	assertTools(t, server, appleSearchToolName, appleDetailToolName, appleFiltersToolName)
+}
+
+func TestAppleGetSearchFiltersE2E(t *testing.T) {
+	client := testAppleMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      appleFiltersToolName,
+		Arguments: map[string]any{},
+	})
+	require.NoError(t, err)
+	require.False(t, result.IsError)
+
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	var output appleFiltersOutput
+	require.NoError(t, json.Unmarshal(data, &output))
+	assert.Len(t, output.Teams, 84)
+	assert.Contains(t, output.Teams, appleFilterOption{Value: "HRDWR/CAM", Name: "Hardware: Camera Technologies"})
+	assert.Len(t, output.Products, 31)
+	assert.Contains(t, output.Products, appleFilterOption{Value: "IPHN", Name: "iPhone"})
+}
+
+func TestAppleSearchJobsFilteredE2E(t *testing.T) {
+	client := testAppleMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name: "apple_search_jobs",
+		Arguments: map[string]any{
+			appleTestKeywordKey: "engineer",
+			"country_code":      "USA",
+			appleTestSortKey:    string(apple.SortNewest),
+			appleTestPageKey:    2,
+			"keywords":          []string{"camera"},
+			"teams":             []string{"HRDWR/CAM"},
+			"products":          []string{"IPHN"},
+			"languages":         []string{"en_US"},
+		},
+	})
+	require.NoError(t, err)
+	require.False(t, result.IsError)
+
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	var output appleSearchOutput
+	require.NoError(t, json.Unmarshal(data, &output))
+	assert.Equal(t, 63, output.Total)
+	assert.Equal(t, 2, output.Page)
+	require.Len(t, output.Data, 20)
 }
 
 func TestAppleSearchJobsE2E(t *testing.T) {

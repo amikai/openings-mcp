@@ -37,10 +37,19 @@ const (
 
 // TeamFilter selects one Apple team and sub-team pair by bare code, such as
 // {SFTWR, AF} for "Software and Services: Apps and Frameworks". Codes are
-// listed by the public /api/v1/refData/teamsofinterest endpoint.
+// listed by [JobsClient.ListTeams].
 type TeamFilter struct {
 	TeamCode    string
 	SubTeamCode string
+}
+
+// ParseTeamFilter splits a TEAM/SUBTEAM code pair such as HRDWR/CAM.
+func ParseTeamFilter(value string) (TeamFilter, error) {
+	teamCode, subTeamCode, ok := strings.Cut(value, "/")
+	if !ok {
+		return TeamFilter{}, fmt.Errorf("team filter must be TEAM/SUBTEAM codes such as HRDWR/CAM, got %q", value)
+	}
+	return TeamFilter{TeamCode: teamCode, SubTeamCode: subTeamCode}, nil
 }
 
 // SearchRequest contains the stable, caller-facing Apple search parameters.
@@ -136,6 +145,16 @@ func (c *JobsClient) SearchJobs(ctx context.Context, request SearchRequest) (*Se
 	default:
 		return nil, fmt.Errorf("search apple jobs: unexpected response type %T", response)
 	}
+}
+
+// ListTeams returns Apple's team and sub-team filter taxonomy. The endpoint
+// is anonymous reference data and needs no search session.
+func (c *JobsClient) ListTeams(ctx context.Context) (*TeamsResponse, error) {
+	response, err := c.api.ListTeams(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("list apple teams: %w", err)
+	}
+	return response, nil
 }
 
 // JobDetail returns the complete public posting for a numeric Apple position

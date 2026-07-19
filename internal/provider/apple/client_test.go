@@ -103,6 +103,34 @@ func TestSearchJobsValidation(t *testing.T) {
 	}
 }
 
+func TestListTeams(t *testing.T) {
+	srv := NewMockServer()
+	t.Cleanup(srv.Close)
+	client, err := NewJobsClient(srv.URL, srv.Client())
+	require.NoError(t, err)
+
+	response, err := client.ListTeams(t.Context())
+	require.NoError(t, err)
+	require.Len(t, response.Res, 11)
+
+	first := response.Res[0]
+	assert.Equal(t, "teamsAndSubTeams-MLAI", first.ID)
+	assert.Equal(t, "Machine Learning and AI", first.Type)
+	require.NotEmpty(t, first.Teams)
+	assert.Equal(t, "MLI", first.Teams[0].Code)
+	assert.Equal(t, "MLAI", first.Teams[0].TeamCode)
+	assert.Equal(t, "Machine Learning and AI: Machine Learning Infrastructure", first.Teams[0].DisplayName)
+}
+
+func TestParseTeamFilter(t *testing.T) {
+	team, err := ParseTeamFilter("HRDWR/CAM")
+	require.NoError(t, err)
+	assert.Equal(t, TeamFilter{TeamCode: "HRDWR", SubTeamCode: "CAM"}, team)
+
+	_, err = ParseTeamFilter("HRDWR")
+	assert.ErrorContains(t, err, "TEAM/SUBTEAM")
+}
+
 func TestJobDetail(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)

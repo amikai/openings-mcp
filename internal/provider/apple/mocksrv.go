@@ -41,6 +41,9 @@ var mockJobDetailResponse []byte
 //go:embed testdata/job_detail_not_found_rsp.json
 var mockJobDetailNotFoundResponse []byte
 
+//go:embed testdata/teams_rsp.json
+var mockTeamsResponse []byte
+
 // NewMockServer returns an httptest.Server that replays captured Apple Jobs
 // responses, including the CSRF header and session-cookie search contract.
 // The caller owns the server and must Close it.
@@ -70,6 +73,9 @@ func NewMockServer() *httptest.Server {
 			return
 		}
 		serveMockJSON(w, http.StatusOK, fixture)
+	})
+	mux.HandleFunc("GET /api/v1/refData/teamsofinterest", func(w http.ResponseWriter, _ *http.Request) {
+		serveMockJSON(w, http.StatusOK, mockTeamsResponse)
 	})
 	mux.HandleFunc("GET /api/v1/jobDetails/{jobId}", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("locale") != "en-us" || r.PathValue("jobId") == MockNotFoundJobID {

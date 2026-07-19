@@ -32,6 +32,18 @@ func (UnimplementedHandler) InitSession(ctx context.Context) (r *InitSessionOK, 
 	return r, ht.ErrNotImplemented
 }
 
+// ListTeams implements listTeams operation.
+//
+// Anonymous reference-data endpoint behind the search page's Teams filter; it needs no search session.
+// Sibling refData endpoints: `postlocation?input=…` and `languagesByInput?input=…` are public
+// typeaheads, while `products` rejects anonymous sessions (the product list is embedded in the
+// server-rendered search page).
+//
+// GET /api/v1/refData/teamsofinterest
+func (UnimplementedHandler) ListTeams(ctx context.Context) (r *TeamsResponse, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
 // PostSearchJobs implements postSearchJobs operation.
 //
 // Search Apple job postings.

@@ -41,6 +41,15 @@ type Invoker interface {
 	//
 	// GET /api/v1/CSRFToken
 	InitSession(ctx context.Context) (*InitSessionOK, error)
+	// ListTeams invokes listTeams operation.
+	//
+	// Anonymous reference-data endpoint behind the search page's Teams filter; it needs no search session.
+	// Sibling refData endpoints: `postlocation?input=…` and `languagesByInput?input=…` are public
+	// typeaheads, while `products` rejects anonymous sessions (the product list is embedded in the
+	// server-rendered search page).
+	//
+	// GET /api/v1/refData/teamsofinterest
+	ListTeams(ctx context.Context) (*TeamsResponse, error)
 	// PostSearchJobs invokes postSearchJobs operation.
 	//
 	// Search Apple job postings.
@@ -278,6 +287,89 @@ func (c *Client) sendInitSession(ctx context.Context) (res *InitSessionOK, err e
 
 	stage = "DecodeResponse"
 	result, err := decodeInitSessionResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListTeams invokes listTeams operation.
+//
+// Anonymous reference-data endpoint behind the search page's Teams filter; it needs no search session.
+// Sibling refData endpoints: `postlocation?input=…` and `languagesByInput?input=…` are public
+// typeaheads, while `products` rejects anonymous sessions (the product list is embedded in the
+// server-rendered search page).
+//
+// GET /api/v1/refData/teamsofinterest
+func (c *Client) ListTeams(ctx context.Context) (*TeamsResponse, error) {
+	res, err := c.sendListTeams(ctx)
+	return res, err
+}
+
+func (c *Client) sendListTeams(ctx context.Context) (res *TeamsResponse, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("listTeams"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/api/v1/refData/teamsofinterest"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListTeamsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/api/v1/refData/teamsofinterest"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListTeamsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

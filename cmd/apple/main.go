@@ -17,7 +17,10 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 )
 
-const defaultBaseURL = "https://jobs.apple.com"
+const (
+	defaultBaseURL = "https://jobs.apple.com"
+	jsonFormat     = "json"
+)
 
 func main() {
 	rootFlags := ff.NewFlagSet("apple")
@@ -91,6 +94,25 @@ func main() {
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, detailCmd)
+
+	filtersFS := ff.NewFlagSet("filters").SetParent(rootFlags)
+	filtersCmd := &ff.Command{
+		Name:      "filters",
+		Usage:     "apple filters",
+		ShortHelp: "list team and product filter codes for search",
+		Flags:     filtersFS,
+		Exec: func(ctx context.Context, args []string) error {
+			if len(args) > 0 {
+				return fmt.Errorf("filters takes no positional arguments, got %v", args)
+			}
+			return runFilters(ctx, filterFlags{
+				baseURL: *baseURL,
+				timeout: *timeout,
+				format:  *format,
+			}, os.Stdout)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, filtersCmd)
 
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
@@ -168,17 +190,17 @@ func runSearch(ctx context.Context, flags searchFlags, out io.Writer) error {
 func teamFilters(values []string) ([]apple.TeamFilter, error) {
 	teams := make([]apple.TeamFilter, 0, len(values))
 	for _, value := range values {
-		teamCode, subTeamCode, ok := strings.Cut(value, "/")
-		if !ok {
-			return nil, fmt.Errorf("--team must be TEAM/SUBTEAM codes such as HRDWR/CAM, got %q", value)
+		team, err := apple.ParseTeamFilter(value)
+		if err != nil {
+			return nil, fmt.Errorf("--team: %w", err)
 		}
-		teams = append(teams, apple.TeamFilter{TeamCode: teamCode, SubTeamCode: subTeamCode})
+		teams = append(teams, team)
 	}
 	return teams, nil
 }
 
 func writeSearch(out io.Writer, format string, page int, response *apple.SearchResponse) error {
-	if format == "json" {
+	if format == jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {
@@ -201,6 +223,50 @@ func writeSearch(out io.Writer, format string, page int, response *apple.SearchR
 			fmt.Fprintf(out, "   posted: %s\n", job.PostingDate)
 		}
 		fmt.Fprintf(out, "   url: %s\n\n", apple.JobURL(job.PositionId, job.TransformedPostingTitle))
+	}
+	return nil
+}
+
+type filterFlags struct {
+	baseURL string
+	format  string
+	timeout time.Duration
+}
+
+func runFilters(ctx context.Context, flags filterFlags, out io.Writer) error {
+	client, err := apple.NewJobsClient(flags.baseURL, nil)
+	if err != nil {
+		return fmt.Errorf("create apple client: %w", err)
+	}
+	ctx, cancel := context.WithTimeout(ctx, flags.timeout)
+	defer cancel()
+
+	teams, err := client.ListTeams(ctx)
+	if err != nil {
+		return fmt.Errorf("list apple teams: %w", err)
+	}
+	return writeFilters(out, flags.format, teams)
+}
+
+func writeFilters(out io.Writer, format string, teams *apple.TeamsResponse) error {
+	if format == jsonFormat {
+		encoder := json.NewEncoder(out)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(map[string]any{"teams": teams.Res, "products": apple.Products}); err != nil {
+			return fmt.Errorf("encode filters: %w", err)
+		}
+		return nil
+	}
+
+	fmt.Fprintln(out, "Teams (--team TEAM/SUB):")
+	for _, group := range teams.Res {
+		for _, subTeam := range group.Teams {
+			fmt.Fprintf(out, "  %s/%s\t%s\n", subTeam.TeamCode, subTeam.Code, subTeam.DisplayName)
+		}
+	}
+	fmt.Fprintln(out, "\nProducts (--product CODE):")
+	for _, product := range apple.Products {
+		fmt.Fprintf(out, "  %s\t%s\n", product.Code, product.Name)
 	}
 	return nil
 }
@@ -232,7 +298,7 @@ func runDetail(ctx context.Context, flags detailFlags, out io.Writer) error {
 }
 
 func writeDetail(out io.Writer, format string, response *apple.JobDetailResponse) error {
-	if format == "json" {
+	if format == jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {

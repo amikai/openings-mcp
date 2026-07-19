@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	rn5AllowedHeaders = map[string]string{
+	rn6AllowedHeaders = map[string]string{
 		"POST": "Content-Type,X-Apple-Csrf-Token",
 	}
 )
@@ -128,6 +128,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					return
 				}
 
+			case 'r': // Prefix: "refData/teamsofinterest"
+
+				if l := len("refData/teamsofinterest"); len(elem) >= l && elem[0:l] == "refData/teamsofinterest" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleListTeamsRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "GET",
+							allowedHeaders: nil,
+							acceptPost:     "",
+							acceptPatch:    "",
+						})
+					}
+
+					return
+				}
+
 			case 's': // Prefix: "search"
 
 				if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
@@ -144,7 +169,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					default:
 						s.notAllowed(w, r, notAllowedParams{
 							allowedMethods: "POST",
-							allowedHeaders: rn5AllowedHeaders,
+							allowedHeaders: rn6AllowedHeaders,
 							acceptPost:     "application/json",
 							acceptPatch:    "",
 						})
@@ -306,6 +331,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 						r.pathPattern = "/api/v1/jobDetails/{jobId}"
 						r.args = args
 						r.count = 1
+						return r, true
+					default:
+						return
+					}
+				}
+
+			case 'r': // Prefix: "refData/teamsofinterest"
+
+				if l := len("refData/teamsofinterest"); len(elem) >= l && elem[0:l] == "refData/teamsofinterest" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = ListTeamsOperation
+						r.summary = "List the Apple team and sub-team filter taxonomy"
+						r.operationID = "listTeams"
+						r.operationGroup = ""
+						r.pathPattern = "/api/v1/refData/teamsofinterest"
+						r.args = args
+						r.count = 0
 						return r, true
 					default:
 						return

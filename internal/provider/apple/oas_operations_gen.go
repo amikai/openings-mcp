@@ -8,5 +8,6 @@ type OperationName = string
 const (
 	GetJobDetailOperation   OperationName = "GetJobDetail"
 	InitSessionOperation    OperationName = "InitSession"
+	ListTeamsOperation      OperationName = "ListTeams"
 	PostSearchJobsOperation OperationName = "PostSearchJobs"
 )

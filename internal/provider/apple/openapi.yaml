@@ -83,6 +83,24 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /api/v1/refData/teamsofinterest:
+    get:
+      operationId: listTeams
+      summary: List the Apple team and sub-team filter taxonomy
+      description: |
+        Anonymous reference-data endpoint behind the search page's Teams
+        filter; it needs no search session. Sibling refData endpoints:
+        `postlocation?input=…` and `languagesByInput?input=…` are public
+        typeaheads, while `products` rejects anonymous sessions (the
+        product list is embedded in the server-rendered search page).
+      responses:
+        "200":
+          description: Team groups with their selectable sub-teams.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeamsResponse"
+
   /api/v1/jobDetails/{jobId}:
     get:
       operationId: getJobDetail
@@ -275,6 +293,44 @@ components:
       required: [teamName]
       properties:
         teamName:
+          type: string
+
+    TeamsResponse:
+      type: object
+      required: [res]
+      properties:
+        res:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamGroup"
+
+    TeamGroup:
+      type: object
+      required: [id, type, teams]
+      properties:
+        id:
+          type: string
+          pattern: '^teamsAndSubTeams-[A-Z0-9]+$'
+        type:
+          description: Human-readable group name, such as "Hardware".
+          type: string
+        teams:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubTeam"
+
+    SubTeam:
+      type: object
+      required: [code, teamCode, displayName]
+      properties:
+        code:
+          description: Bare sub-team code, such as CAM.
+          type: string
+        teamCode:
+          description: Bare parent team code, such as HRDWR.
+          type: string
+        displayName:
+          description: 'Full label, such as "Hardware: Camera Technologies".'
           type: string
 
     JobDetailResponse:

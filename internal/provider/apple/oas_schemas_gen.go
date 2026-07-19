@@ -1059,6 +1059,46 @@ func (s *SearchTeamFilter) SetSubTeam(val string) {
 	s.SubTeam = val
 }
 
+// Ref: #/components/schemas/SubTeam
+type SubTeam struct {
+	// Bare sub-team code, such as CAM.
+	Code string `json:"code"`
+	// Bare parent team code, such as HRDWR.
+	TeamCode string `json:"teamCode"`
+	// Full label, such as "Hardware: Camera Technologies".
+	DisplayName string `json:"displayName"`
+}
+
+// GetCode returns the value of Code.
+func (s *SubTeam) GetCode() string {
+	return s.Code
+}
+
+// GetTeamCode returns the value of TeamCode.
+func (s *SubTeam) GetTeamCode() string {
+	return s.TeamCode
+}
+
+// GetDisplayName returns the value of DisplayName.
+func (s *SubTeam) GetDisplayName() string {
+	return s.DisplayName
+}
+
+// SetCode sets the value of Code.
+func (s *SubTeam) SetCode(val string) {
+	s.Code = val
+}
+
+// SetTeamCode sets the value of TeamCode.
+func (s *SubTeam) SetTeamCode(val string) {
+	s.TeamCode = val
+}
+
+// SetDisplayName sets the value of DisplayName.
+func (s *SubTeam) SetDisplayName(val string) {
+	s.DisplayName = val
+}
+
 // Ref: #/components/schemas/Team
 type Team struct {
 	TeamName string `json:"teamName"`
@@ -1072,4 +1112,57 @@ func (s *Team) GetTeamName() string {
 // SetTeamName sets the value of TeamName.
 func (s *Team) SetTeamName(val string) {
 	s.TeamName = val
+}
+
+// Ref: #/components/schemas/TeamGroup
+type TeamGroup struct {
+	ID string `json:"id"`
+	// Human-readable group name, such as "Hardware".
+	Type  string    `json:"type"`
+	Teams []SubTeam `json:"teams"`
+}
+
+// GetID returns the value of ID.
+func (s *TeamGroup) GetID() string {
+	return s.ID
+}
+
+// GetType returns the value of Type.
+func (s *TeamGroup) GetType() string {
+	return s.Type
+}
+
+// GetTeams returns the value of Teams.
+func (s *TeamGroup) GetTeams() []SubTeam {
+	return s.Teams
+}
+
+// SetID sets the value of ID.
+func (s *TeamGroup) SetID(val string) {
+	s.ID = val
+}
+
+// SetType sets the value of Type.
+func (s *TeamGroup) SetType(val string) {
+	s.Type = val
+}
+
+// SetTeams sets the value of Teams.
+func (s *TeamGroup) SetTeams(val []SubTeam) {
+	s.Teams = val
+}
+
+// Ref: #/components/schemas/TeamsResponse
+type TeamsResponse struct {
+	Res []TeamGroup `json:"res"`
+}
+
+// GetRes returns the value of Res.
+func (s *TeamsResponse) GetRes() []TeamGroup {
+	return s.Res
+}
+
+// SetRes sets the value of Res.
+func (s *TeamsResponse) SetRes(val []TeamGroup) {
+	s.Res = val
 }
