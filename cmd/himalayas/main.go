@@ -35,7 +35,7 @@ func main() {
 
 	browseFS := ff.NewFlagSet("browse").SetParent(rootFlags)
 	var (
-		limit  = browseFS.IntLong("limit", 20, "page size (upstream caps at 20; larger values are clamped server-side)")
+		limit  = browseFS.IntLong("limit", 20, "page size, 1-20 (upstream caps at 20; larger values are rejected)")
 		offset = browseFS.IntLong("offset", 0, "zero-based result offset")
 	)
 	browseCmd := &ff.Command{
@@ -151,8 +151,8 @@ func summarize(j himalayas.Job) jobSummaryJSON {
 }
 
 // formatSalary renders the disclosed salary range, e.g. "USD 120000-180000
-// annual". Himalayas nulls currency together with the bounds when no salary
-// is disclosed, so a null currency means no salary line at all.
+// annual". A null currency means no salary line at all, since the currency
+// is required to render either bound meaningfully.
 func formatSalary(j himalayas.Job) string {
 	if j.Currency.Null {
 		return ""
