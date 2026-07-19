@@ -1,0 +1,16 @@
+# Curated Avature career portals. Each url is a portal base without a
+# locale segment, verified live: GET <url>/SearchJobs returns HTTP 200 with
+# at least one JobDetail link. Some tenants block non-browser clients
+# (e.g. Delta 202-challenges, Maximus requires login) — verify before adding.
+# Display names must stay unique across all ATS rosters.
+
+- company: "Avature"
+  url: "https://careers.avature.net/main"
+- company: "Bloomberg"
+  url: "https://bloomberg.avature.net/careers"
+- company: "Koch Industries"
+  url: "https://koch.avature.net/careers"
+- company: "One Call"
+  url: "https://onecall.avature.net/careers"
+- company: "Unifi Aviation"
+  url: "https://careers.unifiservice.com/careers"

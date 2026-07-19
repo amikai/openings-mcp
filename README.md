@@ -25,6 +25,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[Oracle Recruiting Cloud](https://www.oracle.com/human-capital-management/recruiting/)**,
   **[JOIN](https://join.com)**,
   **[UKG Pro (UltiPro)](https://www.ukg.com/products/ukg-pro)**,
+  **[Avature](https://www.avature.net)**,
   and **[BambooHR](https://www.bamboohr.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms

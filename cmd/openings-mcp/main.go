@@ -237,6 +237,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		workableAdapter,
 		ripplingAdapter,
 		ats.NewICIMSAdapter(hc),
+		ats.NewAvatureAdapter(hc),
 		ats.NewOracleAdapter(hc),
 		ats.NewJoinAdapter("https://join.com", hc),
 		ats.NewUltiProAdapter(hc),
