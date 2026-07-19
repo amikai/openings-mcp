@@ -33,7 +33,14 @@ type workableTestJob struct {
 	title      string
 	department string
 	location   string
-	remote     bool
+	// locations are secondary places (city/region/country); when set, the
+	// mock emits both location and locations[] so multi-site rendering can
+	// be asserted.
+	locations []map[string]string
+	// body is plain text served on the detail endpoint so residual query
+	// matching can see body-only keyword hits.
+	body   string
+	remote bool
 }
 
 // workableSearchBody is the decoded shape of one recorded search request, so
@@ -61,9 +68,9 @@ const workableTestFacetsJSON = `{
 }`
 
 // workableSearchServer serves query-specific OR candidate sets with real
-// cursor pagination (tokens encode the next offset) plus static facets, so
-// adapter tests exercise residual filtering and multi-page collection
-// without depending on live jobs.
+// cursor pagination (tokens encode the next offset) plus static facets and
+// per-job detail bodies, so adapter tests exercise residual filtering,
+// description enrichment, and multi-page collection without live jobs.
 func workableSearchServer(
 	t *testing.T,
 	byQuery map[string][]workableTestJob,
@@ -71,6 +78,14 @@ func workableSearchServer(
 ) (*httptest.Server, *[]workableSearchBody) {
 	t.Helper()
 	var bodies []workableSearchBody
+	// Index every job by shortcode so detail enrichment can resolve bodies
+	// regardless of which query page produced the candidate.
+	byShortcode := map[string]workableTestJob{}
+	for _, jobs := range byQuery {
+		for _, j := range jobs {
+			byShortcode[j.shortcode] = j
+		}
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/v3/accounts/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/jobs/filters") {
@@ -99,17 +114,27 @@ func workableSearchServer(
 		end := min(start+workableUpstreamPageSize, len(jobs))
 		results := make([]map[string]any, 0, end-start)
 		for _, j := range jobs[start:end] {
-			results = append(results, map[string]any{
-				"id":        1,
-				"shortcode": j.shortcode,
-				"title":     j.title,
-				"remote":    j.remote,
-				"location":  map[string]any{"display": j.location},
-				"published": "2026-07-10T00:00:00.000Z",
-				"department": []string{
-					j.department,
-				},
-			})
+			row := map[string]any{
+				"id":         1,
+				"shortcode":  j.shortcode,
+				"title":      j.title,
+				"remote":     j.remote,
+				"location":   map[string]any{"display": j.location},
+				"published":  "2026-07-10T00:00:00.000Z",
+				"department": []string{j.department},
+			}
+			if len(j.locations) > 0 {
+				locs := make([]map[string]any, 0, len(j.locations))
+				for _, l := range j.locations {
+					entry := map[string]any{"hidden": false}
+					for k, v := range l {
+						entry[k] = v
+					}
+					locs = append(locs, entry)
+				}
+				row["locations"] = locs
+			}
+			results = append(results, row)
 		}
 		total := len(jobs)
 		if override, ok := totalOverrides[body.Query]; ok {
@@ -121,6 +146,40 @@ func workableSearchServer(
 		}
 		w.Header().Set("Content-Type", "application/json")
 		assert.NoError(t, json.NewEncoder(w).Encode(rsp))
+	})
+	// Detail path used by residual-query description enrichment.
+	mux.HandleFunc("/api/v2/accounts/", func(w http.ResponseWriter, r *http.Request) {
+		// /api/v2/accounts/{account}/jobs/{shortcode}
+		parts := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
+		// api v2 accounts {account} jobs {shortcode}
+		if len(parts) < 6 || parts[5] == "" {
+			http.NotFound(w, r)
+			return
+		}
+		j, ok := byShortcode[parts[5]]
+		if !ok {
+			w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+			w.WriteHeader(http.StatusNotFound)
+			fmt.Fprint(w, "Job not found")
+			return
+		}
+		// Nil locations encode as JSON null, which ogen rejects; always emit
+		// an array so residual enrichment can decode every candidate.
+		locs := j.locations
+		if locs == nil {
+			locs = []map[string]string{}
+		}
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		assert.NoError(t, json.NewEncoder(w).Encode(map[string]any{
+			"id":          1,
+			"shortcode":   j.shortcode,
+			"title":       j.title,
+			"description": "<p>" + j.body + "</p>",
+			"location":    map[string]any{"display": j.location},
+			"locations":   locs,
+			"published":   "2026-07-10T00:00:00.000Z",
+			"department":  []string{j.department},
+		}))
 	})
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
@@ -221,9 +280,9 @@ func TestWorkableSearchExcludesLocationOnlyQueryHits(t *testing.T) {
 		"trainer": {
 			{shortcode: "a", title: "Personal Trainer", location: "Los Angeles"},
 			{shortcode: "b", title: "Personal Trainer", location: "Houston"},
-			// Upstream OR-matched this via body/location text; the unified
-			// Query semantics exclude it.
-			{shortcode: "c", title: "Front Desk Associate", location: "Trainer, PA"},
+			// Upstream OR-matched this via location text only; the unified
+			// Query semantics exclude it even after detail enrichment.
+			{shortcode: "c", title: "Front Desk Associate", location: "Trainer, PA", body: "front desk duties"},
 		},
 	}, nil)
 	a := newWorkableSearchAdapter(t, server.URL)
@@ -232,6 +291,89 @@ func TestWorkableSearchExcludesLocationOnlyQueryHits(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, 2, res.TotalCount)
 	assert.Equal(t, []string{"a", "b"}, []string{res.Jobs[0].JobID, res.Jobs[1].JobID})
+}
+
+// TestWorkableSearchKeepsBodyOnlyQueryHits guards the residual-filter path:
+// Workable's upstream query matches posting bodies, but list rows omit JD
+// text. Without detail enrichment, searchDump would drop body-only hits.
+func TestWorkableSearchKeepsBodyOnlyQueryHits(t *testing.T) {
+	server, _ := workableSearchServer(t, map[string][]workableTestJob{
+		"engineer": {
+			{shortcode: "title-hit", title: "Software Engineer", location: "Athens"},
+			// Title has no query word; body does — must survive residual AND.
+			{
+				shortcode: "body-hit",
+				title:     "Maintenance Technician",
+				location:  "San Jose",
+				body:      "Support the engineering team with lab equipment.",
+			},
+			// Upstream false positive: neither title nor body match.
+			{
+				shortcode: "noise",
+				title:     "SEO Senior Associate",
+				location:  "Athens",
+				body:      "Drive organic search growth.",
+			},
+		},
+	}, nil)
+	a := newWorkableSearchAdapter(t, server.URL)
+
+	res, err := a.Search(t.Context(), "acme", SearchParams{Query: "engineer"})
+	require.NoError(t, err)
+	assert.Equal(t, 2, res.TotalCount)
+	ids := []string{res.Jobs[0].JobID, res.Jobs[1].JobID}
+	assert.Equal(t, []string{"title-hit", "body-hit"}, ids)
+}
+
+// TestWorkableSearchIncludesSecondaryLocations proves multi-site postings
+// surface every distinct visible place, not only the primary location.
+func TestWorkableSearchIncludesSecondaryLocations(t *testing.T) {
+	server, _ := workableSearchServer(t, map[string][]workableTestJob{
+		"": {{
+			shortcode: "multi",
+			title:     "Exam Coordinator",
+			// Primary is Tokyo; London is secondary (PeopleCert-style).
+			location: "Tokyo, Japan",
+			locations: []map[string]string{
+				{"country": "Japan", "city": "Tokyo"},
+				{"country": "United Kingdom", "city": "London"},
+			},
+		}},
+	}, nil)
+	a := newWorkableSearchAdapter(t, server.URL)
+
+	res, err := a.Search(t.Context(), "acme", SearchParams{})
+	require.NoError(t, err)
+	require.Len(t, res.Jobs, 1)
+	assert.Equal(t, "Tokyo, Japan; London, United Kingdom", res.Jobs[0].Location)
+}
+
+func TestWorkableJobLocationDedupesPrimaryAgainstSecondaries(t *testing.T) {
+	primary := workable.NewOptLocation(workable.Location{
+		Display: workable.NewOptNilString("Athens, Greece"),
+		Country: workable.NewOptNilString("Greece"),
+		Region:  workable.NewOptNilString("Attica"),
+		City:    workable.NewOptNilString("Athens"),
+	})
+	secondaries := []workable.Location{
+		{
+			Country: workable.NewOptNilString("Greece"),
+			Region:  workable.NewOptNilString("Attica"),
+			City:    workable.NewOptNilString("Athens"),
+			Hidden:  workable.NewOptBool(false),
+		},
+		{
+			Country: workable.NewOptNilString("United Kingdom"),
+			City:    workable.NewOptNilString("London"),
+			Hidden:  workable.NewOptBool(false),
+		},
+		{
+			Country: workable.NewOptNilString("Germany"),
+			City:    workable.NewOptNilString("Stuttgart"),
+			Hidden:  workable.NewOptBool(true), // hidden secondaries stay out
+		},
+	}
+	assert.Equal(t, "Athens, Greece; London, United Kingdom", workableJobLocation(primary, secondaries))
 }
 
 func TestWorkableSearchRemoteLocationUsesRemoteFilter(t *testing.T) {

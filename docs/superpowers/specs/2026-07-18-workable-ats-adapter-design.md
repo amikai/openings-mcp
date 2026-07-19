@@ -40,6 +40,13 @@ Rejected alternatives:
   as `token`; the last page omits `nextPage` entirely.
 - Errors: unknown account → 404 `text/plain` "Not Found"; unknown shortcode
   on detail → 404 `text/plain` "Job not found".
+- Query residual filtering: Workable ORs query terms and also matches
+  location text, so the adapter collects a bounded candidate set and re-
+  applies unified AND semantics via `searchDump`. List rows carry no JD
+  text, so residual filtering fans out to the detail endpoint (concurrency
+  8) before matching; 404s between search and detail leave description
+  blank rather than failing the whole search. Candidate walks are capped
+  at 200 total hits.
 
 ## Detail behavior
 
@@ -49,7 +56,8 @@ The posting body is split across three HTML fields — `description`,
 
 ## Unified mapping decisions
 
-- `SearchParams.Query` → body `query` (server-side).
+- `SearchParams.Query` → body `query` (server-side), then residual AND on
+  title + department + detail description.
 - `SearchParams.Location` → resolved against the facets endpoint's
   `locations` (case-insensitive match on display/country/region/city); all
   matching facet entries are sent as `location` objects (OR). No facet
@@ -60,6 +68,10 @@ The posting body is split across three HTML fields — `description`,
   one unified page = a cursor walk of 2×page upstream requests. Acceptable:
   requests are fast (<0.5s) and deep pages are rare in MCP use.
 - Job URL: `https://apply.workable.com/<account>/j/<shortcode>/`.
+- Location display: join the primary `location` with every distinct visible
+  entry from `locations[]` (skip `hidden: true` and the primary duplicate),
+  separated by `"; "`. Multi-site postings otherwise surface only the
+  primary city (e.g. Tokyo while London is secondary).
 
 ## Quirk notes
 

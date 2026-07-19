@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/jaytaylor/html2text"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/amikai/openings-mcp/internal/provider/workable"
 )
@@ -38,13 +39,18 @@ const (
 	// maxWorkableCandidates bounds the local-AND candidate walk to
 	// maxWorkableCandidates/workableUpstreamPageSize upstream requests.
 	maxWorkableCandidates = 200
+	// workableDetailConcurrency caps concurrent detail fetches when Search
+	// enriches descriptions for residual query matching.
+	workableDetailConcurrency = 8
 )
 
 // WorkableAdapter serves Workable-hosted companies via the public job board
 // API behind apply.workable.com. Structured filters and locations run
 // server-side. Text search uses query only to select a bounded candidate set,
 // then applies the unified Query semantics locally, because Workable ORs
-// query terms and matches location text too.
+// query terms and matches location text too. List rows carry no JD text, so
+// residual filtering fans out to the detail endpoint to keep body-only
+// keyword matches.
 type WorkableAdapter struct {
 	client *workable.Client
 }
@@ -167,9 +173,11 @@ func (a *WorkableAdapter) searchWorkablePage(
 
 // searchWorkableCandidates sends query upstream only to select a bounded
 // candidate set (a superset of the AND matches, since every AND match also
-// OR-matches), collects every cursor page, and applies the unified Query
-// semantics locally with searchDump. Structured filters and locations stay
-// on the request, so the candidate set is already narrowed server-side.
+// OR-matches), collects every cursor page, enriches each candidate's
+// description from detail (Workable's full-text index covers bodies, but
+// list rows do not), and applies the unified Query semantics locally with
+// searchDump. Structured filters and locations stay on the request, so the
+// candidate set is already narrowed server-side.
 func (a *WorkableAdapter) searchWorkableCandidates(
 	ctx context.Context,
 	slug, query string,
@@ -202,9 +210,48 @@ func (a *WorkableAdapter) searchWorkableCandidates(
 	for _, j := range items {
 		jobs = append(jobs, workableDumpJob(slug, j))
 	}
+	// List rows omit JD text. Without detail enrichment, residual AND
+	// filtering would drop body-only upstream hits (e.g. query=engineer
+	// matching a Maintenance Technician whose body mentions "engineering").
+	if err := a.enrichDescriptions(ctx, slug, jobs); err != nil {
+		return nil, err
+	}
 	// Location went upstream as structured filters (or remote), so only
 	// Query runs locally.
 	return searchDump(jobs, SearchParams{Query: query, Page: page})
+}
+
+// enrichDescriptions fills dumpJob.description from the detail endpoint so
+// searchDump's tier-3 query matching can see posting bodies. Jobs that 404
+// between search and detail are left blank rather than failing the whole
+// search (boards can race with removals).
+func (a *WorkableAdapter) enrichDescriptions(ctx context.Context, slug string, jobs []dumpJob) error {
+	if len(jobs) == 0 {
+		return nil
+	}
+	g, gCtx := errgroup.WithContext(ctx)
+	g.SetLimit(workableDetailConcurrency)
+	for i := range jobs {
+		i := i
+		g.Go(func() error {
+			id := jobs[i].summary.JobID
+			res, err := a.client.GetJob(gCtx, workable.GetJobParams{Account: slug, Shortcode: id})
+			if err != nil {
+				return fmt.Errorf("workable: fetch job %q for %q: %w", id, slug, err)
+			}
+			switch d := res.(type) {
+			case *workable.JobDetail:
+				jobs[i].description = workableDescription(d)
+				return nil
+			case *workable.NotFound:
+				// Removed between search and detail; leave description empty.
+				return nil
+			default:
+				return fmt.Errorf("workable: unexpected detail response type %T for job %q", res, id)
+			}
+		})
+	}
+	return g.Wait()
 }
 
 // searchJobs performs one search request, mapping the text/plain 404 an
@@ -342,7 +389,7 @@ func workableSummary(account string, j workable.JobSummary) JobSummary {
 	return JobSummary{
 		JobID:    j.Shortcode,
 		Title:    j.Title,
-		Location: workableLocationText(j.Location),
+		Location: workableJobLocation(j.Location, j.Locations),
 		PostedAt: workablePostedAt(j.Published),
 		URL:      workableJobURL(account, j.Shortcode),
 	}
@@ -351,27 +398,60 @@ func workableSummary(account string, j workable.JobSummary) JobSummary {
 func workableDumpJob(account string, j workable.JobSummary) dumpJob {
 	summary := workableSummary(account, j)
 	published, _ := time.Parse(time.RFC3339, j.Published.Value)
-	locations := []string{summary.Location}
-	for _, l := range j.Locations {
-		locations = append(locations, strings.Join([]string{l.City.Or(""), l.Region.Or(""), l.Country.Or("")}, " "))
-	}
 	return dumpJob{
-		summary:   summary,
-		sortKey:   published,
-		orgUnit:   strings.Join(j.Department, " "),
-		locations: strings.Join(locations, "; "),
+		summary: summary,
+		sortKey: published,
+		orgUnit: strings.Join(j.Department, " "),
+		// Summary already joins primary + secondary; reuse it for fuzzy
+		// location matching so search and display agree.
+		locations: summary.Location,
 		isRemote:  j.Remote.Or(false) || j.Workplace.Value == workable.JobSummaryWorkplaceRemote,
 	}
 }
 
-// workableLocationText renders one location object, preferring the API's
-// own display string; facet-less accounts (and hidden locations) still
-// carry the structured fields.
-func workableLocationText(loc workable.OptLocation) string {
-	v, ok := loc.Get()
-	if !ok {
-		return ""
+// workableJobLocation joins the primary location with every distinct visible
+// secondary entry. Workable's singular `location` is only the primary site;
+// multi-site postings put additional cities in `locations[]` (including a
+// duplicate of the primary). Hidden secondaries are skipped.
+func workableJobLocation(primary workable.OptLocation, secondaries []workable.Location) string {
+	var parts []string
+	seenKeys := map[string]bool{}
+	seenText := map[string]bool{}
+	add := func(text, key string) {
+		text = strings.TrimSpace(text)
+		if text == "" {
+			return
+		}
+		textKey := strings.ToLower(text)
+		if seenText[textKey] {
+			return
+		}
+		if key != "" && seenKeys[key] {
+			return
+		}
+		if key != "" {
+			seenKeys[key] = true
+		}
+		seenText[textKey] = true
+		parts = append(parts, text)
 	}
+
+	if v, ok := primary.Get(); ok {
+		add(formatWorkableLocation(v), workableLocationKey(v))
+	}
+	for _, l := range secondaries {
+		if l.Hidden.Or(false) {
+			continue
+		}
+		add(formatWorkableLocation(l), workableLocationKey(l))
+	}
+	return strings.Join(parts, "; ")
+}
+
+// formatWorkableLocation renders one location object, preferring the API's
+// own display string; facet-less accounts (and locations[] entries) still
+// carry the structured fields.
+func formatWorkableLocation(v workable.Location) string {
 	if d, ok := v.Display.Get(); ok && d != "" {
 		return d
 	}
@@ -382,6 +462,14 @@ func workableLocationText(loc workable.OptLocation) string {
 		}
 	}
 	return strings.Join(parts, ", ")
+}
+
+// workableLocationKey identifies a place for dedupe across primary display
+// text and structured secondary entries that describe the same city.
+func workableLocationKey(v workable.Location) string {
+	return strings.ToLower(strings.Join([]string{
+		v.Country.Or(""), v.Region.Or(""), v.City.Or(""),
+	}, "\x00"))
 }
 
 // workablePostedAt guards a present-but-missing published timestamp, and
@@ -443,7 +531,7 @@ func (a *WorkableAdapter) Detail(ctx context.Context, slug, jobID string) (*JobD
 		JobID:       cmp.Or(d.Shortcode, jobID),
 		Title:       d.Title,
 		Company:     name,
-		Location:    workableLocationText(d.Location),
+		Location:    workableJobLocation(d.Location, d.Locations),
 		PostedAt:    workablePostedAt(d.Published),
 		URL:         workableJobURL(account, cmp.Or(d.Shortcode, jobID)),
 		Description: workableDescription(d),
