@@ -230,7 +230,7 @@ func metaHTTPToMCPDetail(detail *meta.JobDetail) (*metaDetailOutput, error) {
 func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        metaSearchToolName,
-		Description: "Search jobs on Meta Careers (metacareers.com) by keyword, team, office, product, and employment type. Unpaginated: every match is returned, so prefer filters over broad queries. Filter value lists are dynamic; meta_get_search_filters enumerates current ones.",
+		Description: "Search jobs on the Meta careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Meta Careers jobs", ReadOnlyHint: true},
 		InputSchema: metaSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaSearchInput) (*mcp.CallToolResult, *metaSearchOutput, error) {
