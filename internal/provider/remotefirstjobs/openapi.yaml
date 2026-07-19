@@ -1,0 +1,223 @@
+openapi: 3.1.0
+
+info:
+  title: RemoteFirstJobs Public Jobs API
+  version: "1"
+  contact:
+    name: Remote First Jobs
+    url: https://remotefirstjobs.com/jobs-api
+  description: >
+    RemoteFirstJobs' free public JSON API, hand-written from the official
+    endpoint documentation at https://remotefirstjobs.com/jobs-api and
+    verified against live captured responses (2026-07-19, see
+    testdata/*.hurl). The official page documents the API in prose only;
+    no official OpenAPI document exists.
+
+    The single operation is the whole public surface: there is no per-job
+    detail endpoint (/api/jobs/<id> and variants 404), but every search
+    hit already carries the full HTML description inline (1.7k-15k chars
+    observed), so a detail lookup means resolving the id from search
+    pages.
+
+    ## Quirks verified live
+
+    * Zero hits return HTTP 200 with `"jobs": null` — not an empty
+      array — so `jobs` is nullable.
+
+    * `category` accepts dash and underscore forms interchangeably
+      (`software-development` ≡ `software_development`, byte-identical
+      bodies); responses always carry the underscore form. There is no
+      category-list endpoint; the values below were observed across live
+      responses, and the parameter stays an open string.
+
+    * An unknown `category` or an out-of-range `page` is a hard 400 with
+      the uniform `{kind, message}` error shape; a query with zero hits
+      is not (200 with `jobs: null`).
+
+    * `published_at` carries no timezone offset ("2026-07-17T21:33:30"),
+      so it is modeled as a plain string — `format: date-time` would make
+      ogen's RFC3339 decoder reject every response.
+
+    * `company_logo` and `salary_min`/`salary_max` are documented as
+      possibly null (not observed in 500 sampled jobs, but the official
+      docs are explicit); `locations` is sometimes an empty array
+      (84 of 500 sampled).
+
+    ## Freshness and usage terms
+
+    Jobs appear in the API 24 hours after publication; fresh listings are
+    website-only. Upstream refreshes the data every 10 minutes. The
+    `_README_` envelope field and the /jobs-api page state the terms:
+    credit Remote First Jobs with a link when using the data, and do not
+    republish jobs to third-party job boards.
+
+servers:
+  - url: https://remotefirstjobs.com/api
+
+tags:
+  - name: jobs
+    description: Remote jobs search API
+
+paths:
+  /search-jobs:
+    get:
+      summary: Search remote jobs
+      description: >
+        Full-text search over the board, newest first, 100 jobs per page
+        across at most 5 pages — up to 500 jobs reachable per query.
+        `query` and `category` filter server-side and compose with
+        `page` (page 0 and page 1 of the same query share zero ids,
+        verified at capture time).
+      operationId: searchJobs
+      tags: [jobs]
+      parameters:
+        - name: query
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Full-text search term, e.g. "python" or "react engineer".
+            Zero hits yield HTTP 200 with `jobs: null`, not an error.
+        - name: category
+          in: query
+          required: false
+          schema:
+            type: string
+          description: >
+            Job category filter. Observed values (underscore form, as
+            responses carry them): all_others, business,
+            customer_service, cybersecurity, data, design, devops,
+            finance_legal, human_resources, marketing, product,
+            project_management, qa, sales, software_development,
+            writing. Dash forms are accepted interchangeably. Unknown
+            values are a 400, not an empty result.
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 4
+          description: >
+            Page number, 0 (default) to 4. Values outside the range are
+            a 400.
+      responses:
+        "200":
+          description: OK — returned even for zero-hit queries.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchJobsResult"
+        "400":
+          description: Invalid category or out-of-range page.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    SearchJobsResult:
+      type: object
+      required: [page, jobs_count, jobs]
+      x-ogen-properties:
+        _README_: {name: README}
+      properties:
+        _README_:
+          type: string
+          description: >
+            Usage terms banner (credit with a link, no republishing to
+            third-party boards); always present.
+        page:
+          type: integer
+          description: Echo of the requested page (0-4).
+        jobs_count:
+          type: integer
+          description: Number of entries in `jobs`; 0 when `jobs` is null.
+        jobs:
+          type: [array, "null"]
+          items:
+            $ref: "#/components/schemas/Job"
+          description: >
+            The page's jobs, newest first. Null — not an empty array —
+            when the query has no hits.
+
+    Job:
+      type: object
+      required:
+        - id
+        - url
+        - company_name
+        - title
+        - category
+        - seniority
+        - description
+        - locations
+        - published_at
+      properties:
+        id:
+          type: string
+          description: >
+            Unique job slug ending in a numeric suffix, e.g.
+            "senior-product-manager-ai-platform-837752". There is no
+            endpoint that exchanges it for a single job; resolve it
+            against search pages.
+        url:
+          type: string
+          description: >
+            Public job page on remotefirstjobs.com (the usage terms ask
+            for this link to be credited).
+        company_name:
+          type: string
+        company_logo:
+          type: [string, "null"]
+          description: Company logo URL on cdn.remotefirstjobs.com.
+        title:
+          type: string
+        category:
+          type: string
+          description: >
+            Category in underscore form (e.g. "software_development"),
+            one of the values listed on the `category` parameter.
+        seniority:
+          type: string
+          description: >
+            Observed values: entry_level, intern, middle, senior,
+            manager, director, principal, executive. Kept an open
+            string.
+        description:
+          type: string
+          description: Full job description, HTML.
+        salary_min:
+          type: [integer, "null"]
+          description: Lower bound of the salary range, when listed.
+        salary_max:
+          type: [integer, "null"]
+          description: Upper bound of the salary range, when listed.
+        locations:
+          type: array
+          items:
+            type: string
+          description: >
+            Country names (max 3 per the official docs); empty for
+            postings without a stated location constraint.
+        published_at:
+          type: string
+          description: >
+            Local timestamp without timezone offset, e.g.
+            "2026-07-17T21:33:30" — not RFC3339, hence not
+            `format: date-time`.
+
+    Error:
+      type: object
+      required: [kind, message]
+      properties:
+        kind:
+          type: string
+          description: Error class; observed only "invalid_argument".
+        message:
+          type: string
+          description: >
+            Human-readable cause, e.g. "invalid category: doesnotexist"
+            or "page must be between 0 and 4".
