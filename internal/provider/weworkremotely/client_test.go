@@ -138,6 +138,28 @@ func TestClient_Search_categoryFetchesOnlyThatFeed(t *testing.T) {
 	}
 }
 
+func TestClient_Search_categoryPathDedupesLikeFullDump(t *testing.T) {
+	c := testClient(t)
+	jobs, err := c.Search(context.Background(), FilterOptions{Category: "Full-Stack Programming"})
+	if err != nil {
+		t.Fatalf("Search: %v", err)
+	}
+	// The captured fixture has 42 raw items but one duplicate (see
+	// TestClient_Jobs and TestClient_AllJobs_mergesEveryCategory) —
+	// Search's recognized-category fast path must dedupe the same way the
+	// AllJobs-backed full-dump path does, not just return the raw feed.
+	if want := 42 - 1; len(jobs) != want {
+		t.Fatalf("got %d jobs, want %d", len(jobs), want)
+	}
+	seen := make(map[string]bool)
+	for _, j := range jobs {
+		if seen[j.ID] {
+			t.Fatalf("duplicate job ID %q in Search result", j.ID)
+		}
+		seen[j.ID] = true
+	}
+}
+
 func TestClient_Search_unrecognizedCategoryFallsBackToFullDump(t *testing.T) {
 	c := testClient(t)
 	jobs, err := c.Search(context.Background(), FilterOptions{Category: "Not A Real Category"})

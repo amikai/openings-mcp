@@ -49,7 +49,9 @@
 //
 // A single feed can list the same job twice under identical <link>/<guid>
 // values (observed live in the Full-Stack Programming feed); [Client.Jobs]
-// returns feeds as-is, but [Client.AllJobs] deduplicates by [Job.ID].
+// returns a feed as-is, duplicates included, but every other exported path
+// ([Client.AllJobs], [Client.Search], [Client.Detail]) deduplicates by
+// [Job.ID].
 //
 // # Fields
 //

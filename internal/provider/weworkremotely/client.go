@@ -91,7 +91,6 @@ func (c *Client) Jobs(ctx context.Context, category Category) ([]Job, error) {
 // outright. A nil error means every category succeeded; check len(jobs)
 // rather than err == nil to tell partial success from total failure.
 func (c *Client) AllJobs(ctx context.Context) ([]Job, error) {
-	seen := make(map[string]bool)
 	var all []Job
 	var errs []error
 	for _, cat := range Categories {
@@ -100,24 +99,20 @@ func (c *Client) AllJobs(ctx context.Context) ([]Job, error) {
 			errs = append(errs, err)
 			continue
 		}
-		for _, j := range jobs {
-			if seen[j.ID] {
-				continue
-			}
-			seen[j.ID] = true
-			all = append(all, j)
-		}
+		all = append(all, jobs...)
 	}
-	return all, errors.Join(errs...)
+	return dedupeByID(all), errors.Join(errs...)
 }
 
 // Search fetches the relevant feed(s) for opts and filters them with
 // [FilterJobs]. A recognized opts.Category fetches only that one feed
-// instead of the full 10-feed dump. When opts.Category isn't recognized
-// and some (not all) category feeds fail, Search still returns the
-// filtered results from whichever feeds succeeded, alongside the joined
-// error — check len(result) to distinguish a partial result from having
-// nothing to filter.
+// instead of the full 10-feed dump; either path deduplicates by [Job.ID]
+// first (see [Client.Jobs] — a raw feed can list the same job twice), so
+// Search never returns a duplicate regardless of which path ran. When
+// opts.Category isn't recognized and some (not all) category feeds fail,
+// Search still returns the filtered results from whichever feeds
+// succeeded, alongside the joined error — check len(result) to
+// distinguish a partial result from having nothing to filter.
 func (c *Client) Search(ctx context.Context, opts FilterOptions) ([]Job, error) {
 	if cat, ok := lookupCategory(opts.Category); ok {
 		jobs, err := c.Jobs(ctx, cat)
@@ -126,7 +121,7 @@ func (c *Client) Search(ctx context.Context, opts FilterOptions) ([]Job, error) 
 		}
 		narrowed := opts
 		narrowed.Category = "" // the fetch already narrowed it; avoid re-filtering
-		return FilterJobs(jobs, narrowed), nil
+		return FilterJobs(dedupeByID(jobs), narrowed), nil
 	}
 	jobs, err := c.AllJobs(ctx)
 	if len(jobs) == 0 && err != nil {
@@ -161,6 +156,23 @@ func lookupCategory(name string) (Category, bool) {
 		}
 	}
 	return Category{}, false
+}
+
+// dedupeByID drops later jobs sharing an earlier one's ID, preserving
+// order. A single feed can list the same job twice under an identical
+// link/guid (see the package doc), so every caller-facing path applies
+// this rather than trusting a feed to be duplicate-free.
+func dedupeByID(jobs []Job) []Job {
+	seen := make(map[string]bool, len(jobs))
+	out := make([]Job, 0, len(jobs))
+	for _, j := range jobs {
+		if seen[j.ID] {
+			continue
+		}
+		seen[j.ID] = true
+		out = append(out, j)
+	}
+	return out
 }
 
 func (c *Client) fetch(ctx context.Context, rawURL string) ([]Job, error) {
