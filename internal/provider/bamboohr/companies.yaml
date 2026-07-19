@@ -50,14 +50,8 @@
   slug: actian
 - company: Acuity Insights
   slug: acuityinsights
-- company: Addi (addi)
-  slug: addi
 - company: Admiral Markets
   slug: admirals
-- company: Aera Technology (aeratechnology)
-  slug: aeratechnology
-- company: Aero Technologies
-  slug: aero
 - company: Aerones
   slug: aerones
 - company: Aerospace Technology Institute
@@ -68,8 +62,6 @@
   slug: affinity
 - company: "AG Consulting Partners, Inc"
   slug: agcp
-- company: AirApps
-  slug: airapps
 - company: Aircall
   slug: aircall
 - company: AirTrunk (airtrunk)
@@ -116,10 +108,6 @@
   slug: andesite
 - company: Ans Exam B.V.
   slug: ans
-- company: Antares Solutions
-  slug: antares
-- company: AnyVan (anyvan)
-  slug: anyvan
 - company: Apex.AI
   slug: apexai
 - company: AppNation
@@ -138,8 +126,6 @@
   slug: aroabio
 - company: ARTBIO
   slug: artbio
-- company: Artelia (artelia)
-  slug: artelia
 - company: Ascend Analytics
   slug: ascendanalytics
 - company: Asheville Recovery Center
@@ -150,16 +136,12 @@
   slug: afg
 - company: Aspect Biosystems
   slug: aspectbiosystems
-- company: Association of Municipalities of Ontario
-  slug: amo
 - company: Astra
   slug: astra
 - company: At Home Real Estate Services of SW MO
   slug: athome
 - company: ATI Inc.
   slug: atiinc
-- company: Atomic (atomic)
-  slug: atomic
 - company: Attune (attune)
   slug: attune
 - company: Audinate Pty Limited
@@ -182,22 +164,16 @@
   slug: axios
 - company: Azul Systems
   slug: azul
-- company: BambooHR
-  slug: january
 - company: Banyan Software
   slug: banyansoftware
 - company: Barkley Project Group
   slug: barkley
-- company: Base (base)
-  slug: base
 - company: BC Partners
   slug: bcpartners
 - company: Behavox (behavox)
   slug: behavox
 - company: Berlin Packaging LLC
   slug: berlinpackaging
-- company: Bestow (bestow)
-  slug: bestow
 - company: Beyond Identity
   slug: beyondidentity
 - company: BFAM Partners
@@ -248,10 +224,6 @@
   slug: branch
 - company: Brannon Steel
   slug: brannonsteel
-- company: Brevo (brevo)
-  slug: brevo
-- company: BRICK Education Network
-  slug: ben
 - company: Bridge 33 Capital
   slug: bridge33capital
 - company: Bridge to Enter Advanced Mathematics (BEAM)
@@ -288,8 +260,6 @@
   slug: capco
 - company: CapIntel Inc
   slug: capintel
-- company: CaptivateIQ (captivateiq)
-  slug: captivateiq
 - company: Caribou (caribou)
   slug: caribou
 - company: Carry 1st
@@ -320,8 +290,6 @@
   slug: choice
 - company: Cin7
   slug: cin7
-- company: Circles
-  slug: circles
 - company: Clarion Project
   slug: clarion
 - company: Clarity AI
@@ -332,12 +300,8 @@
   slug: clear
 - company: Clickatell
   slug: clickatell
-- company: ClickHouse (clickhouse)
-  slug: clickhouse
 - company: ClickView
   slug: clickview
-- company: Close (close)
-  slug: close
 - company: CloudTalk
   slug: cloudtalk
 - company: CMSPI
@@ -348,24 +312,16 @@
   slug: codasip
 - company: Cognigy
   slug: cognigy
-- company: Cohere (cohere)
-  slug: cohere
 - company: CoinMarketCap
   slug: coinmarketcap
-- company: coins.ph (coins)
-  slug: coins
 - company: ColdQuanta
   slug: coldquanta
 - company: Color
   slug: color
 - company: Commercial Spa Services LLC
   slug: css
-- company: "Comprehensive Approach Solutions, LLC"
-  slug: cas
 - company: Concept2
   slug: concept2
-- company: CONDUIT INC.
-  slug: conduit
 - company: Consensus
   slug: consensus
 - company: Constantinople
@@ -392,8 +348,6 @@
   slug: curtinmaritime
 - company: CYARA
   slug: cyara
-- company: CyberVadis (cybervadis)
-  slug: cybervadis
 - company: Cyware
   slug: cyware
 - company: "D&P China (HK) Limited"
@@ -404,8 +358,6 @@
   slug: datacamp
 - company: Datacor (datacor)
   slug: datacor
-- company: DataLab USA (datalabusa)
-  slug: datalabusa
 - company: Dataroid Teknoloji A.Ş.
   slug: dataroid
 - company: Datatonic
@@ -416,10 +368,6 @@
   slug: dbox
 - company: Decentralized Masters
   slug: decentralizedmasters
-- company: Deep South and Co
-  slug: dsm
-- company: Deepgram (deepgram)
-  slug: deepgram
 - company: DeepIntent (deepintent)
   slug: deepintent
 - company: Degensoft Ltd
@@ -430,8 +378,6 @@
   slug: dept
 - company: Desmone Architects
   slug: desmonearchitects
-- company: Devoteam (devoteam)
-  slug: devoteam
 - company: Devrev
   slug: devrev
 - company: DFINITY
@@ -446,16 +392,12 @@
   slug: distilled
 - company: dLocal
   slug: dlocal
-- company: Docker (docker)
-  slug: docker
 - company: Doctor Care Anywhere Group PLC
   slug: doctorcareanywhere
 - company: DomainTools
   slug: domaintools
 - company: Donorbox (donorbox)
   slug: donorbox
-- company: Dream Games (dreamgames)
-  slug: dreamgames
 - company: Dreamdata
   slug: dreamdata
 - company: dscout
@@ -464,8 +406,6 @@
   slug: dubber
 - company: DULCEDO
   slug: dulcedo
-- company: Dune (dune)
-  slug: dune
 - company: Durham College Student Association
   slug: dcsa
 - company: DVT
@@ -474,8 +414,6 @@
   slug: easyship
 - company: Edpuzzle
   slug: edpuzzle
-- company: Educative
-  slug: educative
 - company: Eightcap Services Pty Ltd
   slug: eightcap
 - company: elasticStage
@@ -488,8 +426,6 @@
   slug: emovis
 - company: Emsere
   slug: emsere
-- company: Enable New Zealand Limited
-  slug: enable
 - company: Energy Aspects
   slug: energyaspects
 - company: Enterprise Electrical
@@ -502,10 +438,6 @@
   slug: episodesix
 - company: Equal Experts
   slug: equalexperts
-- company: Equativ (equativ)
-  slug: equativ
-- company: Equus (equus)
-  slug: equus
 - company: Ethernovia (ethernovia)
   slug: ethernovia
 - company: European Tech Group A/S
@@ -514,8 +446,6 @@
   slug: everflow
 - company: Evidence Action
   slug: evidenceaction
-- company: Exa (exa)
-  slug: exa
 - company: EZYPAY
   slug: ezypay
 - company: Fable Data
@@ -582,8 +512,6 @@
   slug: fsg
 - company: Fuel Labs
   slug: fuellabs
-- company: Fulcrum (fulcrum)
-  slug: fulcrum
 - company: Fulfillment IQ
   slug: fiq
 - company: Fundraise Up
@@ -664,24 +592,16 @@
   slug: hearthsupportservices
 - company: Hello Heart
   slug: helloheart
-- company: HelloKindred
-  slug: kindred
-- company: Help Scout (helpscout)
-  slug: helpscout
 - company: HeyJobs GmbH
   slug: heyjobs
 - company: hippodigital
   slug: hippodigital
-- company: Hive.co (hive)
-  slug: hive
 - company: "HMT Engineering & Surveying"
   slug: hmt
 - company: Holocene Advisors
   slug: holocene
 - company: HomeToGo
   slug: hometogo
-- company: Hopper (hopper)
-  slug: hopper
 - company: Hoppr Limited
   slug: hoppr
 - company: "Hourly, Inc."
@@ -702,8 +622,6 @@
   slug: idt
 - company: IDEX Biometrics
   slug: idex
-- company: Immutable (immutable)
-  slug: immutable
 - company: impact.com
   slug: impact
 - company: InDebted
@@ -722,8 +640,6 @@
   slug: instead
 - company: Integra Technical Services
   slug: integra
-- company: Interaction (interaction)
-  slug: interaction
 - company: Intropic
   slug: intropic
 - company: Intégral
@@ -740,8 +656,6 @@
   slug: intuitive
 - company: Janea Systems
   slug: janeasystems
-- company: Jobandtalent
-  slug: jobandtalent
 - company: Journey Church
   slug: journey
 - company: Jungle Scout
@@ -750,8 +664,6 @@
   slug: justwatch
 - company: Juvare (juvare)
   slug: juvare
-- company: JYSK Canada (jysk)
-  slug: jysk
 - company: Karat (karat)
   slug: karat
 - company: Kasada
@@ -780,8 +692,6 @@
   slug: kobiton
 - company: KOHO
   slug: koho
-- company: Kpler (kpler)
-  slug: kpler
 - company: Kroo
   slug: kroo
 - company: Kuda
@@ -794,24 +704,12 @@
   slug: landytech
 - company: Lark Technologies
   slug: lark
-- company: Later (later)
-  slug: later
-- company: "Lavender Youth Recreation & Information Center (LYRIC)"
-  slug: lyric
 - company: LawZero (lawzero)
   slug: lawzero
 - company: LDX Digital
   slug: ldxdigital
-- company: Lead Bank
-  slug: leadbank
-- company: LEAP (leap)
-  slug: leap
 - company: LearnUpon (learnupon)
   slug: learnupon
-- company: Lendable (lendable)
-  slug: lendable
-- company: Level Controls
-  slug: level
 - company: Levitate (levitate)
   slug: levitate
 - company: Liberis
@@ -820,8 +718,6 @@
   slug: life
 - company: Lindus Health
   slug: lindushealth
-- company: Linear Logistics Ltd.
-  slug: linear
 - company: Littlepay (littlepay)
   slug: littlepay
 - company: LiveWire Construction Inc.
@@ -836,8 +732,6 @@
   slug: lunit
 - company: Luxury Escapes
   slug: luxuryescapes
-- company: Madhive (madhive)
-  slug: madhive
 - company: MailerLite
   slug: mailerlite
 - company: Malaria No More
@@ -848,16 +742,12 @@
   slug: map
 - company: Maple (getmaple)
   slug: getmaple
-- company: Maple Finance
-  slug: maple
 - company: "Marks & Clerk"
   slug: marksandclerk
 - company: MarqVision (marqvision)
   slug: marqvision
 - company: Martello Re Limited
   slug: martellore
-- company: masabi (masabi)
-  slug: masabi
 - company: MasterClass
   slug: masterclass
 - company: MealSuite
@@ -874,10 +764,6 @@
   slug: medtrainer
 - company: MEMX
   slug: memx
-- company: "Menlo Security, Inc."
-  slug: menlosecurity
-- company: Merge (merge)
-  slug: merge
 - company: Mesh (mesh)
   slug: mesh
 - company: Metalab
@@ -914,14 +800,8 @@
   slug: moonshot
 - company: Morning Brew
   slug: morningbrew
-- company: Mosaic Insurance
-  slug: mosaic
-- company: Motorway (motorway)
-  slug: motorway
 - company: Mozilla Foundation
   slug: mozilla
-- company: MPC LLC
-  slug: mpc
 - company: Muck Rack
   slug: muckrack
 - company: Musixmatch S.p.A
@@ -936,8 +816,6 @@
   slug: natilik
 - company: National Air Technologies
   slug: natech
-- company: Native Health (nativehealth)
-  slug: nativehealth
 - company: Navarino
   slug: navarino
 - company: Navitas
@@ -948,14 +826,6 @@
   slug: nayya
 - company: NCH Canada Inc.
   slug: nch
-- company: Nearmap (nearmap)
-  slug: nearmap
-- company: Neighbor (neighbor)
-  slug: neighbor
-- company: Nest Health (nesthealth)
-  slug: nesthealth
-- company: Netlify (netlify)
-  slug: netlify
 - company: Neural Concept
   slug: neuralconcept
 - company: New Code Partnership Ltd
@@ -966,8 +836,6 @@
   slug: newoakland
 - company: Newsweek Publishing LLC
   slug: newsweek
-- company: Newton (newton)
-  slug: newton
 - company: Next Health
   slug: nexthealth
 - company: NFQ
@@ -986,15 +854,11 @@
   slug: nbr
 - company: Novacom Building Partners
   slug: novacom
-- company: Novo (novo)
-  slug: novo
 - company: Nozomi Networks
   slug: nozominetworks
 - company: NRS
   slug: nrs
 - company: Nuclera Ltd.
   slug: nuclera
-- company: Nucleus
-  slug: nucleus
 - company: NYC Tourism + Conventions
   slug: nyctourism

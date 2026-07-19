@@ -48,8 +48,6 @@
   board_slug: actionist-consulting
 - company: Active Start Childcare
   board_slug: active-start-childcare
-- company: Adapt
-  board_slug: adapt
 - company: Adelaide
   board_slug: adelaide
 - company: Adiabatic Materials
@@ -76,8 +74,6 @@
   board_slug: aeris-communications-inc
 - company: Aerwave
   board_slug: aerwavecareers
-- company: Affinity Consulting Group
-  board_slug: affinity
 - company: AgAmerica
   board_slug: agamerica-careers
 - company: AgelessRx
@@ -98,8 +94,6 @@
   board_slug: aitp
 - company: Ai2iO
   board_slug: ai2io
-- company: Aidkit (aidkit)
-  board_slug: aidkit
 - company: Aimtal LLC
   board_slug: aimtal
 - company: AIQ
@@ -158,8 +152,6 @@
   board_slug: ampliwork-inc
 - company: Amplo
   board_slug: amplo
-- company: Amyloidosis Research Consortium
-  board_slug: arc
 - company: "Anaconda, Inc."
   board_slug: anaconda
 - company: Analyte Health
@@ -204,8 +196,6 @@
   board_slug: apptega
 - company: AppWork
   board_slug: appwork
-- company: Apres Nail (apres-nail)
-  board_slug: apres-nail
 - company: Aptera Motors Corp.
   board_slug: aptera
 - company: ArborXR
@@ -252,14 +242,10 @@
   board_slug: aspenview
 - company: Aspire General Insurance
   board_slug: aspire-general-insurance-careers
-- company: Astra (astra)
-  board_slug: astra
 - company: ATA
   board_slug: ata
 - company: Athos Commerce
   board_slug: athos-commerce-careers
-- company: ATI
-  board_slug: ati
 - company: "Atlantic Coast Mortgage, LLC"
   board_slug: atlantic-coast-mortgage
 - company: Atlas Data Storage Inc
@@ -432,8 +418,6 @@
   board_slug: buildpass
 - company: Bullet Labs
   board_slug: bullet-labs-career
-- company: Button (button)
-  board_slug: button
 - company: böhme
   board_slug: bohme
 - company: Cabrini Green Legal Aid
@@ -550,8 +534,6 @@
   board_slug: citrine-informatics
 - company: Citylogix Inc.
   board_slug: citylogix
-- company: Clara Analytics (clara-analytics)
-  board_slug: clara-analytics
 - company: Clarity Clinic
   board_slug: clarity-clinic
 - company: Clean Energy Services
@@ -594,8 +576,6 @@
   board_slug: collieraerospace
 - company: "Columbia Helicopters, Inc."
   board_slug: colheli
-- company: Column Software
-  board_slug: column
 - company: COMBASE USA
   board_slug: combase-usa
 - company: ComboCurve Inc.
@@ -624,8 +604,6 @@
   board_slug: concerthealthcareers
 - company: "Connect Globally, Serve Locally at DC BLOX"
   board_slug: dc-blox-careers
-- company: "Consensus Sales, LLC"
-  board_slug: consensus
 - company: Consolidated Analytics Private Limited
   board_slug: consolidated-analytics-inc
 - company: Contextual.io
@@ -700,12 +678,8 @@
   board_slug: crossroads
 - company: "Crosswalk Health, Inc."
   board_slug: crosswalk-health-inc
-- company: Crowe BGK (crowe-bgk)
-  board_slug: crowe-bgk
 - company: CrucialLogics Inc.
   board_slug: cruciallogics
-- company: Cruise Planners (cruiseplanners)
-  board_slug: cruiseplanners
 - company: Crunchafi LLC
   board_slug: crunchafi-llc
 - company: CS Erickson
@@ -794,8 +768,6 @@
   board_slug: dk-law
 - company: DLB Associates
   board_slug: dlb-associates
-- company: "DLS Engineering Associates, Inc."
-  board_slug: dlsengineering
 - company: Dmrtechnologies
   board_slug: dmrtechnologies
 - company: Document Crunch Inc
@@ -814,8 +786,6 @@
   board_slug: dreww-jobs
 - company: Drivepoint
   board_slug: drivepoint
-- company: DroneShield Group Pty Ltd
-  board_slug: droneshield
 - company: DroneUp
   board_slug: droneup
 - company: Dropzone AI
@@ -892,8 +862,6 @@
   board_slug: elg-careers-attorneys
 - company: Ellit Groups LLC
   board_slug: ellit-groups-llc
-- company: Emovis (emovis)
-  board_slug: emovis
 - company: Encamp
   board_slug: encamp
 - company: Encore Auctions
@@ -946,8 +914,6 @@
   board_slug: eventeny
 - company: Everfi LLC
   board_slug: everfi
-- company: Everflow Technologies Inc.
-  board_slug: everflow
 - company: "Evergreen Park & Recreation District"
   board_slug: evergreen-park-recreation-district
 - company: Evergreen Wealth
@@ -958,14 +924,10 @@
   board_slug: everyday-speech
 - company: Everything Bagel
   board_slug: everythingbagelcareers
-- company: Evidation (evidation)
-  board_slug: evidation
 - company: "Evommune, Inc."
   board_slug: evommune
 - company: Evotix Limited
   board_slug: evotix-limited
-- company: Exploration Technology Corp.
-  board_slug: etg
 - company: Fiveonefour Labs Inc
   board_slug: 514-careers
 - company: FlexGen
