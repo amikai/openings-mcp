@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss">
+  <channel>
+    <title>We Work Remotely: Back-End Programming Jobs</title>
+    <link>https://weworkremotely.com/categories/remote-back-end-programming-jobs.rss</link>
+    <description>We Work Remotely: Back-End Programming Jobs</description>
+    <language>en-US</language>
+    <ttl>60</ttl>
+    <item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0084/0935/logo.gif" type="image/png"/>
+      <title>Proxify AB: Senior Java Backend Developer</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Stockholm</state>
+      <skills>Java and Back-End Dev</skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0084/0935/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Sweden
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="http://career.proxify.io"&gt;http://career.proxify.io&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h4&gt;&lt;strong&gt;The Role:&lt;/strong&gt;&lt;/h4&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;We are looking for a Senior Java Developer for one of our clients. You are a perfect candidate if you are growth-oriented, you love what you do, and you enjoy working on new ideas to develop exciting products.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;What we are looking for:&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;5+ years of professional experience in backend software development.&lt;/li&gt;
+&lt;li&gt;Expert-level proficiency with Java&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;and core features.&lt;/li&gt;
+&lt;li&gt;Deep expertise with the Spring Framework&lt;/li&gt;
+&lt;li&gt;Proven track record in designing and implementing Microservices Architecture and RESTful APIs.&lt;/li&gt;
+&lt;li&gt;Experience with SQL and NoSQL databases&lt;/li&gt;
+&lt;li&gt;Strong understanding of Cloud Computing principles&lt;/li&gt;
+&lt;li&gt;Solid grasp of testing methodologies, including unit, integration, and end-to-end testing.&lt;/li&gt;
+&lt;li&gt;Ability to work with minimal supervision.&lt;/li&gt;
+&lt;li&gt;Intermediate-advanced English level.&lt;/li&gt;
+&lt;li&gt;You can communicate well with both technical and non-technical clients.&lt;/li&gt;
+&lt;li&gt;Located in CET timezone (+/- 3 hours), we are unable to consider applications from candidates in other time zones.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;Nice-to-Have:&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Hands-on experience with Kubernetes&lt;/li&gt;
+&lt;li&gt;Knowledge of event-driven architectures (EDA) and Domain-Driven Design (DDD)&lt;/li&gt;
+&lt;li&gt;Familiarity with functional programming paradigms.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;Responsibilities&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Lead the design and implementation of robust, scalable backend services using Java and the Spring Ecosystem (Spring Boot, Spring Cloud).&lt;/li&gt;
+&lt;li&gt;Drive best practices in coding, testing, security, and performance optimization&lt;/li&gt;
+&lt;li&gt;Build and maintain RESTful APIs and event-driven architectures to support business logic and front-end applications.&lt;/li&gt;
+&lt;li&gt;Work extensively with cloud environments, leveraging containerization technologies (Docker/Kubernetes).&lt;/li&gt;
+&lt;li&gt;Diagnose and resolve complex production issues, ensuring high availability and system reliability.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;h4&gt;&lt;strong&gt;What we offer:&lt;br&gt;&lt;/strong&gt;&lt;/h4&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Get paid, not played&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;No more unreliable clients. Enjoy on-time monthly payments with flexible withdrawal options.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;&lt;br&gt;Predictable project hours&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy a harmonious work-life balance with consistent 8-hour working days with clients.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Flex days, so you can recharge&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy up to 24 flex days off per year without losing pay, for full-time positions found through Proxify.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Career-accelerating positions at cutting-edge companies&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Discover exclusive long-term remote positions at the world's most exciting companies.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Hand-picked opportunities just for you&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Skip the typical recruitment roadblocks and biases with personally matched positions.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;One seamless process, multiple opportunities&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;A one-time contracting process for endless opportunities, with no extra assessments.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Compensation&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy the same pay, every month with positions landed through Proxify.&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/proxify-ab-senior-java-backend-developer"&gt;https://weworkremotely.com/remote-jobs/proxify-ab-senior-java-backend-developer&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Mon, 13 Jul 2026 13:41:15 +0000</pubDate>
+      <expires_at>Wed, 12 Aug 2026 13:41:15 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/proxify-ab-senior-java-backend-developer</guid>
+      <link>https://weworkremotely.com/remote-jobs/proxify-ab-senior-java-backend-developer</link>
+    </item>
+    <item>
+      <title>Proxify AB: Senior Ruby on Rails Developer</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Stockholm</state>
+      <skills>Ruby and Ruby on Rails</skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Sweden
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="http://career.proxify.io"&gt;http://career.proxify.io&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;div&gt;
+&lt;h3&gt;&lt;strong&gt;The Role:&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;We are looking for a Senior Ruby on Rails developer for one of our clients. You are a perfect candidate if you are growth-oriented, you love what you do, and you enjoy working on new ideas to develop exciting products and growth features.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;What we are looking for:&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Minimum of 5 years of experience in Ruby on Rails development with a strong portfolio of completed projects.&lt;/li&gt;
+&lt;li&gt;Proficiency in Ruby, Ruby on Rails, and related technologies such as HTML, CSS, JavaScript, and SQL.&lt;/li&gt;
+&lt;li&gt;Strong experience with relational databases such as PostgreSQL or MySQL.&lt;/li&gt;
+&lt;li&gt;Proficiency with testing frameworks such as RSpec and Capybara.&lt;/li&gt;
+&lt;li&gt;Strong knowledge of version control systems, particularly Git.&lt;/li&gt;
+&lt;li&gt;Excellent analytical and problem-solving skills with a proactive approach to identifying and resolving issues.&lt;/li&gt;
+&lt;li&gt;Located in CET timezone (+/- 3 hours), we are unable to consider applications from candidates in other time zones.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;Responsibilities:&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;Design, develop, and maintain high-quality web applications using Ruby on Rails.&lt;/li&gt;
+&lt;li&gt;Write clean, maintainable, and efficient code following best practices and coding standards.&lt;/li&gt;
+&lt;li&gt;Implement comprehensive testing strategies to ensure application stability and robustness, including unit tests, integration tests, and end-to-end tests.&lt;/li&gt;
+&lt;li&gt;Identify and resolve performance bottlenecks to ensure applications run smoothly and efficiently.&lt;/li&gt;
+&lt;li&gt;Maintain thorough documentation of development processes, code, and system configurations to ensure knowledge sharing and project continuity.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;strong&gt;&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;h4&gt;&lt;strong&gt;What we offer:&lt;/strong&gt;&lt;/h4&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Get paid, not played&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;No more unreliable clients. Enjoy on-time monthly payments with flexible withdrawal options.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Predictable project hours&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy a harmonious work-life balance with consistent 8-hour working days with clients.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Flex days, so you can recharge&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy up to 24 flex days off per year without losing pay, for full-time positions found through Proxify.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Career-accelerating positions at cutting-edge companies&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Discover exclusive long-term remote positions at the world's most exciting companies.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Hand-picked opportunities, just for you&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Skip the typical recruitment roadblocks and biases with personally matched positions.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;One seamless process, multiple opportunities&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;A one-time contracting process for endless opportunities, with no extra assessments.&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Compensation&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy the same pay, every month with positions landed through Proxify.&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/proxify-ab-senior-ruby-on-rails-developer-3"&gt;https://weworkremotely.com/remote-jobs/proxify-ab-senior-ruby-on-rails-developer-3&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Mon, 13 Jul 2026 13:31:24 +0000</pubDate>
+      <expires_at>Wed, 12 Aug 2026 13:31:24 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/proxify-ab-senior-ruby-on-rails-developer-3</guid>
+      <link>https://weworkremotely.com/remote-jobs/proxify-ab-senior-ruby-on-rails-developer-3</link>
+    </item>
+    <item>
+      <title>Proxify AB: Senior Backend Developer (Python)</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Stockholm</state>
+      <skills>Django and Python</skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Sweden
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="http://career.proxify.io"&gt;http://career.proxify.io&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;h3&gt;&lt;strong&gt;The Role:&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;We are looking for a Senior Python Developer for one of our clients. You are a perfect candidate if you are growth-oriented, you love what you do, and you enjoy working on new ideas to develop exciting products.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;h4&gt;&lt;strong&gt;What we are looking for:&lt;/strong&gt;&lt;/h4&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;5+ years of experience building products with Python and Django.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;High proficiency in SQL with experience using databases like PostgreSQL.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Experience scaling cloud infrastructures with Docker or Kubernetes is a plus.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Experience managing cloud infrastructures, specifically AWS or GCP.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You follow the best practices and conventions.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Relevant experience in CI/CD and related tools.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ability to work with minimal supervision.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Intermediate-advanced English level.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can communicate well with both technical and non-technical clients.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Time zone: CET (+/- 3 hours). We are unable to consider applications from candidates in other time zones.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Responsibilities:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Ability to build libraries and frameworks of reusable efficient code.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Competence in designing and implementing low-latency, stable and performing applications.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Capacity to effectively collaborate with other team members and stakeholders remotely.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ability to implement data protection systems.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Competence in data storage solutions.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;h4&gt;&lt;strong&gt;What we offer:&lt;br&gt;&lt;/strong&gt;&lt;/h4&gt;
+&lt;div&gt;&amp;nbsp;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;Get paid, not played&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;No more unreliable clients. Enjoy on-time monthly payments with flexible withdrawal options.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;&lt;br&gt;Predictable project hours&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy a harmonious work-life balance with consistent 8-hour working days with clients.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Flex days, so you can recharge&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy up to 24 flex days off per year without losing pay, for full-time positions found through Proxify.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Career-accelerating positions at cutting-edge companies&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Discover exclusive long-term remote positions at the world's most exciting companies.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Hand-picked opportunities just for you&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Skip the typical recruitment roadblocks and biases with personally matched positions.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;One seamless process, multiple opportunities&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;A one-time contracting process for endless opportunities, with no extra assessments.&lt;br&gt;&lt;br&gt;&lt;/div&gt;
+&lt;div&gt;&lt;br&gt;&lt;strong&gt;Compensation&lt;/strong&gt;&lt;/div&gt;
+&lt;div&gt;Enjoy the same pay, every month with positions landed through Proxify.&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-python-8"&gt;https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-python-8&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Mon, 13 Jul 2026 12:54:38 +0000</pubDate>
+      <expires_at>Wed, 12 Aug 2026 12:54:38 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-python-8</guid>
+      <link>https://weworkremotely.com/remote-jobs/proxify-ab-senior-backend-developer-python-8</link>
+    </item>
+    <item>
+      <title>Vidalytics: AI Automation Engineer, In-House MarTech Video SaaS</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Delaware</state>
+      <skills></skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Austin, TX
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="https://vidalytics.com"&gt;https://vidalytics.com&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;If you love building AI agents, wiring systems together, and watching whole teams stop doing by hand what a machine can do better, faster, and cheaper, and you want to make a whole company AI native rather than ship a slick demo, keep reading.&lt;/p&gt;
+&lt;p&gt;You'll be the person who makes Vidalytics AI native from top to bottom. You'll build the agents, the chains, the prompts, the reusable skills, and the cross system automations that let every team punch way above its weight. You'll report to the CEO. LFG!&lt;/p&gt;
+&lt;p&gt;You'll start where the money is, on the revenue teams (sales, marketing and customer success), then take it across the whole org. You’ll work with the stakeholders who will use your workflow automations on a daily basis, to achieve the best solutions.&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;Most importantly work w/ each team member to help them become AI Native themselves. Which tools they should be using, how they can build upon your ideas, or even spearheading projects of their own that you ensure the success of from a technical perspective. &lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;h1&gt;What You'll Be Doing (Job Tasks) &lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Build AI agents and chains that do real work end to end, not chatbots that just talk.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Write, version, and test prompts like code. Build reusable skills the whole org can run.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Stand up cross system automations (n8n, Zapier, and custom code) that wire our tools together so work flows without a human babysitting it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Make each team at Vidalytics AI native,.&amp;nbsp; Not just automating work, but helping each team member become AI Native - knowing which tools to use and how to use them. Where they’re self sufficient to continue automating their jobs.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ship internal tools and automations that make the company more efficient and effective. You stay hungry for more, always improving what we build and use.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Build evals and observability so every AI system is measured, monitored, traced, and cost controlled. If you can't measure it, you can't ship it.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Ground AI outputs in our own company data (retrieval / RAG) so they're accurate, not confidently wrong.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Diagnose failures, kill hallucinations, and build the guardrails that keep systems reliable in production.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Help with AEO / GEO where it moves the needle.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
+&lt;h1&gt;Requirements &lt;/h1&gt;
+&lt;p&gt;(The must haves)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You’re able to choose the right tool for the job. Which AI tool, LLM, agent is the best answer you can figure out wihtout endless tinkering. You care whether the work gets faster, cheaper, or better, not whether it uses the trendy thing.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You've already shipped this kind of work in production. This is not a learn on the job role nor is it for the hobbiest. We expect real results, right away. We’re already doing all of this ourselves but need an expert level person to take ownership.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;AI is a young field, so we expect only a few years of hands on AI experience, but it has to sit on top of strong, relevant broader engineering experience, and you must have built and run real AI systems that other people depend on.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You can actually code, and not just with Claude lol. You're comfortable with databases, APIs, and MCP, wiring systems together for real, not just clicking boxes.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You build evals and observability by default. You measure, monitor, trace, and control cost as a matter of habit.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You hold a production grade reliability bar. You ship systems that keep working for months, not demos that impress once and break the next day.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A ready to show portfolio, or concrete examples of what you've built and the results it delivered.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Your working hours overlap strongly with US Eastern time. We can discuss further.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You’re not token-wise, prompt foolish.&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're fluent across the frontier models, (Claude is our primary, ideally it is yours), and you know which model to reach for and why (cost, latency, context, reliability, specific use cases, etc.).&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You use tools like Claude Code and Claude Cowork daily, and not just a prompt&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're comfortable with AI native hosting and deployment, for example Vercel.&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're hands on with automation tools like n8n and Zapier, and you know when to drop them and write custom orchestration instead.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You ground AI outputs in real data with retrieval / RAG so they're accurate and don't hallucinate.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Most of your availabe working hours overlaps (or can) w/ the Eastern US time zone.&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;&amp;nbsp;&lt;/strong&gt;&lt;/p&gt;
+&lt;h1&gt;Nice to Have &lt;/h1&gt;
+&lt;p&gt;(Not required, but a plus)&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Basic security and data protection know how. When you automate things, you don't want a free for all where anything can touch whatever data. Not a deal breaker.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;AEO / GEO experience.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Deeper software engineering chops.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Exposure to our stack: HubSpot, Fathom, Slack, Google Workspace, PostHog, Intercom, BigQuery, GCP, Vercel, v0, Lovable, Github.&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;Who You Are (Personality Type) &lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;You’re a passionate tinker who loves this field and playing with new tech, but you can also shut down your internal shiny ball syndrome and GSD (get shit done).&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You translate between business problems and AI systems. You ask the right questions, fill the gaps, and turn messy business needs into working automations.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You’re organized. You speak ROI. You’re familiar with marketing, sales and customer success workflows in particular as well as other functions of a modern tech company.&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're biased toward shipping fast. You deliver in small, valuable chunks that compound.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're loyal to outcomes, not hype. You don't care how cool the tech is. You care whether it saved time, made money, or removed a human bottleneck.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You measure everything. Evals, cost, latency, reliability. If it isn't measured, it isn't real.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You thrive on vague specs and can coordinate the rapid ideas of a choatic visionary. You can talk out ideas, bring structure to projects and don’t need everything spoon fed to you or spec’ed out in pretty user stories. &lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;What You'll Love About Us (Benefits and Perks) &lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;High performance company culture. You won't be a cog in a machine. You'll be a key member of a high performance team that gets shit done. This is a place to grow and realize your potential, no matter where you are in your career.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;No office politics. We're small and flat. No dancing around sensitive topics or diverting resources from other teams. We're direct, we're honest, and we're here to accomplish big audacious goals.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;We value your ideas. At Vidalytics, my door is always open. Need help? Let's talk. Have a vision for the future of the company? I want to hear it. Think I suck at my job? Help me grow.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Rest and relaxation. Employees get 20 days of PTO.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Professional development. Want to keep learning? Vidalytics pays for classes, conferences, and more.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You're more than an employee, you're a person. Every coworker you meet is committed to treating you with respect and kindness. You won't hear stuff like “It's just business.”&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;This is a resume making position, where you'll learn a lot and carry real responsibility. You don't have to wait for someone to die or retire to move up, like in a megacorp.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Entrepreneurial to our core. Not only are we a startup, but we need intrapreneurs who will help us scale, and we plan to start sister corps over time to form a portfolio of companies you could help found.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h1&gt;&lt;br&gt;Vidalytics' Values (Yes, We're Actually Serious About These) &lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Play to Win. We're competitors. We do what it takes to win. That means we will fail and we will lose, but we want to do those things fast so we can win, because winning is on the other side of mistakes.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Scrappy. We're a startup and it's chaotic. This isn't the government. You need to learn fast, move fast, and handle it. If you want an easy job, go work at the government.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Meritocracy. The best idea wins, not the person it came from. You can be direct and transparent with anyone. Start with analysis, form hypotheses, test small, measure results, iterate, and scale big with data. We can't have perfect data, so once a decision is made, get on board.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Own Yourself. We do what we say, and we own what we've done. Mistakes happen. The worst thing is when someone doesn't own and learn from them. You trust us. We trust you.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Self Actualization. This is a place for hyper learning. We want to scale, and you need to scale with us. That doesn't always mean climbing a ladder. It means upleveling skill, closing gaps, growing, and being self actualized.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Conscious Teamwork. No politics. No bullshit. Instead, integrity, emotional intelligence, transparency, and curiosity. Attack ideas, not people.&lt;br&gt;&lt;br&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Cheers,&lt;/p&gt;
+&lt;p&gt;Patrick Stiles&lt;/p&gt;
+&lt;p&gt;Founder / CEO @ Vidalytics&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/vidalytics-ai-automation-engineer-in-house-martech-video-saas"&gt;https://weworkremotely.com/remote-jobs/vidalytics-ai-automation-engineer-in-house-martech-video-saas&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Tue, 07 Jul 2026 12:49:42 +0000</pubDate>
+      <expires_at>Thu, 06 Aug 2026 12:49:42 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/vidalytics-ai-automation-engineer-in-house-martech-video-saas</guid>
+      <link>https://weworkremotely.com/remote-jobs/vidalytics-ai-automation-engineer-in-house-martech-video-saas</link>
+    </item>
+    <item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0171/5141/logo.gif" type="image/png"/>
+      <title>bunny.net: Staff Software Engineer (Magic Containers)</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>Ljubljana</state>
+      <skills>Containers, Linux, Network Protocols, C#, Kubernetes, and Large-scale Distributed Systems</skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0171/5141/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; Slovenia
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="http://bunny.net"&gt;http://bunny.net&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Staff&amp;nbsp;Software Engineer (Magic Containers)&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Magic Containers is bunny.net’s edge-native platform for running containerized applications. It’s fast, flexible, and free from traditional cloud complexity. No Kubernetes. No YAML jungles. Just a simple, powerful way to deploy and scale apps globally with minimal setup.&lt;/p&gt;
+&lt;p&gt;It’s already running in production, powering real workloads, and we’re ready to take it further.&lt;/p&gt;
+&lt;p&gt;As a&amp;nbsp;&lt;strong&gt;Staff Software Engineer&lt;/strong&gt;, you’ll help evolve a platform that’s built for developers, with great DX, simple operations, and rock-solid reliability. You’ll work fast, ship often, and have a real voice in shaping the future of how containers run at the edge.&lt;/p&gt;
+&lt;p&gt;You’re a technical leader who shapes how we build at scale. You solve problems that cross teams, connect technical and business strategy, and make others better through influence, clarity, and mentorship. You set direction, not just follow it. And you leave every system and team stronger than you found them.&lt;/p&gt;
+&lt;p&gt;You won’t do it alone. You’ll work with people who challenge what’s possible and take pride in doing things well.&lt;/p&gt;
+&lt;p&gt;If this sounds like the kind of infrastructure you’d want to help others build with, we’d love to hear from you.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What will you do?&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Build and evolve the core of our edge-native container platform -&amp;nbsp;&lt;a href="https://bunny.net/magic-containers/"&gt;Magic Containers&lt;/a&gt;&amp;nbsp;and shape how developers build at the edge&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Multiply your impact by setting standards, mentoring engineers, and improving both code quality and team-wide knowledge&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Proactively spot opportunities to improve the platform, processes, or developer experience and drive those improvements end-to-end&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Lead cross-team efforts, whether it’s scaling orchestration systems, improving global observability, or driving company-wide migrations and technology shifts&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Align technical direction across teams by collaborating on specs, guiding architecture, and connecting engineering decisions to business goals&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Debug and resolve complex production issues, including those reported by customers&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Own outcomes end to end: not just shipping features, but delivering systems that solve real customer problems at scale&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Set a high bar for what great looks like in code quality, system design, and how we support what we build in production&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;What will you bring?&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;5+ years of experience with C# or a strong willingness to switch to it&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Deep understanding of containers (cgroups, namespaces, runtimes) and how they work under the hood&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Proven experience building and operating distributed systems across global infrastructure, especially those designed for global scale, low latency, or edge environments&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Strong Linux systems knowledge and comfort working close to the OS&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Solid grasp of networking fundamentals, including routing protocols, load balancing strategies, and distributed traffic patterns&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Familiarity with time-series or analytical databases like ClickHouse or InfluxDB&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Sharp debugging skills and the ability to diagnose complex production issues&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Experience leading cross-team or company-wide technical initiatives, guiding architecture, and mentoring engineers&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Understanding of observability best practices: including logging, metrics, and health monitoring for distributed systems&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Clear, thoughtful communication: you write great docs, explain trade-offs, and build alignment&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A customer-first mindset focused on outcomes, long-term reliability, and continuous improvement&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;A desire to help others grow and a habit of leading by example in how you write and review code&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;What will make us extra happy?&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;High-level understanding of Anycast: how it works, and how it impacts global routing, performance, and failover&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You’ve worked on sandboxing or container security (e.g. gVisor, Kata Containers)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You’ve improved developer experience or infrastructure usability at scale&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Familiarity with message brokers like RabbitMQ or Kafka&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Hands-on with Redis, etcd, or other distributed key-value stores&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You've used bunny.net products or have experience with edge compute/CDN platforms&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You contribute to open source or share knowledge publicly (talks, posts, docs)&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You care deeply about developer experience and are thoughtful about the systems you design&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;You bring curiosity, care, and energy to your work, and to the people around you&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Not sure if you check every box?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;That’s okay. We care more about how you think and what you’ve built than perfect credentials. If this work sounds exciting and you're ready to grow, we want to hear from you.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Where should you be located?&lt;/strong&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;This job is fully remote from Europe (ideally CET or close time zone) with a flexible schedule, to make our collaboration easier. You’re still free to hop around the world and switch up your scenery whenever you want.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;strong&gt;What's in it for you?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Life at bunny.net comes with benefits that make work (and life) better.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;100% flexible hours -&lt;/strong&gt;&amp;nbsp;Your work, your rhythm. Whether you thrive at 3 am or on a beach at noon, we've got you.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Remote-first by design&lt;/strong&gt;&amp;nbsp;- No offices, no commute, just the freedom to work anywhere. Miss the office? We’ll give you a 3-night voucher for visiting our&amp;nbsp;&lt;a href="https://bunnynet.teamtailor.com/locations/bunny-net-headquarters"&gt;headquarters&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Performance-based bonuses&lt;/strong&gt;&amp;nbsp;- Great work pays off, and we reward impact annually.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Medical, dental, and vision insurance -&lt;/strong&gt;&amp;nbsp;Coverage worldwide.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Paid time off -&lt;/strong&gt;&amp;nbsp;Love the slopes or the sea? Enjoy them with 25 vacation days, plus an extra loyalty day each year, capped at 5 years (30 days total), on top of your local public holidays.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Meeting-free Thursdays&lt;/strong&gt;&amp;nbsp;- We keep Thursdays meeting free internally so you can focus on deep work without interruptions.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Home office budget -&lt;/strong&gt;&amp;nbsp;We believe everyone is more efficient working in a comfortable office, and we're happy to help you set it up with an annual budget of €500.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Paid sick leave -&lt;/strong&gt;&amp;nbsp;Feeling ill? Take time off to fully recover without having to worry about your finances.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Parental leave -&lt;/strong&gt;&amp;nbsp;Paid 16 weeks for birthing parents, 8 weeks for non-birthing parents. If your country gives more, that’s your baseline. If it gives less, we top it up. Take your leave all at once or split it across the first year for maximum flexibility. After paid leave, your local statutory rules apply.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Annual fluffle-building&amp;nbsp;&lt;/strong&gt;- We're remote, but not distant! Once a year, we meet in a sunny location where virtual high-fives turn into real ones.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Employee Stock Option Plan (ESOP)&lt;/strong&gt;&amp;nbsp;- Everyone at bunny.net gets a piece of the pie, starting with 0.01% equity.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Mental health support -&lt;/strong&gt;&amp;nbsp;Feeling down? We've got your back. bunny.net provides mental health resources and help via&amp;nbsp;&lt;a href="http://betterhelp.com/"&gt;&lt;strong&gt;BetterHelp.com&lt;/strong&gt;&lt;/a&gt;.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Wellness budget -&lt;/strong&gt;&amp;nbsp;An annual well-being budget of €480 is here to help you stay fresh and focused.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Educational budget -&lt;/strong&gt;&amp;nbsp;€500 yearly for books, seminars, or online courses to keep your learning on track, work-related or not.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Music on us&lt;/strong&gt;&amp;nbsp;&lt;strong&gt;-&lt;/strong&gt; Work is better with music. Enjoy a yearly Apple, Spotify, or YouTube Premium subscription on us.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/bunny-net-staff-software-engineer-magic-containers"&gt;https://weworkremotely.com/remote-jobs/bunny-net-staff-software-engineer-magic-containers&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Tue, 12 May 2026 12:34:46 +0000</pubDate>
+      <expires_at>Mon, 10 Aug 2026 12:34:46 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/bunny-net-staff-software-engineer-magic-containers</guid>
+      <link>https://weworkremotely.com/remote-jobs/bunny-net-staff-software-engineer-magic-containers</link>
+    </item>
+    <item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0171/4689/logo.gif" type="image/png"/>
+      <title>Reveleer: Full Stack AI Engineer</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>California</state>
+      <skills></skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0171/4689/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; United States
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="https://www.reveleer.com/"&gt;https://www.reveleer.com/&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Full Stack AI Engineer&lt;br&gt;Remote Opportunity&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As the industry’s pioneering value-based care (VBC) technology platform, Reveleer is purpose-built to solve the most pressing real-world challenges faced by providers and health-plan organizations today. By unifying retrieval, clinical intelligence, risk adjustment, quality improvement, and member management solutions into one intelligent, AI-powered system, Reveleer streamlines fragmented workflows to supercharge productivity, enhance care quality, and optimize performance on high-priority value-based initiatives.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;About the Team:&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;You will be joining a small team within Reveleer AI division, in charge of developing the next generation agentic model for clinical prospective suspecting. As a full stack software developer in our team, you will be working in the unique environment of a small team with large scale impact to enable the expansion of our product and fast growth of our users.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Responsibilities:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Obsess over the details and applying first principle mindset to address challenges.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Understand business needs and build end-to-end product experiences.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Solve product problems and build delightful user experiences for our users.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Contribute to building and scaling infrastructure.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Develop and continually improve observability of activity and infra at scale.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Continually challenge status quo and existing solutions to improve scalability &amp;amp; efficiency&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Partner closely with other engineers and scientists to build highly scalable, ML driven system(s), help run experiments, and surface insights across all points of customer interactions&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Resolve problems and provide daily troubleshooting, analysis, and problem definition for production issues.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Required Skills:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;5+ years of experience building high quality code and infrastructure.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;3+ years of experience working with large-scale systems.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;2+ Experience with AWS and Google Cloud&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;A passion for building delightful Customer-centric user experiences, from the backend to the frontend.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Proven curiosity with the latest Generative AI advances.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Hands-on experience in client-side development using ReactJS, CSS, JavaScript, Typescript.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Hands-on experience in NodeJS and MongoDB.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Familiarity with common best practices, design and architectural patterns.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Great problem-solving skills, eager to learn and face new challenges.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Highly motivated, self-learner with great attention to detail.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Thrive in a collaborative environment involving different functions, stakeholders, and subject matter experts.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Attention to detail, especially around performance, accessibility, reliability, and security.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;WHAT YOU’LL RECEIVE:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Competitive salary &lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Medical, Dental and Vision benefits &lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;401k match&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ul&gt;
+&lt;li&gt;Generous PTO plan &lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt; Our compensation reflects the cost of labor across several US geographic markets. Pay is based on several factors including market location and may vary depending on job-related knowledge, skills, and experience.&lt;/p&gt;
+&lt;p&gt;Reveleer E-Verifies all new hires.&lt;/p&gt;
+&lt;p&gt;Reveleer is an equal opportunity employer. We do not discriminate on the basis of race, religion, color, national origin, gender, gender identity, sexual orientation, age, marital status, veteran status, disability status or genetic information, in compliance with applicable federal, state and local law.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/reveleer-full-stack-ai-engineer"&gt;https://weworkremotely.com/remote-jobs/reveleer-full-stack-ai-engineer&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Thu, 02 Apr 2026 20:46:00 +0000</pubDate>
+      <expires_at>Fri, 31 Jul 2026 20:46:00 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/reveleer-full-stack-ai-engineer</guid>
+      <link>https://weworkremotely.com/remote-jobs/reveleer-full-stack-ai-engineer</link>
+    </item>
+    <item>
+      <media:content url="https://wwr-pro.s3.amazonaws.com/logos/0171/4688/logo.gif" type="image/png"/>
+      <title>Tether: AI Research Engineer</title>
+      <region>Anywhere in the World</region>
+      <country></country>
+      <state>California</state>
+      <skills></skills>
+      <category>Back-End Programming</category>
+      <type>Full-Time</type>
+      <description>&lt;img src="https://we-work-remotely.imgix.net/logos/0171/4688/logo.gif?ixlib=rails-4.0.0&amp;w=50&amp;h=50&amp;dpr=2&amp;fit=fill&amp;auto=compress" /&gt;
+
+&lt;p&gt;
+  &lt;strong&gt;Headquarters:&lt;/strong&gt; El Salvador
+    &lt;br /&gt;&lt;strong&gt;URL:&lt;/strong&gt; &lt;a href="https://careers.tether.io/"&gt;https://careers.tether.io/&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;div class="sc-1fwbcuw-0 kbZOmE"&gt;
+&lt;div&gt;
+&lt;p&gt;&lt;strong&gt;&lt;em&gt;Why Join Us?&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Our team is a global talent powerhouse, working remotely from every corner of the world. If you’re passionate about making a mark in the fintech space, this is your opportunity to collaborate with some of the brightest minds, pushing boundaries and setting new standards. We’ve grown fast, stayed lean, and secured our place as a leader in the industry.&lt;/p&gt;
+&lt;p&gt;If you have excellent English communication skills and are ready to contribute to the most innovative platform on the planet, Tether is the place for you.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Are you ready to be part of the future?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;About the job&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As a member of the AI model team, you will drive innovation in reinforcement learning approaches for advanced models. Your work will optimize decision-making and adaptive behavior to deliver enhanced intelligence, improved performance, and domain-specific capabilities for real-world challenges. You will work across a broad spectrum of systems, including resource-efficient models designed for limited hardware environments and complex multi-modal architectures that integrate data such as text, images, and audio.&lt;/p&gt;
+&lt;p&gt;We expect you to have deep expertise in designing reinforcement learning systems and a strong background in advanced model architectures. You will adopt a hands-on, research-driven approach to developing, testing, and implementing novel reinforcement learning algorithms and training frameworks. Your responsibilities include curating specialized simulation environments and training datasets, strengthening baseline policy performance, and identifying as well as resolving bottlenecks in the reinforcement learning process. The ultimate goal is to unlock superior, domain-adapted AI performance and push the limits of what these models can achieve in dynamic, real-world environments.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Responsibilities&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Develop and implement state-of-the-art reinforcement learning algorithms designed to optimize decision-making processes in both simulated and real-world settings. Establish clear performance targets such as reward maximization and policy stability.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Build, run, and monitor controlled reinforcement learning experiments. Track key performance indicators while documenting iterative results and comparing outcomes against established benchmarks.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Identify and curate high-quality simulation environments and training datasets that are tailored to specific domain challenges. Set measurable criteria to ensure that the selection and preparation of these resources significantly enhance the learning process and overall model performance.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Systematically debug and optimize the reinforcement learning pipeline by analyzing both computational efficiency and learning performance metrics. Address issues such as reward signal noise, exploration strategy, and policy divergence to improve convergence and stability.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Collaborate with cross-functional teams to integrate reinforcement learning agents into production systems. Define clear success metrics such as real-world performance improvements and robustness under varied conditions and ensure continuous monitoring and iterative refinements for sustained domain adaptation.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;h2 class="sc-1npqnwg-4 sc-1npqnwg-5 sc-1uwf3m5-0 sc-1uwf3m5-1 gCDcOw custom-css-style-job-requirements"&gt;Job requirements&lt;/h2&gt;
+&lt;div class="sc-1fwbcuw-0 kbZOmE"&gt;
+&lt;div&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;A degree in Computer Science or related field. Ideally PhD in NLP, Machine Learning, or a related field, complemented by a solid track record in AI R&amp;amp;D (with good publications in A* conferences).&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Proven experience with large-scale reinforcement learning experiments, including online RL techniques such as Group Relative Policy Optimization (GRPO), is essential. Your contributions should have led to measurable improvements in domain-specific decision-making and overall policy performance.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Deep understanding of reinforcement learning algorithms is required, including state-of-the-art online RL methods and other gradient-based optimization approaches like policy gradients, actor-critic, and GRPO. Your expertise should emphasize enhancing policy stability, exploration, and sample efficiency in complex, dynamic environments.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Strong expertise in PyTorch and relevant reinforcement learning frameworks is a must. Practical experience in developing RL pipelines, from simulation and online training to post-training evaluation and deploying RL-based solutions in production environments is expected.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Demonstrated ability to apply empirical research to overcome reinforcement learning challenges such as sample inefficiency, exploration-exploitation tradeoffs, and training instability. You should be proficient in designing robust evaluation frameworks and iterating on algorithmic innovations to continuously push the boundaries of RL agent performance.&lt;/p&gt;
+&lt;p&gt;&amp;nbsp;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Important information for candidates&lt;/strong&gt;&lt;br&gt;Recruitment scams have become increasingly common. To protect yourself, please keep the following in mind when applying for roles:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Apply only through our official channels.&lt;/strong&gt;&amp;nbsp;We do not use third-party platforms or agencies for recruitment unless clearly stated. All open roles are listed on our official careers page:&amp;nbsp;https://tether.recruitee.com/&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Verify the recruiter’s identity.&lt;/strong&gt;&amp;nbsp;All our recruiters have verified LinkedIn profiles. If you’re unsure, you can confirm their identity by checking their profile or contacting us through our website.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Be cautious of unusual communication methods.&lt;/strong&gt;&amp;nbsp;We do not conduct interviews over WhatsApp, Telegram, or SMS. All communication is done through official company emails and platforms.&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Double-check email addresses.&lt;/strong&gt;&amp;nbsp;All communication from us will come from emails ending in&amp;nbsp;&lt;strong&gt;@&lt;/strong&gt;&lt;a href="http://tether.to/"&gt;tether.to&lt;/a&gt;&lt;strong&gt;&amp;nbsp;or&amp;nbsp;@&lt;/strong&gt;&lt;a href="http://tether.io/"&gt;tether.io&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;We will never request payment or financial details.&lt;/strong&gt; If someone asks for personal financial information or payment at any point during the hiring process, it is a scam. Please report it immediately.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;To apply:&lt;/strong&gt; &lt;a href="https://weworkremotely.com/remote-jobs/tether-ai-research-engineer"&gt;https://weworkremotely.com/remote-jobs/tether-ai-research-engineer&lt;/a&gt;&lt;/p&gt;
+</description>
+      <pubDate>Thu, 02 Apr 2026 20:28:59 +0000</pubDate>
+      <expires_at>Fri, 31 Jul 2026 20:28:59 +0000</expires_at>
+      <guid>https://weworkremotely.com/remote-jobs/tether-ai-research-engineer</guid>
+      <link>https://weworkremotely.com/remote-jobs/tether-ai-research-engineer</link>
+    </item>
+  </channel>
+</rss>
