@@ -26,10 +26,18 @@ type slugEntry struct {
 // Registry is the read-only union of every adapter's roster, built once at
 // startup. It owns name resolution; adapters never see unresolved input.
 type Registry struct {
-	adapters []Adapter                // registration order; polled for careers-URL input
-	bySlug   map[string]registryEntry // key: normalize(slug)
-	byName   map[string]registryEntry // key: normalize(display name)
-	slugs    []slugEntry              // sorted by slug, for suggestions
+	adapters []Adapter                  // registration order; polled for careers-URL input
+	entries  map[string][]registryEntry // key: normalize(slug) and normalize(name); collisions append
+	count    int                        // total roster companies, for the teaching error
+	slugs    []slugEntry                // sorted by slug, for suggestions
+}
+
+// ResolvedCompany is one (adapter, slug) pair a company string resolved to.
+// A query can match several rosters at once; callers fan out over all of
+// them and merge.
+type ResolvedCompany struct {
+	Adapter Adapter
+	Slug    string
 }
 
 // careersHostPatternsByAdapter maps each known adapter name to the
@@ -55,30 +63,30 @@ var careersHostPatternsByAdapter = map[string]string{
 	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
 }
 
-// NewRegistry unions the adapters' rosters. A slug or normalized display
-// name colliding across entries is a curation bug — fail startup loudly
-// rather than silently shadowing one company with another.
+// NewRegistry unions the adapters' rosters. Slugs and display names may
+// collide across adapters — such keys resolve to every colliding entry. A
+// duplicate slug within one adapter's roster is a curation bug — fail
+// startup loudly rather than silently shadowing one company with another.
 func NewRegistry(adapters ...Adapter) (*Registry, error) {
 	r := &Registry{
 		adapters: adapters,
-		bySlug:   make(map[string]registryEntry),
-		byName:   make(map[string]registryEntry),
+		entries:  make(map[string][]registryEntry),
 	}
 	for _, a := range adapters {
+		seen := make(map[string]string) // normalized slug -> original slug, this adapter only
 		for _, c := range a.Roster() {
 			e := registryEntry{adapter: a, slug: c.Slug, name: c.Name}
 			slugKey := normalize(c.Slug)
-			if prev, ok := r.bySlug[slugKey]; ok {
-				return nil, fmt.Errorf("ats: company slug %q from %s collides with %q from %s",
-					c.Slug, a.Name(), prev.slug, prev.adapter.Name())
+			if prev, ok := seen[slugKey]; ok {
+				return nil, fmt.Errorf("ats: adapter %s lists duplicate slug %q (collides with %q)",
+					a.Name(), c.Slug, prev)
 			}
-			r.bySlug[slugKey] = e
-			nameKey := normalize(c.Name)
-			if prev, ok := r.byName[nameKey]; ok {
-				return nil, fmt.Errorf("ats: company name %q from %s collides with %q from %s",
-					c.Name, a.Name(), prev.name, prev.adapter.Name())
+			seen[slugKey] = c.Slug
+			r.entries[slugKey] = append(r.entries[slugKey], e)
+			if nameKey := normalize(c.Name); nameKey != slugKey {
+				r.entries[nameKey] = append(r.entries[nameKey], e)
 			}
-			r.byName[nameKey] = e
+			r.count++
 			r.slugs = append(r.slugs, slugEntry{slug: c.Slug, norm: slugKey})
 		}
 	}
@@ -86,36 +94,39 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 	return r, nil
 }
 
-// Resolve maps a user-supplied company string to (adapter, slug). The input can
-// be a roster slug, a display name, or a careers URL. The returned slug is not
-// always a roster key: a careers URL for a company outside the roster resolves
-// to whatever slug the owning adapter minted via [Adapter.ParseCareersURL]
-// (Workday mints the canonical careers URL). Misses return a teaching error
-// carrying the closest slugs, so one retry from the LLM almost always lands.
-func (r *Registry) Resolve(company string) (Adapter, string, error) {
+// Resolve maps a user-supplied company string to every (adapter, slug) it
+// names. The input can be a roster slug, a display name, or a careers URL.
+// Slugs and names may collide across adapters; all colliding entries come
+// back, in adapter registration order, and callers merge their results. A
+// returned slug is not always a roster key: a careers URL for a company
+// outside the roster resolves to whatever slug the owning adapter minted via
+// [Adapter.ParseCareersURL] (Workday mints the canonical careers URL).
+// Misses return a teaching error carrying the closest slugs, so one retry
+// from the LLM almost always lands. A nil error implies at least one match.
+func (r *Registry) Resolve(company string) ([]ResolvedCompany, error) {
 	key := normalize(company)
 	if key == "" {
-		return nil, "", errors.New("company is required")
+		return nil, errors.New("company is required")
 	}
-	// 1. match slug
-	if e, ok := r.bySlug[key]; ok {
-		return e.adapter, e.slug, nil
+	// 1. match slug or display name
+	if es, ok := r.entries[key]; ok {
+		out := make([]ResolvedCompany, 0, len(es))
+		for _, e := range es {
+			out = append(out, ResolvedCompany{Adapter: e.adapter, Slug: e.slug})
+		}
+		return out, nil
 	}
-	// 2. match company name
-	if e, ok := r.byName[key]; ok {
-		return e.adapter, e.slug, nil
-	}
-	// 3. fallback to careers URL to match url slug
+	// 2. fallback to careers URL to match url slug
 	if u, ok := parseCareersInput(company); ok {
 		for _, a := range r.adapters {
 			if slug, ok := a.ParseCareersURL(u); ok {
-				return a, slug, nil
+				return []ResolvedCompany{{Adapter: a, Slug: slug}}, nil
 			}
 		}
-		return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
+		return nil, fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
 	}
-	return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
-		company, strings.Join(r.suggest(key, 3), ", "), len(r.bySlug))
+	return nil, fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
+		company, strings.Join(r.suggest(key, 3), ", "), r.count)
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered

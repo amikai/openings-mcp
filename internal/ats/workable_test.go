@@ -618,13 +618,15 @@ func TestWorkableResolvesThroughRegistry(t *testing.T) {
 	r, err := NewRegistry(a)
 	require.NoError(t, err)
 
-	got, slug, err := r.Resolve("Blueground")
+	rs, err := r.Resolve("Blueground")
 	require.NoError(t, err)
-	assert.Equal(t, "workable", got.Name())
-	assert.Equal(t, "blueground", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "workable", rs[0].Adapter.Name())
+	assert.Equal(t, "blueground", rs[0].Slug)
 
-	got, slug, err = r.Resolve("https://apply.workable.com/some-unknown-co/")
+	rs, err = r.Resolve("https://apply.workable.com/some-unknown-co/")
 	require.NoError(t, err)
-	assert.Equal(t, "workable", got.Name())
-	assert.Equal(t, "some-unknown-co", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "workable", rs[0].Adapter.Name())
+	assert.Equal(t, "some-unknown-co", rs[0].Slug)
 }

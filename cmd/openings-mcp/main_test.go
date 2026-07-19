@@ -205,37 +205,41 @@ func TestATSRegistryIncludesTeamtailor(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Teamtailor")
+	rs, err := registry.Resolve("Teamtailor")
 	require.NoError(t, err)
-	assert.Equal(t, "teamtailor", adapter.Name())
-	assert.Equal(t, "career.teamtailor.com", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "teamtailor", rs[0].Adapter.Name())
+	assert.Equal(t, "career.teamtailor.com", rs[0].Slug)
 
-	adapter, slug, err = registry.Resolve("https://unlisted.na.teamtailor.com/jobs")
+	rs, err = registry.Resolve("https://unlisted.na.teamtailor.com/jobs")
 	require.NoError(t, err)
-	assert.Equal(t, "teamtailor", adapter.Name())
-	assert.Equal(t, "unlisted.na.teamtailor.com", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "teamtailor", rs[0].Adapter.Name())
+	assert.Equal(t, "unlisted.na.teamtailor.com", rs[0].Slug)
 }
 
 func TestATSRegistryIncludesOracle(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Mayo Clinic")
+	rs, err := registry.Resolve("Mayo Clinic")
 	require.NoError(t, err)
-	assert.Equal(t, "oracle", adapter.Name())
-	assert.Equal(t, "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "oracle", rs[0].Adapter.Name())
+	assert.Equal(t, "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1", rs[0].Slug)
 
-	adapter, slug, err = registry.Resolve(
+	rs, err = registry.Resolve(
 		"https://fa-example.fa.us2.oraclecloud.com/" +
 			"hcmUI/CandidateExperience/en/sites/Acme/jobs",
 	)
 	require.NoError(t, err)
-	assert.Equal(t, "oracle", adapter.Name())
+	require.Len(t, rs, 1)
+	assert.Equal(t, "oracle", rs[0].Adapter.Name())
 	assert.Equal(
 		t,
 		"https://fa-example.fa.us2.oraclecloud.com/"+
 			"hcmUI/CandidateExperience/en/sites/Acme/jobs",
-		slug,
+		rs[0].Slug,
 	)
 }
 
@@ -243,28 +247,32 @@ func TestATSRegistryIncludesJoin(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Routine Labs")
+	rs, err := registry.Resolve("Routine Labs")
 	require.NoError(t, err)
-	assert.Equal(t, "join", adapter.Name())
-	assert.Equal(t, "routinelabs", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "join", rs[0].Adapter.Name())
+	assert.Equal(t, "routinelabs", rs[0].Slug)
 
-	adapter, slug, err = registry.Resolve("https://join.com/companies/routinelabs")
+	rs, err = registry.Resolve("https://join.com/companies/routinelabs")
 	require.NoError(t, err)
-	assert.Equal(t, "join", adapter.Name())
-	assert.Equal(t, "routinelabs", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "join", rs[0].Adapter.Name())
+	assert.Equal(t, "routinelabs", rs[0].Slug)
 }
 
 func TestATSRegistryIncludesBambooHR(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Concept2")
+	rs, err := registry.Resolve("Concept2")
 	require.NoError(t, err)
-	assert.Equal(t, "bamboohr", adapter.Name())
-	assert.Equal(t, "concept2", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "bamboohr", rs[0].Adapter.Name())
+	assert.Equal(t, "concept2", rs[0].Slug)
 
-	adapter, slug, err = registry.Resolve("https://unlisted.bamboohr.com/careers")
+	rs, err = registry.Resolve("https://unlisted.bamboohr.com/careers")
 	require.NoError(t, err)
-	assert.Equal(t, "bamboohr", adapter.Name())
-	assert.Equal(t, "unlisted", slug)
+	require.Len(t, rs, 1)
+	assert.Equal(t, "bamboohr", rs[0].Adapter.Name())
+	assert.Equal(t, "unlisted", rs[0].Slug)
 }

@@ -2,6 +2,8 @@ package openingsmcp
 
 import (
 	"context"
+	"errors"
+	"slices"
 
 	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -77,33 +79,39 @@ type companySearchOutput struct {
 }
 
 func companySearch(ctx context.Context, reg *ats.Registry, in *companySearchInput) (*companySearchOutput, error) {
-	adapter, slug, err := reg.Resolve(in.Company)
+	resolved, err := reg.Resolve(in.Company)
 	if err != nil {
 		return nil, err
 	}
-	res, err := adapter.Search(ctx, slug, ats.SearchParams{
+	params := ats.SearchParams{
 		Query:    in.Query,
 		Location: in.Location,
 		Filters:  in.Filters,
 		Page:     in.Page,
-	})
-	if err != nil {
-		return nil, err
 	}
-	out := &companySearchOutput{
-		Data:       make([]companyJobSummary, 0, len(res.Jobs)),
-		TotalCount: res.TotalCount,
-		Page:       res.Page,
-		TotalPages: res.TotalPages,
+	out := &companySearchOutput{Data: []companyJobSummary{}}
+	var errs []error
+	for _, rc := range resolved {
+		res, err := rc.Adapter.Search(ctx, rc.Slug, params)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		for _, j := range res.Jobs {
+			out.Data = append(out.Data, companyJobSummary{
+				JobID:    j.JobID,
+				Title:    j.Title,
+				Location: j.Location,
+				PostedAt: j.PostedAt,
+				URL:      j.URL,
+			})
+		}
+		out.TotalCount += res.TotalCount
+		out.Page = res.Page
+		out.TotalPages = max(out.TotalPages, res.TotalPages)
 	}
-	for _, j := range res.Jobs {
-		out.Data = append(out.Data, companyJobSummary{
-			JobID:    j.JobID,
-			Title:    j.Title,
-			Location: j.Location,
-			PostedAt: j.PostedAt,
-			URL:      j.URL,
-		})
+	if len(errs) == len(resolved) {
+		return nil, errors.Join(errs...)
 	}
 	return out, nil
 }
@@ -117,15 +125,30 @@ type companyFiltersOutput struct {
 }
 
 func companyFilters(ctx context.Context, reg *ats.Registry, in *companyFiltersInput) (*companyFiltersOutput, error) {
-	adapter, slug, err := reg.Resolve(in.Company)
+	resolved, err := reg.Resolve(in.Company)
 	if err != nil {
 		return nil, err
 	}
-	fs, err := adapter.Filters(ctx, slug)
-	if err != nil {
-		return nil, err
+	merged := ats.FilterSet{}
+	var errs []error
+	for _, rc := range resolved {
+		fs, err := rc.Adapter.Filters(ctx, rc.Slug)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		for dim, vals := range fs {
+			for _, v := range vals {
+				if !slices.Contains(merged[dim], v) {
+					merged[dim] = append(merged[dim], v)
+				}
+			}
+		}
 	}
-	return &companyFiltersOutput{Filters: fs}, nil
+	if len(errs) == len(resolved) {
+		return nil, errors.Join(errs...)
+	}
+	return &companyFiltersOutput{Filters: merged}, nil
 }
 
 type companyDetailInput struct {
@@ -144,23 +167,29 @@ type companyDetailOutput struct {
 }
 
 func companyDetail(ctx context.Context, reg *ats.Registry, in *companyDetailInput) (*companyDetailOutput, error) {
-	adapter, slug, err := reg.Resolve(in.Company)
+	resolved, err := reg.Resolve(in.Company)
 	if err != nil {
 		return nil, err
 	}
-	d, err := adapter.Detail(ctx, slug, in.JobID)
-	if err != nil {
-		return nil, err
+	// The job_id belongs to exactly one adapter; take the first that has it.
+	var errs []error
+	for _, rc := range resolved {
+		d, err := rc.Adapter.Detail(ctx, rc.Slug, in.JobID)
+		if err != nil {
+			errs = append(errs, err)
+			continue
+		}
+		return &companyDetailOutput{
+			JobID:       d.JobID,
+			Title:       d.Title,
+			Company:     d.Company,
+			Location:    d.Location,
+			PostedAt:    d.PostedAt,
+			URL:         d.URL,
+			Description: d.Description,
+		}, nil
 	}
-	return &companyDetailOutput{
-		JobID:       d.JobID,
-		Title:       d.Title,
-		Company:     d.Company,
-		Location:    d.Location,
-		PostedAt:    d.PostedAt,
-		URL:         d.URL,
-		Description: d.Description,
-	}, nil
+	return nil, errors.Join(errs...)
 }
 
 // RegisterCompany registers the unified company-parameterized job tools.
