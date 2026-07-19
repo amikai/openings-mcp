@@ -40,7 +40,53 @@ func testMetaMCPClientServer(t *testing.T) *mcp.ClientSession {
 func TestRegisterMeta(t *testing.T) {
 	server := mcp.NewServer(&mcp.Implementation{Name: metaTestServerName, Version: "v0"}, nil)
 	RegisterMeta(server, meta.NewClient("https://www.metacareers.com", nil))
-	assertTools(t, server, metaSearchToolName, metaDetailToolName)
+	assertTools(t, server, metaSearchToolName, metaDetailToolName, metaFiltersToolName)
+}
+
+func TestMetaGetSearchFiltersE2E(t *testing.T) {
+	client := testMetaMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      metaFiltersToolName,
+		Arguments: map[string]any{},
+	})
+	require.NoError(t, err)
+	require.False(t, result.IsError)
+
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	var output metaFiltersOutput
+	require.NoError(t, json.Unmarshal(data, &output))
+	assert.Contains(t, output.Teams, "Software Engineering")
+	assert.Contains(t, output.Technologies, "Meta Quest")
+	assert.Contains(t, output.Roles, "Internship")
+	require.NotEmpty(t, output.Offices)
+	assert.Equal(t, metaLocation{
+		ID:          "aiken-dc",
+		DisplayName: "Aiken, SC",
+		State:       "South Carolina",
+		Country:     "United States",
+	}, output.Offices[0])
+}
+
+func TestMetaSearchJobsTechnologiesE2E(t *testing.T) {
+	client := testMetaMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name: metaSearchToolName,
+		Arguments: map[string]any{
+			// The mock replays the Singapore-filtered fixture for any
+			// variables containing "Singapore"; the point here is that the
+			// technologies param reaches search_input as divisions.
+			"technologies": []string{"Singapore"},
+		},
+	})
+	require.NoError(t, err)
+	require.False(t, result.IsError)
+
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	var output metaSearchOutput
+	require.NoError(t, json.Unmarshal(data, &output))
+	require.NotEmpty(t, output.Data)
 }
 
 func TestMetaSearchJobsE2E(t *testing.T) {

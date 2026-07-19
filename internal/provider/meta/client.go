@@ -16,8 +16,10 @@ const graphqlPath = "/graphql"
 // Persisted-query document IDs; see doc.go for how to re-derive them when
 // Meta redeploys the site.
 const (
-	searchDocID = "27506805582236862" // CareersJobSearchResultsDataQuery
-	detailDocID = "27371134039243725" // CandidatePortalJobDetailsViewQuery
+	searchDocID    = "27506805582236862" // CareersJobSearchResultsDataQuery
+	detailDocID    = "27371134039243725" // CandidatePortalJobDetailsViewQuery
+	filtersDocID   = "25103492705924273" // CareersJobSearchFiltersV3Query
+	locationsDocID = "24867916029505828" // CareersJobSearchLocationFilterV3Query
 )
 
 // lsdToken satisfies the endpoint's presence-only anti-CSRF check; the value
@@ -49,17 +51,19 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 // SearchRequest mirrors the site's search_input filters. All filters are
 // server-side; results always arrive in full (no pagination — see doc.go).
 //
-// Filter value domains, as served by the site's own filter queries:
-//   - Teams: display names such as "Software Engineering", "AR/VR",
-//     "Artificial Intelligence", "Data Center".
-//   - SubTeams: display names such as "Design" or "Product Marketing
-//     Management".
-//   - Offices: either location display names ("Menlo Park, CA",
-//     "Singapore") or the site's location IDs ("menlo-park", "singapore");
-//     both match.
-//   - Roles: "Full time employment", "Internship", "Short term employment".
-//   - Divisions and LeadershipLevels exist in search_input but the public
-//     filter UI no longer exposes value lists for them.
+// Filter value lists are dynamic — [Client.SearchFilters] returns the
+// current ones. In terms of that response:
+//   - Teams takes SearchFilters.Teams values ("Software Engineering",
+//     "AR/VR", ...).
+//   - Divisions takes SearchFilters.Technologies values ("Facebook",
+//     "Meta Quest", ...) — the UI labels this filter "Technology" but
+//     submits it under the divisions key.
+//   - Offices takes a [Location] DisplayName or ID; both match.
+//   - Roles takes SearchFilters.Roles values ("Full time employment", ...).
+//   - SubTeams values are not enumerated by any public filter query; they
+//     appear on search results as Job.SubTeams.
+//   - LeadershipLevels exists in search_input but the public filter UI
+//     exposes no value list for it.
 type SearchRequest struct {
 	Q                string
 	Teams            []string
@@ -124,6 +128,25 @@ type JobDetail struct {
 	OwnershipInformation json.RawMessage
 }
 
+// Location is one entry of the site's office filter; either ID or
+// DisplayName is accepted as a [SearchRequest] office value.
+type Location struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"location_display_name"`
+	IsRemote    bool   `json:"is_remote"`
+	State       string `json:"state"`
+	Country     string `json:"country"`
+}
+
+// SearchFilters carries the site's current filter value lists; see
+// [SearchRequest] for which field each list feeds.
+type SearchFilters struct {
+	Teams        []string
+	Technologies []string
+	Roles        []string
+	Locations    []Location
+}
+
 // JobURL returns the public posting URL for a requisition ID.
 func JobURL(id string) string {
 	return "https://www.metacareers.com/jobs/" + id + "/"
@@ -143,6 +166,36 @@ func (c *Client) SearchJobs(ctx context.Context, r SearchRequest) (*SearchRespon
 	return &SearchResponse{
 		AllJobs:      data.JobSearch.AllJobs,
 		FeaturedJobs: data.JobSearch.FeaturedJobs,
+	}, nil
+}
+
+// SearchFilters returns the site's current filter value lists, merging the
+// two filter queries (teams/technologies/roles and locations) it serves
+// them from.
+func (c *Client) SearchFilters(ctx context.Context) (*SearchFilters, error) {
+	var filters filtersData
+	if err := c.graphql(ctx, filtersDocID, map[string]any{}, &filters); err != nil {
+		return nil, fmt.Errorf("search filters: %w", err)
+	}
+	if filters.Filters == nil {
+		return nil, errors.New("search filters: response has no job_search_filters")
+	}
+	var locations locationsData
+	if err := c.graphql(ctx, locationsDocID, map[string]any{}, &locations); err != nil {
+		return nil, fmt.Errorf("search filters: %w", err)
+	}
+	if locations.Filters == nil {
+		return nil, errors.New("search filters: locations response has no job_search_filters")
+	}
+	teams := make([]string, 0, len(filters.Filters.Teams))
+	for _, team := range filters.Filters.Teams {
+		teams = append(teams, team.DisplayName)
+	}
+	return &SearchFilters{
+		Teams:        teams,
+		Technologies: filters.Filters.Technologies,
+		Roles:        filters.Filters.Roles,
+		Locations:    locations.Filters.Locations,
 	}, nil
 }
 

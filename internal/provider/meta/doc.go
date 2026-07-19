@@ -12,6 +12,11 @@
 //     {isLoggedIn, search_input, viewasUserID}
 //   - CandidatePortalJobDetailsViewQuery (detail): variables
 //     {renderLoggedInView, requisitionID, viewasUserID}
+//   - CareersJobSearchFiltersV3Query and
+//     CareersJobSearchLocationFilterV3Query (filter value lists): empty
+//     variables. The lists are dynamic — teams, technologies, roles, and
+//     offices change as Meta reorganizes — so clients enumerate them at
+//     call time instead of hardcoding values.
 //
 // doc_ids drift when Meta redeploys the site. If both operations start
 // failing, re-derive them from the site: search-page doc_ids live in JS

@@ -29,7 +29,7 @@ func main() {
 	)
 	rootCmd := &ff.Command{
 		Name:  "meta",
-		Usage: "meta [FLAGS] <search|detail> [FLAGS]",
+		Usage: "meta [FLAGS] <search|detail|filters> [FLAGS]",
 		Flags: rootFlags,
 	}
 
@@ -40,7 +40,7 @@ func main() {
 		subTeams         = searchFS.StringSetLong("sub-team", `sub-team display name, e.g. "Design" (repeatable)`)
 		offices          = searchFS.StringSetLong("office", `office display name or ID, e.g. "Singapore" or "menlo-park" (repeatable)`)
 		roles            = searchFS.StringSetLong("role", `employment type: "Full time employment", "Internship", or "Short term employment" (repeatable)`)
-		divisions        = searchFS.StringSetLong("division", "division filter (repeatable)")
+		divisions        = searchFS.StringSetLong("division", `technology filter, e.g. "Facebook", "Instagram", "Meta Quest" (repeatable; the site's Technology filter submits under the divisions key)`)
 		leadershipLevels = searchFS.StringSetLong("leadership-level", "leadership level filter (repeatable)")
 		isLeadership     = searchFS.BoolLong("leadership", "only leadership roles")
 		remoteOnly       = searchFS.BoolLong("remote-only", "only remote-eligible roles")
@@ -97,6 +97,25 @@ func main() {
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, detailCmd)
 
+	filtersFS := ff.NewFlagSet("filters").SetParent(rootFlags)
+	filtersCmd := &ff.Command{
+		Name:      "filters",
+		Usage:     "meta filters",
+		ShortHelp: "list the current search filter values (teams, technologies, roles, offices)",
+		Flags:     filtersFS,
+		Exec: func(ctx context.Context, args []string) error {
+			if len(args) > 0 {
+				return fmt.Errorf("filters takes no positional arguments, got %v", args)
+			}
+			return runFilters(ctx, filtersFlags{
+				baseURL: *baseURL,
+				timeout: *timeout,
+				format:  *format,
+			}, os.Stdout)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, filtersCmd)
+
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
@@ -107,7 +126,7 @@ func main() {
 	}
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
-		fmt.Fprintln(os.Stderr, "err: a subcommand (search or detail) is required")
+		fmt.Fprintln(os.Stderr, "err: a subcommand (search, detail, or filters) is required")
 		os.Exit(1)
 	}
 	if err := rootCmd.Run(context.Background()); err != nil {
@@ -215,6 +234,48 @@ func writeDetail(out io.Writer, format string, detail *meta.JobDetail) error {
 	writeList(out, "Responsibilities", detail.Responsibilities)
 	writeList(out, "Minimum qualifications", detail.MinimumQualifications)
 	writeList(out, "Preferred qualifications", detail.PreferredQualifications)
+	return nil
+}
+
+type filtersFlags struct {
+	baseURL string
+	format  string
+	timeout time.Duration
+}
+
+func runFilters(ctx context.Context, flags filtersFlags, out io.Writer) error {
+	client := meta.NewClient(flags.baseURL, nil)
+	ctx, cancel := context.WithTimeout(ctx, flags.timeout)
+	defer cancel()
+
+	filters, err := client.SearchFilters(ctx)
+	if err != nil {
+		return fmt.Errorf("get meta search filters: %w", err)
+	}
+	return writeFilters(out, flags.format, filters)
+}
+
+func writeFilters(out io.Writer, format string, filters *meta.SearchFilters) error {
+	if format == "json" {
+		encoder := json.NewEncoder(out)
+		encoder.SetIndent("", "  ")
+		if err := encoder.Encode(filters); err != nil {
+			return fmt.Errorf("encode filters response: %w", err)
+		}
+		return nil
+	}
+
+	writeList(out, "Teams (--team)", filters.Teams)
+	writeList(out, "Technologies (--division)", filters.Technologies)
+	writeList(out, "Roles (--role)", filters.Roles)
+	fmt.Fprintf(out, "\nOffices (--office; display name or ID)\n")
+	for _, location := range filters.Locations {
+		remote := ""
+		if location.IsRemote {
+			remote = " (remote)"
+		}
+		fmt.Fprintf(out, "- %s [%s]%s\n", location.DisplayName, location.ID, remote)
+	}
 	return nil
 }
 

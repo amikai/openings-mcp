@@ -28,6 +28,12 @@ var mockJobDetailResponse []byte
 //go:embed testdata/job_detail_notfound_rsp.json
 var mockJobDetailNotFoundResponse []byte
 
+//go:embed testdata/filters_rsp.json
+var mockFiltersResponse []byte
+
+//go:embed testdata/locations_rsp.json
+var mockLocationsResponse []byte
+
 // NewMockServer returns an httptest.Server that replays captured Meta
 // Careers GraphQL responses, dispatching on doc_id and variables and
 // enforcing the endpoint's presence-only lsd + header contract. The caller
@@ -63,6 +69,10 @@ func NewMockServer() *httptest.Server {
 			} else {
 				body = mockJobDetailNotFoundResponse
 			}
+		case filtersDocID:
+			body = mockFiltersResponse
+		case locationsDocID:
+			body = mockLocationsResponse
 		default:
 			http.Error(w, "unknown doc_id", http.StatusBadRequest)
 			return

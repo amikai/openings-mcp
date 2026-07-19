@@ -44,6 +44,27 @@ func TestSearchJobsFiltered(t *testing.T) {
 	}
 }
 
+func TestSearchFilters(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(srv.URL, srv.Client())
+
+	got, err := c.SearchFilters(t.Context())
+	require.NoError(t, err)
+
+	assert.Contains(t, got.Teams, "Software Engineering")
+	assert.Contains(t, got.Technologies, "Meta Quest")
+	assert.Contains(t, got.Roles, "Full time employment")
+	require.NotEmpty(t, got.Locations)
+	assert.Equal(t, Location{
+		ID:          "aiken-dc",
+		DisplayName: "Aiken, SC",
+		IsRemote:    false,
+		State:       "South Carolina",
+		Country:     "United States",
+	}, got.Locations[0])
+}
+
 func TestJobDetail(t *testing.T) {
 	srv := NewMockServer()
 	defer srv.Close()

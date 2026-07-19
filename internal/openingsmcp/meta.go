@@ -20,22 +20,27 @@ var metaSearchInputRawSchema = []byte(`{
 		"teams": {
 			"type": "array",
 			"items": {"type": "string"},
-			"description": "Team display names, e.g. Software Engineering, Artificial Intelligence, AR/VR, Data Center, Design & User Experience, Sales & Marketing."
+			"description": "Team display names, e.g. Software Engineering, Artificial Intelligence, AR/VR. The list is dynamic; meta_get_search_filters returns current values."
 		},
 		"sub_teams": {
 			"type": "array",
 			"items": {"type": "string"},
-			"description": "Sub-team display names, e.g. Design, Network Engineering, Product Marketing Management."
+			"description": "Sub-team display names, e.g. Design, Network Engineering. Not enumerated by any filter endpoint; take values from search results' sub_teams."
 		},
 		"offices": {
 			"type": "array",
 			"items": {"type": "string"},
-			"description": "Office display names or IDs; both match, e.g. Menlo Park, CA or menlo-park, Singapore, London, UK."
+			"description": "Office display names or IDs; both match, e.g. Menlo Park, CA or menlo-park. The list is dynamic; meta_get_search_filters returns current values."
+		},
+		"technologies": {
+			"type": "array",
+			"items": {"type": "string"},
+			"description": "Product filter, e.g. Facebook, Instagram, WhatsApp, Meta Quest. The list is dynamic; meta_get_search_filters returns current values."
 		},
 		"roles": {
 			"type": "array",
-			"items": {"type": "string", "enum": ["Full time employment", "Internship", "Short term employment"]},
-			"description": "Employment types."
+			"items": {"type": "string"},
+			"description": "Employment types, e.g. Full time employment, Internship, Short term employment. The list is dynamic; meta_get_search_filters returns current values."
 		},
 		"is_remote_only": {
 			"type": "boolean",
@@ -59,8 +64,9 @@ var metaSearchInputRawSchema = []byte(`{
 var metaSearchInputSchema = mustSchema(metaSearchInputRawSchema)
 
 const (
-	metaSearchToolName = "meta_search_jobs"
-	metaDetailToolName = "meta_get_job_detail"
+	metaSearchToolName  = "meta_search_jobs"
+	metaDetailToolName  = "meta_get_job_detail"
+	metaFiltersToolName = "meta_get_search_filters"
 )
 
 type metaSearchInput struct {
@@ -68,10 +74,28 @@ type metaSearchInput struct {
 	Teams        []string `json:"teams,omitempty"`
 	SubTeams     []string `json:"sub_teams,omitempty"`
 	Offices      []string `json:"offices,omitempty"`
+	Technologies []string `json:"technologies,omitempty"`
 	Roles        []string `json:"roles,omitempty"`
 	IsRemoteOnly bool     `json:"is_remote_only,omitempty"`
 	IsLeadership bool     `json:"is_leadership,omitempty"`
 	SortByNew    bool     `json:"sort_by_new,omitempty"`
+}
+
+type metaFiltersInput struct{}
+
+type metaFiltersOutput struct {
+	Teams        []string       `json:"teams" jsonschema:"Values for meta_search_jobs teams."`
+	Technologies []string       `json:"technologies" jsonschema:"Values for meta_search_jobs technologies."`
+	Roles        []string       `json:"roles" jsonschema:"Values for meta_search_jobs roles."`
+	Offices      []metaLocation `json:"offices" jsonschema:"Values for meta_search_jobs offices; id and display_name both match."`
+}
+
+type metaLocation struct {
+	ID          string `json:"id"`
+	DisplayName string `json:"display_name"`
+	State       string `json:"state,omitempty"`
+	Country     string `json:"country,omitempty"`
+	IsRemote    bool   `json:"is_remote,omitempty"`
 }
 
 type metaSearchOutput struct {
@@ -117,14 +141,35 @@ type metaDetailOutput struct {
 
 func metaMCPToHTTPRequest(input *metaSearchInput) meta.SearchRequest {
 	return meta.SearchRequest{
-		Q:            input.Keyword,
-		Teams:        input.Teams,
-		SubTeams:     input.SubTeams,
-		Offices:      input.Offices,
+		Q:        input.Keyword,
+		Teams:    input.Teams,
+		SubTeams: input.SubTeams,
+		Offices:  input.Offices,
+		// The site's Technology filter submits under the divisions key.
+		Divisions:    input.Technologies,
 		Roles:        input.Roles,
 		IsRemoteOnly: input.IsRemoteOnly,
 		IsLeadership: input.IsLeadership,
 		SortByNew:    input.SortByNew,
+	}
+}
+
+func metaHTTPToMCPFilters(filters *meta.SearchFilters) *metaFiltersOutput {
+	offices := make([]metaLocation, 0, len(filters.Locations))
+	for _, location := range filters.Locations {
+		offices = append(offices, metaLocation{
+			ID:          location.ID,
+			DisplayName: location.DisplayName,
+			State:       location.State,
+			Country:     location.Country,
+			IsRemote:    location.IsRemote,
+		})
+	}
+	return &metaFiltersOutput{
+		Teams:        filters.Teams,
+		Technologies: filters.Technologies,
+		Roles:        filters.Roles,
+		Offices:      offices,
 	}
 }
 
@@ -185,7 +230,7 @@ func metaHTTPToMCPDetail(detail *meta.JobDetail) (*metaDetailOutput, error) {
 func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	mcp.AddTool(server, &mcp.Tool{
 		Name:        metaSearchToolName,
-		Description: "Search jobs on Meta Careers (metacareers.com) by keyword, team, office, and employment type. Unpaginated: every match is returned, so prefer filters over broad queries.",
+		Description: "Search jobs on Meta Careers (metacareers.com) by keyword, team, office, product, and employment type. Unpaginated: every match is returned, so prefer filters over broad queries. Filter value lists are dynamic; meta_get_search_filters enumerates current ones.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Meta Careers jobs", ReadOnlyHint: true},
 		InputSchema: metaSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaSearchInput) (*mcp.CallToolResult, *metaSearchOutput, error) {
@@ -194,6 +239,18 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 			return errorResult(err), nil, nil
 		}
 		return nil, metaHTTPToMCPResponse(response), nil
+	})
+
+	mcp.AddTool(server, &mcp.Tool{
+		Name:        metaFiltersToolName,
+		Description: "List Meta Careers' current search filter values: teams, technologies (products), employment types, and offices. Call before filtered meta_search_jobs queries when unsure of exact values.",
+		Annotations: &mcp.ToolAnnotations{Title: "List Meta Careers search filters", ReadOnlyHint: true},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *metaFiltersInput) (*mcp.CallToolResult, *metaFiltersOutput, error) {
+		filters, err := client.SearchFilters(ctx)
+		if err != nil {
+			return errorResult(err), nil, nil
+		}
+		return nil, metaHTTPToMCPFilters(filters), nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{

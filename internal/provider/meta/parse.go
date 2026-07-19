@@ -20,6 +20,28 @@ type searchResult struct {
 	FeaturedJobs []Job `json:"featured_jobs"`
 }
 
+type filtersData struct {
+	Filters *wireFilters `json:"job_search_filters"`
+}
+
+type wireFilters struct {
+	Teams        []wireTeam `json:"teams"`
+	Technologies []string   `json:"technologies"`
+	Roles        []string   `json:"roles"`
+}
+
+type wireTeam struct {
+	DisplayName string `json:"team_display_name"`
+}
+
+type locationsData struct {
+	Filters *wireLocations `json:"job_search_filters"`
+}
+
+type wireLocations struct {
+	Locations []Location `json:"locations"`
+}
+
 type detailData struct {
 	Description *wireJobDetail `json:"xcp_requisition_job_description"`
 }
