@@ -1,6 +1,7 @@
 package openingsmcp
 
 import (
+	"cmp"
 	"context"
 
 	"github.com/jaytaylor/html2text"
@@ -8,6 +9,12 @@ import (
 
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 )
+
+// Search has no upstream pagination (see [meta.SearchRequest]) — the MCP
+// tool caps the returned page itself so an unfiltered query can't dump all
+// matches (hundreds of jobs, tens of thousands of tokens) into one response.
+// The upper bound lives in metaSearchInputRawSchema's "limit" property.
+const metaDefaultLimit = 20
 
 var metaSearchInputRawSchema = []byte(`{
 	"type": "object",
@@ -56,6 +63,18 @@ var metaSearchInputRawSchema = []byte(`{
 			"type": "boolean",
 			"description": "Order by posting date instead of relevance.",
 			"default": false
+		},
+		"limit": {
+			"type": "integer",
+			"description": "Max results to return. Search is unpaginated upstream — total shows the full match count, so narrow with filters or page through with offset.",
+			"minimum": 1,
+			"maximum": 100,
+			"default": 20
+		},
+		"offset": {
+			"type": "integer",
+			"description": "Zero-based index into the full match list, for paging past the first limit results.",
+			"minimum": 0
 		}
 	},
 	"additionalProperties": false
@@ -79,6 +98,8 @@ type metaSearchInput struct {
 	IsRemoteOnly bool     `json:"is_remote_only,omitempty"`
 	IsLeadership bool     `json:"is_leadership,omitempty"`
 	SortByNew    bool     `json:"sort_by_new,omitempty"`
+	Limit        int      `json:"limit,omitempty"`
+	Offset       int      `json:"offset,omitempty"`
 }
 
 type metaFiltersInput struct{}
@@ -100,7 +121,7 @@ type metaLocation struct {
 
 type metaSearchOutput struct {
 	Data  []metaJobSummary `json:"data"`
-	Total int              `json:"total" jsonschema:"Total matches. Search is unpaginated: data always carries every match, so narrow with filters when this is large."`
+	Total int              `json:"total" jsonschema:"Total matches across all pages. Data carries at most limit of them starting at offset."`
 }
 
 type metaJobSummary struct {
@@ -110,7 +131,7 @@ type metaJobSummary struct {
 	Locations []string `json:"locations,omitempty"`
 	Teams     []string `json:"teams,omitempty"`
 	SubTeams  []string `json:"sub_teams,omitempty"`
-	Featured  bool     `json:"featured,omitempty" jsonschema:"Listed in the site's small curated Featured Jobs rail."`
+	Featured  bool     `json:"featured,omitempty" jsonschema:"Listed in the site's small curated Featured Jobs rail, which is unrelated to this search's filters."`
 }
 
 type metaDetailInput struct {
@@ -173,16 +194,23 @@ func metaHTTPToMCPFilters(filters *meta.SearchFilters) *metaFiltersOutput {
 	}
 }
 
-func metaHTTPToMCPResponse(response *meta.SearchResponse) *metaSearchOutput {
+func metaHTTPToMCPResponse(response *meta.SearchResponse, limit, offset int) *metaSearchOutput {
 	featured := make(map[string]bool, len(response.FeaturedJobs))
 	for _, job := range response.FeaturedJobs {
 		featured[job.ID] = true
 	}
-	output := &metaSearchOutput{
-		Total: len(response.AllJobs),
-		Data:  make([]metaJobSummary, 0, len(response.AllJobs)),
+	output := &metaSearchOutput{Total: len(response.AllJobs)}
+	jobs := response.AllJobs
+	if offset >= len(jobs) {
+		jobs = nil
+	} else {
+		jobs = jobs[offset:]
 	}
-	for _, job := range response.AllJobs {
+	if limit < len(jobs) {
+		jobs = jobs[:limit]
+	}
+	output.Data = make([]metaJobSummary, 0, len(jobs))
+	for _, job := range jobs {
 		output.Data = append(output.Data, metaJobSummary{
 			JobID:     job.ID,
 			URL:       meta.JobURL(job.ID),
@@ -238,7 +266,8 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		return nil, metaHTTPToMCPResponse(response), nil
+		limit := cmp.Or(input.Limit, metaDefaultLimit)
+		return nil, metaHTTPToMCPResponse(response, limit, input.Offset), nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{

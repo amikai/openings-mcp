@@ -164,7 +164,7 @@ func writeSearch(out io.Writer, format string, response *meta.SearchResponse) er
 		return nil
 	}
 
-	fmt.Fprintf(out, "jobs=%d featured=%d\n\n", len(response.AllJobs), len(response.FeaturedJobs))
+	fmt.Fprintf(out, "jobs=%d featured=%d (site-wide, unrelated to filters)\n\n", len(response.AllJobs), len(response.FeaturedJobs))
 	for index, job := range response.AllJobs {
 		fmt.Fprintf(out, "%d. [%s] %s\n", index+1, job.ID, job.Title)
 		if len(job.Teams) > 0 {

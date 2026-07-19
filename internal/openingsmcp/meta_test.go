@@ -103,7 +103,7 @@ func TestMetaSearchJobsE2E(t *testing.T) {
 	var output metaSearchOutput
 	require.NoError(t, json.Unmarshal(data, &output))
 	assert.Equal(t, 648, output.Total)
-	require.Len(t, output.Data, 648)
+	require.Len(t, output.Data, metaDefaultLimit)
 	assert.Equal(t, metaJobSummary{
 		JobID:     meta.MockJobID,
 		URL:       "https://www.metacareers.com/jobs/1063741453022215/",
@@ -112,6 +112,36 @@ func TestMetaSearchJobsE2E(t *testing.T) {
 		Teams:     []string{"Design & User Experience", "Creative"},
 		SubTeams:  []string{"Design"},
 	}, output.Data[0])
+}
+
+func TestMetaSearchJobsPagingE2E(t *testing.T) {
+	client := testMetaMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name: metaSearchToolName,
+		Arguments: map[string]any{
+			"limit":  5,
+			"offset": 645,
+		},
+	})
+	require.NoError(t, err)
+	require.False(t, result.IsError)
+
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	var output metaSearchOutput
+	require.NoError(t, json.Unmarshal(data, &output))
+	assert.Equal(t, 648, output.Total)
+	require.Len(t, output.Data, 3)
+}
+
+func TestMetaSearchJobsLimitAboveSchemaMaxE2E(t *testing.T) {
+	client := testMetaMCPClientServer(t)
+	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      metaSearchToolName,
+		Arguments: map[string]any{"limit": 10000},
+	})
+	require.NoError(t, err)
+	assert.True(t, result.IsError, "limit exceeds the schema's maximum and should be rejected before reaching the handler")
 }
 
 func TestMetaSearchJobsFilteredE2E(t *testing.T) {

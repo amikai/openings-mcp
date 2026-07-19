@@ -87,8 +87,11 @@ type Job struct {
 	SubTeams  []string `json:"sub_teams"`
 }
 
-// SearchResponse carries every job matching the request; FeaturedJobs is the
-// site's small curated subset and overlaps AllJobs.
+// SearchResponse carries every job matching the request's filters in
+// AllJobs. FeaturedJobs is the site's small "Featured Jobs" rail — content
+// promoted site-wide, unrelated to the request (verified: a filtered query
+// with 17 matches and a zero-match query both surfaced the same featured
+// job, absent from either result set). Do not assume it overlaps AllJobs.
 type SearchResponse struct {
 	AllJobs      []Job
 	FeaturedJobs []Job
