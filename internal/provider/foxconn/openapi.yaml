@@ -1,0 +1,325 @@
+openapi: 3.1.0
+
+info:
+  title: Foxconn (Hon Hai) Taiwan careers API
+  version: "1"
+  description: >
+    Reverse-engineered spec for the public, unauthenticated JSON REST API
+    backing Hon Hai / Foxconn's Taiwan careers portal — the Vue SPA at
+    https://recruit.foxconn.com/isite-web-tw/main/jobsearch, served by
+    https://recruit.foxconn.com/hh_recruit_tw_api/portal_api/. No official
+    OpenAPI or developer docs exist; paths, parameters, and schemas were
+    derived by driving the live page in a browser and reading its network
+    requests, then confirmed standalone with plain curl (no cookies, auth,
+    or special headers — every endpoint answers a bare shell). Captured
+    2026-07-21; fixtures live in testdata/.
+
+    This is a single careers site (Hon Hai's own board), not a multi-tenant
+    ATS: there is no company/tenant path segment. Foxconn runs sibling
+    regional portals under other host paths (e.g. isite-web-vn); only the
+    Taiwan (isite-web-tw / hh_recruit_tw_api) portal is modeled here.
+
+    ## Surface notes / deviations
+
+    * **No pagination.** `$top`/`$skip` (and any other paging params) are
+      silently ignored; every JobVacancies request returns its full
+      matching result set as one JSON array. The unfiltered call returns
+      all open jobs (~950, ~1.2 MB) — a valid response, just large. Prefer
+      a filtered request as a small "happy path".
+
+    * **List filters are server-side and AND-combined.** `workplaceCode`,
+      `talentZoneCode`, and `keywords` are all optional and freely
+      combinable. `keywords` is a case-insensitive free-text match across
+      the title AND body/description fields (not the title alone), so a
+      keyword can match jobs whose `job_name` does not contain it. Accepts
+      URL-encoded Chinese.
+
+    * **No 404 on a bad filter.** An unknown/invalid `workplaceCode` or
+      `talentZoneCode`, and a keyword with zero matches, all return HTTP
+      200 with an empty array `[]` — not an error. An empty result is
+      therefore indistinguishable from a valid filter that currently
+      matches nothing (same no-404 shape as SmartRecruiters' unknown
+      company).
+
+    * **`job_type`/`job_type_name` flip to null on the detail endpoint.**
+      Both are populated on the list endpoint (e.g. "DR,MA" /
+      "身障友善職缺專區,新幹班") but come back `null` on the detail endpoint
+      for the very same job (verified on id
+      08de75d7bd7611a790b20d5b47c2f1bb / job_no PP26022700001). Conversely,
+      many fields that are always `null` on the list endpoint (edu_level,
+      treat_desc, expect_date, desc_1..desc_3, outside_flag, ...) are
+      populated on the detail endpoint. Model every non-required field as
+      nullable and do not assume list/detail parity in either direction.
+
+    * **Detail 404 is RFC 7807 problem+json.** An unknown/invalid detail
+      `{id}` returns HTTP 404 with `{"type","title","status","traceId"}`.
+      `traceId` is per-request and unstable — never assert its value.
+
+    * The two Labels/*/Codes reference endpoints (workplace and
+      talent-zone enums) are intentionally NOT modeled here. They change
+      rarely and are hand-transcribed into Go as static reference data
+      (see codes.go), the same way a curated roster is.
+
+    * Response content type is `application/json; charset=utf-8`; the
+      generated decoder strips the charset parameter before matching.
+
+servers:
+  - url: https://recruit.foxconn.com
+
+tags:
+  - name: jobs
+    description: Job vacancy search and detail
+
+paths:
+  /hh_recruit_tw_api/portal_api/JobVacancies:
+    get:
+      operationId: listJobVacancies
+      summary: Search job vacancies (server-side filters, no pagination).
+      tags: [jobs]
+      parameters:
+        - in: query
+          name: workplaceCode
+          description: >
+            Location filter, e.g. TA (Taiwan), CH (China), VM (Vietnam).
+            Full enum is the Labels/Workplace/Codes reference data
+            (codes.go). An unknown value yields HTTP 200 with an empty
+            array, not a 404.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: talentZoneCode
+          description: >
+            Recruitment-track filter, e.g. MA (新幹班/management associate),
+            TALENTS (一般招募), INTERN, PT, DR (身障友善). Full enum is the
+            Labels/TalentZone/Codes reference data (codes.go). An unknown
+            value yields HTTP 200 with an empty array, not a 404.
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: keywords
+          description: >
+            Case-insensitive free-text search across the title AND body
+            text (not the title alone). Accepts URL-encoded Chinese. A
+            keyword with zero matches yields HTTP 200 with an empty array.
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          description: >
+            Full matching result set as one array (no pagination). Empty
+            array for an unknown filter value or a zero-match keyword —
+            see the no-404 note in the API description.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobVacancyList"
+
+  /hh_recruit_tw_api/portal_api/JobVacancies/{id}:
+    get:
+      operationId: getJobVacancy
+      summary: Get one job vacancy by its opaque id.
+      tags: [jobs]
+      parameters:
+        - in: path
+          name: id
+          description: >
+            The opaque `id` field from a list result (a hex-ish string,
+            e.g. 08de75d7bd7611a790b20d5b47c2f1bb) — NOT the human-readable
+            `job_no` (e.g. PP26022700001).
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: >
+            One job. Same shape as a list item but with far more fields
+            populated — except job_type/job_type_name, which are null here
+            though populated on the list endpoint for the same job.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobVacancy"
+        "404":
+          description: >
+            Unknown/invalid id. RFC 7807 problem+json body; `traceId` is
+            per-request and unstable.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+components:
+  schemas:
+    JobVacancyList:
+      type: array
+      items:
+        $ref: "#/components/schemas/JobVacancy"
+
+    JobVacancy:
+      type: object
+      # Only these five are present and non-null across every sampled
+      # record on both the list and detail endpoints. Everything else is
+      # present-but-null on at least one endpoint (see the list/detail
+      # deviation note), so nothing else is required.
+      required: [id, job_no, job_name, loc, loc_name]
+      properties:
+        id:
+          type: string
+          description: Opaque record id; the key for the detail endpoint.
+        job_no:
+          type: string
+          description: Human-readable job code, e.g. PP26022700001.
+        job_name:
+          type: string
+        job_type:
+          description: >
+            Comma-joined talent-zone codes, e.g. "DR,MA". Populated on the
+            list endpoint but null on the detail endpoint for the same job.
+          type: [string, "null"]
+        job_type_name:
+          description: >
+            Comma-joined talent-zone display names. Same list/detail null
+            flip as job_type.
+          type: [string, "null"]
+        job_type_desc:
+          type: [string, "null"]
+        sex:
+          type: [string, "null"]
+        sex_name:
+          type: [string, "null"]
+        edu_level:
+          description: Education-level code, e.g. "C". Populated on detail only.
+          type: [string, "null"]
+        edu_desc:
+          type: [string, "null"]
+        age_min:
+          type: [integer, "null"]
+        age_max:
+          type: [integer, "null"]
+        loc:
+          type: string
+          description: Workplace code, e.g. TA, CH, VM (matches workplaceCode).
+        loc_name:
+          type: string
+          description: Workplace display name, e.g. 台灣, 大陸.
+        loc_desc:
+          type: [string, "null"]
+          description: Specific location/address, e.g. 鄭州.
+        edu_level_name:
+          description: >
+            Untranslated i18n key, e.g.
+            "sys.param.educational_qualifications.c". Populated on detail
+            only.
+          type: [string, "null"]
+        edu_level_name_and_desc:
+          description: Education-level display string, e.g. "大學(含)以上".
+          type: [string, "null"]
+        factory:
+          type: [string, "null"]
+        factory_desc:
+          type: [string, "null"]
+        mgr_code:
+          type: [string, "null"]
+        mgr_name:
+          type: [string, "null"]
+        mgr_desc:
+          type: [string, "null"]
+        ot_desc:
+          type: [string, "null"]
+        outside_flag:
+          description: Business-travel flag, e.g. "0". Populated on detail only.
+          type: [string, "null"]
+        expect_date:
+          description: ISO 8601 with +08:00 offset, e.g. "2026-02-27T00:00:00+08:00".
+          type: [string, "null"]
+        expect_date_utc:
+          type: [string, "null"]
+        desc_1:
+          type: [string, "null"]
+        desc_2:
+          type: [string, "null"]
+        desc_3:
+          description: >
+            Free-text section. No field-level label from the API; inferred
+            to be requirements, but the desc_* meanings vary by job.
+          type: [string, "null"]
+        desc_4:
+          description: >
+            Free-text section (usually responsibilities). Almost always
+            populated on the list endpoint.
+          type: [string, "null"]
+        desc_5:
+          type: [string, "null"]
+        desc_6:
+          type: [string, "null"]
+        desc_7:
+          type: [string, "null"]
+        desc_8:
+          type: [string, "null"]
+        treat_type:
+          description: Compensation-type code, e.g. "I". Populated on detail only.
+          type: [string, "null"]
+        treat_min:
+          type: [number, "null"]
+        treat_max:
+          type: [number, "null"]
+        lang_desc_1:
+          description: >
+            Comma-separated language-proficiency tuple, empty in every
+            sample (e.g. ",,,,").
+          type: [string, "null"]
+        lang_desc_2:
+          type: [string, "null"]
+        lang_desc_3:
+          type: [string, "null"]
+        sort_id:
+          type: [integer, "null"]
+        loc_name_and_desc:
+          type: [string, "null"]
+        factory_name_and_desc:
+          description: Interview mode / factory display, e.g. "線上面談". Detail only.
+          type: [string, "null"]
+        age_desc:
+          type: [string, "null"]
+        outside_flag_name:
+          description: Business-travel flag display, e.g. "無需". Detail only.
+          type: [string, "null"]
+        lang_desc:
+          description: >
+            Bracket-concatenation of lang_desc_1..3, e.g. "[,,,,][,,,,][,,,,]".
+          type: [string, "null"]
+        treat_desc:
+          description: Compensation display, e.g. "面議". Populated on detail only.
+          type: [string, "null"]
+        cg_name:
+          type: [string, "null"]
+        cg_name_desc:
+          type: [string, "null"]
+        cg_type:
+          type: [string, "null"]
+        rel_flag:
+          description: >
+            Related-jobs flag, "N" or "Y". Every sampled job was "N"; the
+            related-jobs group endpoint it gates is out of scope.
+          type: [string, "null"]
+
+    ProblemDetails:
+      type: object
+      description: >
+        RFC 7807 problem+json body returned by the detail endpoint for an
+        unknown/invalid id.
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+          example: Not Found
+        status:
+          type: integer
+          example: 404
+        traceId:
+          type: string
+          description: Per-request and unstable — never assert its value.
