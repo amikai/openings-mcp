@@ -7,6 +7,7 @@ OPENAPI_SPECS := \
 	internal/provider/bamboohr/openapi.yaml \
 	internal/provider/cake/openapi.yaml \
 	internal/provider/eightfold/openapi.yaml \
+	internal/provider/foxconn/openapi.yaml \
 	internal/provider/google/openapi.yaml \
 	internal/provider/greenhouse/openapi.yaml \
 	internal/provider/himalayas/openapi.yaml \
