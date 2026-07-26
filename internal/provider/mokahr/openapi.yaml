@@ -1,0 +1,598 @@
+openapi: 3.1.0
+
+info:
+  title: MokaHR careers-site API
+  version: "1"
+  contact:
+    name: MokaHR
+    url: https://www.mokahr.com
+  description: >
+    The private JSON API behind MokaHR-hosted careers sites
+    (https://app.mokahr.com/social-recruitment/<orgId>/<siteId>). MokaHR
+    publishes no developer documentation, so this document was derived from
+    live traffic captured off the DeepSeek/幻方 (`high-flyer`) and Moka
+    (`moka`) sites on 2026-07-27, cross-checked against the site's own
+    frontend bundle (recruitmentWeb-20260721-1926-0cce6-release.js).
+
+    Endpoints need no authentication, cookies, or `Referer`, and the whole
+    request body is plain JSON. Only the *response* bodies are unusual — see
+    below.
+
+    ## Responses are transport-obfuscated, and this document describes the
+    ## payload *after* deobfuscation
+
+    Most endpoints answer with an envelope of the form
+
+        {"data": "<base64 AES-128-CBC ciphertext>", "necromancer": "<key>"}
+
+    where `necromancer` is the 16-byte AES key for that very response and the
+    IV is the constant `de7c21ed8d6f50fe` (published in every careers page's
+    server-rendered state as `aesIv`, and observed identical across tenants
+    and sessions). The site's own frontend does exactly this:
+    `e.necromancer ? parseJson(decrypt(e.data, e.necromancer)) : e` — so the
+    scheme is obfuscation, not access control, and an endpoint may answer in
+    the clear (`filterFieldsAggregations` does).
+
+    `transport.go` unwraps that envelope before ogen decodes the body, so
+    every schema below describes the *deobfuscated* payload. Nothing in this
+    document is encrypted-envelope-aware on purpose.
+
+    ## Everything is HTTP 200
+
+    There are no error status codes: unknown tenants, unknown job ids, and
+    malformed parameters all answer HTTP 200 with `success: false` and a
+    Chinese `msg`. Observed codes: `703002` 未找到对应的官网 (unknown
+    orgId/siteId pair), `703015` 您访问的职位已不存在 (unknown jobId), `102`
+    参数错误 (bad or missing parameter), `101` JSON格式错误 (wrong JSON
+    type). `client.go` turns `success: false` into a Go error; the schemas
+    here model `data` as optional because an unsuccessful envelope omits it.
+
+    ## Other surface notes
+
+    * `limit` on the job list caps at 50; 60 is rejected with code 102.
+    * `keyword` matches job **titles only** — it does not search
+      descriptions. Verified against `high-flyer`: "CLIP" and "SigLIP"
+      appear in one description each and return 0 hits, while every tested
+      term's upstream hit count equals its title-match count exactly.
+    * `locale` selects the language of place names only (`zh-CN` →
+      "北京市"/"海淀区", `en-US` → "Beijing"/"Haidian"). Job titles,
+      descriptions, `commitment`, and 职能 (`zhineng`) labels stay in
+      whatever language the tenant authored them in. Omitting `locale`
+      yields Chinese place names on the job endpoints but English ones on
+      `filterFieldsAggregations`, so this client always sends it explicitly.
+
+    * `locale` is not honored uniformly, so the same workplace can read
+      differently depending on where it came from. Under `en-US`, `getJob`
+      returns `country` in Chinese ("中国") and the English name in
+      `countryDescription`, while `listJobs` returns English in `country`
+      and no `countryDescription` at all. Some tenants ignore `locale`
+      outright and return Chinese everywhere ("闵行区", "上海市"). Callers
+      that must render a workplace consistently should prefer the location
+      facet, which is keyed by the same `Location.id` and does honor
+      `locale`, over the fields on the posting.
+
+    * A posting's workplaces are not always on the posting. `listJobs`
+      returns `"locations": null` for some tenants even though `getJob`
+      reports a real workplace for those same postings, and the same
+      tenants tend to return an empty `systemFieldsAggregations`. Filtering
+      by `locationIds` still works on such a board — verified against `ey`,
+      where an unfiltered 340 postings narrow to 102 for Shanghai's ids —
+      so the ids are the reliable way to reach a place, not the payload.
+    * Timestamps are local wall-clock strings with no zone or offset
+      ("2026-06-25T14:23:06", and "2026-06-25T00:00" for `openedAt`), so
+      they are modeled as plain strings rather than `format: date-time`.
+    * The job list already carries each posting's full HTML description;
+      there is no field-selection parameter that suppresses it
+      (`enableFullDescription: false` and `jobEnableFields: []` are ignored
+      on the public endpoint).
+
+    ## Deliberately unmodeled fields
+
+    The job detail response carries roughly forty recruiter-side fields with
+    no candidate-facing meaning — resume-screening thresholds
+    (`aiThresholdAccuracy`, `autoFilterThreshold`), pipeline and talent-pool
+    ids, interview counters (`shmInterview`), referral-bonus bookkeeping, and
+    similar. They are omitted here rather than modeled; ogen ignores
+    undeclared fields. `customFields` is omitted for a different reason: it
+    is a tenant-defined map whose `value` arrays have no fixed element type.
+
+servers:
+  - url: https://app.mokahr.com
+
+paths:
+  /api/outer/ats-apply/website/jobs/v2:
+    post:
+      operationId: listJobs
+      summary: List a careers site's published jobs.
+      description: >
+        Returns one page of open postings, each with its full HTML
+        description. `needStat: true` adds `jobStats.total`, the only source
+        of an exact board size.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListJobsRequest"
+      responses:
+        "200":
+          description: >
+            Always returned, including for unknown tenants and bad
+            parameters — check `success`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListJobsResponse"
+
+  /api/outer/ats-apply/website/job:
+    post:
+      operationId: getJob
+      summary: Get one posting by id.
+      description: >
+        Returns the fields the list endpoint omits, notably `department` and
+        `commitment` (employment type).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetJobRequest"
+      responses:
+        "200":
+          description: Always returned — check `success`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetJobResponse"
+
+  /api/outer/ats-apply/website/jobs/v2/filterFieldsAggregations:
+    post:
+      operationId: listFilterAggregations
+      summary: List the site's filter dimensions and their values.
+      description: >
+        Supplies the ids `listJobs` takes as `locationIds` and `zhinengIds`,
+        together with their display labels. Unlike the job endpoints, this
+        one answers in the clear.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FilterAggregationsRequest"
+      responses:
+        "200":
+          description: Always returned — check `success`.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FilterAggregationsResponse"
+
+components:
+  schemas:
+    SiteRef:
+      type: object
+      description: The (tenant, careers site) pair every endpoint requires.
+      required: [orgId, siteId]
+      properties:
+        orgId:
+          type: string
+          description: >
+            Tenant slug, the first path segment of the careers URL
+            (e.g. "high-flyer").
+          examples: ["high-flyer"]
+        siteId:
+          type: string
+          description: >
+            Careers-site id, the second path segment. A tenant can own
+            several sites with different job sets, and the site a bare
+            /social-recruitment/<orgId> redirects to is not necessarily the
+            largest one, so it is never inferred.
+          examples: ["140576"]
+        locale:
+          type: string
+          description: >
+            Language for place names only. This client always sends
+            "en-US"; see the document description.
+          examples: ["en-US", "zh-CN"]
+
+    ListJobsRequest:
+      allOf:
+        - $ref: "#/components/schemas/SiteRef"
+        - type: object
+          properties:
+            limit:
+              type: integer
+              description: Page size. Values above 50 are rejected with code 102.
+              minimum: 1
+              maximum: 50
+            offset:
+              type: integer
+              description: Zero-based offset of the first returned job.
+              minimum: 0
+            needStat:
+              type: boolean
+              description: Populate `jobStats`. Without it the total is unavailable.
+            keyword:
+              type: string
+              description: >
+                Title substring match. Does not search descriptions; see the
+                document description.
+            locationIds:
+              type: array
+              description: >
+                Location ids from
+                `locationAggregation.locationList[].locationRows[].id`.
+                Multiple ids are ORed.
+              items:
+                type: integer
+            zhinengIds:
+              type: array
+              description: >
+                职能 (job-function) ids from
+                `zhinengAggregation.zhinengList[].id`. Multiple ids are ORed.
+              items:
+                type: integer
+
+    GetJobRequest:
+      allOf:
+        - $ref: "#/components/schemas/SiteRef"
+        - type: object
+          required: [jobId]
+          properties:
+            jobId:
+              type: string
+              description: A `Job.id` from `listJobs`.
+
+    FilterAggregationsRequest:
+      $ref: "#/components/schemas/SiteRef"
+
+    Envelope:
+      type: object
+      description: >
+        The wrapper every endpoint returns. `success` is the only reliable
+        outcome signal, since the HTTP status is always 200.
+      required: [code, success]
+      properties:
+        code:
+          type: integer
+          description: 0 on success; see the document description for known failures.
+        codeType:
+          type: integer
+        msg:
+          type: string
+          description: Human-readable status, in Chinese ("成功" on success).
+        success:
+          type: boolean
+
+    ListJobsResponse:
+      allOf:
+        - $ref: "#/components/schemas/Envelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/JobList"
+
+    GetJobResponse:
+      allOf:
+        - $ref: "#/components/schemas/Envelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/JobDetail"
+
+    FilterAggregationsResponse:
+      allOf:
+        - $ref: "#/components/schemas/Envelope"
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/FilterAggregations"
+
+    JobList:
+      type: object
+      properties:
+        jobs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        jobStats:
+          $ref: "#/components/schemas/JobStats"
+
+    JobStats:
+      type: object
+      description: "Present only when the request set `needStat: true`."
+      properties:
+        orgId:
+          type: string
+        total:
+          type: integer
+          description: Total jobs matching the request, ignoring limit/offset.
+
+    Job:
+      type: object
+      description: One posting as the list endpoint returns it.
+      required: [id, title]
+      properties:
+        id:
+          type: string
+          description: UUID; the `jobId` accepted by `getJob`.
+          examples: ["7dcd6fde-84f1-4deb-890c-f1f275df0efc"]
+        title:
+          type: string
+        status:
+          type: string
+          description: Observed only as "open" on public sites.
+        jobDescription:
+          type: string
+          description: Full description as HTML.
+        locations:
+          type: array
+          description: >
+            Null on tenants that keep workplaces off the list endpoint; see
+            the document description. `getJob` still reports them.
+          items:
+            $ref: "#/components/schemas/Location"
+        zhineng:
+          $ref: "#/components/schemas/NamedRef"
+        orgId:
+          type: string
+        deptId:
+          type: integer
+          description: >
+            Department id. The list endpoint carries the id only; the
+            department's name comes from `getJob`.
+        hireMode:
+          type: integer
+        salaryUnit:
+          type: integer
+        showIsCampus:
+          type: boolean
+          description: Whether the site presents this posting as campus recruitment.
+        multiLocale:
+          type: string
+          description: >
+            A JSON *string*, not an object, e.g.
+            '{"mainLocale":"zh-CN","secondLocale":""}'.
+        createdAt:
+          type: string
+          description: Local wall clock, no zone ("2026-06-25T14:23:06").
+        updatedAt:
+          type: string
+          description: Local wall clock, no zone.
+        openedAt:
+          type: string
+          description: >
+            Local wall clock, minute precision and no zone
+            ("2026-06-25T00:00").
+
+    JobDetail:
+      type: object
+      description: >
+        A posting as the detail endpoint returns it: every `Job` field plus
+        the ones the list omits.
+      required: [id, title]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        status:
+          type: string
+        jobDescription:
+          type: string
+        locations:
+          type: array
+          items:
+            $ref: "#/components/schemas/Location"
+        zhineng:
+          $ref: "#/components/schemas/NamedRef"
+        orgId:
+          type: string
+        commitment:
+          type: string
+          description: >
+            Employment type, in the tenant's own language ("全职",
+            "实习"). Not localized by `locale`.
+        department:
+          $ref: "#/components/schemas/NamedRef"
+        departments:
+          type: array
+          description: >
+            Every department the posting belongs to; `department` is the
+            primary one.
+          items:
+            $ref: "#/components/schemas/NamedRef"
+        departmentId:
+          type: integer
+        hireMode:
+          type: integer
+        salaryUnit:
+          type: integer
+        showIsCampus:
+          type: boolean
+        multiLocale:
+          type: string
+        brandMessage:
+          type: string
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+        openedAt:
+          type: string
+        publishedAt:
+          type: string
+          description: >
+            When the posting went live on the careers site. Absent from the
+            list endpoint.
+
+    Location:
+      type: object
+      description: >
+        One workplace. `id` is what `listJobs` takes as a `locationIds`
+        element and what the location facet is keyed by. Which of the name
+        fields are present, and in which language, varies by endpoint and by
+        tenant — see the document description; only `id` is dependable.
+      properties:
+        id:
+          type: integer
+        cityId:
+          type: integer
+          description: >
+            National division code of the district, not the city — 110108 is
+            Haidian, inside Beijing.
+        cityName:
+          type: string
+          description: >
+            District, not city ("Haidian", "Gongshu"). Absent from `getJob`
+            on some tenants.
+        provinceId:
+          type: integer
+          description: Returned by `listJobs` only.
+        provinceName:
+          type: string
+          description: Absent from `getJob` on some tenants.
+        country:
+          type: string
+          description: >
+            English under `locale=en-US` on `listJobs`, but Chinese on
+            `getJob`; prefer `countryDescription` when it is present.
+        countryDescription:
+          type: string
+          description: The country in the requested locale. `getJob` only.
+        address:
+          type: string
+          description: Street address. `getJob` only, and only on some tenants.
+
+    NamedRef:
+      type: object
+      description: An id/name pair, used for 职能 (job function) and departments.
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+
+    FilterAggregations:
+      type: object
+      properties:
+        systemFieldsAggregations:
+          $ref: "#/components/schemas/SystemFieldsAggregations"
+
+    SystemFieldsAggregations:
+      type: object
+      description: >
+        Empty for tenants that publish no filter dimensions at all — the same
+        ones whose postings tend to carry no `locations`.
+        `customFieldsAggregations` is returned but unused.
+      properties:
+        locationAggregation:
+          $ref: "#/components/schemas/LocationAggregation"
+        provinceAggregation:
+          $ref: "#/components/schemas/ProvinceAggregation"
+        zhinengAggregation:
+          $ref: "#/components/schemas/ZhinengAggregation"
+
+    ProvinceAggregation:
+      type: object
+      properties:
+        provinceList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProvinceFacet"
+
+    ProvinceFacet:
+      type: object
+      description: >
+        One province, and the cities under it. Municipalities repeat
+        themselves — Shanghai is both the province label and its only city.
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+        provinceId:
+          type: integer
+        locationRows:
+          type: array
+          description: Every `Location.id` in the province, across all its cities.
+          items:
+            $ref: "#/components/schemas/LocationRow"
+        cityRows:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationFacet"
+
+    LocationAggregation:
+      type: object
+      properties:
+        locationList:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationFacet"
+
+    LocationFacet:
+      type: object
+      description: >
+        One city. `label` is the display value; the `locationIds` to filter
+        on are in `locationRows`, because one city can cover several
+        districts.
+      properties:
+        id:
+          type: string
+          description: >
+            The city's label, repeated — a string here, unlike the integer
+            ids in `locationRows`.
+          examples: ["Beijing"]
+        label:
+          type: string
+        cityId:
+          type: integer
+        jobCount:
+          type: integer
+          description: Returned under `provinceAggregation` only, and observed as 0.
+        locationRows:
+          type: array
+          items:
+            $ref: "#/components/schemas/LocationRow"
+
+    LocationRow:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: A `Location.id`, accepted as a `locationIds` element.
+        cityId:
+          type: integer
+
+    ZhinengAggregation:
+      type: object
+      properties:
+        zhinengList:
+          type: array
+          items:
+            $ref: "#/components/schemas/ZhinengFacet"
+
+    ZhinengFacet:
+      type: object
+      description: >
+        One 职能 (job function) the site groups postings under. The list is a
+        two-level tree; a parent's `jobCount` includes its children's.
+      properties:
+        id:
+          type: integer
+          description: Accepted as a `zhinengIds` element.
+        label:
+          type: string
+        parentId:
+          type: integer
+          description: 0 for top-level entries.
+        jobCount:
+          type: integer
+        sort:
+          type: integer
+          description: The tenant's display order.
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/ZhinengFacet"

@@ -66,6 +66,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"icims":           "careers-<slug>.icims.com/jobs/search",
 	"oracle":          "<fusion>.oraclecloud.com/hcmUI/CandidateExperience/<lang>/sites/<site>/jobs",
 	"join":            "join.com/companies/<company> (roster companies only)",
+	"mokahr":          "app.mokahr.com/{social-recruitment,campus_apply}/<org>/<siteId>",
 	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
 }
 

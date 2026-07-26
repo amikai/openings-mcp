@@ -26,6 +26,7 @@ import (
 
 	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/amikai/openings-mcp/internal/provider/eightfold"
+	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 )
 
 // providerOrder fixes the --provider default and the report's grouping order.
@@ -41,6 +42,7 @@ var providerOrder = []string{
 	"icims",
 	"join",
 	"lever",
+	"mokahr",
 	"oracle",
 	"recruitee",
 	"rippling",
@@ -204,6 +206,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a = ats.NewJoinAdapter("https://join.com", hc)
 		case "lever":
 			a, err = ats.NewLeverAdapter("https://api.lever.co", hc)
+		case "mokahr":
+			a, err = ats.NewMokaHRAdapter(mokahr.DefaultBaseURL, hc)
 		case "oracle":
 			a = ats.NewOracleAdapter(hc)
 		case "recruitee":

@@ -29,6 +29,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
 	"github.com/amikai/openings-mcp/internal/provider/meta"
+	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
 	"github.com/amikai/openings-mcp/internal/provider/nvidia"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
@@ -246,6 +247,10 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create Rippling ATS adapter: %w", err)
 	}
+	mokahrAdapter, err := ats.NewMokaHRAdapter(mokahr.DefaultBaseURL, hc)
+	if err != nil {
+		return nil, fmt.Errorf("create MokaHR ATS adapter: %w", err)
+	}
 
 	return []ats.Adapter{
 		ats.NewWorkdayAdapter(hc),
@@ -268,6 +273,7 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 		ats.NewJoinAdapter("https://join.com", hc),
 		ats.NewUltiProAdapter(hc),
 		ats.NewHrmosAdapter("https://hrmos.co", hc),
+		mokahrAdapter,
 	}, nil
 }
 
