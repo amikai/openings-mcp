@@ -285,6 +285,39 @@ func TestMokaHRUnknownSite(t *testing.T) {
 	assert.Contains(t, err.Error(), "including its site id")
 }
 
+// TestMokaHRPageCount pins the arithmetic the concurrent board read fans out
+// on. An off-by-one here would silently skip a page's postings rather than
+// fail, which is why it is tested apart from the network path.
+func TestMokaHRPageCount(t *testing.T) {
+	for _, tc := range []struct {
+		name      string
+		total     int
+		pageSize  int
+		wantPages int
+	}{
+		{"empty board still holds the fetched page", 0, 50, 1},
+		{"single posting", 1, 50, 1},
+		{"exactly one page", 50, 50, 1},
+		{"one past a page boundary", 51, 50, 2},
+		{"exact multiple", 100, 50, 2},
+		{"largest roster board", 1284, 50, 26},
+		{"at the candidate cap", maxMokaHRCandidates, 50, 40},
+		{"total upstream declined to report", -1, 50, 1},
+		{"page size lost", 35, 0, 1},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			got := mokaHRPageCount(tc.total, tc.pageSize)
+			assert.Equal(t, tc.wantPages, got)
+			if tc.total > 0 && tc.pageSize > 0 {
+				// Every posting has to land on some page.
+				assert.GreaterOrEqual(t, got*tc.pageSize, tc.total)
+				// And no page beyond the last may be requested.
+				assert.Less(t, (got-1)*tc.pageSize, tc.total)
+			}
+		})
+	}
+}
+
 func TestMokaHRResolveSite(t *testing.T) {
 	// A roster company resolves by slug and keeps its display name; an
 	// unlisted site falls back to naming itself after its tenant.

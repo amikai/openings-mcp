@@ -247,7 +247,7 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 			"mokahr: %q has %d postings, too many to text-search at once; narrow it first with a city or category filter",
 			site.name, total)
 	}
-	pages := make([][]mokahr.Job, max(1, (total+pageSize-1)/pageSize))
+	pages := make([][]mokahr.Job, mokaHRPageCount(total, pageSize))
 	pages[0] = first.Jobs
 	// MokaHR answers with min(limit, remaining), so a short page is the last
 	// one. Trusting that keeps every later offset a clean multiple of the
@@ -329,6 +329,17 @@ func (a *MokaHRAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 		URL:         mokahr.JobURL(site.org, site.site, jobID),
 		Description: mokaHRDescription(d.JobDescription.Or("")),
 	}, nil
+}
+
+// mokaHRPageCount is how many upstream pages a board of total postings
+// occupies. It never returns zero: the first page has already been fetched by
+// the time the count is needed, so there is always one page to hold it, even
+// for an empty board or a total upstream declines to report.
+func mokaHRPageCount(total, pageSize int) int {
+	if total <= 0 || pageSize <= 0 {
+		return 1
+	}
+	return max(1, (total+pageSize-1)/pageSize)
 }
 
 // mokaHRFacets is one site's filter catalog: display labels, the upstream ids
