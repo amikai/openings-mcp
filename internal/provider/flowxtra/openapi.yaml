@@ -1,0 +1,375 @@
+openapi: 3.1.0
+
+info:
+  title: Flowxtra Central Jobs API
+  version: "1"
+  contact:
+    name: Flowxtra
+    url: https://flowxtra.com
+  description: >
+    Flowxtra's public cross-tenant jobs API, written from live captured
+    responses (2026-07-26, see testdata/*.hurl). Flowxtra
+    (https://flowxtra.com) is a multi-tenant ATS; the central endpoint
+    lists live postings from every company hosted on the platform in one
+    board-wide feed — no per-company slug, no token, no auth. No official
+    OpenAPI document exists; this spec models only the fields this
+    provider consumes (verified non-null across all 116 rows live at
+    capture time unless marked nullable).
+
+    ## Surface notes
+
+    * `GET /central/jobs` is a Laravel-paginated list with real
+      server-side narrowing: `search-key` (title LIKE), `location`
+      (city / state / country LIKE), `company_name` (LIKE), and
+      `workplace` (exact match) all reduce `total`. The server hardcodes
+      the visibility window (status Live, admin-approved, shared within
+      the last 90 days, not expired), so there is no status parameter.
+
+    * An `employment_type` parameter exists upstream but is a live no-op:
+      the backing JSON column stores objects while the filter compares
+      plain strings, so every value returns zero rows (verified
+      2026-07-26). It is deliberately not modeled.
+
+    * List rows always carry `date_share` (RFC3339 with fractional
+      seconds); the detail endpoint serializes the same field as null on
+      every probed job, so posted-at only comes from the list.
+
+    * `urlJobApplay` (sic — upstream spelling) is the ready-made apply
+      URL. The list serves `https://flowxtra.com/apply/{has_id}`; detail
+      serves the company's own career-page URL, e.g.
+      `https://<company>.<career-domain>/job/<slug>/<has_id>`.
+
+    * Unknown `has_id` on the detail endpoint returns a clean JSON 404.
+
+servers:
+  - url: https://app.flowxtra.com/api
+
+tags:
+  - name: jobs
+    description: Cross-tenant job listings
+
+paths:
+  /central/jobs:
+    get:
+      summary: List live jobs across every company on Flowxtra
+      description: >
+        Laravel-paginated cross-tenant list, newest-first by date_share.
+        All narrowing parameters are server-side (total drops); combine
+        freely. Omitting every parameter returns the newest postings on
+        the whole board.
+      operationId: listJobs
+      tags: [jobs]
+      parameters:
+        - name: search-key
+          in: query
+          description: Free-text job-title search (server-side LIKE).
+          schema:
+            type: string
+        - name: location
+          in: query
+          description: >
+            Location search — matches company city, state, or country
+            (server-side LIKE), e.g. "Spain" or "Barcelona".
+          schema:
+            type: string
+        - name: workplace
+          in: query
+          description: >
+            Exact workplace match. Live rows carry "On-site" and
+            "Remote"; the site's own filter UI also offers "Hybrid".
+          schema:
+            type: string
+            enum: [On-site, Hybrid, Remote]
+        - name: company_name
+          in: query
+          description: Company-name search (server-side LIKE).
+          schema:
+            type: string
+        - name: page
+          in: query
+          description: 1-based page number.
+          schema:
+            type: integer
+            minimum: 1
+        - name: per_page
+          in: query
+          description: Page size (100 verified working live).
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        "200":
+          description: OK — also returned for filters matching zero jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobListEnvelope"
+
+  /candidate/jobs/{hasId}:
+    get:
+      summary: Get one job posting in full by its public hashed id
+      description: >
+        Full posting detail: HTML description, company profile,
+        employment types, office location, and the company's career-page
+        apply URL.
+      operationId: getJobDetail
+      tags: [jobs]
+      parameters:
+        - name: hasId
+          in: path
+          required: true
+          description: Public hashed job id (`has_id` on every list row).
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailEnvelope"
+        "404":
+          description: >
+            Unknown or deleted has_id ("Central job not found").
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFoundError"
+
+components:
+  schemas:
+    JobListEnvelope:
+      type: object
+      required: [success, data, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          description: Stringified HTTP status, e.g. "200".
+        data:
+          $ref: "#/components/schemas/JobPage"
+
+    JobPage:
+      type: object
+      required: [current_page, last_page, per_page, total, data]
+      properties:
+        current_page:
+          type: integer
+        last_page:
+          type: integer
+        per_page:
+          type: integer
+        total:
+          type: integer
+          description: Total matching jobs across all pages.
+        next_page_url:
+          type: [string, "null"]
+          description: Null on the last page.
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobSummary"
+
+    JobSummary:
+      type: object
+      required:
+        - id
+        - has_id
+        - title
+        - workplace
+        - currency
+        - date_share
+        - min_salary
+        - max_salary
+        - salary
+        - rate_salary
+        - name_company
+        - city_company
+        - state_company
+        - country_company
+        - logo_company
+        - employment_types
+        - urlJobApplay
+      properties:
+        id:
+          type: integer
+          description: Internal numeric id; use has_id for lookups.
+        has_id:
+          type: string
+          description: >
+            Public hashed job id — pass to /candidate/jobs/{hasId}.
+        title:
+          type: string
+        workplace:
+          type: string
+          description: >
+            Observed values live: "On-site", "Remote".
+        currency:
+          type: string
+          description: ISO currency code, e.g. "EUR".
+        date_share:
+          type: string
+          format: date-time
+          description: Posting date (RFC3339 with fractional seconds).
+        min_salary:
+          type: [number, "null"]
+        max_salary:
+          type: [number, "null"]
+        salary:
+          type: [number, "null"]
+          description: Fixed salary; rarely set (2 of 116 rows live).
+        rate_salary:
+          type: string
+          description: >
+            Salary period. Observed values: "year", "monthly", "month",
+            "hour".
+        name_company:
+          type: string
+        city_company:
+          type: string
+          description: May be empty.
+        state_company:
+          type: string
+          description: May be empty.
+        country_company:
+          type: string
+        logo_company:
+          type: string
+        employment_types:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmploymentType"
+        urlJobApplay:
+          type: string
+          description: >
+            Ready-made apply URL (sic — upstream spelling), always
+            https://flowxtra.com/apply/{has_id} on list rows.
+
+    EmploymentType:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          description: >
+            Human label, e.g. "Full-time", "Part-time", "Internship",
+            "Contract", "Freelance".
+
+    JobDetailEnvelope:
+      type: object
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+        data:
+          $ref: "#/components/schemas/JobDetail"
+
+    JobDetail:
+      type: object
+      required:
+        - has_id
+        - title
+        - workplace
+        - description
+        - currency
+        - min_salary
+        - max_salary
+        - salary
+        - rate_salary
+        - urlJobApplay
+        - company
+        - job_type_job
+      properties:
+        has_id:
+          type: string
+        title:
+          type: string
+        workplace:
+          type: string
+        seniority:
+          type: [string, "null"]
+          description: E.g. "Junior", "Midlevel", "Intern"; often null.
+        description:
+          type: string
+          description: Full job description, HTML.
+        currency:
+          type: string
+        date_expired:
+          type: [string, "null"]
+          description: Expiry timestamp; null when open-ended.
+        min_salary:
+          type: [number, "null"]
+        max_salary:
+          type: [number, "null"]
+        salary:
+          type: [number, "null"]
+        rate_salary:
+          type: string
+        career_level:
+          type: [string, "null"]
+        urlJobApplay:
+          type: string
+          description: >
+            The company's own career-page apply URL here (unlike list
+            rows), e.g. https://<company>.<career-domain>/job/<slug>/<has_id>.
+        company:
+          $ref: "#/components/schemas/Company"
+        job_type_job:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmploymentType"
+        company_office:
+          oneOf:
+            - $ref: "#/components/schemas/CompanyOffice"
+            - type: "null"
+          description: >
+            The posting's office; modeled nullable defensively (jobs can
+            use a custom location instead).
+
+    Company:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+        website:
+          type: [string, "null"]
+        logo:
+          type: [string, "null"]
+        career_domain:
+          type: [string, "null"]
+          description: >
+            Shared career domain hosting the company's jobs page, e.g.
+            "apply-link.net".
+
+    CompanyOffice:
+      type: object
+      properties:
+        address:
+          type: [string, "null"]
+        country:
+          oneOf:
+            - $ref: "#/components/schemas/NamedPlace"
+            - type: "null"
+        state:
+          oneOf:
+            - $ref: "#/components/schemas/NamedPlace"
+            - type: "null"
+
+    NamedPlace:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+
+    NotFoundError:
+      type: object
+      required: [success, message]
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+          description: '"Central job not found".'
