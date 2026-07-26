@@ -28,14 +28,16 @@ const (
 )
 
 // APIError is an unsuccessful MokaHR response. Msg is upstream's own wording
-// and is written in Chinese.
+// and is written in Chinese. It carries no package prefix: callers in
+// internal/ats and cmd/mokahr add their own, and two would read as one
+// doubled.
 type APIError struct {
 	Code int
 	Msg  string
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("mokahr: upstream error %d: %s", e.Code, e.Msg)
+	return fmt.Sprintf("upstream error %d: %s", e.Code, e.Msg)
 }
 
 // JobsClient reads MokaHR careers sites. It exists so the response
@@ -54,7 +56,7 @@ func NewJobsClient(baseURL string, hc *http.Client) (*JobsClient, error) {
 	deobfuscating.Transport = Transport{Base: hc.Transport}
 	api, err := NewClient(baseURL, WithClient(&deobfuscating))
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: create api client: %w", err)
+		return nil, fmt.Errorf("create api client: %w", err)
 	}
 	return &JobsClient{api: api}, nil
 }
@@ -67,14 +69,14 @@ func (c *JobsClient) ListJobs(ctx context.Context, req ListJobsRequest) (*JobLis
 	}
 	rsp, err := c.api.ListJobs(ctx, &req)
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: list jobs for %s/%s: %w", req.OrgId, req.SiteId, err)
+		return nil, fmt.Errorf("list jobs for %s/%s: %w", req.OrgId, req.SiteId, err)
 	}
 	if !rsp.Success {
 		return nil, &APIError{Code: rsp.Code, Msg: rsp.Msg.Or("")}
 	}
 	list, ok := rsp.Data.Get()
 	if !ok {
-		return nil, fmt.Errorf("mokahr: list jobs for %s/%s: successful response carried no data", req.OrgId, req.SiteId)
+		return nil, fmt.Errorf("list jobs for %s/%s: successful response carried no data", req.OrgId, req.SiteId)
 	}
 	return &list, nil
 }
@@ -87,14 +89,14 @@ func (c *JobsClient) GetJob(ctx context.Context, req GetJobRequest) (*JobDetail,
 	}
 	rsp, err := c.api.GetJob(ctx, &req)
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: get job %s: %w", req.JobId, err)
+		return nil, fmt.Errorf("get job %s: %w", req.JobId, err)
 	}
 	if !rsp.Success {
 		return nil, &APIError{Code: rsp.Code, Msg: rsp.Msg.Or("")}
 	}
 	detail, ok := rsp.Data.Get()
 	if !ok {
-		return nil, fmt.Errorf("mokahr: get job %s: successful response carried no data", req.JobId)
+		return nil, fmt.Errorf("get job %s: successful response carried no data", req.JobId)
 	}
 	return &detail, nil
 }
@@ -108,14 +110,14 @@ func (c *JobsClient) ListFilterAggregations(ctx context.Context, req SiteRef) (*
 	}
 	rsp, err := c.api.ListFilterAggregations(ctx, &req)
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: list filters for %s/%s: %w", req.OrgId, req.SiteId, err)
+		return nil, fmt.Errorf("list filters for %s/%s: %w", req.OrgId, req.SiteId, err)
 	}
 	if !rsp.Success {
 		return nil, &APIError{Code: rsp.Code, Msg: rsp.Msg.Or("")}
 	}
 	aggs, ok := rsp.Data.Get()
 	if !ok {
-		return nil, fmt.Errorf("mokahr: list filters for %s/%s: successful response carried no data", req.OrgId, req.SiteId)
+		return nil, fmt.Errorf("list filters for %s/%s: successful response carried no data", req.OrgId, req.SiteId)
 	}
 	return &aggs, nil
 }

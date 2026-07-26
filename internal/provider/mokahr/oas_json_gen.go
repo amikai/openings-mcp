@@ -579,13 +579,21 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Locations != nil {
+		if s.Locations.Set {
 			e.FieldStart("locations")
-			e.ArrStart()
-			for _, elem := range s.Locations {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.Locations.Encode(e)
+		}
+	}
+	{
+		if s.Department.Set {
+			e.FieldStart("department")
+			s.Department.Encode(e)
+		}
+	}
+	{
+		if s.PublishedAt.Set {
+			e.FieldStart("publishedAt")
+			s.PublishedAt.Encode(e)
 		}
 	}
 	{
@@ -650,22 +658,24 @@ func (s *Job) encodeFields(e *jx.Encoder) {
 	}
 }
 
-var jsonFieldsNameOfJob = [15]string{
+var jsonFieldsNameOfJob = [17]string{
 	0:  "id",
 	1:  "title",
 	2:  "status",
 	3:  "jobDescription",
 	4:  "locations",
-	5:  "zhineng",
-	6:  "orgId",
-	7:  "deptId",
-	8:  "hireMode",
-	9:  "salaryUnit",
-	10: "showIsCampus",
-	11: "multiLocale",
-	12: "createdAt",
-	13: "updatedAt",
-	14: "openedAt",
+	5:  "department",
+	6:  "publishedAt",
+	7:  "zhineng",
+	8:  "orgId",
+	9:  "deptId",
+	10: "hireMode",
+	11: "salaryUnit",
+	12: "showIsCampus",
+	13: "multiLocale",
+	14: "createdAt",
+	15: "updatedAt",
+	16: "openedAt",
 }
 
 // Decode decodes Job from json.
@@ -673,7 +683,7 @@ func (s *Job) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Job to nil")
 	}
-	var requiredBitSet [2]uint8
+	var requiredBitSet [3]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -723,20 +733,33 @@ func (s *Job) Decode(d *jx.Decoder) error {
 			}
 		case "locations":
 			if err := func() error {
-				s.Locations = make([]Location, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem Location
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Locations = append(s.Locations, elem)
-					return nil
-				}); err != nil {
+				s.Locations.Reset()
+				if err := s.Locations.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"locations\"")
+			}
+		case "department":
+			if err := func() error {
+				s.Department.Reset()
+				if err := s.Department.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"department\"")
+			}
+		case "publishedAt":
+			if err := func() error {
+				s.PublishedAt.Reset()
+				if err := s.PublishedAt.Decode(d); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return errors.Wrap(err, "decode field \"publishedAt\"")
 			}
 		case "zhineng":
 			if err := func() error {
@@ -847,8 +870,9 @@ func (s *Job) Decode(d *jx.Decoder) error {
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
-	for i, mask := range [2]uint8{
+	for i, mask := range [3]uint8{
 		0b00000011,
+		0b00000000,
 		0b00000000,
 	} {
 		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
@@ -925,13 +949,9 @@ func (s *JobDetail) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Locations != nil {
+		if s.Locations.Set {
 			e.FieldStart("locations")
-			e.ArrStart()
-			for _, elem := range s.Locations {
-				elem.Encode(e)
-			}
-			e.ArrEnd()
+			s.Locations.Encode(e)
 		}
 	}
 	{
@@ -1108,15 +1128,8 @@ func (s *JobDetail) Decode(d *jx.Decoder) error {
 			}
 		case "locations":
 			if err := func() error {
-				s.Locations = make([]Location, 0)
-				if err := d.Arr(func(d *jx.Decoder) error {
-					var elem Location
-					if err := elem.Decode(d); err != nil {
-						return err
-					}
-					s.Locations = append(s.Locations, elem)
-					return nil
-				}); err != nil {
+				s.Locations.Reset()
+				if err := s.Locations.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -2754,6 +2767,67 @@ func (s OptNamedRef) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
 func (s *OptNamedRef) UnmarshalJSON(data []byte) error {
+	d := jx.DecodeBytes(data)
+	return s.Decode(d)
+}
+
+// Encode encodes []Location as json.
+func (o OptNilLocationArray) Encode(e *jx.Encoder) {
+	if !o.Set {
+		return
+	}
+	if o.Null {
+		e.Null()
+		return
+	}
+	e.ArrStart()
+	for _, elem := range o.Value {
+		elem.Encode(e)
+	}
+	e.ArrEnd()
+}
+
+// Decode decodes []Location from json.
+func (o *OptNilLocationArray) Decode(d *jx.Decoder) error {
+	if o == nil {
+		return errors.New("invalid: unable to decode OptNilLocationArray to nil")
+	}
+	if d.Next() == jx.Null {
+		if err := d.Null(); err != nil {
+			return err
+		}
+
+		var v []Location
+		o.Value = v
+		o.Set = true
+		o.Null = true
+		return nil
+	}
+	o.Set = true
+	o.Null = false
+	o.Value = make([]Location, 0)
+	if err := d.Arr(func(d *jx.Decoder) error {
+		var elem Location
+		if err := elem.Decode(d); err != nil {
+			return err
+		}
+		o.Value = append(o.Value, elem)
+		return nil
+	}); err != nil {
+		return err
+	}
+	return nil
+}
+
+// MarshalJSON implements stdjson.Marshaler.
+func (s OptNilLocationArray) MarshalJSON() ([]byte, error) {
+	e := jx.Encoder{}
+	s.Encode(&e)
+	return e.Bytes(), nil
+}
+
+// UnmarshalJSON implements stdjson.Unmarshaler.
+func (s *OptNilLocationArray) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }

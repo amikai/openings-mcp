@@ -206,11 +206,14 @@ type Job struct {
 	Status OptString `json:"status"`
 	// Full description as HTML.
 	JobDescription OptString `json:"jobDescription"`
-	// Null on tenants that keep workplaces off the list endpoint; see the document description. `getJob`
-	// still reports them.
-	Locations []Location  `json:"locations"`
-	Zhineng   OptNamedRef `json:"zhineng"`
-	OrgId     OptString   `json:"orgId"`
+	// Absent entirely on tenants that keep workplaces off the list endpoint; see the document description.
+	// `getJob` still reports them.
+	Locations  OptNilLocationArray `json:"locations"`
+	Department OptNamedRef         `json:"department"`
+	// Returned by some tenants here as well as by `getJob`.
+	PublishedAt OptString   `json:"publishedAt"`
+	Zhineng     OptNamedRef `json:"zhineng"`
+	OrgId       OptString   `json:"orgId"`
 	// Department id. The list endpoint carries the id only; the department's name comes from `getJob`.
 	DeptId     OptInt `json:"deptId"`
 	HireMode   OptInt `json:"hireMode"`
@@ -248,8 +251,18 @@ func (s *Job) GetJobDescription() OptString {
 }
 
 // GetLocations returns the value of Locations.
-func (s *Job) GetLocations() []Location {
+func (s *Job) GetLocations() OptNilLocationArray {
 	return s.Locations
+}
+
+// GetDepartment returns the value of Department.
+func (s *Job) GetDepartment() OptNamedRef {
+	return s.Department
+}
+
+// GetPublishedAt returns the value of PublishedAt.
+func (s *Job) GetPublishedAt() OptString {
+	return s.PublishedAt
 }
 
 // GetZhineng returns the value of Zhineng.
@@ -323,8 +336,18 @@ func (s *Job) SetJobDescription(val OptString) {
 }
 
 // SetLocations sets the value of Locations.
-func (s *Job) SetLocations(val []Location) {
+func (s *Job) SetLocations(val OptNilLocationArray) {
 	s.Locations = val
+}
+
+// SetDepartment sets the value of Department.
+func (s *Job) SetDepartment(val OptNamedRef) {
+	s.Department = val
+}
+
+// SetPublishedAt sets the value of PublishedAt.
+func (s *Job) SetPublishedAt(val OptString) {
+	s.PublishedAt = val
 }
 
 // SetZhineng sets the value of Zhineng.
@@ -380,13 +403,13 @@ func (s *Job) SetOpenedAt(val OptString) {
 // A posting as the detail endpoint returns it: every `Job` field plus the ones the list omits.
 // Ref: #/components/schemas/JobDetail
 type JobDetail struct {
-	ID             string      `json:"id"`
-	Title          string      `json:"title"`
-	Status         OptString   `json:"status"`
-	JobDescription OptString   `json:"jobDescription"`
-	Locations      []Location  `json:"locations"`
-	Zhineng        OptNamedRef `json:"zhineng"`
-	OrgId          OptString   `json:"orgId"`
+	ID             string              `json:"id"`
+	Title          string              `json:"title"`
+	Status         OptString           `json:"status"`
+	JobDescription OptString           `json:"jobDescription"`
+	Locations      OptNilLocationArray `json:"locations"`
+	Zhineng        OptNamedRef         `json:"zhineng"`
+	OrgId          OptString           `json:"orgId"`
 	// Employment type, in the tenant's own language ("全职", "实习"). Not localized by `locale`.
 	Commitment OptString   `json:"commitment"`
 	Department OptNamedRef `json:"department"`
@@ -426,7 +449,7 @@ func (s *JobDetail) GetJobDescription() OptString {
 }
 
 // GetLocations returns the value of Locations.
-func (s *JobDetail) GetLocations() []Location {
+func (s *JobDetail) GetLocations() OptNilLocationArray {
 	return s.Locations
 }
 
@@ -526,7 +549,7 @@ func (s *JobDetail) SetJobDescription(val OptString) {
 }
 
 // SetLocations sets the value of Locations.
-func (s *JobDetail) SetLocations(val []Location) {
+func (s *JobDetail) SetLocations(val OptNilLocationArray) {
 	s.Locations = val
 }
 
@@ -1433,6 +1456,74 @@ func (o OptNamedRef) Get() (v NamedRef, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptNamedRef) Or(d NamedRef) NamedRef {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptNilLocationArray returns new OptNilLocationArray with value set to v.
+func NewOptNilLocationArray(v []Location) OptNilLocationArray {
+	return OptNilLocationArray{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptNilLocationArray is optional nullable []Location.
+type OptNilLocationArray struct {
+	Value []Location
+	Set   bool
+	Null  bool
+}
+
+// IsSet returns true if OptNilLocationArray was set.
+func (o OptNilLocationArray) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptNilLocationArray) Reset() {
+	var v []Location
+	o.Value = v
+	o.Set = false
+	o.Null = false
+}
+
+// SetTo sets value to v.
+func (o *OptNilLocationArray) SetTo(v []Location) {
+	o.Set = true
+	o.Null = false
+	o.Value = v
+}
+
+// IsNull returns true if value is Null.
+func (o OptNilLocationArray) IsNull() bool { return o.Null }
+
+// SetToNull sets value to null.
+func (o *OptNilLocationArray) SetToNull() {
+	o.Set = true
+	o.Null = true
+	var v []Location
+	o.Value = v
+}
+
+// IsEmpty returns true if the field was omitted from the payload (not Set and not Null).
+func (o OptNilLocationArray) IsEmpty() bool {
+	return !o.Set && !o.Null
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptNilLocationArray) Get() (v []Location, ok bool) {
+	if o.Null {
+		return v, false
+	}
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptNilLocationArray) Or(d []Location) []Location {
 	if v, ok := o.Get(); ok {
 		return v
 	}

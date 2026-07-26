@@ -1,6 +1,9 @@
 package mokahr
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -46,11 +49,12 @@ func TestListJobs(t *testing.T) {
 	assert.Equal(t, NewOptString("深度学习研究员"), zhineng.Name)
 
 	// locale defaults to en-US, so place names arrive romanized.
-	require.Len(t, first.Locations, 2)
-	assert.Equal(t, NewOptString("Gongshu"), first.Locations[0].CityName)
-	assert.Equal(t, NewOptString("Zhejiang"), first.Locations[0].ProvinceName)
-	assert.Equal(t, NewOptString("China"), first.Locations[0].Country)
-	assert.Equal(t, NewOptInt(31373), first.Locations[0].ID)
+	firstLocations := first.Locations.Or(nil)
+	require.Len(t, firstLocations, 2)
+	assert.Equal(t, NewOptString("Gongshu"), firstLocations[0].CityName)
+	assert.Equal(t, NewOptString("Zhejiang"), firstLocations[0].ProvinceName)
+	assert.Equal(t, NewOptString("China"), firstLocations[0].Country)
+	assert.Equal(t, NewOptInt(31373), firstLocations[0].ID)
 }
 
 func TestListJobsPaginates(t *testing.T) {
@@ -130,9 +134,10 @@ func TestGetJob(t *testing.T) {
 
 	// Detail locations carry countryDescription and omit provinceId, unlike
 	// the list endpoint's.
-	require.Len(t, job.Locations, 2)
-	assert.Equal(t, NewOptString("China"), job.Locations[0].CountryDescription)
-	assert.False(t, job.Locations[0].ProvinceId.IsSet())
+	jobLocations := job.Locations.Or(nil)
+	require.Len(t, jobLocations, 2)
+	assert.Equal(t, NewOptString("China"), jobLocations[0].CountryDescription)
+	assert.False(t, jobLocations[0].ProvinceId.IsSet())
 }
 
 func TestGetJobNotFound(t *testing.T) {
@@ -212,4 +217,46 @@ func TestURLs(t *testing.T) {
 	assert.Equal(t,
 		"https://app.mokahr.com/social-recruitment/high-flyer/140576#/job/"+MockJobID,
 		JobURL(MockOrgID, MockSiteID, MockJobID))
+}
+
+// TestListJobsOmittedLocations covers the tenants that keep workplaces off the
+// listing: the key is absent, not null, and has to decode to nothing rather
+// than fail.
+func TestListJobsOmittedLocations(t *testing.T) {
+	client := testClient(t)
+
+	list, err := client.ListJobs(t.Context(), ListJobsRequest{
+		OrgId:    MockNoLocationOrgID,
+		SiteId:   MockNoLocationSiteID,
+		Limit:    NewOptInt(5),
+		NeedStat: NewOptBool(true),
+	})
+	require.NoError(t, err)
+
+	require.NotEmpty(t, list.Jobs)
+	for _, j := range list.Jobs {
+		assert.NotEmpty(t, j.ID)
+		assert.NotEmpty(t, j.Title)
+		assert.Empty(t, j.Locations.Or(nil), "the listing carries no workplace")
+	}
+}
+
+// TestListJobsTolerantOfNullLocations pins why locations is modeled nullable.
+// MokaHR has only ever been seen omitting the key, but an explicit null is
+// what a plain array schema turns into a hard decode failure, and careers-URL
+// input reaches tenants no roster sampling has covered.
+func TestListJobsTolerantOfNullLocations(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(w, `{"code":0,"success":true,"msg":"成功","data":{"jobStats":{"orgId":"x","total":1},`+
+			`"jobs":[{"id":"a","title":"T","locations":null}]}}`)
+	}))
+	t.Cleanup(srv.Close)
+	client, err := NewJobsClient(srv.URL, nil)
+	require.NoError(t, err)
+
+	list, err := client.ListJobs(t.Context(), ListJobsRequest{OrgId: "x", SiteId: "1"})
+	require.NoError(t, err)
+	require.Len(t, list.Jobs, 1)
+	assert.Empty(t, list.Jobs[0].Locations.Or(nil))
 }

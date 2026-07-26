@@ -333,3 +333,46 @@ func TestMokaHRResolveSite(t *testing.T) {
 	require.Error(t, err)
 	assert.True(t, strings.Contains(err.Error(), "unknown company"))
 }
+
+// TestMokaHRSearchFiltersUpstream proves the structured filter reaches the
+// wire. The mock answers filtered requests with a different, smaller capture,
+// so dropping LocationIds from the request would change the result set rather
+// than pass silently.
+func TestMokaHRSearchFiltersUpstream(t *testing.T) {
+	a := testMokaHRAdapter(t)
+
+	unfiltered, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{})
+	require.NoError(t, err)
+	require.Equal(t, mokahr.MockTotal, unfiltered.TotalCount)
+
+	// "Ulanqab" is the facet city whose ids the filtered capture was taken for.
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"city": {"Ulanqab"}}})
+	require.NoError(t, err)
+	assert.Equal(t, 2, res.TotalCount, "the filter has to narrow the board upstream")
+	require.Len(t, res.Jobs, 2)
+	assert.Equal(t, "采购团队", res.Jobs[0].Title)
+
+	// A 职能 filter travels the same way.
+	byCategory, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"category": {"运维"}}})
+	require.NoError(t, err)
+	assert.Equal(t, 2, byCategory.TotalCount)
+}
+
+// TestMokaHRSearchWithoutUsableTotal covers a board whose listing reports
+// total 0 while still returning a full page. Trusting that total would end the
+// read after one page and answer from a fraction of the board.
+func TestMokaHRSearchWithoutUsableTotal(t *testing.T) {
+	a := testMokaHRAdapter(t)
+	slug := mokahr.MockOrgID + "/" + mokahr.MockZeroTotalSiteID
+
+	res, err := a.Search(t.Context(), slug, SearchParams{Query: "团队"})
+	require.NoError(t, err)
+	// Both captured pages match; stopping at the reported total would have
+	// found only the first.
+	assert.Equal(t, 2*mokahr.MockPageSize, res.TotalCount)
+	seen := make(map[string]bool, res.TotalCount)
+	for _, j := range res.Jobs {
+		assert.Falsef(t, seen[j.JobID], "job %s returned twice", j.JobID)
+		seen[j.JobID] = true
+	}
+}

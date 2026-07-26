@@ -21,6 +21,14 @@ const (
 	// aggregations come back empty.
 	MockNoLocationOrgID  = "vanke"
 	MockNoLocationSiteID = "36266"
+	// MockZeroTotalSiteID serves a capture taken without needStat, where the
+	// board reports total 0 alongside a full page of jobs. Nothing upstream
+	// addresses that shape by site id; the id is the mock's way of reaching a
+	// real response a caller cannot otherwise ask for.
+	MockZeroTotalSiteID = "140576-zero-total"
+	// MockFilteredLocationID narrows the captured board to two postings, so a
+	// request that drops LocationIds returns a visibly different set.
+	MockFilteredLocationID = 655446
 	// MockKeyword matches exactly one posting's title upstream.
 	MockKeyword = "运维"
 	// MockPageSize is how many jobs each captured page holds. The mock hands
@@ -62,6 +70,12 @@ var mockJobsNoLocationsRsp []byte
 //go:embed testdata/filter_aggregations_empty_rsp.json
 var mockFilterAggregationsEmptyRsp []byte
 
+//go:embed testdata/jobs_filtered_rsp.json
+var mockJobsFilteredRsp []byte
+
+//go:embed testdata/jobs_zero_total_rsp.json
+var mockJobsZeroTotalRsp []byte
+
 // NewMockServer returns an httptest.Server replaying the captured MokaHR
 // fixtures, so tests never hit the live API. The fixtures are stored exactly
 // as MokaHR sent them — still obfuscated — so a client talking to this server
@@ -77,8 +91,20 @@ func NewMockServer() *httptest.Server {
 		switch {
 		case req.OrgID == MockNoLocationOrgID && req.SiteID == MockNoLocationSiteID:
 			writeMockJSON(w, mockJobsNoLocationsRsp)
+		case req.OrgID == MockOrgID && req.SiteID == MockZeroTotalSiteID && req.Offset == 0:
+			writeMockJSON(w, mockJobsZeroTotalRsp)
+		case req.OrgID == MockOrgID && req.SiteID == MockZeroTotalSiteID:
+			// Later offsets reuse the ordinary captures, so a caller that
+			// keeps reading past the useless total finds a real second page.
+			if req.Offset >= 2*MockPageSize {
+				writeMockJSON(w, mockJobsEndRsp)
+			} else {
+				writeMockJSON(w, mockJobsPage2Rsp)
+			}
 		case req.OrgID != MockOrgID || req.SiteID != MockSiteID:
 			writeMockJSON(w, mockJobsUnknownSiteRsp)
+		case len(req.LocationIDs) > 0 || len(req.ZhinengIDs) > 0:
+			writeMockJSON(w, mockJobsFilteredRsp)
 		case req.Keyword != "":
 			writeMockJSON(w, mockJobsKeywordRsp)
 		case req.Offset >= 2*MockPageSize:
@@ -116,11 +142,13 @@ func NewMockServer() *httptest.Server {
 
 // mockRequest is the union of the request fields the mock routes on.
 type mockRequest struct {
-	OrgID   string `json:"orgId"`
-	SiteID  string `json:"siteId"`
-	JobID   string `json:"jobId"`
-	Keyword string `json:"keyword"`
-	Offset  int    `json:"offset"`
+	OrgID       string `json:"orgId"`
+	SiteID      string `json:"siteId"`
+	JobID       string `json:"jobId"`
+	Keyword     string `json:"keyword"`
+	Offset      int    `json:"offset"`
+	LocationIDs []int  `json:"locationIds"`
+	ZhinengIDs  []int  `json:"zhinengIds"`
 }
 
 func decodeMockRequest(r *http.Request) mockRequest {

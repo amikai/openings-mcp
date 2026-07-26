@@ -208,7 +208,7 @@ func summarize(j mokahr.Job, org, site string) jobSummaryJSON {
 	s := jobSummaryJSON{
 		ID:       j.ID,
 		Title:    j.Title,
-		Location: locations(j.Locations),
+		Location: locations(j.Locations.Or(nil)),
 		OpenedAt: j.OpenedAt.Or(""),
 		URL:      mokahr.JobURL(org, site, j.ID),
 	}
@@ -373,7 +373,7 @@ func printDetail(d *mokahr.JobDetail, c mokahr.Company, format string) error {
 	if commitment := d.Commitment.Or(""); commitment != "" {
 		fmt.Printf("Commitment: %s\n", commitment)
 	}
-	if loc := locations(d.Locations); loc != "" {
+	if loc := locations(d.Locations.Or(nil)); loc != "" {
 		fmt.Printf("Location: %s\n", loc)
 	}
 	if opened := d.OpenedAt.Or(""); opened != "" {

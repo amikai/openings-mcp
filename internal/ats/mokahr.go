@@ -210,7 +210,7 @@ func (a *MokaHRAdapter) searchMokaHRDump(
 	for _, page := range pages {
 		for _, j := range page {
 			jobs = append(jobs, mokaHRDumpJob(site, facets, j))
-			located = located || len(j.Locations) > 0
+			located = located || len(j.Locations.Or(nil)) > 0
 		}
 	}
 	// Some tenants keep workplaces off the list endpoint entirely. Matching a
@@ -241,18 +241,28 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 	if err != nil {
 		return nil, mokaHRError(site, err)
 	}
-	total := first.JobStats.Value.Total.Or(len(first.Jobs))
-	if total > maxMokaHRCandidates {
-		return nil, fmt.Errorf(
-			"mokahr: %q has %d postings, too many to text-search at once; narrow it first with a city or category filter",
-			site.name, total)
+	total, hasTotal := first.JobStats.Value.Total.Get()
+	if hasTotal && total > maxMokaHRCandidates {
+		return nil, mokaHRTooBroad(site, total)
 	}
-	pages := make([][]mokahr.Job, mokaHRPageCount(total, pageSize))
-	pages[0] = first.Jobs
 	// MokaHR answers with min(limit, remaining), so a short page is the last
 	// one. Trusting that keeps every later offset a clean multiple of the
 	// page size, with no gap to fall through if the total disagrees.
-	if len(pages) == 1 || len(first.Jobs) < pageSize {
+	if len(first.Jobs) < pageSize {
+		return [][]mokahr.Job{first.Jobs}, nil
+	}
+	// A full page with no usable total says nothing about how much follows.
+	// The schema makes the total optional, and dropping needStat degrades it
+	// to 0 rather than omitting it, so both shapes have to mean "unknown" —
+	// treating either as the board size would stop the read after one page
+	// and silently answer from a fraction of the board.
+	if !hasTotal || total <= 0 {
+		return a.walkMokaHRBoard(ctx, site, req, pageSize, first.Jobs)
+	}
+
+	pages := make([][]mokahr.Job, mokaHRPageCount(total, pageSize))
+	pages[0] = first.Jobs
+	if len(pages) == 1 {
 		return pages[:1], nil
 	}
 
@@ -324,11 +334,50 @@ func (a *MokaHRAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 		JobID:       jobID,
 		Title:       d.Title,
 		Company:     site.name,
-		Location:    mokaHRLocationDisplay(facets, d.Locations),
+		Location:    mokaHRLocationDisplay(facets, d.Locations.Or(nil)),
 		PostedAt:    mokaHRPostedAt(d.OpenedAt.Or(d.PublishedAt.Or(d.CreatedAt.Or("")))),
 		URL:         mokahr.JobURL(site.org, site.site, jobID),
 		Description: mokaHRDescription(d.JobDescription.Or("")),
 	}, nil
+}
+
+// walkMokaHRBoard reads the rest of a board one page at a time, for the case
+// where upstream withheld the total. It cannot fan out — without a total
+// there is no way to know which offsets exist — so it trades the concurrent
+// path's speed for not silently stopping early.
+func (a *MokaHRAdapter) walkMokaHRBoard(
+	ctx context.Context,
+	site mokaHRSite,
+	req mokahr.ListJobsRequest,
+	pageSize int,
+	firstPage []mokahr.Job,
+) ([][]mokahr.Job, error) {
+	pages := [][]mokahr.Job{firstPage}
+	read := len(firstPage)
+	for offset := pageSize; ; offset += pageSize {
+		if read > maxMokaHRCandidates {
+			return nil, mokaHRTooBroad(site, read)
+		}
+		req.Offset = mokahr.NewOptInt(offset)
+		list, err := a.client.ListJobs(ctx, req)
+		if err != nil {
+			return nil, mokaHRError(site, err)
+		}
+		if len(list.Jobs) == 0 {
+			return pages, nil
+		}
+		pages = append(pages, list.Jobs)
+		read += len(list.Jobs)
+		if len(list.Jobs) < pageSize {
+			return pages, nil
+		}
+	}
+}
+
+func mokaHRTooBroad(site mokaHRSite, postings int) error {
+	return fmt.Errorf(
+		"mokahr: %q has %d postings, too many to text-search at once; narrow it first with a city or category filter",
+		site.name, postings)
 }
 
 // mokaHRPageCount is how many upstream pages a board of total postings
@@ -495,7 +544,7 @@ func mokaHRSummary(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) JobSumma
 	return JobSummary{
 		JobID:    j.ID,
 		Title:    j.Title,
-		Location: mokaHRLocationDisplay(facets, j.Locations),
+		Location: mokaHRLocationDisplay(facets, j.Locations.Or(nil)),
 		PostedAt: mokaHRPostedAt(j.OpenedAt.Or(j.CreatedAt.Or(""))),
 		URL:      mokahr.JobURL(site.org, site.site, j.ID),
 	}
@@ -504,7 +553,7 @@ func mokaHRSummary(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) JobSumma
 func mokaHRDumpJob(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) dumpJob {
 	summary := mokaHRSummary(site, facets, j)
 	fields := map[string][]string{}
-	if cities := mokaHRCities(facets, j.Locations); len(cities) > 0 {
+	if cities := mokaHRCities(facets, j.Locations.Or(nil)); len(cities) > 0 {
 		fields["city"] = cities
 	}
 	category := ""
@@ -520,7 +569,7 @@ func mokaHRDumpJob(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) dumpJob 
 		sortKey:     posted,
 		orgUnit:     category,
 		description: mokaHRDescription(j.JobDescription.Or("")),
-		locations:   mokaHRLocationSearch(facets, j.Locations),
+		locations:   mokaHRLocationSearch(facets, j.Locations.Or(nil)),
 		fields:      fields,
 	}
 }

@@ -71,13 +71,22 @@ info:
       facet, which is keyed by the same `Location.id` and does honor
       `locale`, over the fields on the posting.
 
-    * A posting's workplaces are not always on the posting. `listJobs`
-      returns `"locations": null` for some tenants even though `getJob`
-      reports a real workplace for those same postings, and the same
-      tenants tend to return an empty `systemFieldsAggregations`. Filtering
-      by `locationIds` still works on such a board — verified against `ey`,
-      where an unfiltered 340 postings narrow to 102 for Shanghai's ids —
-      so the ids are the reliable way to reach a place, not the payload.
+    * A posting's workplaces are not always on the posting. For some
+      tenants `listJobs` omits the `locations` key entirely — the field is
+      absent, not null — even though `getJob` reports a real workplace for
+      those same postings, and the same tenants tend to return an empty
+      `systemFieldsAggregations`. Filtering by `locationIds` still works on
+      such a board — verified against `ey`, where an unfiltered 340
+      postings narrow to 102 for Shanghai's ids — so the ids are the
+      reliable way to reach a place, not the payload. `locations` is
+      modeled as nullable anyway: an explicit null is not something this
+      API has been observed to send, but it would otherwise fail to decode
+      rather than degrade.
+
+    * The set of fields on a listed posting varies by tenant. A board that
+      omits `locations` may carry `department` and `publishedAt`, which
+      other tenants only return from `getJob`, alongside recruiter-side
+      fields this document does not model.
     * Timestamps are local wall-clock strings with no zone or offset
       ("2026-06-25T14:23:06", and "2026-06-25T00:00" for `openedAt`), so
       they are modeled as plain strings rather than `format: date-time`.
@@ -326,12 +335,18 @@ components:
           type: string
           description: Full description as HTML.
         locations:
-          type: array
+          type: [array, "null"]
           description: >
-            Null on tenants that keep workplaces off the list endpoint; see
-            the document description. `getJob` still reports them.
+            Absent entirely on tenants that keep workplaces off the list
+            endpoint; see the document description. `getJob` still reports
+            them.
           items:
             $ref: "#/components/schemas/Location"
+        department:
+          $ref: "#/components/schemas/NamedRef"
+        publishedAt:
+          type: string
+          description: Returned by some tenants here as well as by `getJob`.
         zhineng:
           $ref: "#/components/schemas/NamedRef"
         orgId:
@@ -381,7 +396,7 @@ components:
         jobDescription:
           type: string
         locations:
-          type: array
+          type: [array, "null"]
           items:
             $ref: "#/components/schemas/Location"
         zhineng:

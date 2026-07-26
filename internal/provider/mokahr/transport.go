@@ -48,7 +48,7 @@ func (t Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	body, err := io.ReadAll(rsp.Body)
 	rsp.Body.Close()
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: read response body: %w", err)
+		return nil, fmt.Errorf("read response body: %w", err)
 	}
 	plain, err := deobfuscate(body)
 	if err != nil {
@@ -69,7 +69,7 @@ func deobfuscate(body []byte) ([]byte, error) {
 	}
 	ciphertext, err := base64.StdEncoding.DecodeString(env.Data)
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: decode response payload: %w", err)
+		return nil, fmt.Errorf("decode response payload: %w", err)
 	}
 	plain, err := decryptCBC(ciphertext, []byte(env.Necromancer), []byte(aesIV))
 	if err != nil {
@@ -82,13 +82,13 @@ func deobfuscate(body []byte) ([]byte, error) {
 func decryptCBC(ciphertext, key, iv []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, fmt.Errorf("mokahr: response key is not a valid AES key: %w", err)
+		return nil, fmt.Errorf("response key is not a valid AES key: %w", err)
 	}
 	if len(iv) != block.BlockSize() {
-		return nil, fmt.Errorf("mokahr: response IV %q is %d bytes, want %d", iv, len(iv), block.BlockSize())
+		return nil, fmt.Errorf("response IV %q is %d bytes, want %d", iv, len(iv), block.BlockSize())
 	}
 	if len(ciphertext) == 0 || len(ciphertext)%block.BlockSize() != 0 {
-		return nil, fmt.Errorf("mokahr: response payload is %d bytes, not a whole number of %d-byte blocks",
+		return nil, fmt.Errorf("response payload is %d bytes, not a whole number of %d-byte blocks",
 			len(ciphertext), block.BlockSize())
 	}
 	plain := make([]byte, len(ciphertext))
@@ -99,11 +99,11 @@ func decryptCBC(ciphertext, key, iv []byte) ([]byte, error) {
 func unpadPKCS7(b []byte, blockSize int) ([]byte, error) {
 	pad := int(b[len(b)-1])
 	if pad == 0 || pad > blockSize || pad > len(b) {
-		return nil, fmt.Errorf("mokahr: response padding byte is %d, outside 1..%d", pad, min(blockSize, len(b)))
+		return nil, fmt.Errorf("response padding byte is %d, outside 1..%d", pad, min(blockSize, len(b)))
 	}
 	for _, c := range b[len(b)-pad:] {
 		if int(c) != pad {
-			return nil, fmt.Errorf("mokahr: response padding is inconsistent; wrong key or IV %q", aesIV)
+			return nil, fmt.Errorf("response padding is inconsistent; wrong key or IV %q", aesIV)
 		}
 	}
 	return b[:len(b)-pad], nil
