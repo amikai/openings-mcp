@@ -271,6 +271,12 @@ New:
   the query tiers — one whose `jobRoles[].name` contains a term absent from
   its title, and one where the same term appears only in the JD body.
 
+  `company_outside_founder_rsp.json` — a tenant with a director whose only
+  `isFounder` history has `isInside: false`. Without one, a founder-badge
+  test passes under both the correct and the naive predicate and guards
+  nothing; this shape turned out to be rare (absent from 120 sampled
+  companies), so it needs its own capture.
+
   `company_media_optout_rsp.json` — a tenant with
   `companyIsApplicationEnabled: false` and open postings, so the URL-surface
   rule and the 応募受付 status can be pinned against a real capture rather

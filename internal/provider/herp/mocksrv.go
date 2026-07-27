@@ -25,6 +25,12 @@ const MockSparseSlug = "resmahr"
 // Hire career pages still accept applications.
 const MockMediaOptOutSlug = "unifa"
 
+// MockOutsideFounderSlug is the company captured in
+// testdata/company_outside_founder_rsp.json. One of its directors carries
+// isFounder for a previous company with isInside false, which is the shape
+// that makes a naive founder check misattribute the founding.
+const MockOutsideFounderSlug = "kaminashi"
+
 // MockUnknownSlug is a slug the mock server 404s, replaying the upstream's
 // message-less error body.
 const MockUnknownSlug = "this-company-does-not-exist-xyz"
@@ -37,6 +43,9 @@ var mockCompanySparseRsp []byte
 
 //go:embed testdata/company_media_optout_rsp.json
 var mockCompanyMediaOptOutRsp []byte
+
+//go:embed testdata/company_outside_founder_rsp.json
+var mockCompanyOutsideFounderRsp []byte
 
 //go:embed testdata/company_not_found_rsp.json
 var mockCompanyNotFoundRsp []byte
@@ -51,6 +60,7 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/careers/api/v1/companies/"+MockSlug, serveMockJSON(http.StatusOK, mockCompanyRsp))
 	mux.HandleFunc("/careers/api/v1/companies/"+MockSparseSlug, serveMockJSON(http.StatusOK, mockCompanySparseRsp))
 	mux.HandleFunc("/careers/api/v1/companies/"+MockMediaOptOutSlug, serveMockJSON(http.StatusOK, mockCompanyMediaOptOutRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockOutsideFounderSlug, serveMockJSON(http.StatusOK, mockCompanyOutsideFounderRsp))
 	mux.HandleFunc("/careers/api/v1/jobs", serveMockJSON(http.StatusOK, mockJobsRsp))
 	mux.HandleFunc("/careers/api/v1/companies/", serveMockJSON(http.StatusNotFound, mockCompanyNotFoundRsp))
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {

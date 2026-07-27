@@ -262,12 +262,23 @@ func TestHerpMediaOptOutLinksToApplicableSurface(t *testing.T) {
 
 func TestHerpFounderBadgeIsScopedToThisCompany(t *testing.T) {
 	a := testHerpAdapter(t)
+
+	// The inside founder keeps the badge.
 	d, err := a.Detail(t.Context(), herp.MockSlug, herpFullRemoteJobID)
 	require.NoError(t, err)
-
-	// isFounder rides on one history entry, which often names a previous
-	// company; only an entry with isInside refers to this one.
 	assert.Contains(t, d.Description, "経営陣: 永田 周一（創業者）")
+
+	// The regression this guards: isFounder rides on one history entry, which
+	// often names a previous company. On this board 原 康紘 founded TRIDENT
+	// (isInside false) and 諸岡 裕人 founded this company (isInside true), so
+	// a check on isFounder alone would badge both.
+	res, err := a.Search(t.Context(), herp.MockOutsideFounderSlug, SearchParams{})
+	require.NoError(t, err)
+	require.NotEmpty(t, res.Jobs)
+	d, err = a.Detail(t.Context(), herp.MockOutsideFounderSlug, res.Jobs[0].JobID)
+	require.NoError(t, err)
+	assert.Contains(t, d.Description, "経営陣: 原 康紘, 諸岡 裕人（創業者）, 河内 佑介")
+	assert.NotContains(t, d.Description, "原 康紘（創業者）")
 }
 
 func TestHerpFreeTextLocationStaysSearchable(t *testing.T) {

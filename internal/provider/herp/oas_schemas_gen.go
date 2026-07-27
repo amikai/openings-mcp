@@ -44,7 +44,11 @@ type CompanyBoard struct {
 	// How it goes to market, one bullet per entry.
 	CompanyHow              []string     `json:"companyHow"`
 	CompanyPrivacyPolicyUrl OptNilString `json:"companyPrivacyPolicyUrl"`
-	// Whether the company accepts applications through HERP at all.
+	// Whether the HERP Career media pages take applications for this company. It does not say whether the
+	// company is hiring: a company with this false still has a working HERP Hire career page, so its
+	// `/careers/companies/{slug}/jobs/{id}` page renders without an apply action while `/v1/{slug}/{id}`
+	// accepts applications normally. Whether an individual posting is open is `Job.isApplicable`, which is
+	// independent of this — `unifa` has this false with every posting applicable.
 	CompanyIsApplicationEnabled OptNilBool `json:"companyIsApplicationEnabled"`
 	// Number of employee testimonials; null on most companies.
 	CompanyMembersVoiceCount OptNilInt `json:"companyMembersVoiceCount"`
@@ -668,7 +672,9 @@ type Job struct {
 	JobPublishedAt string `json:"jobPublishedAt"`
 	// RFC 3339 timestamp of the last edit.
 	UpdatedAt string `json:"updatedAt"`
-	// Whether this posting still accepts applications. `getCompany` only.
+	// Whether this posting is still open. This is the posting's own state and is independent of
+	// `companyIsApplicationEnabled`, which only picks which surface takes the application. `getCompany`
+	// only.
 	IsApplicable OptNilBool `json:"isApplicable"`
 	// Observed as the constant "herp-hire" on every posting.
 	Source        OptNilString `json:"source"`

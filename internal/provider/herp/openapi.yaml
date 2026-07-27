@@ -267,7 +267,15 @@ components:
         companyIsApplicationEnabled:
           type: boolean
           nullable: true
-          description: Whether the company accepts applications through HERP at all.
+          description: >
+            Whether the HERP Career **media** pages take applications for this
+            company. It does not say whether the company is hiring: a company
+            with this false still has a working HERP Hire career page, so its
+            `/careers/companies/{slug}/jobs/{id}` page renders without an apply
+            action while `/v1/{slug}/{id}` accepts applications normally.
+            Whether an individual posting is open is `Job.isApplicable`, which
+            is independent of this — `unifa` has this false with every posting
+            applicable.
         companyMembersVoiceCount:
           type: integer
           nullable: true
@@ -405,7 +413,9 @@ components:
           type: boolean
           nullable: true
           description: >
-            Whether this posting still accepts applications. `getCompany` only.
+            Whether this posting is still open. This is the posting's own
+            state and is independent of `companyIsApplicationEnabled`, which
+            only picks which surface takes the application. `getCompany` only.
         source:
           type: string
           nullable: true
