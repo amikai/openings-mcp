@@ -914,11 +914,12 @@ func (s *Job) SetCoverImageUrl(val OptNilString) {
 type JobJobEmploymentTypeIdsItem string
 
 const (
-	JobJobEmploymentTypeIdsItemFULLTIME   JobJobEmploymentTypeIdsItem = "FULL_TIME"
-	JobJobEmploymentTypeIdsItemCONTRACT   JobJobEmploymentTypeIdsItem = "CONTRACT"
-	JobJobEmploymentTypeIdsItemFREELANCE  JobJobEmploymentTypeIdsItem = "FREELANCE"
-	JobJobEmploymentTypeIdsItemINTERNSHIP JobJobEmploymentTypeIdsItem = "INTERNSHIP"
-	JobJobEmploymentTypeIdsItemPARTTIME   JobJobEmploymentTypeIdsItem = "PART_TIME"
+	JobJobEmploymentTypeIdsItemFULLTIME       JobJobEmploymentTypeIdsItem = "FULL_TIME"
+	JobJobEmploymentTypeIdsItemCONTRACT       JobJobEmploymentTypeIdsItem = "CONTRACT"
+	JobJobEmploymentTypeIdsItemFREELANCE      JobJobEmploymentTypeIdsItem = "FREELANCE"
+	JobJobEmploymentTypeIdsItemINTERNSHIP     JobJobEmploymentTypeIdsItem = "INTERNSHIP"
+	JobJobEmploymentTypeIdsItemPARTTIME       JobJobEmploymentTypeIdsItem = "PART_TIME"
+	JobJobEmploymentTypeIdsItemTEMPORARYSTAFF JobJobEmploymentTypeIdsItem = "TEMPORARY_STAFF"
 )
 
 // AllValues returns all JobJobEmploymentTypeIdsItem values.
@@ -929,6 +930,7 @@ func (JobJobEmploymentTypeIdsItem) AllValues() []JobJobEmploymentTypeIdsItem {
 		JobJobEmploymentTypeIdsItemFREELANCE,
 		JobJobEmploymentTypeIdsItemINTERNSHIP,
 		JobJobEmploymentTypeIdsItemPARTTIME,
+		JobJobEmploymentTypeIdsItemTEMPORARYSTAFF,
 	}
 }
 
@@ -944,6 +946,8 @@ func (s JobJobEmploymentTypeIdsItem) MarshalText() ([]byte, error) {
 	case JobJobEmploymentTypeIdsItemINTERNSHIP:
 		return []byte(s), nil
 	case JobJobEmploymentTypeIdsItemPARTTIME:
+		return []byte(s), nil
+	case JobJobEmploymentTypeIdsItemTEMPORARYSTAFF:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -967,6 +971,9 @@ func (s *JobJobEmploymentTypeIdsItem) UnmarshalText(data []byte) error {
 		return nil
 	case JobJobEmploymentTypeIdsItemPARTTIME:
 		*s = JobJobEmploymentTypeIdsItemPARTTIME
+		return nil
+	case JobJobEmploymentTypeIdsItemTEMPORARYSTAFF:
+		*s = JobJobEmploymentTypeIdsItemTEMPORARYSTAFF
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -1848,6 +1855,7 @@ const (
 	SalaryPeriodANNUAL  SalaryPeriod = "ANNUAL"
 	SalaryPeriodMONTHLY SalaryPeriod = "MONTHLY"
 	SalaryPeriodHOURLY  SalaryPeriod = "HOURLY"
+	SalaryPeriodDAILY   SalaryPeriod = "DAILY"
 )
 
 // AllValues returns all SalaryPeriod values.
@@ -1856,6 +1864,7 @@ func (SalaryPeriod) AllValues() []SalaryPeriod {
 		SalaryPeriodANNUAL,
 		SalaryPeriodMONTHLY,
 		SalaryPeriodHOURLY,
+		SalaryPeriodDAILY,
 	}
 }
 
@@ -1867,6 +1876,8 @@ func (s SalaryPeriod) MarshalText() ([]byte, error) {
 	case SalaryPeriodMONTHLY:
 		return []byte(s), nil
 	case SalaryPeriodHOURLY:
+		return []byte(s), nil
+	case SalaryPeriodDAILY:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -1884,6 +1895,9 @@ func (s *SalaryPeriod) UnmarshalText(data []byte) error {
 		return nil
 	case SalaryPeriodHOURLY:
 		*s = SalaryPeriodHOURLY
+		return nil
+	case SalaryPeriodDAILY:
+		*s = SalaryPeriodDAILY
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)

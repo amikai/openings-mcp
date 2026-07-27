@@ -395,7 +395,7 @@ components:
           type: array
           items:
             type: string
-            enum: [FULL_TIME, CONTRACT, FREELANCE, INTERNSHIP, PART_TIME]
+            enum: [FULL_TIME, CONTRACT, FREELANCE, INTERNSHIP, PART_TIME, TEMPORARY_STAFF]
         jobRemoteworkType:
           type: string
           nullable: true
@@ -447,7 +447,7 @@ components:
         period:
           type: string
           nullable: true
-          enum: [ANNUAL, MONTHLY, HOURLY]
+          enum: [ANNUAL, MONTHLY, HOURLY, DAILY]
 
     JobRole:
       type: object
