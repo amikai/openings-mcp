@@ -21,6 +21,7 @@ const (
 	herpNoRemoteJobID   = "MGp32NANKleO" // no jobRemoteworkType at all
 	herpBodyOnlyJobID   = "WZPIQQCxEKFO" // mentions コンサルティング only in its body
 	herpSparseJobID     = "zCbE82jVP-8s" // company_sparse_rsp.json: no location of any kind
+	herpOptOutJobID     = "FfCSxynEKKev" // company_media_optout_rsp.json: open, but no media apply action
 )
 
 func testHerpAdapter(t *testing.T) *HerpAdapter {
@@ -235,6 +236,54 @@ func TestHerpDetail(t *testing.T) {
 	assert.Contains(t, d.Description, "応募受付\n受付中\n\n企業情報\n")
 	assert.Contains(t, d.Description, "累計調達額: 33.3億円")
 	assert.Contains(t, d.Description, "従業員数: 245名")
+}
+
+func TestHerpMediaOptOutLinksToApplicableSurface(t *testing.T) {
+	a := testHerpAdapter(t)
+
+	// companyIsApplicationEnabled governs the media pages only. When it is
+	// false the media page has no apply action, so the applicant handoff has
+	// to point at the HERP Hire career page instead of a dead end.
+	res, err := a.Search(t.Context(), herp.MockMediaOptOutSlug, SearchParams{})
+	require.NoError(t, err)
+	require.NotEmpty(t, res.Jobs)
+	for _, j := range res.Jobs {
+		assert.Contains(t, j.URL, "/v1/"+herp.MockMediaOptOutSlug+"/"+j.JobID)
+	}
+
+	d, err := a.Detail(t.Context(), herp.MockMediaOptOutSlug, herpOptOutJobID)
+	require.NoError(t, err)
+	assert.Contains(t, d.URL, "/v1/"+herp.MockMediaOptOutSlug+"/"+herpOptOutJobID)
+
+	// The company opting out of media applications says nothing about whether
+	// this posting is open; isApplicable does.
+	assert.Contains(t, d.Description, "応募受付\n受付中")
+}
+
+func TestHerpFounderBadgeIsScopedToThisCompany(t *testing.T) {
+	a := testHerpAdapter(t)
+	d, err := a.Detail(t.Context(), herp.MockSlug, herpFullRemoteJobID)
+	require.NoError(t, err)
+
+	// isFounder rides on one history entry, which often names a previous
+	// company; only an entry with isInside refers to this one.
+	assert.Contains(t, d.Description, "経営陣: 永田 周一（創業者）")
+}
+
+func TestHerpFreeTextLocationStaysSearchable(t *testing.T) {
+	a := testHerpAdapter(t)
+
+	// The structured entry for 京都府 carries a null city, so 上京区 exists
+	// only in the free-text location. Losing it would make a perfectly
+	// reasonable city search return nothing.
+	ids := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: "上京区"})
+	assert.Contains(t, ids, herpFullRemoteJobID)
+
+	// The concise structured form is still what gets displayed.
+	res, err := a.Search(t.Context(), herp.MockSlug, SearchParams{Location: "上京区"})
+	require.NoError(t, err)
+	require.NotEmpty(t, res.Jobs)
+	assert.NotContains(t, res.Jobs[0].Location, "上京区")
 }
 
 func TestHerpDetailNotFound(t *testing.T) {

@@ -29,6 +29,12 @@ func (UnimplementedHandler) GetCompany(ctx context.Context, params GetCompanyPar
 // however many that company actually has, so this cannot stand in for a cross-company job search —
 // use it to discover slugs, then fetch each board through `getCompany`.
 //
+// Paging stops at an offset of 1000 companies whatever `limit` is (`limit=100&page=11`,
+// `limit=20&page=51`, and `limit=10&page=101` all fall off the same edge). Past it the endpoint does
+// not error: it answers 200 with `totalPages: 0` and a degenerate body that repeats the first
+// companies again, so callers must treat `totalPages: 0` as the end. Roster discovery therefore
+// reaches only the first 1000 of the 2,198 companies `total` reports.
+//
 // The filter-looking query parameters the web UI puts in its own URLs (`employment-type-id`,
 // `parent-job-role-ids`, `remote-work-type-ids`) are no-ops on this endpoint: the response is
 // byte-identical with and without them. They are omitted here rather than modeled as parameters that

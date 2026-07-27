@@ -158,7 +158,10 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
-func summarize(slug string, j *herp.Job) jobSummaryJSON {
+// summarize takes the board rather than the caller's --company string: the
+// slug the caller typed may differ in case, and herp.careers 404s on a
+// mixed-case path, so every rendered URL uses board.CompanySlug.
+func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 	roles := make([]string, 0, len(j.JobRoles))
 	for _, r := range j.JobRoles {
 		roles = append(roles, r.Name)
@@ -178,12 +181,18 @@ func summarize(slug string, j *herp.Job) jobSummaryJSON {
 		Location:    strings.Join(strings.Fields(j.Location), " "),
 		Salary:      salary,
 		PublishedAt: published,
-		URL:         jobURL(slug, j.ID),
+		URL:         jobURL(board, j.ID),
 	}
 }
 
-func jobURL(slug, id string) string {
-	return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", baseURL, slug, id)
+// jobURL mirrors the ATS adapter: a company that opted out of HERP Career
+// applications renders a media page with no apply action, so its postings are
+// linked to the HERP Hire career page instead.
+func jobURL(board *herp.CompanyBoard, id string) string {
+	if board.CompanyIsApplicationEnabled.Or(true) {
+		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", baseURL, board.CompanySlug, id)
+	}
+	return fmt.Sprintf("%s/v1/%s/%s", baseURL, board.CompanySlug, id)
 }
 
 // searchFlags carries the parsed "search" subcommand flags into runSearch.
@@ -205,7 +214,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		if f.keyword != "" && !strings.Contains(strings.ToLower(j.Name), strings.ToLower(f.keyword)) {
 			continue
 		}
-		matched = append(matched, summarize(f.company, &j))
+		matched = append(matched, summarize(board, &j))
 	}
 
 	if f.format == "json" {
@@ -214,7 +223,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		return enc.Encode(searchResultJSON{Total: len(board.Jobs), Jobs: matched})
 	}
 
-	fmt.Printf("HERP Career Jobs Report for %s (%s)\n", board.CompanyName, f.company)
+	fmt.Printf("HERP Career Jobs Report for %s (%s)\n", board.CompanyName, board.CompanySlug)
 	fmt.Printf("Found %d jobs; showing %d\n\n", len(board.Jobs), len(matched))
 	for i, s := range matched {
 		fmt.Printf("%d. %s\n", i+1, s.Title)
@@ -252,20 +261,20 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 	for _, j := range board.Jobs {
 		if j.ID == f.jobID {
-			return printJob(f.company, board, &j, f.format)
+			return printJob(board, &j, f.format)
 		}
 	}
 	return fmt.Errorf("job %q not found on company %q", f.jobID, f.company)
 }
 
-func printJob(slug string, board *herp.CompanyBoard, j *herp.Job, format string) error {
+func printJob(board *herp.CompanyBoard, j *herp.Job, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(j)
 	}
 
-	s := summarize(slug, j)
+	s := summarize(board, j)
 	fmt.Println(s.Title)
 	if j.Title != "" {
 		fmt.Println(j.Title)

@@ -146,17 +146,30 @@ func (a *HerpAdapter) dump(ctx context.Context, slug string) ([]dumpJob, *herp.C
 				Title:    j.Name,
 				Location: loc.display,
 				PostedAt: postedDate,
-				URL:      fmt.Sprintf("%s/careers/companies/%s/jobs/%s", a.baseURL, slug, j.ID),
+				URL:      a.jobURL(board, slug, j.ID),
 			},
 			sortKey:     posted,
 			orgUnit:     herpOrgUnit(&j),
-			description: herpDescription(board, &j),
+			description: herpDescription(&j),
 			locations:   loc.search,
 			fields:      herpFields(&j, loc),
 			isRemote:    loc.isRemote,
 		})
 	}
 	return jobs, board, nil
+}
+
+// jobURL picks the surface that can actually take an application, because
+// JobSummary.URL is where the applicant is handed off.
+// companyIsApplicationEnabled governs the HERP Career media pages only: when
+// a company opts out there, its media page renders without an apply action
+// while its HERP Hire career page still accepts applications. Sending the
+// applicant to the media page in that case is a dead end.
+func (a *HerpAdapter) jobURL(board *herp.CompanyBoard, slug, jobID string) string {
+	if board.CompanyIsApplicationEnabled.Or(true) {
+		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", a.baseURL, slug, jobID)
+	}
+	return fmt.Sprintf("%s/v1/%s/%s", a.baseURL, slug, jobID)
 }
 
 // herpLocationText is one posting's location rendered three ways: what to
@@ -202,10 +215,15 @@ func herpLocation(j *herp.Job) herpLocationText {
 		parts = appendDistinct(parts, strings.TrimSpace(firstLine))
 	}
 
-	aliases := make([]string, 0, len(out.prefectures)+1)
+	aliases := make([]string, 0, len(out.prefectures)+2)
 	for _, l := range j.JobLocations {
 		aliases = appendDistinct(aliases, herpPrefectureRomaji[l.PrefCode])
 	}
+	// The structured entries drive the concise display, but they routinely
+	// drop detail the company did write out: a posting can name 京都市上京区
+	// in the free text while its Kyoto entry carries a null city. Index the
+	// whole upstream string so cities, stations, and addresses stay findable.
+	aliases = appendDistinct(aliases, strings.Join(strings.Fields(j.Location), " "))
 
 	if label, ok := herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
 		out.isRemote = true
@@ -267,7 +285,7 @@ func herpOrgUnit(j *herp.Job) string {
 // herpDescription renders the posting the way the site lays it out. The
 // unified JobDetail has one free-text field, so everything HERP Career
 // publishes about the job goes here rather than being dropped.
-func herpDescription(board *herp.CompanyBoard, j *herp.Job) string {
+func herpDescription(j *herp.Job) string {
 	var b strings.Builder
 	writeHerpSection(&b, "求人タイトル", j.Title)
 	writeHerpSection(&b, "仕事概要", j.Summary)
@@ -284,16 +302,20 @@ func herpDescription(board *herp.CompanyBoard, j *herp.Job) string {
 	if _, updated := herpParseTime(j.UpdatedAt); updated != "" {
 		writeHerpSection(&b, "最終更新", updated)
 	}
-	writeHerpSection(&b, "応募受付", herpApplicationStatus(board, j))
+	writeHerpSection(&b, "応募受付", herpApplicationStatus(j))
 	return b.String()
 }
 
-func herpApplicationStatus(board *herp.CompanyBoard, j *herp.Job) string {
+// herpApplicationStatus reports whether this posting is still open, which is
+// isApplicable alone. companyIsApplicationEnabled is a different fact — it
+// says which surface takes applications, not whether the opening is live —
+// and folding it in here marked active roles as closed (see jobURL).
+func herpApplicationStatus(j *herp.Job) string {
 	applicable, ok := j.IsApplicable.Get()
 	if !ok {
 		return ""
 	}
-	if applicable && board.CompanyIsApplicationEnabled.Or(true) {
+	if applicable {
 		return "受付中"
 	}
 	return "停止中"
@@ -427,7 +449,12 @@ func herpDirectors(board *herp.CompanyBoard) string {
 	names := make([]string, 0, len(board.Directors))
 	for _, d := range board.Directors {
 		name := d.DirectorName
-		if slices.ContainsFunc(d.Histories, func(h herp.DirectorHistory) bool { return h.IsFounder }) {
+		// isFounder is a property of one history entry, which often describes
+		// a previous company — kaminashi's 原 康紘 founded TRIDENT, not
+		// カミナシ. isInside is what ties the entry to this company.
+		if slices.ContainsFunc(d.Histories, func(h herp.DirectorHistory) bool {
+			return h.IsFounder && h.IsInside
+		}) {
 			name = d.DirectorName + "（創業者）"
 		}
 		names = appendDistinct(names, name)

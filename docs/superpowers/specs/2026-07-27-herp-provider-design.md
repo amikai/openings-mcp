@@ -102,7 +102,7 @@ Measured over the 991 preview postings on the first five `/jobs` pages:
   | `summary.Title` | `name` |
   | `summary.Location` | composed — see below |
   | `summary.PostedAt` | `jobPublishedAt` → `YYYY-MM-DD` |
-  | `summary.URL` | `https://herp.careers/careers/companies/{slug}/jobs/{id}` |
+  | `summary.URL` | `/careers/companies/{slug}/jobs/{id}`, or `/v1/{slug}/{id}` when `companyIsApplicationEnabled` is false — see below |
   | `sortKey` | `jobPublishedAt` |
   | `orgUnit` | `jobRoles[]` `name` + `parentJobRoleName` (query tier 2) |
   | `description` | labelled JA sections — see below |
@@ -161,11 +161,16 @@ Measured over the 991 preview postings on the first five `/jobs` pages:
 5. Otherwise `summary.Location` is empty. It is never synthesized.
 
 `locations` — the string `matchLocation` actually searches — is
-`summary.Location` plus `"; "`-joined Latin aliases: the romanized
-prefecture for each distinct `prefCode` (`13` → `Tokyo`) from a static
-47-entry table in `herp.go`, and `Remote` / `Hybrid remote` for the remote
-label. Everything displayed stays searchable, and the aliases only add
-reach — this is the reason `locations` is a superset rather than a copy.
+`summary.Location` plus two `"; "`-joined additions. First, Latin aliases:
+the romanized prefecture for each distinct `prefCode` (`13` → `Tokyo`) from
+a static 47-entry table in `herp.go`, and `Remote` / `Hybrid remote` for the
+remote label. Second, the **whole** free-text `location`, whitespace
+collapsed — the structured entries are the concise display but they routinely
+drop what the company wrote out, so a posting can name 京都市上京区 in free
+text while its Kyoto entry carries a null city, and indexing only the display
+form would make `location: "上京区"` return nothing. Everything displayed
+stays searchable and the additions only add reach; that is why `locations` is
+a superset rather than a copy.
 
 Without them, herp would be the first `internal/ats` adapter whose location
 text is CJK-only, and `location: "tokyo"` would return zero rows with no
@@ -204,9 +209,10 @@ the site itself uses:
    rows even though `salary` itself is always present.
 5. 勤務地 (`location`) / 雇用形態 (`formOfEmployment`) /
    勤務体系 (`workingConditions`) / 試用期間 (`trial`) / 福利厚生 (`welfare`)
-6. 最終更新 (`updatedAt`) and 応募受付 (`isApplicable` ∧
-   `companyIsApplicationEnabled`) — freshness and whether applications are
-   actually open, neither of which fits `JobSummary`.
+6. 最終更新 (`updatedAt`) and 応募受付 (`isApplicable` **alone**) — freshness
+   and whether the opening is still live, neither of which fits `JobSummary`.
+   `companyIsApplicationEnabled` is deliberately not part of this: it picks
+   the application surface, not the posting's state (see below).
 7. 企業情報 — the startup due-diligence block no other provider in this repo
    has: 累計調達額 / 評価額 (`companyCumulativeFunding`, `companyValuation`,
    both in 億円), 投資家 (`companyInvestors`), 従業員数 with its recent
@@ -214,11 +220,24 @@ the site itself uses:
    設立 (`companyFoundedIn`, `companyYearsSinceFounded`), 本社
    (`companyHeadquarterLocation`), 資本金 (`companyShareCapital`), 事業内容
    (`companySynopsis`, `companyWhat`/`Why`/`Where`/`How`), タグ
-   (`companyTags`), 企業サイト (`companyUrl`), 経営陣 (`directors`, each with
-   their career history and founder flag).
+   (`companyTags`), 企業サイト (`companyUrl`), 経営陣 (`directors`). The
+   founder badge requires `isFounder` **and** `isInside`: `isFounder` sits on
+   a single history entry that usually names a previous company, so the flag
+   alone would credit a director with founding whichever startup they came
+   from.
 
 The company block is emitted by `Detail` only; `Search` results stay at
 `JobSummary` size.
+
+### Which URL the applicant gets
+
+`companyIsApplicationEnabled` governs the HERP Career **media** pages only.
+A company that opts out still has a working HERP Hire career page: its media
+job page renders with no apply action while `/v1/{slug}/{id}` shows 応募する.
+Since `JobSummary.URL` is the applicant handoff, the adapter links to
+`/careers/companies/{slug}/jobs/{id}` normally and falls back to
+`/v1/{slug}/{id}` when the flag is false — otherwise valid search results
+lead to a dead end. `cmd/herp` applies the same rule.
 
 Deliberately dropped: `coverImageUrl` and `companyLogoUrl` (images),
 `requisitionId` and `companyId` (internal ids with no public page),
@@ -251,6 +270,11 @@ New:
   two distinct `jobRoles[].parentJobRoleName`; and two postings that separate
   the query tiers — one whose `jobRoles[].name` contains a term absent from
   its title, and one where the same term appears only in the JD body.
+
+  `company_media_optout_rsp.json` — a tenant with
+  `companyIsApplicationEnabled: false` and open postings, so the URL-surface
+  rule and the 応募受付 status can be pinned against a real capture rather
+  than a hand-built one.
 
   `company_sparse_rsp.json` — a tenant with at least one posting that has
   empty `jobLocations`, empty free-text `location`, and null

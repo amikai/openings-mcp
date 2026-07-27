@@ -115,6 +115,28 @@ func TestGetCompanySparseFields(t *testing.T) {
 	assert.Equal(t, herp.OptNilSalaryPeriod{Set: true, Null: true}, job.Salary.Value.Period)
 }
 
+func TestGetCompanyMediaApplicationsDisabled(t *testing.T) {
+	srv := herp.NewMockServer()
+	defer srv.Close()
+
+	client, err := herp.NewClient(srv.URL)
+	require.NoError(t, err)
+
+	res, err := client.GetCompany(t.Context(), herp.GetCompanyParams{Slug: herp.MockMediaOptOutSlug})
+	require.NoError(t, err)
+
+	rsp, ok := res.(*herp.CompanyResponse)
+	require.True(t, ok, "want *CompanyResponse, got %T", res)
+
+	// The two application flags are independent: this company takes no
+	// applications through the HERP Career media, yet its postings are open.
+	assert.Equal(t, herp.NewOptNilBool(false), rsp.Company.CompanyIsApplicationEnabled)
+	require.NotEmpty(t, rsp.Company.Jobs)
+	for _, j := range rsp.Company.Jobs {
+		assert.Equal(t, herp.NewOptNilBool(true), j.IsApplicable)
+	}
+}
+
 func TestListJobs(t *testing.T) {
 	srv := herp.NewMockServer()
 	defer srv.Close()

@@ -18,6 +18,13 @@ const MockSlug = "notainc"
 // tests can also exercise a URL-resolved company outside the curated roster.
 const MockSparseSlug = "resmahr"
 
+// MockMediaOptOutSlug is the company captured in
+// testdata/company_media_optout_rsp.json, whose
+// companyIsApplicationEnabled is false: its HERP Career media pages render
+// without an apply action even though its postings are open and its HERP
+// Hire career pages still accept applications.
+const MockMediaOptOutSlug = "unifa"
+
 // MockUnknownSlug is a slug the mock server 404s, replaying the upstream's
 // message-less error body.
 const MockUnknownSlug = "this-company-does-not-exist-xyz"
@@ -27,6 +34,9 @@ var mockCompanyRsp []byte
 
 //go:embed testdata/company_sparse_rsp.json
 var mockCompanySparseRsp []byte
+
+//go:embed testdata/company_media_optout_rsp.json
+var mockCompanyMediaOptOutRsp []byte
 
 //go:embed testdata/company_not_found_rsp.json
 var mockCompanyNotFoundRsp []byte
@@ -40,6 +50,7 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/careers/api/v1/companies/"+MockSlug, serveMockJSON(http.StatusOK, mockCompanyRsp))
 	mux.HandleFunc("/careers/api/v1/companies/"+MockSparseSlug, serveMockJSON(http.StatusOK, mockCompanySparseRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockMediaOptOutSlug, serveMockJSON(http.StatusOK, mockCompanyMediaOptOutRsp))
 	mux.HandleFunc("/careers/api/v1/jobs", serveMockJSON(http.StatusOK, mockJobsRsp))
 	mux.HandleFunc("/careers/api/v1/companies/", serveMockJSON(http.StatusNotFound, mockCompanyNotFoundRsp))
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
