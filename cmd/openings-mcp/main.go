@@ -267,6 +267,7 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 		ats.NewOracleAdapter(hc),
 		ats.NewJoinAdapter("https://join.com", hc),
 		ats.NewUltiProAdapter(hc),
+		ats.NewHrmosAdapter("https://hrmos.co", hc),
 	}, nil
 }
 
