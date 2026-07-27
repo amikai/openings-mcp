@@ -1,0 +1,558 @@
+openapi: 3.1.0
+
+info:
+  title: HERP Career Public API
+  version: "1.0.0"
+  description: >
+    Minimal client surface for HERP Career (`herp.careers/careers`), the job
+    media that republishes the boards of companies using the HERP Hire ATS.
+
+
+    `GET /careers/api/v1/companies/{slug}` returns one company's entire board
+    in a single response — every posting with its full text, salary, and the
+    company's own profile. There is no server-side search, no pagination, and
+    no per-job endpoint (`/careers/api/v1/companies/{slug}/jobs/{id}` 404s),
+    so callers fetch the dump once and filter or select from it locally.
+
+
+    `GET /careers/api/v1/jobs` enumerates companies rather than postings. It
+    exists here only to discover and refresh the curated roster.
+
+
+    The same host also serves the older HERP Hire career-page API at
+    `GET /api/v1/{slug}`. It is not modeled: it carries no salary, no posting
+    date, and no structured location, employment type, or job taxonomy.
+
+servers:
+  - url: https://herp.careers
+    description: Production
+
+tags:
+  - name: Companies
+    description: Public company boards and the cross-company company index
+
+paths:
+  /careers/api/v1/companies/{slug}:
+    get:
+      tags: [Companies]
+      operationId: getCompany
+      summary: Return one company's profile and its entire board
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Company slug, as it appears in `herp.careers/careers/companies/{slug}`.
+          schema:
+            type: string
+          example: notainc
+      responses:
+        "200":
+          description: The company profile and every published posting.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompanyResponse"
+        "404":
+          description: >
+            Unknown slug. The body is the constant `{"error":{"message":"Function"}}`
+            — it carries no usable detail, so callers supply their own message.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /careers/api/v1/jobs:
+    get:
+      tags: [Companies]
+      operationId: listJobs
+      summary: Enumerate companies, each with a preview of its postings
+      description: >
+        Despite the operation path, this paginates by COMPANY: `total` counts
+        companies (2,198 as of 2026-07-27) and `totalPages` is
+        `ceil(total / limit)`. Each row carries at most two preview postings
+        however many that company actually has, so this cannot stand in for a
+        cross-company job search — use it to discover slugs, then fetch each
+        board through `getCompany`.
+
+
+        Paging stops at an offset of 1000 companies whatever `limit` is
+        (`limit=100&page=11`, `limit=20&page=51`, and `limit=10&page=101` all
+        fall off the same edge). Past it the endpoint does not error: it
+        answers 200 with `totalPages: 0` and a degenerate body that repeats
+        the first companies again, so callers must treat `totalPages: 0` as
+        the end. Roster discovery therefore reaches only the first 1000 of
+        the 2,198 companies `total` reports.
+
+
+        The filter-looking query parameters the web UI puts in its own URLs
+        (`employment-type-id`, `parent-job-role-ids`, `remote-work-type-ids`)
+        are no-ops on this endpoint: the response is byte-identical with and
+        without them. They are omitted here rather than modeled as parameters
+        that do nothing.
+      parameters:
+        - name: page
+          in: query
+          required: false
+          description: 1-based page number.
+          schema:
+            type: integer
+            minimum: 1
+          example: 1
+        - name: limit
+          in: query
+          required: false
+          description: >
+            Companies per page. Defaults to 20 and caps at 100 — a larger
+            value is rejected with HTTP 400.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+          example: 100
+      responses:
+        "200":
+          description: One page of companies.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobsResponse"
+
+components:
+  schemas:
+    CompanyResponse:
+      type: object
+      required: [company, statusCode]
+      properties:
+        company:
+          $ref: "#/components/schemas/CompanyBoard"
+        statusCode:
+          type: integer
+          example: 200
+
+    JobsResponse:
+      type: object
+      required: [companies, total, page, totalPages, statusCode]
+      properties:
+        companies:
+          type: array
+          description: >
+            One page of companies. Rows omit `directors`, `fundingHistories`,
+            and `numberOfEmployeesHistories`, and their `jobs` are previews.
+          items:
+            $ref: "#/components/schemas/CompanyBoard"
+        total:
+          type: integer
+          description: Total number of COMPANIES, not postings.
+          example: 2198
+        page:
+          type: integer
+          example: 1
+        totalPages:
+          type: integer
+          description: "`ceil(total / limit)`, so it moves with `limit`."
+          example: 22
+        statusCode:
+          type: integer
+          example: 200
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Always the literal "Function" on a 404.
+              example: Function
+
+    CompanyBoard:
+      type: object
+      required:
+        - companyId
+        - companySlug
+        - companyName
+        - jobs
+      properties:
+        companyId:
+          type: string
+          description: Internal company id; no public page uses it.
+          example: C-30O49
+        companySlug:
+          type: string
+          description: The slug in `herp.careers/careers/companies/{slug}`.
+          example: notainc
+        companyName:
+          type: string
+          example: 株式会社Helpfeel
+        companyLogoUrl:
+          type: string
+          nullable: true
+          description: >
+            Absolute URL. Note the explicit port the upstream emits:
+            `https://herp.careers:443/careers/api/v1/images/...`.
+        companyUrl:
+          type: string
+          nullable: true
+          description: The company's own website.
+        companySynopsis:
+          type: string
+          nullable: true
+          description: One-paragraph description of what the company does.
+        companyTags:
+          type: array
+          description: Industry tags.
+          items:
+            type: string
+          example: [SaaS]
+        companyFoundedIn:
+          type: string
+          nullable: true
+          description: Year and month.
+          example: "2020-12"
+        companyYearsSinceFounded:
+          type: integer
+          nullable: true
+          example: 6
+        companyHeadquarterLocation:
+          type: string
+          nullable: true
+          description: Postal address.
+        companyNumberOfEmployees:
+          type: integer
+          nullable: true
+          example: 245
+        companyShareCapital:
+          type: string
+          nullable: true
+          description: Free text, occasionally with a leading space.
+          example: 1億円
+        companyInvestors:
+          type: array
+          items:
+            type: string
+        companyCumulativeFunding:
+          type: number
+          nullable: true
+          description: Cumulative funding raised, in 億円 (100M JPY).
+          example: 33.3
+        companyValuation:
+          type: number
+          nullable: true
+          description: Valuation, in 億円 (100M JPY).
+          example: 110.9
+        companyWhat:
+          type: array
+          description: What the company builds, one bullet per entry.
+          items:
+            type: string
+        companyWhy:
+          type: array
+          description: Why it exists, one bullet per entry.
+          items:
+            type: string
+        companyWhere:
+          type: array
+          description: Which markets it operates in, one bullet per entry.
+          items:
+            type: string
+        companyHow:
+          type: array
+          description: How it goes to market, one bullet per entry.
+          items:
+            type: string
+        companyPrivacyPolicyUrl:
+          type: string
+          nullable: true
+        companyIsApplicationEnabled:
+          type: boolean
+          nullable: true
+          description: Whether the company accepts applications through HERP at all.
+        companyMembersVoiceCount:
+          type: integer
+          nullable: true
+          description: Number of employee testimonials; null on most companies.
+        jobs:
+          type: array
+          description: >
+            Every published posting on `getCompany`; at most two previews on
+            `listJobs`. Each entry repeats the whole `company*` block verbatim;
+            those duplicated keys are not modeled here because the parent
+            object already carries them.
+          items:
+            $ref: "#/components/schemas/Job"
+        directors:
+          type: array
+          description: Founders and board members. `getCompany` only.
+          items:
+            $ref: "#/components/schemas/Director"
+        fundingHistories:
+          type: array
+          description: One entry per funding round. `getCompany` only.
+          items:
+            $ref: "#/components/schemas/FundingHistory"
+        numberOfEmployeesHistories:
+          type: array
+          description: Headcount over time. `getCompany` only.
+          items:
+            $ref: "#/components/schemas/EmployeeCountHistory"
+
+    Job:
+      type: object
+      required:
+        - id
+        - name
+        - title
+        - summary
+        - location
+        - formOfEmployment
+        - jobRoles
+        - jobLocations
+        - jobEmploymentTypeIds
+        - jobPublishedAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+          description: >
+            The career-page id, and the only id with a public page:
+            `herp.careers/careers/companies/{slug}/jobs/{id}`.
+          example: i3jT6wNu2_Ym
+        requisitionId:
+          type: string
+          nullable: true
+          description: Internal HERP Hire requisition UUID; no public page uses it.
+        name:
+          type: string
+          description: >
+            The posting's public heading — this is the job title, not `title`.
+          example: 698｜アナリティクスエンジニア（開発部）
+        title:
+          type: string
+          description: >
+            A separate marketing headline shown under the heading. Empty on
+            roughly 44% of postings.
+        summary:
+          type: string
+          description: The 仕事概要 body. Plain text, not HTML.
+        requiredSkills:
+          type: string
+          nullable: true
+          description: 必須スキル.
+        preferredSkills:
+          type: string
+          nullable: true
+          description: 歓迎スキル.
+        personality:
+          type: string
+          nullable: true
+          description: 求める人物像.
+        workingConditions:
+          type: string
+          nullable: true
+          description: 勤務体系 — hours, flextime, holidays.
+        welfare:
+          type: string
+          nullable: true
+          description: 福利厚生.
+        trial:
+          type: string
+          nullable: true
+          description: 試用期間.
+        location:
+          type: string
+          description: Free-text 勤務地; may hold several offices across lines.
+        formOfEmployment:
+          type: string
+          description: >
+            Free-text Japanese employment form, e.g. 正社員 or
+            正社員（期間の定めなし）. Distinct from the
+            `jobEmploymentTypeIds` enum.
+        salary:
+          allOf:
+            - $ref: "#/components/schemas/Salary"
+          nullable: true
+        jobRoles:
+          type: array
+          description: >
+            Job taxonomy. A posting may carry several, and duplicates do occur.
+          items:
+            $ref: "#/components/schemas/JobRole"
+        jobLocations:
+          type: array
+          description: Structured locations. Empty when the company gave none.
+          items:
+            $ref: "#/components/schemas/JobLocation"
+        jobEmploymentTypeIds:
+          type: array
+          items:
+            type: string
+            enum: [FULL_TIME, CONTRACT, FREELANCE, INTERNSHIP, PART_TIME]
+        jobRemoteworkType:
+          type: string
+          nullable: true
+          description: Null on roughly half of all postings.
+          enum: [FULL_REMOTEWORK, HYBRID_REMOTEWORK]
+        jobPublishedAt:
+          type: string
+          description: RFC 3339 timestamp.
+          example: "2026-07-15T06:45:33.000Z"
+        updatedAt:
+          type: string
+          description: RFC 3339 timestamp of the last edit.
+          example: "2026-07-24T08:33:17.000Z"
+        isApplicable:
+          type: boolean
+          nullable: true
+          description: >
+            Whether this posting still accepts applications. `getCompany` only.
+        source:
+          type: string
+          nullable: true
+          description: Observed as the constant "herp-hire" on every posting.
+        coverImageUrl:
+          type: string
+          nullable: true
+
+    Salary:
+      type: object
+      required: [text]
+      properties:
+        text:
+          type: string
+          description: >
+            The range as written by the company, including caveats. Always
+            present when `salary` is; the parsed fields below are not.
+          example: 700万円～1,200万円（昇給年1回）
+        minimum:
+          type: integer
+          nullable: true
+          description: Parsed lower bound in JPY.
+          example: 7000000
+        maximum:
+          type: integer
+          nullable: true
+          description: Parsed upper bound in JPY.
+          example: 12000000
+        period:
+          type: string
+          nullable: true
+          enum: [ANNUAL, MONTHLY, HOURLY]
+
+    JobRole:
+      type: object
+      required: [id, name, parentJobRoleId, parentJobRoleName]
+      properties:
+        id:
+          type: string
+          example: customer_success
+        name:
+          type: string
+          example: カスタマーサクセス
+        parentJobRoleId:
+          type: string
+          example: customer_success_support
+        parentJobRoleName:
+          type: string
+          example: カスタマーサクセス・サポート
+
+    JobLocation:
+      type: object
+      required: [prefCode, prefName]
+      properties:
+        prefCode:
+          type: string
+          description: JIS prefecture code, zero-padded.
+          example: "13"
+        prefName:
+          type: string
+          example: 東京都
+        cityCode:
+          type: string
+          nullable: true
+          description: JIS city code. Null on roughly half the entries.
+          example: "13102"
+        cityName:
+          type: string
+          nullable: true
+          example: 中央区
+
+    Director:
+      type: object
+      required: [id, directorName, histories]
+      properties:
+        id:
+          type: string
+          example: DIR-350
+        directorName:
+          type: string
+        xLink:
+          type: string
+          nullable: true
+          description: The director's X (Twitter) profile.
+        histories:
+          type: array
+          description: Career history, newest first by `seq`.
+          items:
+            $ref: "#/components/schemas/DirectorHistory"
+
+    DirectorHistory:
+      type: object
+      required: [seq, orgName, orgCategory, isFounder, isInside, isRepresentativeDirector]
+      properties:
+        seq:
+          type: integer
+          description: Ordering within the director's history, oldest first.
+        historyYear:
+          type: integer
+          nullable: true
+        orgName:
+          type: string
+        orgCategory:
+          type: string
+          description: '"com" for a company, "edu" for a school.'
+        slug:
+          type: string
+          nullable: true
+          description: Set when the organization is itself on HERP Career.
+        isFounder:
+          type: boolean
+        isInside:
+          type: boolean
+          description: Whether the role was at this company.
+        isRepresentativeDirector:
+          type: boolean
+
+    FundingHistory:
+      type: object
+      required: [slug, companyName, fundingDate]
+      properties:
+        slug:
+          type: string
+        companyName:
+          type: string
+        fundingDate:
+          type: string
+          description: Slash-separated date, not RFC 3339.
+          example: 2023/12/20
+        cumulativeFunding:
+          type: number
+          nullable: true
+          description: Cumulative funding after this round, in 億円.
+        valuation:
+          type: number
+          nullable: true
+          description: Valuation at this round, in 億円.
+
+    EmployeeCountHistory:
+      type: object
+      required: [slug, timestamp, companyNumberOfEmployees]
+      properties:
+        slug:
+          type: string
+        timestamp:
+          type: string
+          description: RFC 3339 timestamp, always the first of a month.
+          example: "2024-08-01T00:00:00.000Z"
+        companyNumberOfEmployees:
+          type: integer

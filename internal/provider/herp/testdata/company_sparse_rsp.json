@@ -1,0 +1,809 @@
+{
+  "company": {
+    "companyFoundedIn": "2021-04",
+    "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+    "companyHow": [
+      "- 独自の相場検索システムSmapraを開発・提供",
+      "- リユース業者の買取価格設定や販売価格設定を支援",
+      "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+      "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+    ],
+    "companyId": "C-3ZZXM",
+    "companyInvestors": [],
+    "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+    "companyName": "株式会社リスマ",
+    "companyNumberOfEmployees": 4,
+    "companyShareCapital": "",
+    "companySlug": "resmahr",
+    "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+    "companyTags": [
+      "コンサルティング",
+      "EC"
+    ],
+    "companyUrl": "https://company.re-sma.com/",
+    "companyWhat": [
+      "- リユース業者向けの相場検索ツール Smapraの運営",
+      "- ECサイト制作・ECコンサルティング"
+    ],
+    "companyWhere": [
+      "- リユース業界（中古品売買業界）",
+      "- ECサイト制作業界"
+    ],
+    "companyWhy": [
+      "- リユース業界の課題と買取販売業務の課題を解決するため",
+      "- 循環型社会の形成に貢献するため",
+      "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+    ],
+    "companyYearsSinceFounded": 6,
+    "companyCumulativeFunding": 1.4,
+    "companyValuation": 6.7,
+    "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+    "companyIsApplicationEnabled": true,
+    "companyMembersVoiceCount": null,
+    "directors": [
+      {
+        "directorName": "木村 洋介",
+        "histories": [
+          {
+            "historyYear": 2021,
+            "isFounder": true,
+            "isInside": true,
+            "isRepresentativeDirector": true,
+            "orgCategory": "com",
+            "orgName": "リスマ",
+            "seq": 3,
+            "slug": "resmahr"
+          },
+          {
+            "historyYear": null,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "KDDIグループ",
+            "seq": 2,
+            "slug": null
+          },
+          {
+            "historyYear": 2020,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "edu",
+            "orgName": "グロービス経営大学院（MBA）",
+            "seq": 2,
+            "slug": null
+          },
+          {
+            "historyYear": 2013,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "三越伊勢丹",
+            "seq": 1,
+            "slug": null
+          }
+        ],
+        "id": "DIR-1441",
+        "xLink": null
+      }
+    ],
+    "fundingHistories": [
+      {
+        "companyName": "株式会社リスマ",
+        "cumulativeFunding": 1.4,
+        "fundingDate": "2024/07/30",
+        "slug": "resmahr",
+        "valuation": 6.7
+      }
+    ],
+    "jobs": [
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "12p0uk-hrFac",
+        "name": " ECマーケティングインターン",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/12p0uk-hrFac/e26267bb-a576-45b5-8df6-a9a85ee5ecb0.jpg",
+        "formOfEmployment": "学生インターン・アルバイト",
+        "requisitionId": "64d1ec13-25fc-48bc-85ea-686d3be0eb20",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17\nTOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "・ロジカルに物事を考え、仮説を立てるのが好き\n・トレンドや消費者行動に興味がある\n・チームで協働しながらも、自走して学べる",
+        "preferredSkills": "・データ分析や統計学の知識がある方",
+        "requiredSkills": "・ブラウザ、メール、Excel、Word等の操作に不安の無い方\n・円滑なコミュニケーション、メンバーとのコミュニケーションを楽しみながら協調できる方\n・ミスや漏れなく作業できる方\n\n",
+        "salary": {
+          "text": "時給:1500円~2000円\n※交通費は別途全額支給\n※能力や関わるプロジェクトに応じて決定",
+          "minimum": 1500,
+          "maximum": 2000,
+          "period": "HOURLY"
+        },
+        "summary": "< 事業内容>\n「AIとデータでリユースECを変える。」\n株式会社リスマは、独自の価格調査AI「Smapra」を展開するスタートアップです。\n今回募集するのは、AI×ビッグデータを活用したECマーケティングの実践インターン。\n\nマーケティングの理論を学んでいるだけでは得られない、リアルなデータ分析・価格戦略・UX改善に携わるチャンスです。\n現役のECマネージャー・データアナリストとともに、成長するECの現場で「売れる仕組み」を学び、作り上げてください。\n\n\n💡 主な業務内容\n・ECサイト（TreMart・楽天・Yahoo・メルカリ等）の販売データ分析・価格リサーチ\n・AI価格エンジン（Smapra）のデータを活用したマーケット分析\n・商品ページ改善（タイトル・画像・SEOワード等の最適化）\n・顧客行動データを基にした販売戦略の企画提案\n・SNS広告・キャンペーン施策の補助（希望者）\n\n🧭 得られるスキル\n・ECマーケティングの実務理解（SEO／価格戦略／データ活用）\n・AI・ビッグデータの応用スキル（Smapraを使用）\n・デジタル広告・LP改善の基礎\n・グロースハック思考・仮説検証力\n・スタートアップでの課題発見力・提案力\n\n🧑‍💻 こんな方におすすめ\n・将来マーケティング職・コンサル職・起業を志す方\n・AI／データ分析／ECのいずれかに関心がある方\n・座学ではなく「事業を伸ばす経験」を積みたい方\n・スタートアップで挑戦したい方\n\n≪おすすめポイント≫\n◎裁量権を持って、事業開発の高いスキルを身につけることができます！\n◎今主流のデータ×AI（DX）領域に関わることができます！\n◎データ分析・データ集計の経験が身につきます\n◎働き方は柔軟に調整することが可能です！",
+        "title": " ECマーケティングインターン",
+        "trial": "",
+        "updatedAt": "2025-10-19T13:59:50.000Z",
+        "welfare": "・ウォーターサーバー設置\n・お菓子コーナー設置",
+        "workingConditions": "・10:00～19:00の範囲内で稼働時間により決定\n・週2日〜週3日\n※シフト調整可能\n※残業なし",
+        "jobRoles": [
+          {
+            "id": "marketing",
+            "name": "マーケティング",
+            "parentJobRoleId": "marketing",
+            "parentJobRoleName": "マーケティング・商品開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "PART_TIME",
+          "INTERNSHIP"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2025-10-19T14:01:59.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "zCbE82jVP-8s",
+        "name": "AI駆動開発エンジニア（副業・業務委託）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/zCbE82jVP-8s/7e400624-ede4-48d3-8206-7151a8836cf7.jpg",
+        "formOfEmployment": "副業／業務委託",
+        "requisitionId": "7a47d336-b2a9-4fc4-8b60-c45ab9144f08",
+        "location": "",
+        "personality": "・AIが書いたコードを鵜呑みにせず、設計意図から評価できる方\n・「仕様書待ち」ではなく、顧客の課題から逆算して何をつくるか考えられる方\n・完璧な設計より、動くものを早く出して磨くことを優先できる方",
+        "preferredSkills": "・Webスクレイピング、データパイプライン、大量データ処理の経験\n・AWS でのインフラ構築・運用経験\n・LLMを組み込んだプロダクト開発の経験（プロンプト設計・RAG・エージェント設計）\n・0→1のプロダクト立ち上げ経験\n・EC・リユース業界のドメイン知識、または強い関心",
+        "requiredSkills": "・TypeScript（Next.js / React）または Python での実務開発経験3年以上\n・AIコーディングエージェント（Claude Code / Cursor / GitHub Copilot 等）を\n　日常的に使い、実務のアウトプットを出している方\n・設計から実装、リリースまで一人で通して進められる方\n・テキストコミュニケーションを中心にチーム開発ができる方",
+        "salary": {
+          "text": "・雇用形態：業務委託（副業可）※成果と相性次第で正社員も相談可\n・報酬：時給3,000円〜6,000円（経験・能力により決定）\n・稼働：週15時間以上（応相談）\n・勤務形態：フルリモート可",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "私たちは「EC運営を、AIに任せられる世界。」をビジョンに掲げ、\n自分たち自身の開発もAIに任せる方向へ振り切っています。\n実装の多くはAIコーディングエージェント（Claude Code等）が書き、\n人は「何をつくるか」の設計と、出てきたコードのレビュー・判断に時間を使う。\nその体制で、少人数のままプロダクトを伸ばしています。\n\n顧客の増加とプロダクト拡張に対して実装のキャパシティを増やすため、\nこのやり方を一緒に回してくださるエンジニアを募集します。\n\n【具体的な業務】（ご経験と希望に応じて相談します）\n・ECリサーチAI「Smapra」の機能開発（Next.js / TypeScript）\n・価格・検索順位・在庫データの収集基盤の改善（Python / スクレイピング / AWS）\n・新機能の技術選定・アーキテクチャ設計の議論\n・AIエージェントに実装させるための設計・タスク分解・コードレビュー\n\n【この現場の特徴】\n・AI駆動開発が建前ではなく標準です。「AIを使ってもいい」ではなく\n　「AIに書かせる前提で設計する」のが日常です\n・少人数のため意思決定が速く、技術選定から関われます\n・営業・CSと距離が近く、顧客の声が直接届きます\n・AIツール（Claude等）の業務利用環境を会社が提供します\n\n【将来について】\nまずは副業・業務委託でお互いを知るところから始めます。\n相性と成果次第で、稼働の拡大やコアメンバーとしての参画もご相談可能です。",
+        "title": "【副業／業務委託】Webアプリケーションエンジニア",
+        "trial": "",
+        "updatedAt": "2026-07-18T09:26:06.000Z",
+        "welfare": "",
+        "workingConditions": "",
+        "jobRoles": [
+          {
+            "id": "other_engineer",
+            "name": "その他エンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          }
+        ],
+        "jobLocations": [],
+        "jobEmploymentTypeIds": [
+          "FREELANCE"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2024-11-13T12:26:56.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "weBffB7DwxdF",
+        "name": "インサイドセールス（第二新卒・営業未経験歓迎）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/weBffB7DwxdF/a801d979-c638-49fc-a36c-f58a61e4db20.jpg",
+        "formOfEmployment": "正社員",
+        "requisitionId": "51b2641b-a52b-42eb-ab6b-73338b7a15eb",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17\nTOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "・まずは責任者の「型」を素直に実行し、そのうえで自分なりの工夫ができる方\n・考えるより先に手が動く、行動量で勝負できる方\n・顧客にも社内にも誠実で、データを正直に扱える方\n・1〜2年でクロージングまで担える営業になりたい成長意欲のある方\n\n※学歴不問・年齢不問。第二新卒の方も歓迎します。",
+        "preferredSkills": "・インサイドセールス、テレアポ、法人営業の経験\n・SaaS・IT・無形商材に関わった経験\n・リユース・EC・小売業界の知見、または強い関心\n・断られても関係を維持し、後追いで案件化した経験\n・自分の行動を振り返って改善（PDCA）を回した経験",
+        "requiredSkills": "・社会人経験1年以上（業種・職種は問いません／営業経験は不問です）\n・数字（目標・KPI）にコミットして動いた経験\n・スプレッドシートやCRM等のツールを使った記録・管理に抵抗がない方\n・東京・五反田のオフィスに出社可能な方\n・スタートアップのスピード感・変化を前向きに楽しめる方\n",
+        "salary": {
+          "text": "・想定年収：420万円 〜 540万円\n・月給 350,000円 〜 450,000円（経験・能力により決定）\n　基本給 267,000円〜344,000円\n　固定残業代 83,000円〜106,000円（固定残業40時間/月・超過分は別途支給）\n※成果に応じてフルサイクル担当（想定年収550〜900万）へ登用",
+          "minimum": 4200000,
+          "maximum": 5400000,
+          "period": "ANNUAL"
+        },
+        "summary": "■リスマ／Smapraについて\nECリサーチAI「Smapra」の商談をつくる役割です。\nテレアポ・セミナー・展示会・DM・問い合わせなど複数の導線から見込み顧客にアプローチし、\n商談化までを担当します。\n\nまずは「商談をつくる」ことに集中していただきます。クロージングは営業責任者・\nフルサイクル担当が引き取るため、いきなり受注責任を背負うことはありません。\nその代わり、一次商談への同席・実施を通じて、提案とクロージングの型を現場で覚えていきます。\n\n【具体的な業務】\n・テレアポ、メール、セミナー・展示会の参加者フォローによる商談化\n・問い合わせ・資料請求いただいた企業への一次対応\n・一次商談への同席（慣れてきたら自分で実施）\n・CRM（HubSpot）への活動記録と、架電→商談→受注のファネル数値管理\n・どの導線・どのトークが効いたかの振り返りと改善提案\n・商談で拾った顧客の声をエンジニアチームへ共有\n\n【働く環境 — AIネイティブな営業組織】\n・顧客リサーチ・商談準備シートは社内のAIエージェント（Claude）が下ごしらえ。\n　あなたは対話に集中できます\n・議事録・フォローアップもAI支援で事務処理を最小化\n・全メンバーにAIツール（Claude等）の業務利用環境を提供しています\n\n【1年後の姿 — この仕事の出口】\n・入社〜3ヶ月：導線ごとのトークを習得し、商談化の数を安定させる\n・3〜6ヶ月：一次商談を自分で実施。顧客の課題を引き出すヒアリングを習得\n・6〜12ヶ月：提案〜クロージングへ範囲を拡張\n・その先：フルサイクル営業（リード創出→クロージング→オンボーディング）へ。\n　当社の経験者ポジション（想定年収550〜900万）と同じ役割に、内側から上がっていけます\n\n「インサイドセールスで終わらせない」——アポを渡して終わりではなく、\n売り切るところまで担える営業に育てる前提のポジションです。",
+        "title": "新規セールス（フィールドセールス／クロージング担当・第二新卒〜若手歓迎）",
+        "trial": "あり(6ヶ月)",
+        "updatedAt": "2026-07-18T09:12:40.000Z",
+        "welfare": "・社会保険完備\n・交通費支給\n・昇給、賞与あり\n・健康診断あり\n\n■ 選考フロー\n書類選考 → カジュアル面談（非選考・オンライン可） → 面接（オンライン）\n→ 面接（対面） → 半日インターン → 内定",
+        "workingConditions": "勤務時間：10:00〜19:00（フレックスタイム制）\n試用期間：6ヶ月\n待遇・福利厚生：社会保険完備、交通費支給、昇給・賞与あり、健康診断",
+        "jobRoles": [
+          {
+            "id": "inside_sales",
+            "name": "インサイドセールス",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2026-06-09T10:33:15.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "cgpl_uj8tq5N",
+        "name": "カジュアル面談・オープンポジション",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/cgpl_uj8tq5N/20f0b605-f292-44ef-9345-f7dfcfced53c.jpg",
+        "formOfEmployment": "正社員",
+        "requisitionId": "9a9b02a7-4ec0-469f-92a5-1848aa0418be",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17\nTOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "・事業のビジョンに共感いただける方\n・自ら考え、実行できる方\n・顧客視点で物事を捉えられる方\n・チームで成果を出すことを大切にできる方\n・高い成長意欲をお持ちの方",
+        "preferredSkills": "ポジションにより異なります。\n適正ポジションのご提案とあわせて、カジュアル面談の際にHR担当者からご案内差し上げます。",
+        "requiredSkills": "ポジションにより異なります。\n適正ポジションのご提案とあわせて、カジュアル面談の際にHR担当者からご案内差し上げます。",
+        "salary": {
+          "text": "・雇用形態：正社員（ポジションにより業務委託・インターンも相談可）\n・想定年収：400万円〜900万円（ポジション・経験・能力により決定／固定残業40時間分を含む）\n・勤務時間：フレックスタイム制（コアタイムなし／フレキシブルタイム 10:00〜19:00）\n・試用期間：6ヶ月（条件変更なし）\n・勤務地：東京都品川区西五反田7-22-17 TOCビル\n・スキル要件：ポジションにより異なるため、面談時にご相談ください",
+          "minimum": 4000000,
+          "maximum": 9000000,
+          "period": "ANNUAL"
+        },
+        "summary": "◆「興味はあるが、どのポジションが自分に合うか分からない」という方向けの相談窓口です。\n選考ではありません。事業の話をしたうえで、経験・志向に合うポジションをこちらから提案します。◆\n\n■プロダクト構成\nSmapra（スマプラ）— 主力プロダクト\n競合の価格・検索順位・在庫を、毎日、自動で捉えるECリサーチAI。\n主要ECモールから任意の競合サイト・公式サイトまで横断して収集・分析し、\n「自社はいくらが適切か」の判断材料に変えます。（サービス継続率 92%）\n\nSmapraBI — 中古相場検索\n中古ガジェット領域に特化し、蓄積した取引データから相場を検索できるサービス。\nSmapraシリーズのデータ基盤を支えています。\n\n※累計追跡商品数 780万件・サービス継続率 92%\n　（本数値は、SmapraBIを含むSmapraシリーズ全体の実績です）\n\n■職場環境\n20～30代の若手が中心に活躍する自由で風通しの良い職場です。\nスタートアップ企業ならではのチャレンジ精神があり、\n提案や意見交換がしやすい環境です。\n\n■キャリアアップ\nマネージャー候補として、リーダーシップを磨きながら成長可能です。\n\n【参考情報】\n▼採用HP\nhttps://company.re-sma.com/recruit",
+        "title": "カジュアル面談・オープンポジション",
+        "trial": "あり(6ヶ月)",
+        "updatedAt": "2026-07-18T09:08:45.000Z",
+        "welfare": "・社会保険完備\n・交通費支給\n・昇給、賞与あり\n・健康診断あり\n",
+        "workingConditions": "勤務時間・曜日:\n10:00～19:00\nフレックスタイム制度\n\n休暇・休日:\n生活や希望する働き方に柔軟に対応可能です。\nお気軽にご相談ください。",
+        "jobRoles": [
+          {
+            "id": "open_position",
+            "name": "オープンポジション",
+            "parentJobRoleId": "open_position",
+            "parentJobRoleName": "オープンポジション"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2025-10-19T14:04:06.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "YjfS68dF8Tq-",
+        "name": "大手向けSaaSソリューションセールス",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/YjfS68dF8Tq-/66c12f1f-f661-4507-9cde-892a4975621c.jpg",
+        "formOfEmployment": "正社員",
+        "requisitionId": "bbcc1525-00e8-468b-99c9-81e912579983",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17\nTOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "・顧客の言語化されていない課題に向き合える方\n・ベンチャーやSaaSの成長フェーズにおいて自ら仕組み作りに関わりたい方",
+        "preferredSkills": "・エンタープライズ企業への新規開拓経験\n・自社SaaSの活用提案における導入設計・オンボーディング経験\n・コンサル営業、またはIT業界におけるソリューション提案経験\n・業務改善やデータ活用に強い関心を持ち、自ら学び提案に活かせる方",
+        "requiredSkills": "・オフィス勤務が可能な方（東京・五反田）\n・無形商材（特にSaaS／ITサービスなど）の法人営業経験（2年以上）\n・顧客の業務課題を可視化し、提案資料や定量データを活用した提案経験",
+        "salary": {
+          "text": "年収550〜900万\n※固定残業40時間を含む",
+          "minimum": 5500000,
+          "maximum": 9000000,
+          "period": "ANNUAL"
+        },
+        "summary": "自社開発の価格トラッキングSaaS「SmapraTracker」を大手（EC・小売・リユース等）に提案し、課題定義→PoC→導入→活用定着→拡張まで一気通貫で牽引するポジションです。新規営業で培った“打席力”を、意思決定を動かすエンプラAEの力に転化します。（エンプラ未経験歓迎／AE候補）\n\n▼SmapraTrackerとは\nhttps://www.smapra.com/tracker\nリユース・EC事業者様向けに、“相場価格”や“競合価格”を自動で比較・可視化するWebサービスです。国内・海外問わずどのサイトでも、AIが毎日価格を収集・通知するのが特徴で、属人的かつ手作業で行われていた業務の工数を大幅に削減します。価格戦略や販促の意思決定支援ツールとして、多チャネル運用企業を中心に導入が進んでいます。\n\n■主な業務\n・ABM／アウトバウンド／展示会・紹介を起点に新規商談創出\n・価格調査・価格改定フローをヒアリングし、SmapraTrackerの活用設計を提案\n・本導入のPMと利用部門の拡張/アップセル\n・開発チームと連携したフィードバック→機能改善、導入事例の言語化\n・セミナー登壇\n\n■この仕事で得られること\n・エンプラAEスキル：新規→課題定義→PoC→導入→拡張の全工程を自走\n・生成AI×データの実装：価格変動検知やアラート運用を実ビジネスに実装する経験\n・越境できる裁量：縦割りに留まらず、セールス×事業開発まで踏み込める\n\n■利用ツール\nHubSpot、Google Workspace、Slack、Notion（必要に応じてデータ連携/CSVテンプレ）\n\n■アピールポイント:\n20～30代の若手が中心に活躍する自由で風通しの良い職場です。\nスタートアップ企業ならではのチャレンジ精神があり、\n提案や意見交換がしやすい環境です。\n\n■採用HP\nhttps://company.re-sma.com/recruit\n\n",
+        "title": "エンタープライズ向けソリューションセールス（SaaS・価格調査DX）",
+        "trial": "あり(6ヶ月)",
+        "updatedAt": "2025-10-30T10:54:00.000Z",
+        "welfare": "待遇・福利厚生:\n・社会保険完備\n・交通費支給\n・昇給、賞与あり\n・健康診断あり",
+        "workingConditions": "勤務時間・曜日:\n10:00～19:00\nフレックスタイム制度\n\n休暇・休日:\n生活や希望する働き方に柔軟に対応可能です。\nお気軽にご相談ください。",
+        "jobRoles": [
+          {
+            "id": "other_sales",
+            "name": "その他セールス",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2025-10-19T14:03:29.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "nmrihY6ASf7x",
+        "name": "新規セールス（フルサイクル／営業組織の2人目メンバー・経験者採用）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/nmrihY6ASf7x/52047ca5-0a96-45c3-8975-5b6b3e346126.jpg",
+        "formOfEmployment": "正社員",
+        "requisitionId": "9c656dae-03ee-42fd-8099-cc1f00f66e15",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17\nTOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "「決められたモノを売るだけの営業から抜け出し、顧客のビジネスを根本から前進させたい」\n——そんな、自分自身も\"ありたい姿\"へアップデートし続けたい野心的な方を歓迎します。",
+        "preferredSkills": "・IT領域・Webサービス、市場調査・データ系サービスの営業経験\n・新規開拓（アウトバウンド）の経験\n・スタートアップ・少人数組織での就業経験\n・リユース・EC・小売業界の知見、または強い関心\n・セミナー集客・コンテンツ制作・HubSpot等のマーケティング企画の経験\n　（立ち上がり後の役割拡張に直結します）",
+        "requiredSkills": "・オフィス勤務が可能な方（東京・五反田）\n・無形商材（特にSaaS／ITサービスなど）の法人営業経験（2年以上）\n・顧客の業務課題を可視化し、提案資料や定量データを活用した提案経験",
+        "salary": {
+          "text": "・想定年収：550万円 〜 900万円\n・月給 459,000円〜（経験・能力により決定）\n　基本給 350,000円〜574,000円\n　固定残業代 109,000円〜176,000円（固定残業40時間/月・超過分は別途支給）\n※上限側は経験・能力およびリーダー／大手担当への登用による",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "私たちのビジョンは「EC運営を、AIに任せられる世界。」\n勘・根性・人海戦術で\"維持\"されてきたEC運営を、AIエージェントが肩代わりする。\n値付け・改善・運用が手を止めても回り続け、人は「何をやるか・どこを目指すか」に\n集中できる——そんな世界をつくっています。\n\n自社開発のECリサーチAI「Smapra」を、EC・小売・リユース企業へ提案し、新規案件の獲得を\nメインにお任せします。売って終わりではなく、受注後も顧客が自走できるまでの初期\nオンボーディングに伴走するため、一貫した課題解決スキルが身につきます。\n\n【具体的な業務】\n・新規リード（展示会・セミナー・紹介・アウトバウンド等）への一次商談〜クロージング\n・顧客の業務フロー・課題のヒアリングと、最適なプロダクト活用提案\n・導入に向けたトライアル設計・KPI設定・ROI（投資対効果）シミュレーションの構築\n・受注後の初期オンボーディング支援（専任CS・プロダクトチームと連携し立ち上がりまで伴走）\n・商談で得た顧客の声をエンジニアチームへ共有し、プロダクト改善へ接続\n・CRM（HubSpot）を用いた営業活動の記録・数値管理\n\n【働く環境 — AIネイティブな営業組織】\n・商談準備：顧客リサーチ・準備シートはAIエージェントが下ごしらえ。\n　営業は仮説と対話に集中できます\n・議事録・フォローアップ：AI支援で商談後の事務処理を最小化\n・分析：HubSpot＋AIでパイプライン・失注分析を高速に回す\n\n【このポジションで得られる3つの経験】\n1. AIを売る会社が、AIで営業している\n　商談準備・顧客リサーチ・議事録・提案の下ごしらえを、社内のAIエージェント（Claude）が\n　支援します。売る商材がAIで、売り方もAI。ここで身につくのは\n　「AI時代に市場価値が上がる営業」の実務そのものです。\n\n2. 反・分業のフルサイクル。ただし丸投げではない\n　SDR/AEの分業で歯車になるのでも、「ゼロから開拓してこい」と放り出されるのでもありません。\n　セミナー・展示会・アウトバウンド・代理店といったリード導線が既に稼働しており、\n　転換率20%超の「型」を作った営業責任者がマンツーマンで伴走します。\n　リード創出→商談→クロージング→オンボードまでを一気通貫で持てるようになります。\n\n3. 「2人目セールス」という希少なチケット\n　営業組織スケールの前夜、資金調達準備フェーズ。組織が完成した会社では絶対に買えない\n　「つくる側」の経験が積めます。顧客の生の声をエンジニアと共有し、プロダクトの\n　「あるべき姿」に関われるのもこのフェーズならではです。\n\n【キャリアパス — 成果を出した人が、次の役割を選べます】\n・入社〜6ヶ月：新規商談に専念（型に沿った提案〜クロージング。評価は商談成果一本）\n・立ち上がり後：本人の希望と適性で、以下のいずれかへ役割を拡張\n　A. 営業企画／GTMオーナー\n　　　セミナー運営・ホワイトペーパー・コンテンツ・HubSpot活用。\n　　　リード創出から転換まで一気通貫で設計する側へ\n　B. 事業開発（パートナーアライアンス）\n　　　EC支援会社・販売代理パートナーとの協業チャネルの開拓・管理。\n　　　直販の外に売上のレバレッジをつくる側へ\n　C. セールス深化\n　　　リーダー／大手エンタープライズ担当として売る力を極める\n・A・Bに進んでも商談から完全に離れるのではなく、現場感を持ったまま設計側を担う想定です\n\n※大手や複雑な案件は新規営業責任者・代表がフォローします。\n\n■採用HP\nhttps://company.re-sma.com/recruit\n\n",
+        "title": "",
+        "trial": "あり(6ヶ月)",
+        "updatedAt": "2026-07-18T09:16:55.000Z",
+        "welfare": "・各種社会保険完備（健康保険・厚生年金・雇用保険・労災保険）\n・交通費支給（規程に基づき支給）\n・定期健康診断（年1回）\n・残業手当（固定残業40時間超過分は別途支給）\n・服装自由／PC・作業環境は希望に応じて支給\n・AIツール（Claude等）の業務利用環境を全社員に提供",
+        "workingConditions": "勤務時間・曜日:\n10:00～19:00\nフレックスタイム制度\n\n休暇・休日:\n生活や希望する働き方に柔軟に対応可能です。\nお気軽にご相談ください。",
+        "jobRoles": [
+          {
+            "id": "other_sales",
+            "name": "その他セールス",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2026-07-18T09:18:37.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2021-04",
+        "companyHeadquarterLocation": "東京都品川区西五反田7-22-17 TOCビル6階42号",
+        "companyHow": [
+          "- 独自の相場検索システムSmapraを開発・提供",
+          "- リユース業者の買取価格設定や販売価格設定を支援",
+          "- ECサイトの制作やコンサルティングを通じてリユース業者のEC事業を支援",
+          "- 業界団体への参画などを通じて、リユース業界全体の発展に貢献"
+        ],
+        "companyId": "C-3ZZXM",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/logo/3158ce3e-9d7b-49ff-8f7a-4c3b7de69e62",
+        "companyName": "株式会社リスマ",
+        "companyNumberOfEmployees": 4,
+        "companyShareCapital": "",
+        "companySlug": "resmahr",
+        "companySynopsis": "リユース業界とECサイト制作業界に特化した企業。独自の相場検索ツールを開発・提供し、中古品の買取・販売価格設定を支援する。ECサイト制作やコンサルティングを通じ、リユース業者のオンライン展開を後押しする。循環型社会の形成と環境負荷低減に寄与している。",
+        "companyTags": [
+          "コンサルティング",
+          "EC"
+        ],
+        "companyUrl": "https://company.re-sma.com/",
+        "companyWhat": [
+          "- リユース業者向けの相場検索ツール Smapraの運営",
+          "- ECサイト制作・ECコンサルティング"
+        ],
+        "companyWhere": [
+          "- リユース業界（中古品売買業界）",
+          "- ECサイト制作業界"
+        ],
+        "companyWhy": [
+          "- リユース業界の課題と買取販売業務の課題を解決するため",
+          "- 循環型社会の形成に貢献するため",
+          "- モノの価値を可能な限り長く保ち、環境負荷を減らすため"
+        ],
+        "companyYearsSinceFounded": 6,
+        "companyCumulativeFunding": 1.4,
+        "companyValuation": 6.7,
+        "companyPrivacyPolicyUrl": "https://herp.careers/privacypolicy/resmahr",
+        "companyIsApplicationEnabled": true,
+        "companyMembersVoiceCount": null,
+        "id": "UwYC3QdvTdah",
+        "name": "リユース商品販売のECサイト運営スタッフ（パート・アルバイト）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-3ZZXM/careerPages/UwYC3QdvTdah/122e30b5-bc93-48c7-9589-9a161a33fdcf.jpg",
+        "formOfEmployment": "パート・アルバイト・業務委託",
+        "requisitionId": "74b22029-00a8-482e-986a-6a18cd5949c9",
+        "location": "勤務地:\n東京都品川区西五反田7-22-17 TOCビル6階42号\n\nアクセス:\nＪＲ、都営地下鉄五反田駅より・・・徒歩８分\n東急電鉄目黒線不動前駅より・・・・徒歩６分\n東急電鉄池上線大崎広小路駅より・・・徒歩５分",
+        "personality": "【興味関心を応援します】\n市場調査やデータを使った売れ筋の推測といった、マーケットへの視点が大切になります。もちろん考え方や推量の立て方はノウハウがありますのでお教えしていきます。最初から知識経験を持っていることよりも、興味関心で学んでいける姿勢を重視した採用をしています。",
+        "preferredSkills": "✋ 学歴・経験不問／PC基本操作ができればOK\n✋ 接客・販売・コールセンター等で顧客対応経験があれば活かせます（必須ではありません）",
+        "requiredSkills": "【必須スキルや求める人物】\n・出社出来る方\n・Excelの使用経験\n・顧客対応が丁寧で、チームでのコミュニケーションが得意な方\n",
+        "salary": {
+          "text": "パート・アルバイト：時給:1500円~1900円\n※能力や経験に応じて決定します",
+          "minimum": 1500,
+          "maximum": 1900,
+          "period": "HOURLY"
+        },
+        "summary": "＼ブランド知識ゼロでもOK！ネットショップ運営スタッフ大募集❗❗／\n\n+‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥+\n⭐未経験・ブランク歓迎：OJT研修でしっかりサポート\n⭐週3日・1日4h〜OK：お子さまの送迎時間などシフト調整可\n⭐駅チカ＋一部在宅OK：通勤ラク＆慣れたら一部リモートも相談可\n⭐社員割引・交通費全額支給：人気ブランド時計やガジェットをお得にGET\n+‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥‥+\n\n【仕事内容】\nブランド時計やデジタルデバイスなどリユース商品の、ECサイト運営をサポートするお仕事です。\n\n＜具体的な業務内容＞\n✅ 動作確認・簡単なクリーニング\n✅ 商品写真の撮影・画像加工（アプリ使用）\n✅ 商品データ登録・価格更新\n✅ 受発注／在庫管理（システム入力中心）\n✅ お客様からのメール・チャット対応\n\n【職場環境】\n20〜30代中心のスタートアップ。代表も30代でフラットな文化。\n意見やアイデアはチャットで即共有、“やってみよう”を尊重する社風です。\n\n⭐この仕事で得られるスキル⭐\n▸ EC運営の基本フロー　\n▸ 市場価格リサーチ術\n▸ 写真撮影・画像編集　\n▸ データ分析の基礎",
+        "title": "リユース商品販売のECサイト運営スタッフ",
+        "trial": "",
+        "updatedAt": "2026-07-18T09:10:03.000Z",
+        "welfare": "",
+        "workingConditions": "10:00～19:00の範囲内で稼働時間により決定\n1日4時間以上、週3日〜勤務",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13109",
+            "cityName": "品川区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FREELANCE",
+          "PART_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2025-10-19T14:05:01.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      }
+    ],
+    "numberOfEmployeesHistories": [
+      {
+        "companyNumberOfEmployees": 2,
+        "slug": "resmahr",
+        "timestamp": "2024-08-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 2,
+        "slug": "resmahr",
+        "timestamp": "2024-09-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 2,
+        "slug": "resmahr",
+        "timestamp": "2024-10-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2024-11-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2024-12-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2025-02-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2025-03-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2025-04-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2025-05-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-06-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-07-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-08-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 5,
+        "slug": "resmahr",
+        "timestamp": "2025-09-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-10-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-11-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2025-12-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2026-02-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 3,
+        "slug": "resmahr",
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 4,
+        "slug": "resmahr",
+        "timestamp": "2026-07-01T00:00:00.000Z"
+      }
+    ]
+  },
+  "statusCode": 200
+}
