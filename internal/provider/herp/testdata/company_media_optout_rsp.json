@@ -1,0 +1,2115 @@
+{
+  "company": {
+    "companyFoundedIn": "2013-05",
+    "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+    "companyHow": [
+      "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+      "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+      "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+      "- 東京と北九州の2拠点体制で事業を展開"
+    ],
+    "companyId": "C-9JZ06",
+    "companyInvestors": [],
+    "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+    "companyName": "ユニファ株式会社",
+    "companyNumberOfEmployees": 225,
+    "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+    "companySlug": "unifa",
+    "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+    "companyTags": [
+      "教育",
+      "AI",
+      "地方創生",
+      "DX"
+    ],
+    "companyUrl": "https://unifa-e.com/",
+    "companyWhat": [
+      "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+      "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+      "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+    ],
+    "companyWhere": [
+      "- 保育・幼児教育業界",
+      "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+    ],
+    "companyWhy": [
+      "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+    ],
+    "companyYearsSinceFounded": 14,
+    "companyCumulativeFunding": 92.8,
+    "companyValuation": 179.4,
+    "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+    "companyIsApplicationEnabled": false,
+    "companyMembersVoiceCount": null,
+    "directors": [
+      {
+        "directorName": "土岐 泰之",
+        "histories": [
+          {
+            "historyYear": 2013,
+            "isFounder": true,
+            "isInside": true,
+            "isRepresentativeDirector": true,
+            "orgCategory": "com",
+            "orgName": "ユニファ",
+            "seq": 5,
+            "slug": "unifa"
+          },
+          {
+            "historyYear": 2009,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "デトロイトトーマツコンサルティング",
+            "seq": 4,
+            "slug": null
+          },
+          {
+            "historyYear": 2008,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "ローランド・ベルガー",
+            "seq": 3,
+            "slug": null
+          },
+          {
+            "historyYear": 2003,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "住友商事",
+            "seq": 2,
+            "slug": null
+          },
+          {
+            "historyYear": 2003,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "edu",
+            "orgName": "九州大学",
+            "seq": 1,
+            "slug": null
+          }
+        ],
+        "id": "DIR-460",
+        "xLink": "https://x.com/unifa_toki"
+      },
+      {
+        "directorName": "星 直人",
+        "histories": [
+          {
+            "historyYear": null,
+            "isFounder": false,
+            "isInside": true,
+            "isRepresentativeDirector": true,
+            "orgCategory": "com",
+            "orgName": "一般社団法人インパクトスタートアップ協会",
+            "seq": 4,
+            "slug": null
+          },
+          {
+            "historyYear": null,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "PIVOT",
+            "seq": 3,
+            "slug": null
+          },
+          {
+            "historyYear": 2019,
+            "isFounder": false,
+            "isInside": true,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "ユニファ",
+            "seq": 2,
+            "slug": "unifa"
+          },
+          {
+            "historyYear": 2007,
+            "isFounder": false,
+            "isInside": false,
+            "isRepresentativeDirector": false,
+            "orgCategory": "com",
+            "orgName": "モルガン・スタンレー",
+            "seq": 1,
+            "slug": null
+          }
+        ],
+        "id": "DIR-463",
+        "xLink": null
+      }
+    ],
+    "fundingHistories": [
+      {
+        "companyName": "ユニファ株式会社",
+        "cumulativeFunding": 92.8,
+        "fundingDate": "2024/09/30",
+        "slug": "unifa",
+        "valuation": 179.4
+      },
+      {
+        "companyName": "ユニファ株式会社",
+        "cumulativeFunding": 86.7,
+        "fundingDate": "2021/07/16",
+        "slug": "unifa",
+        "valuation": 174.3
+      }
+    ],
+    "jobs": [
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "FfCSxynEKKev",
+        "name": "［ALL］オープンポジション",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/FfCSxynEKKev/dbc8b2ab-8a49-403e-a1ac-b8d809cce190.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "c7deb961-fa7e-445f-ac8d-2c766fd82766",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス・バリューへの共感がある方",
+        "preferredSkills": "",
+        "requiredSkills": "各ポジションの必須スキルに準ずる",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "複数のポジションにまたがる応募をご希望の方や、ご経験をお持ちの方はこちらよりご応募ください。\n募集中以外のポジションでの選考もご相談に応じますので、まずはエントリーください。\n\n【変更の範囲：会社の定める業務】\n\n※当社社員よりご紹介のみなさまへ\nこちらのページよりエントリーください。応募時にご希望職種、紹介者名の記載をお願いいたします。",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2025-09-30T08:31:36.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\nスライド勤務、リモート勤務は応相談\n\n■完全週休2日制（土日休み）\n■国民の休日\n■年次有給休暇（入社後に1日付与/入社半年後に法定付与）\n■その他の休暇\n・慶弔、夏季、年末年始休暇\n・生理休暇\n・結婚休暇\n・育休・産休\n・子の看護等休暇（年10日有給付与）\n・介護休暇",
+        "jobRoles": [
+          {
+            "id": "open_position",
+            "name": "オープンポジション",
+            "parentJobRoleId": "open_position",
+            "parentJobRoleName": "オープンポジション"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2025-04-28T09:18:41.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "ahDy1ZNKl68l",
+        "name": "［Biz-01］SMB営業",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/ahDy1ZNKl68l/00bce99a-959f-48ff-82b2-aa3cae58a855.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "f964ccf8-6de5-4587-8adb-4c5a66ef2d0f",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス、バリューへの共感\n・日本の保育業界をより良い環境にしていく志を持っている方\n・現状のやり方や体制の課題を見つけ、改善に向けて積極的に行動できる方\n・同僚と一緒に物を作り上げることが好きな方\n・売上最大化のミッションを担える方\n・不確実なことやわからないことがあっても物事を前に進めることができる方\n・論理的に物事を捉え、プランを立て、実行することのできる方",
+        "preferredSkills": "・新規開拓の営業経験\n・BtoBにおけるソリューションセールス\n・エンタープライズ企業への営業経験\n・SaaSサービスやソフトウェアなどの営業経験\n・育児支援サービス、子ども向け（乳幼児を含む）サービスの経験\n　保育事業におけるSVなど、マネジメント経験\n・カスタマーサクセス、カスタマーセールスの経験 ",
+        "requiredSkills": "・営業経験が2年以上\n・ステークホルダーとの関係を構築、強化できるコミュニケーションスキル\n・課題に即したソリューションセールススキル",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは、家族の幸せを生み出すあたらしい社会インフラを世界中で創り出すことをパーパスとしたITベンチャーです。\n保育の現場ではまだまだ紙とペンのアナログ業務が多いのが実情です。IoTやAIを活用し、保育園・幼稚園などの業務負担を軽減することで、保育者の時間と心のゆとりを確保し、子ども達との豊かな関わりを増やし保育の質を高める「スマート保育園®」の実現を目指し、新規及び既存顧客に提案、伴走していただける方を募集しています。\n\n様々なバックボーンを持つ個性ある社員が多く、また、しっかりとした指導・サポートを行う経験豊かなマネージャーがおり、社会貢献と自身の成長をダイレクトに実感できる環境です。\n\nセールスからカスタマーサポートまで一貫して行い、顧客となる保育施設に寄り添いながら、それぞれの顧客が目指す保育施設の実現に向かって伴走します。\n顧客保育施設の現状、さらにこれから想定される課題や解決していきたい業務等を洗い出すことで、\n保育施設が気づいていない潜在的なニーズまでもを発掘し、それぞれの園に即した情報提供やソリューションを提案、提供し、実現するためのサポートを行います。\n\n▽具体的には下記のとおりです。\n・顧客への訪問、電話、オンライン等を用いたニーズ調査\n・顧客が目指す姿を実現するための業務やコミュニケーションの改善サポート（コンサルティング）\n・課題に即した商品やソリューションの提案、提供\n・改善後の伴走（カスタマーサポート）\n・改善の見える化、園内の魅力の見える化（カスタマーサクセス）\n\n確固たるパーパスの元、顧客となる保育施設に対して何が合うのかを考えて提案しています。\n保育施設の先生方の業務効率改善に向けた提案が、その先にお子様がいて、さらにその先に家族がいて、ということを想像しながらやっていける事も特徴の1つです。\n進め方はある程度個々人の裁量に委ねられており、また社内に向けたアイデアの提案もしっかりと耳を傾ける風土があります。\n営業として出来る事は無限大です。これまでのスキルやご経験を存分に発揮してください。\n\n【変更の範囲：会社の定める業務】\n\n◎研修等について◎\n入社後は、OJTを中心に会社・プロダクト・ステークホルダー・業界等について広くインプット、アウトプットを行います。\n習熟度にもよりますが、3週間～1ヶ月程度で最初の1件受注することが多く、一連の流れを経験していただきます。\n\n◎どんなスキルが伸ばせるか◎\n当社領域における営業だけでなく、汎用性のある営業スキルを伸ばせます。\n",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-03-16T08:37:43.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other_sales",
+            "name": "その他セールス",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2025-04-28T09:05:53.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "W5NPksUMEE8Q",
+        "name": "［Biz-02］ソリューション提案営業",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/W5NPksUMEE8Q/c86813dd-1c1a-469e-a8b0-14b2aaac71a1.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "e0676bd5-624a-4804-9ad1-8eaeb03edd30",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・当社purpose、valueへの共感がある方\n・保育、子育ての領域への興味関心\n・お客様に寄り添いながら、課題を理解し、提案が出来る方\n・新しいことに臆せずチャレンジができる方",
+        "preferredSkills": "・法人営業経験2年以上\n・SaaSやITソリューションを活用した課題解決型の提案経験（営業、コンサルタントなど）\n・組織またはプロジェクトのマネジメント経験\n・保育士・幼稚園教諭の資格保持者、または保育施設での勤務経験者",
+        "requiredSkills": "・新規開拓の営業経験を含む、営業経験が2年以上\n・ステークホルダーとの関係を構築、強化できるコミュニケーションスキル\n・課題に即したソリューション提案スキル",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」をパーパスとしたスタートアップ企業です。\n日本のこどもは自己肯定感が低い。子育てを支える保育士の負担は大きい、にもかかわらず社会的評価は低い。ユニファはこの社会を変えるため、まずは「保育施設」に着目しました。\n未就学児の95%が通う社会インフラである「保育施設」の質を高めることから、家族や子育てに関する社会課題の解決は始まる、ユニファはそう考えています。\n\n\n今回募集する【営業職】は、\n保育施設を運営する法人の経営者・本部担当者・園長先生等に対し、当社サービスを活用したソリューション提案を行うポジションです。\n\n担当エリア制のため、地域に根差した保育法人や自治体と長期的な関係を築きながら、大手法人から地域の保育施設まで幅広いお客様をご担当いただきます。\n単なるサービス提案ではなく、\n「こどもを取り巻く環境をより良くするにはどうすればよいか」\n「保育現場と法人運営をどう変革していくか」\nといった本質的な課題に向き合い、お客様とともに保育の未来を創ることがミッションです。\n受注して終わりではなく、カスタマーサクセスやプロダクトチームと連携しながら、サービスの活用・定着まで長期的なフォローを通じて現場が変革していく姿に伴走できることが魅力です。\n「社会貢献性の高いサービスを世に広めたい」「顧客と長期的な関係を築きながら、本質的な課題解決に挑戦したい」「提案だけでなく実行・改革まで関わりたい」という方は、特にやりがいを感じていただけると思います。\n\n■業務内容詳細\n・顧客（保育園、こども園、幼稚園等）の個々のニーズの調査（ヒアリング）\n・顧客が目指す姿を実現するための業務やコミュニケーションの改善サポート\n・課題に即した商品やソリューションの提案、提供（アップセル、クロスセル）\n・改善の見える化、園内の魅力の見える化\n\n◆期待する姿\n担当エリア・顧客の課題や業務フローを社内の誰よりも深く把握し、顧客ニーズに合わせた的確な提案を行っていただきます。その活動を通じて、ご自身に課せられた目標を達成することを期待しています。\nまた、地域における保育園の意義を共に考える役割として、課題解決を伴走することで「ベンダー」ではなく「パートナー」として信頼される関係を構築していただくことを期待しています。\n\n\n【変更の範囲：会社の定める業務】\n\n◎研修等について◎\n入社後は、OJTを中心に会社・プロダクト・ステークホルダー・業界等について広くインプット、アウトプットを行います。\n習熟度にもよりますが、3週間～1ヶ月程度で最初の1件受注することが多く、一連の流れを経験していただきます。\n\n◎働き方◎\n対面でのコミュニケーションも大切にしながら、リモートと出社を組み合わせたハイブリッド勤務を採用しており、週2日をオフィス出社の推奨日としています。\n※出社自体が目的ではないため、ご事情に応じて柔軟に対応可能です。\n※商談はオンライン・訪問（出張含む）で対応となります。",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-06-19T08:09:31.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other_sales",
+            "name": "その他セールス",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-06-19T07:54:59.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "oubBjV9GYEYs",
+        "name": "［Biz-03］商品企画・推進",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/oubBjV9GYEYs/3b55600b-cfbf-4d49-9583-2033e81dfd51.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "ffb3385e-5760-4f6c-b2f8-3eb38f4689f7",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス、バリューへの共感\n・保育・教育／子育てに強い関心があり、社会性の高い事業に当事者意識を持って取り組める\n・「プロダクト単体ではなく、営業・CS・マーケまで含めた“サービス全体”で価値を届ける」という発想に共感できる\n・圧倒的当事者意識を持ち、立場やKPIの異なる関係者（営業・開発・経営企画・広報・サポート等）と合意形成しながら、目的達成のために動ける\n・自身のやり方に固執せず、課題を自ら定義し、企画から実行まで粘り強くやり切れる方",
+        "preferredSkills": "・商品企画・PMM・プロダクトマーケティング・セールスイネーブルメントの経験\n・複数の部門・顧客フィードバックを統合して「イシューを定義」した経験\n・ToB向けオウンドメディア・コミュニティ・ウェビナー等のコンテンツ企画／運営経験\n・Pardot・Salesforce等のMA/CRM、Googleアナリティクス等の解析実務\n・改善PDCA経験、HTML・CSSの知識／Web制作ディレクション",
+        "requiredSkills": "事業会社における、商品企画・マーケティング・法人営業（ToB）・カスタマーサクセスのいずれかで、企画／改善／コンテンツ制作などを主体的にリードした実務経験2年以上（toB/toC問わず）",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは「家族の幸せを生み出す あたらしい社会インフラを世界中で創り出す」をパーパスに、保育ICT領域を牽引しています。\n本ポジションは、保育施設向けサービス「ルクミー」を誰に・何を・どう普及させるかを、販促・ナレッジ・コミュニティを通じて現場に実装し、施設向け営業力の強化と重点プロダクトの利用率向上に貢献いただく役割です。\n\n当社は2013年の創業以来、保育施設とその利用者に向けて新たなサービスを提供し続け、プロダクト数・事業・組織ともに拡大を続けています。今後、商品企画の組織体制を強化すべく人員を増強します。\n\n【組織ミッション】\n「経営とフロントの結節点として、圧倒的な当事者意識と手触り感を持ちながら、経営ビジョンに基づく事業戦略を策定し、その事業戦略を事業計画に落とし込み、そしてその計画を達成させるために適切なKGI・KPIでの事業進捗管理により、事業と組織をドライブする。また、期中においては兵站部隊として、Biz本部・各事業部の計画達成に向けて、必要となるリソースの分配及び部署横断的な施策の立案・プロジェクトの推進を実施する。」ことがユニファの事業企画部のミッションとなります。\n\n本ポジションは、その中で開発と営業の結節点となり、「ルクミー」を「誰に・何を・どう普及させるか」を、販促・ナレッジ・コミュニティといった具体的な打ち手に落とし込み、企画から実行までリードいただく役割です。実行を通じて顧客・現場・プロダクトの解像度を高め、将来的には売り方の設計まで担う統合的なPMMへと役割を広げていただくことを期待しています\n\n【このポジションの魅力】\n・プロダクトの「売り方」を、資料・コンテンツ・コミュニティという形で自分の手で実装できる大きな裁量\n・経営とフロントの結節点で、企画・実行から効果検証まで一気通貫に関われる\n・将来的には、実行で培った顧客・プロダクトの解像度を土台に、価格・訴求・競争戦略まで含めてLTV最大化を担う統合的なPMMへとキャリアを広げられます\n\n【チーム】\n現メンバーは広告代理店出身の営業・CS経験者や、幼稚園教諭から転身したメンバーなど、多様な経歴が集うチームです。\n現場感の厚いチームに企画・マーケティングの視点を持ち込み、共に学びながら成長したい方を歓迎します。\n\n\n【変更の範囲：会社の定める業務】\n\n",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-06-12T10:08:40.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "product_planning",
+            "name": "商品企画・商品開発",
+            "parentJobRoleId": "marketing",
+            "parentJobRoleName": "マーケティング・商品開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-06-12T08:12:24.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "rSBJf8EavlV8",
+        "name": "［Biz-05］カスタマーサクセス（北九州オフィス）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/rSBJf8EavlV8/70c879b5-4e4a-4dd2-9ce7-b379c7e20b0d.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "f5afbb28-15e9-4d0f-a0bc-0af474400aff",
+        "location": "■北九州オフィス\n福岡県北九州市小倉北区京町2-7-8 小倉ビル6F\n└JR小倉駅北口 徒歩2分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス、バリューへの共感\n・お客様や周囲のメンバーと丁寧にコミュニケーションを取りながら仕事を進めることが好きな方\n・より良いやり方を考えながら、前向きに仕事に取り組める方\n・チームで協力しながら、人の役に立つ仕事にやりがいを感じる方",
+        "preferredSkills": "・幼稚園や保育園などの各施設での業務経験者\n・営業やカスタマーサクセス経験者",
+        "requiredSkills": "・お客様や社内メンバーと円滑にコミュニケーションを取り、相手に寄り添った対応ができる方\n・業務の中で課題に気づき、より良い進め方を考えながら改善に取り組んだご経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファ株式会社では、「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスのもと、保育現場を支えるサービスを展開しています。\n保育施設向け総合ICTサービス「ルクミー」は、多くの保育施設に導入され、今もサービスの成長を続けています。\n\n本ポジションでは、お客様に伴走しながらサービスの定着を支え、より多くの保育現場へ価値を届けていく重要な役割を担っていただきます。\n\n【組織ミッション】\nこの部署は、単なる導入支援チームではありません。\n保育・教育現場にテクノロジーを根付かせ、先生たちが“子どもと向き合う時間”を増やすことをミッションにしています。\nお客様がサービスを導入して終わりではなく、現場に定着し、本当に価値を感じていただける状態まで伴走することで、日本の保育業界の課題解決に挑んでいます。\n\nその実現に向けて、私たちは\n・お客様への提供価値（顧客体験）の最大化\n・現場に根付くまでの課題解決\n・継続利用率・アクティブユーザーの向上\nを通じて、「導入支援」ではなく、事業成長を支えるプロフェッショナル組織を目指しています。\n\n【このポジションの魅力】\n■ 社会課題解決を最前線で実感できる仕事\nユニファのサービスは全国の保育施設で利用されており、あなたの支援が、保育士の業務負担軽減や、子どもと向き合う時間の創出に直結します。\n「売る」だけではなく、社会に価値を届け続ける仕事です。\n\n■ 高い課題解決力が身につく\nお客様ごとに抱える課題は異なります。\n・現場スタッフがITに慣れていない\n・オペレーションが属人化している\n・導入後に活用が進まない\nこうした課題を整理し、解決策を提案・実行していくため、単なるサポート業務ではなく、本質的な課題解決力（コンサルティング力） を身につけることができます。\n\n■ 北九州にいながら成長市場SaaSのキャリアを積める\n全国的に需要が高まっているSaaS・カスタマーサクセス領域ですが、東京に行かなくても、成長市場であるIT/SaaS業界で専門性を高め、市場価値の高いキャリアを築くことができます。\n\n■ 現場の声がプロダクト改善に繋がる\n日々お客様と接する中で得たリアルな課題や声は、開発・プロダクトチームへフィードバックされ、サービス改善に活かされます。\n単なる運用担当ではなく、プロダクトを一緒に育てる重要な役割です。\n\n◎働き方◎\n対面でのコミュニケーションも大切にしながら、リモートと出社を組み合わせたハイブリッド勤務を採用しており、週2日をオフィス出社の推奨日としています。\n※出社自体が目的ではないため、ご事情に応じて柔軟に対応可能です。\n\n【変更の範囲：会社の定める業務】\n\n",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-08T09:45:29.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "customer_success",
+            "name": "カスタマーサクセス",
+            "parentJobRoleId": "customer_success_support",
+            "parentJobRoleName": "カスタマーサクセス・サポート"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13117",
+            "cityName": "北区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          },
+          {
+            "cityCode": null,
+            "cityName": null,
+            "prefCode": "40",
+            "prefName": "福岡県"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-07-08T09:44:38.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "VorrpQJbmLvO",
+        "name": "［Corp-04］（障）労務・給与",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/VorrpQJbmLvO/4e5b252d-7b9a-4e86-baa1-0fd45feb9f5e.png",
+        "formOfEmployment": "契約社員、パートまたはアルバイト",
+        "requisitionId": "d80bc8cd-fa49-4b4f-aaa3-2f463d6d9392",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・当社のパーパス、バリューに共感し、自身も会社と共に成長していきたい気持ちのある方\n・ベンチャー、スタートアップの柔軟性を受け入れながら行動することができる方\n・変化を楽しめる方",
+        "preferredSkills": "・ベンチャー企業や成長フェーズでのバックオフィス経験\n・就業規則や人事制度の策定・改定に携わった経験",
+        "requiredSkills": "・労務・給与関連の基本的な業務（給与計算、勤怠管理、社会保険手続き等）の経験（3年以上）\n・PC・ツール使用スキル（GoogleWorkspace・Excel・Word・slack・jira・Manageozo3・SmartHR・confluence 等）\n・対面またはslackにて社員や関係部署と円滑にコミュニケーションを取れる力",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "労務・給与領域をご担当いただくメンバーを募集します。\n\n継続的な事業成長に伴い、労務・給与領域に求められる役割が多岐に渡り拡大しています。\n勤怠・給与・社会保険などの労務対応に幅広く携わり、社員が安心して働ける環境づくりを担っていただきます。\n\n◎具体的には以下のような業務を想定しています。\n■勤怠管理・給与計算・社会保険手続きなどの労務実務\n■就業規則や各種社内規程の整備・運用\n■上記に付随する業務\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2025-09-30T08:26:47.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "labor_management",
+            "name": "労務",
+            "parentJobRoleId": "corporate",
+            "parentJobRoleName": "コーポレート"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "CONTRACT",
+          "PART_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2025-09-09T04:52:37.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "QgU31G6Mm4Z7",
+        "name": "［Dev01_03］採用担当（開発部門）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/QgU31G6Mm4Z7/3a40c185-03fa-4dc8-b07c-22696cc3e67b.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "ee093cfc-9f0c-4daf-9290-dcca73303898",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・Slackやzoomを通じたオンラインコミュニケーションに抵抗がない方\n・自分と相手の違いを理解しつつ、様々な人と一緒に作っていくことを楽しめる方\n・考えて提案するだけでなく、手を動かすことも楽しめる方\n・変化や未経験のことも楽しみながらチャレンジできる方\n・「なぜ採用がうまくいっていないのか」を構造的に捉え、ロジカルかつ柔軟に打ち手を講じられる方",
+        "preferredSkills": "・エンジニア採用の「立ち上げ」や、一人目リクルーターとしての実務経験\n・採用広報（テックブログ、イベント登壇の企画など）の立ち上げ・運用経験\n・開発現場でのエンジニア経験",
+        "requiredSkills": "・ユニファのビジョン・バリューへ共感できること\n・IT・Web業界における開発人材（PM、エンジニア、デザイナーなど）採用の実務経験（3年以上）\n・ダイレクトリクルーティングを用いた母集団形成、およびエージェントコントロールの実務経験\n・既存の枠組みがない、または変化の激しい環境において、自ら課題を特定し、解決策を提案・実行してきた経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは、家族の幸せを生み出すあたらしい社会インフラを世界中で創り出すことをパーパスとし、子どもと先生がもっとワクワクできる保育を目指してサービスを育てています。\n\nこれまでは人事チームや現場のマネジメント層が兼務する形でエンジニア採用を進めてきましたが、今後のさらなる成長には、開発組織に特化した独自の採用戦略と、それを高速で実行する専任組織の立ち上げが不可欠であるという結論に至りました。\nそこで今回、「開発部門専任リクルーターの立ち上げ一人目」として、本部長・副本部長の右腕となり、採用基盤の構築から泥臭い実行までを牽引してくださるコアメンバーを募集いたします。\n\n\n■ 職務内容\nユニファ開発部門の採用を促進するため、下記の業務を担っていただきます。\n\n・採用戦略の立案・要件定義\n本部長・副本部長や各開発チームのリーダーと密に連携し、経営・事業戦略に紐づいた採用計画の策定\n\n・採用プロセスの「仕組み化」と基盤構築\n選考フローの見直し、各種数数値（歩留まり）の可視化・分析体制の構築、ATSの運用最適化\n\n・母集団形成・現場巻き込み型のスカウト配信\nダイレクトリクルーティング（ビズリーチ、Findy等）を活用したアプローチ、現場エンジニアを巻き込んだスカウト運用の設計\n\n・採用ブランディング・広報の立ち上げ\nテックブログの活性化、採用イベントの企画・運営、SNSを活用した発信強化\n\n■ 本ポジションのやりがい\n・「一人目」として組織を作る圧倒的な裁量\n既存のやり方に縛られることなく、PDCAサイクルを自分で回しながら、理想の採用組織や仕組みをゼロから形にしていけるフェーズです。\n\n・本部直下のスピード感\n意思決定のスピードが非常に早く、良い提案であれば即座に予算やリソースを投下して実行に移すことができます。\n\n・開発組織を自らの手で大きくする実感\n自らが採用した人材がプロダクトを成長させ、事業に貢献していくダイナミズムを特等席で体感できます。\n",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-06-16T00:45:36.000Z",
+        "welfare": "■保険\n・関東ITソフトウェア健康保険、厚生年金保険、雇用保険、労災保険\n\n■手当\n・通勤交通費支給（規程有）\n\n■その他\n・副業許可\n・従業員持株制度\n・定期健康診断\n・インフルエンザ予防接種補助\n・ベビーシッター割引券\n・PC貸与\n・ウォーターサーバー\n・オフィスグリコ",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "human_resource",
+            "name": "人事",
+            "parentJobRoleId": "corporate",
+            "parentJobRoleName": "コーポレート"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2026-06-02T02:41:13.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "_uZQUggXRPmt",
+        "name": "［Dev_01_01］エンジニアリングマネージャー",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/_uZQUggXRPmt/c8d8b804-acfb-46d2-ada5-107536fdb4f5.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "c88e2041-2ffb-4e62-b804-2208dd15c594",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・保育業界の現状や家族コミュニケーションを本気で変えたいと思っている方 \n・自ら現状のシステム・体制の課題を見つけ、改善に向けて積極的に行動できる方 \n・技術者として新しい技術へのアンテナを高く張っている方\n・チームのメンバーへのリスペクトを忘れず、協力してプロダクトを開発していける方",
+        "preferredSkills": "・開発ベンダーのコントロール経験\n・AIやLLMを活用したシステムの開発経験\n・外国籍など多様性のある組織のマネージメント経験\n・日常会話レベルの英語力 ",
+        "requiredSkills": "・エンジニアリングマネージャーとして組織の構築・強化の経験\n・エンジニアとしての実装実務経験\n・プロジェクトリード経験\n・複数の関係者と仕事を進めていける能力\n・リモートワーク環境におけるチーム開発の経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファでは「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスの元、保育の現場を支えるためのパートナーとなるべく事業を展開しております。\n保育施設向け総合ICTサービスである「ルクミー」は、提供する機能も増え、多くの保育施設に導入いただいておりますが、今後さらに領域を拡大し、かつ安定したプロダクトを提供するために、エンジニア組織の拡大と強化が必要となります。\nエンジニアリングマネージャーとしてエンジニア組織の生産性とアウトプットを最大化し、プロダクトの成長をリードする役割を担っていただきます。\n\n家族のための新しい社会インフラを創造する B2B/B2B2C事業において、エンジニアリングマネージャーは部署間の「結節点」となり、パーパスとビジョンをチームに浸透させ、組織のアウトプットを高めていくことが期待されています。\nそのために技術チームのパフォーマンスを最大化し、健全で成長志向の強い組織を築いていただくことを期待しております。\nまた、プロダクトマネージャー、デザイナー、QAなど他職種のチームと連携し、ルクミーを始めとする自社プロダクトの開発プロジェクトを推進することを期待しております。\n\n【主な利用技術】\n・言語: Ruby\n・フレームワーク: Ruby on Rails\n・DB: PostgreSQL, Redis, DynamoDB\n・バージョン管理: Git\n・ソースコード管理: BitBucket, GitHub\n・インフラ: AWS, Docker\n・コミュニケーション: Slack, Google Meet, Zoom\n・ドキュメンテーション: Confluence\n・チケット管理: Jira\n \n下記情報もご参照ください。\n\n開発者ブログ\nhttps://tech.unifa-e.com/",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2025-12-17T06:41:22.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n※スライド勤務（時差出勤）対応\n※原則リモートワークでの勤務となります\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "engineering_manager",
+            "name": "エンジニアリングマネージャー",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "FULL_REMOTEWORK",
+        "jobPublishedAt": "2025-04-28T09:28:47.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "KIWMrpnRLrtt",
+        "name": "［Dev_01_02］サーバサイドエンジニア（EM候補）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/KIWMrpnRLrtt/0a6cea72-d848-4468-b6ac-2ff3ce46c7de.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "62041f09-f92c-4ae9-8182-af05535cc083",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・保育業界の現状や家族コミュニケーションを本気で変えたいと思っている方 \n・自ら現状のシステム・体制の課題を見つけ、改善に向けて積極的に行動できる方 \n・技術者として新しい技術へのアンテナを高く張っている方\n・チームのメンバーへのリスペクトを忘れず、協力してプロダクトを開発していける方\n\n事業成長に伴い、開発体制をより強固なものにし、事業をドライブしていきたいと思っております。\n一方で、メンバーが増える中で、個々のキャリア開発、エンジニア組織の生産性向上、そして技術選定の意思決定をリードする存在が不可欠になっています。\nエンジニアとしての知見を活かしながら、現場に近い距離感でマネジメントしてくださる方を求めています。",
+        "preferredSkills": "・プロジェクトリード経験\n・開発ベンダーのコントロール経験\n・AIやLLMを活用したシステムの開発経験\n・外国籍など多様性のある組織のマネージメント経験\n・日常会話レベルの英語力 ",
+        "requiredSkills": "・Ruby on Rails（3年程度）もしくはその他の Web 言語（8年程度）を用いたエンジニアとしての実装実務経験\n・数名以上のエンジニアチームにおけるリーダー経験、またはマネジメント経験\n・リモートワーク環境におけるチーム開発の経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファでは「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスの元、保育の現場を支えるためのパートナーとなるべく事業を展開しております。\n保育施設向け総合ICTサービスである「ルクミー」は、提供する機能も増え、多くの保育施設に導入いただいておりますが、今後さらに領域を拡大し、かつ安定したプロダクトを提供するために、エンジニア組織の拡大と強化が必要となります。\nエンジニアリングマネージャーとして、エンジニア組織の生産性とアウトプットを最大化し、プロダクトの成長をリードする役割を担っていただきます。\n\n■業務内容\n・開発や保守運用におけるチームメンバーへのタスク割り当てや進捗管理\n・メンバーの育成・成長支援、1on1やフィードバックの実施⁠\n・チームのモチベーション・士気や健康状態の把握・ケア\n・プロダクトマネージャーなど他職種と連携した開発プロセスの推進\n・採用面接を含め、組織の中長期的な成長や持続可能性を意識した組織強化\n\n■ご希望や適性により実施する業務\n・チームや組織全体の技術戦略の策定と改善\n・技術課題の解決、アーキテクチャの方向性検討や判断⁠\n・プロジェクトやプロダクトのマネジメント\n\n今回の募集ポジションは B2B 及び B2B2C 双方の性質を持つルクミーのフォト開発チームです。\nルクミーでは最先端のAI技術を積極的に導入し、現場業務の本質的な課題解決に挑戦しています。\nたとえば園児写真の自動分類や、連絡帳や保育記録の文章生成などをAIで実現。また保育ICTデータとAIを活用して \"こどもの育ち\" を可視化する『すくすくレポート』をリリース。\nPoC止まりでなく、最新技術を活用したプロダクトを積極的にユーザーに届ける組織で、ビジネスインパクト創出と技術革新の手応えを実感できるポジションです。\n\nもちろん開発に Cursor や Claude Code など AI エディタを活用しています。\n\nR&Dとフォトチームのメンバーによる以下のインタビュー記事もぜひご覧ください。\nhttps://findy-code.io/pick-up/interviews/unifa-engineer\n\n【主な利用技術】\n・言語: Ruby\n・フレームワーク: Ruby on Rails\n・DB: PostgreSQL, Redis, DynamoDB\n・バージョン管理: Git\n・ソースコード管理: BitBucket, GitHub\n・インフラ: AWS, Docker\n・コミュニケーション: Slack, Google Meet, Zoom\n・ドキュメンテーション: Confluence\n・チケット管理: Jira\n・AIエディタ: Cursor, Claude Code, GitHub Copilot, Gemini, Kiro\n\n【変更の範囲：会社の定める業務】\n\n \n▶下記情報もご参照ください。\n開発者ブログ\nhttps://tech.unifa-e.com/",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-01-30T06:38:36.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n※スライド勤務（時差出勤）対応\n※原則リモートワークでの勤務となります\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other_engineer",
+            "name": "その他エンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "FULL_REMOTEWORK",
+        "jobPublishedAt": "2026-01-30T06:39:16.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "E8XVC4enGMVa",
+        "name": "［Dev_02］iOSエンジニア",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/E8XVC4enGMVa/45ee9f93-a260-4226-ad79-8999fb1c5a32.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "14e66e80-d5ec-49d0-a249-38b4ed5cb9ae",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・保育業界の現状や家族コミュニケーションを本気で変えたいと思っている方 \n・自ら現状のシステムの課題を見つけ、改善に向けて積極的に行動できる方 \n・チームのメンバーへのリスペクトを忘れず、協力してプロダクトを開発していける方\n・未経験の技術に対して積極的にキャッチアップする意欲のある方",
+        "preferredSkills": "・サーバサイド開発・運用のご経験をお持ちの方\n・BLEを用いたモバイルアプリ開発のご経験をお持ちの方\n・AI関連など新技術の活用に興味がある方\n・ReactNativeを用いたモバイルアプリ開発のご経験をお持ちの方\n・Bitriseの利用経験をお持ちの方\n・日常会話レベルの英語力をお持ちの方",
+        "requiredSkills": "・SwiftによるiOSアプリ開発・運用実務経験\n・リアクティブプログラミングのご経験\n・ユニットテストを定常的に書いたご経験\n・複数の関係者と仕事を進めていける能力\n・リモートワーク環境におけるチーム開発のご経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "■概要\nユニファでは「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスの元、保育の現場を支えるためのパートナーとなるべく事業を展開しております。\n保育施設向け総合ICTサービスである「ルクミー」は、提供する機能も増え、多くの保育施設に導入いただいておりますが、今後さらに領域を拡大し、かつ安定したプロダクトを提供するために、iOSエンジニアとして自社プロダクト全般におけるiOSアプリ開発・運用全般を担っていただきます。\n提供するサービスの数は多く、並行して複数の施策が実行されていくため、複数の開発チームと連携を取りながらサービス開発・運用を進めていくことが求められます。\n\n■詳細\n家族のための新しい社会インフラを創造する B2B/B2B2C事業において、サーバサイドエンジニアやインフラエンジニア、プロダクトマネージャーなどのメンバーと連携し、ルクミーを始めとする自社プロダクトのモバイルアプリの開発・運用を担っていただきます。\n\n【利用技術】\n・言語: Swift\n・バージョン管理: BitBucket/GitHub\n・インフラ: AWS\n・CI: Bitrise\n・コミュニケーション: Slack, Google Meet\n・ドキュメンテーション: Confluence\n・チケット管理: Jira\n\n■期待する役割\n・新規プロダクト開発、既存プロダクトの追加開発におけるモバイルアプリ開発・運用\n・プロダクトマネージャーやサーバサイドエンジニアなど他職種のメンバーと連携した仕様検討\n・障害の対応、復旧プロセスの標準化、障害の予防的検知への取り組み\n\n\n下記情報もご参照ください。\n\n会社紹介資料（開発チーム版）\nhttps://speakerdeck.com/unifa_hr/unifa-inc-information-for-dev-team\n\n開発者ブログ\nhttps://tech.unifa-e.com/\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-21T01:34:39.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n※スライド勤務（時差出勤）対応\n※リモートワーク可\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "mobile_engineer",
+            "name": "モバイルエンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          },
+          {
+            "id": "ios_engineer",
+            "name": "iOSエンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2025-12-23T08:36:18.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "Ih6zFDVZTnuw",
+        "name": "［Dev_03］Androidエンジニア",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/Ih6zFDVZTnuw/66b4338e-84a1-40bc-9984-0517dc5802c0.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "5cd0cdbf-f650-4bab-a58b-8c2e1f3ad1cb",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "- 保育業界の現状や家族コミュニケーションを本気で変えたいと思っている方\n- 自ら現状のシステム・体制の課題を見つけ、改善に向けて積極的に行動できる方\n- エンジニアとして常に技術の向上に取り組んでいる方\n- チームのメンバーへのリスペクトを忘れず、協力してプロダクトを開発していける方\n- 未経験の技術に対して積極的にキャッチアップする意欲のある方",
+        "preferredSkills": "- Clean Architectureでの開発経験\n- Room / DataStoreを用いたローカル永続化の実装経験\n- WorkManagerを用いたバックグラウンド処理の実装経験\n- Detekt/ktlintなど静的解析ツールの導入・運用経験\n- Bitriseなど CI/CDパイプラインの構築・運用経験\n- KMP（Kotlin Multiplatform）のご経験\n- Compose Multiplatformのご経験\n- テックリードとしてチームを牽引した経験\n- 日常会話レベルの英語力",
+        "requiredSkills": "- KotlinによるAndroidアプリ開発運用実務経験\n- Jetpack Composeを用いたUI実装経験\n- Kotlin Coroutines / Flowを用いた非同期処理の実装経験\n- Dagger Hiltなど DIフレームワークを用いた設計経験\n- MVVM等のアーキテクチャパターンの知識・実装経験\n- ユニットテストの実装経験\n- REST API（Retrofit等）と連携したアプリの実装経験\n- 複数の関係者と仕事を進めていける能力\n- リモートワーク環境におけるチーム開発のご経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファでは「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスの元、保育の現場を支えるためのパートナーとなるべく事業を展開しております。\n保育施設向け総合ICTサービスである「ルクミー」は、提供する機能も増え、多くの保育施設に導入いただいておりますが、今後さらに領域を拡大し、かつ安定したプロダクトを提供するために、Androidエンジニアとして自社プロダクト全般におけるアプリケーション開発・運用全般を担っていただきます。提供するサービスの数は多く、並行して複数の施策が実行されていくため、複数の開発チームと連携を取りながらサービス開発・運用を進めていくことが求められます。\n\n■詳細\n家族のための新しい社会インフラを創造するB2B/B2B2C事業において、プロダクトマネージャー、サーバーサイドエンジニア、インフラエンジニアなどのメンバーと連携し、ルクミーを始めとする自社プロダクトのAndroidアプリケーションの開発・運用を担っていただきます。\n\nAndroidアプリは、保護者向け・保育士向け・登降園タブレット・撮影専用・バスドライバー向けと幅広く展開しており、メイン担当はいずれか一つになりますが、適宜他のアプリの開発にも携わっていただくことになります。\n\n【主な利用技術】\n言語：Kotlin\nUI：Jetpack Compose（一部XML Viewあり、Compose移行中）\nアーキテクチャ：MVVM + Clean Architecture\n非同期処理：Kotlin Coroutines / Flow\nDI：Dagger Hilt\nローカルDB：Room, DataStore\n通信：Retrofit, kotlinx.serialization\n画像読み込み：Coil\nテスト：JUnit4, MockK, kotlinx-coroutines-test\n静的解析：Detekt, ktlint\nバージョン管理：Git / BitBucket / GitHub\nFirebase：Analytics, Crashlytics, Cloud Messaging\nCI：Bitrise\nコミュニケーション：Slack, Google Meet\nドキュメンテーション：Confluence\nチケット管理：Jira\n\n\n▽下記情報もご参照ください。\n- 会社紹介資料（開発チーム版）\nhttps://speakerdeck.com/unifa_hr/unifa-inc-information-for-dev-team\n\n- 開発者ブログ\nhttps://tech.unifa-e.com/\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-22T00:37:37.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n※スライド勤務（時差出勤）対応\n※リモートワーク可\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "mobile_engineer",
+            "name": "モバイルエンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          },
+          {
+            "id": "android_engineer",
+            "name": "Androidエンジニア",
+            "parentJobRoleId": "engineer",
+            "parentJobRoleName": "エンジニア"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-07-21T01:47:04.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "2s9vXeywjPpd",
+        "name": "［corp_01］コーポレートIT/リーダー候補",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/2s9vXeywjPpd/ce17f343-5e38-48a4-8027-1fa21e0d7132.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "4e53dec4-eacd-452b-92cc-468a2809de89",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "",
+        "preferredSkills": "- 成長企業やスタートアップでの情報システム部門の経験\n- サポートセンターや社内ヘルプデスクでのSVやリーダー経験\n- Google Workspace運用経験\n- ISMS/Pマーク等の認証審査対応経験\n- デバイスキッティングの自動化/効率化の経験\n- Windows, Mac双方の管理・運用経験\n- MDMの導入・運用経験\n- オフィスネットワークの設計・構築・運用の経験\n- 生成AIなどの新しい技術を活用した業務改善の経験または関心",
+        "requiredSkills": "コーポレートエンジニア、情報システム担当者としての実務経験（3年以上）\n\n加えて下記のご経験がある方\n- 社内ITシステムの導入や効率的な活用、あるいはシステム間連携によって生産性向上に貢献した経験\n- コスト最適化の施策を主体的に実行して成果を得た経験\n- 社内ヘルプデスク対応、運用ルールや手順書の整備・改善活動の推進経験\n- 情報セキュリティに関する知識とセキュリティ向上施策を主体的に実行した経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは、「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」ことをパーパスとし、子どもと先生がもっとワクワクできる保育を目指してサービスを育てています。\n\n運用業務の効率化をはじめ、全社視点でのIT戦略や生産性向上を主導していただける方を求めています。\n\nコーポレートエンジニアの主な役割は、以下の2点です。\n- ユニファのメンバーが高い生産性で働くことができるようなIT環境を最適なコストで提供すること\n- 顧客情報保護も含めたセキュリティやコンプライアンスのリスクに適切に対応すること\n\nその中で、社内ITシステムの各領域において、「生産性」「セキュリティ/IT統制」「 コスト最適化」の3つの観点を持ち、\nそれぞれに対して課題発見、企画設計、構築、運用を優先順位をつけて実行しています。\n\n\n具体的には以下のような業務です。\n>\n・情報セキュリティ全般に関わる対応(企画立案、ルール策定・運用、社員教育、点検、監査、事故対応等)\n・社内ITに関する問い合わせ、トラブルシューティング対応などのヘルプデスク\n・IT資産（デバイス、ソフトウェア、ライセンス等）の調達、管理対応\n・入社時オンボーディングをはじめとした、入退社、異動に伴う準備対応とその改善\n・社内利用ツールの運用方針の策定、導入支援、管理対応\n・各種監査対応やアカウントの棚卸し作業とその改善\n・各種作業の自動化検討とその推進 等\n\n\n［主な利用ツール］\n・Google Workspace, Slack, Jira, Confluence, Zoom, バクラク, Microsoft365, ジョーシス\n・WithSecure, HENNGE One Secure Transfer\n・GAS, Zapier\n・PC（Windows 7割/Mac 3割）\n・スマートフォン (iPhone)\n・MDM（LanScope Cloud, Apple Business, CLOMO）\n・ネットワーク機器（RTX3500, Fortigate）\n\n［ポジションの魅力］\n- 裁量の大きさ：コーポレートエンジニアとして、自ら課題を発見し、企画から運用まで一気通貫で主導できます\n- SaaS環境・AI活用への取り組み：社内のAI活用推進やセキュリティ策定など、モダンな技術環境をベースに、全体最適の経験を積むことができます\n- 「はみ出す」文化：枠に囚われず、他部門と連携しながら会社全体の成長を支えるコアメンバーとして活躍できます\n\n［組織体制］\n社員数：230名（2025年6月現在）\nコーポレートIT担当：正社員1名、契約社員1名、業務委託1名\n\n日々の運用に加えて、IT基盤の改善や業務効率化など、より本質的な課題解決に取り組むことができます。\nユニファの従業員が業務に専念できる環境の構築と運用を幅広く経験することができ、やりがいを感じていただけるかと思います。\n「成長企業でコーポレートエンジニアとして経験を積みたい」とお考えの方は、是非ご応募ください。",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-06-05T08:39:13.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "corporate_engineer",
+            "name": "コーポレートエンジニア",
+            "parentJobRoleId": "corporate",
+            "parentJobRoleName": "コーポレート"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-05-26T06:00:15.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "xrUYC9sAVXXA",
+        "name": "［corp_02］新規事業開発担当（教育ソリューション事業）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/xrUYC9sAVXXA/280787ff-9b8a-45c8-8415-a18eafbf4a4f.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "73308bd1-6b62-4bb3-b003-e9f5c674131d",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス、新規事業で描く未来に強く共感いただき、社会課題解決に情熱を持てる方\n・国の規制緩和の整理によって拡大する市場において、失敗を恐れずアジャイルに実行と学習を繰り返せる方\n・戦略策定だけでなく、泥臭い現場のオペレーション構築や営業推進まで自ら手を動かせる方\n・他責にせず、当事者意識を持って事業成長にコミットできる方",
+        "preferredSkills": "・教育業界（保育園・幼稚園・学校など）に関する知見、またはEdTech領域でのビジネス経験\n・事業企画や営業企画など、自ら企画を立案し推進した経験\n・エンタープライズ（大規模法人）向けの提案営業・アライアンス構築経験\n・新しいオペレーション構築や業務フローの標準化をリードした経験",
+        "requiredSkills": "・3年以上の営業経験（業界不問）\n・自ら考え、行動できる自律性と推進力\n・前向きな姿勢で、未知の領域にも積極的に挑戦できるマインド",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは「家族の幸せを生み出す あたらしい社会インフラを世界中で創り出す」をパーパスに、保育ICT領域を牽引しています。\n少子化など市場環境が激変する中、保育施設は単なる「預かりの場」から、子どもの未来を育む「プラットフォーム」への進化を求められています。私たちはその変革の伴走者として、こどもの体験機会の拡充と保護者の両立支援を実現する新規事業を展開します。\n\n本ポジションでは、この新規事業における戦略立案から現場での営業、サービス改善、オペレーション設計に一緒に取り組みます。市場環境の変化により新たに生まれつつある市場で、再現性のあるビジネスモデルを確立し、スケーラブルな事業成長を力強く推進していただきます。\n\n・教育ソリューション事業の事業戦略立案・実行\n・エンタープライズ（大規模法人）およびSMBに対する営業。\n・営業戦略の設計・推進\n・導入〜運用までのオペレーション設計・標準化\n・サービス改善に向けた仮説検証\n・既存顧客へのアップセル／クロスセル戦略の立案\n・社内外ステークホルダーとの連携・推進\n・事業立ち上げおよび運営に伴う泥臭い事務局業務、および付随する周辺事務作業全般\n（自ら手を動かして事業を推進していただきます）\n\n◆期待する姿\n・泥臭い営業推進による初期トラクションの獲得とトップラインの牽引\n事業立ち上げの最前線に立ち、戦略を描くだけでなく自ら現場に赴くこと。大規模な保育法人等への提案やアプローチを泥臭く実行し、ゼロイチのフェーズで確実に売上と顧客基盤を創り上げていただきます。\n\n・現場の一次情報に基づくPMFの推進\n不確実性の高い新規事業フェーズにおいて、自らの足で稼いだ顧客の生の声を拾い上げ、仮説検証を高速で回すこと。現場の手ざわり感をもとに、事業の勝ち筋を早期に見出していただきます。\n\n・事業拡大に耐えうるオペレーションの土台作り\n現場を走り回りながら見えてきた課題や成功パターンを抽出すること。将来的なスケールを見据え、属人的な業務から脱却するための運用フローや仕組みの構築（導入から運用まで）を並行してリードしていただきます。\n\n\n立ち上げ期特有の泥臭い事務作業から戦略推進まで、やるべき業務は数多く存在します。しかし、これらをすべて一人で完結させることは求めていません。\n限られたリソースの中で事業を最速でグロースさせるために、チームの知恵を結集し、AIをはじめとする最新ツールをどん欲に駆使して前進できるスタンスを重視しています。前例のない環境をチーム戦で突破し、事業と共に自身も圧倒的に成長させたいという意思を持った方を歓迎します！\n\t\t\t\t\t\t\t\t\t\t\n【変更の範囲：会社の定める業務】\n\n\n◎働き方◎\n原則出社となります。（個別事情によって調整可能です）\n新規事業の立ち上げにご尽力いただくため、対面でのコミュニケーションも大切にしております。",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-22T04:08:47.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "biz_dev",
+            "name": "新規事業企画・事業開発・Bizdev",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-06-24T09:35:56.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "Hnx7j01IL9SD",
+        "name": "［corp_03］新規事業開発担当（AI関連サービス）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/Hnx7j01IL9SD/4d35e189-16d1-4591-b7e3-9f456da863b6.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "fdb09f5b-639c-42b6-8e4e-cd2898476bb8",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・変化を楽しみ、カオスな状況でも自ら道を切り拓ける方\n・多様な関係者と円滑なコミュニケーションを築ける方\n・子どもたちの成長を心から応援し、教育に情熱を傾けられる方",
+        "preferredSkills": "・こども領域、AI領域へのご興味、または関連業務のご経験",
+        "requiredSkills": "・不確実な状況でも自ら仮説を立て、検証を繰り返しながら事業推進できる方\n・いづれかのご経験もしくは、それに準ずる業務の経験がある方\n　・プロジェクトリーダー/マネジメントの経験\n　・事業開発（新規・既存問わず）での経験",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファは「家族の幸せを生み出す あたらしい社会インフラを世界中で創り出す」をパーパスに、保育ICT領域を牽引しています。\n\n現在、新たな成長領域として AIを活用した新規事業開発プロジェクト を立ち上げています。\n既存事業で培ってきた保育施設との強固な顧客基盤を活かし、保育施設を運営する法人が抱える 経営課題・業務課題そのものを変革する新たな事業創出 を進めています。\n本ポジションでは、事業構想段階から市場検証（PMF）、正式な事業化、そしてグロースまで、一連の事業開発をリードしていただきます。\nまだ正解がないフェーズだからこそ、仮説構築・顧客理解・検証・改善を高速で繰り返しながら、ゼロから新しい事業を創り上げる経験ができます。\n\n\n以下、2つのサービスのいづれかをメイン担当として動いていたくことを予定しております。\n\n①保育運営法人向け経営データAIソリューションサービス\n・市場ニーズに基づいたサービス企画・設計\n・効果検証計画の策定と実行、および評価\n・事業スキームの構築とその実現（営業活動を含む）\n・将来的なサービス展開の企画・構想\n\n②基幹業務の業務改善ソリューション\n・サービス全般の初期構想及び事業検証推進\n・経営管理との連動した基幹業務における改善企画・推進（BPOも含む）\n・AXソリューションの企画提案、プロダクト開発など\n\n事業立ち上げフェーズの中核メンバーとして、市場や顧客の課題を深く捉えながら、自ら仮説構築・検証・改善を繰り返し、新規事業の成長を主体的に推進いただくことを期待しています。\n\t\t\t\t\t\t\t\t\t\t\n【変更の範囲：会社の定める業務】\n\n\n◎働き方◎\n原則出社となります。（個別事情によって調整可能です）\n新規事業の立ち上げにご尽力いただくため、対面でのコミュニケーションも大切にしております。",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-02T09:18:01.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "biz_dev",
+            "name": "新規事業企画・事業開発・Bizdev",
+            "parentJobRoleId": "sales_and_business_development",
+            "parentJobRoleName": "セールス・事業開発"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-07-02T08:36:40.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "M79_HQZbAQhF",
+        "name": "【カジュアル面談エントリー】",
+        "coverImageUrl": null,
+        "formOfEmployment": "正社員",
+        "requisitionId": "a36ff377-cc18-42f4-9fce-0a338b30257f",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "",
+        "preferredSkills": "",
+        "requiredSkills": "・ユニファのパーパス・バリューに共感いただける方\n・これまでのご経験を活かして、社会課題解決に挑戦したい方\n",
+        "salary": {
+          "text": "",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファや「ルクミー」の事業に興味を持っていただきありがとうございます！\n◎今すぐ選考に進むかは悩んでいるけれど、まずは自分の経験が活かせるポジションがあるか知りたい\n◎現場のメンバーと話してみたい\nなど\n\n▽ご案内への流れ\nご登録いただいたご経歴（職務経歴書やプロフィール）を拝見し、現在募集中の職種や今後お任せしたいポジションとの適性・親和性が高いと判断させていただいた方に、個別でカジュアル面談（または会社説明）のご案内を差し上げております。\n\n※選考のご案内ができかねる場合もございますが、ルクミーのこと、ユニファのカルチャーや働いている人のことなど、お話できる場としての面談も可能です！",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-13T08:56:38.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n └全社ではGemini ProやNotebook LMを利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\nスライド勤務、リモート勤務は応相談\n\n■完全週休2日制（土日休み）\n■国民の休日\n■年次有給休暇（入社後に1日付与/入社半年後に法定付与）\n■その他の休暇\n・慶弔、夏季、年末年始休暇\n・生理休暇\n・結婚休暇\n・育休・産休\n・子の看護等休暇（年10日有給付与）\n・介護休暇",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-07-03T01:34:18.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "djNoaqbPQj93",
+        "name": "［ALL］27卒（秋採用）_新卒【総合職】",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/djNoaqbPQj93/cae0c33c-9e25-4edf-820e-d94a0a1daad6.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "0b4f729a-c53e-4581-a017-69ceee4191bb",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ITスタートアップ、SaaS企業で業務経験してみたい方\n・フィードバックを素直に受け止め、成長に変えられる方\n・困難な状況でもやり切る意思と行動力を持つ方\n・社内関係者や顧客等の外部の方々と良好な関係を構築し、円滑なコミュニケーションが取れる方\n・ベンチャー、スタートアップの柔軟性を受け入れながら行動することができる方\n・何事にもポジティブマインドで取り組める方\n・変化を楽しめる方\n",
+        "preferredSkills": "・インターンシップでの就業経験\n・アルバイト・部活動でのご経験",
+        "requiredSkills": "・文系/理系を問わず、2027年3月までに大学院・大学を卒業・修了(見込み)の方\n※ 2027年4月に新卒として入社が可能な方",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファ株式会社は「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスを掲げた、急成長中のITベンチャーです。\n\n深刻な労働人口不足と、アナログな業務環境が残る保育業界で社会課題のDX化を推進しております。\n私たちは、IoTやAIを活用した独自のSaaSプロダクト群を武器に、これまでテクノロジーの手が届きにくかった業界全体の働き方をドラスティックに変革し、新たな社会インフラ（スマート保育園®）を構築しています。\n\n元メガベンチャー、外資系コンサル、大手金融など、様々なバックグラウンドを持つプロフェッショナルが「意志」を持って集まる環境で、27卒の新卒メンバー（新卒2期生）として、事業成長を牽引していただくことメンバーを募集しております！\n「社会を変える営業から、未来を動かすマネージャーへ」とご活躍いただけることを期待しております。\n\n▼新卒一期生インタビュー\nhttps://www.wantedly.com/companies/unifa-e/post_articles/967074\n\n【募集概要】\n総合職での新卒の社員を募集いたします。\n\n【配属について】\n新卒入社後は、営業部への配属となります。\n数年後マネージャーとしてチームを牽引できる人材になっていただくことを期待しており、\nご本人の適性や組織状況も考慮しつつ、成長できる環境をご提供するために、部署異動なども行う想定となります。\n\n最初から一人で実践するのではなく、社員と共にチーム一丸となって取り組んでいただきます。\nチャレンジしていける環境は用意させていただきますので、成長意欲やチャレンジ精神のある方、大歓迎です！\n\n新卒だからといって、業務を限定することなく、成長に応じて業務レベルは日々上がっていきます。\nベンチャー企業らしく、一人の重要な戦力として皆さまを迎え入れますので、多くの成長機会があると思っていただける環境です！\n\nパーパスのもと、保育×DX領域で社会課題の解決をともに進めていただける方をぜひお待ちしております。\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-06T06:25:49.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-06-12T08:14:13.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "dJYIszgY9rDt",
+        "name": "［ALL］28卒_サマーインターン（受付終了いたしました）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/dJYIszgY9rDt/53a0c83f-c2a1-4246-a4e5-bc2a046c01c7.png",
+        "formOfEmployment": "",
+        "requisitionId": "12b16ec8-58f5-4056-9d1b-43a7b8257ef1",
+        "location": ":office:オフィス\n└東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n:computer:オンライン\n└ZOOMを共有いたします。",
+        "personality": "",
+        "preferredSkills": "",
+        "requiredSkills": ":yellow_circle:参加希望の開催日程①～③を一つ選んでご連絡ください。\n:yellow_circle:ES不要、個別面談へのご招待が可能です。\n\n※注意事項※\n多数ご応募いただいた場合は事前受付を終了する可能性がございます。",
+        "salary": {
+          "text": "",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "\\\\\\\\\\:sparkles::speaker:ユニファが、**初のサマーインターン**を開催します:speaker::sparkles://///\nユニファ株式会社は「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスを掲げたITベンチャーです。\n\n==========================\n##### 【ユニファ １Day サマーインターン】\n■開催日程　※①～③の何れかをお選びください\n~~①7月8日（水）  13：00～16：00~~　※定員充足につき受付終了いたしました\n~~②8月19日（水）13：00～16：00~~　※定員充足につき受付終了いたしました\n~~③9月16日（水）13：00～16：00~~　※定員充足につき受付終了いたしました\n\n###### ■開催場所\nオフィス・オンライン同時開催を予定しております！\n\n###### ■プログラム\n・自己紹介・アイスブレイク\n・内容①：身近な家族／こども・保育・教育現場でのお困りごとの情報共有\n・内容②：保育現場のICT／AI／データ活用について\n・内容③：座談会\n\n###### ■こんな人におすすめ！\n① 社会課題 × ビジネス × テクノロジー、すべてに挑戦したい方\n② 若いうちから「社会に残る仕事」がしたい方\n③ 成長市場で、自分の市場価値を高めたい方\n④ 将来、事業づくり・組織づくりに関わりたい方 \n\n###### ■こんなことが学べる！\n皆さんは社会課題を自分ごととして捉える視点、テクノロジーの社会実装のリアル、そしてサービス企画の思考プロセスに触れられます。文系・理系問わず、「保育×テック」というユニファ独自の強みと、社会インフラとしての価値を深く理解する機会となります。\n\n```\n■担当者より\n私たちは、「家族の幸せを生み出す社会インフラを世界中で創り出す」パーパスのもと、AIやIoTを駆使した「ルクミー」で、保育の現場の構造的な課題を解決しています。単なる業務効率化ではなく、社会インフラそのものを創り変える挑戦です 。\n本インターンでは、まず皆さんと「身近な家族や保育の場で困っていること」を出し合い、その課題を画像認識や生成AIなどの技術でどう解決できるかを議論します。その後、ユニファ社員が、「実際にルクミーで動いている解決策」を紹介します。\n```\n==========================\n\nサマーインターンにご参加を希望される方は、\n右上の「応募する」より希望日程を添えてご連絡ください！",
+        "title": "",
+        "trial": "",
+        "updatedAt": "2026-07-13T00:23:40.000Z",
+        "welfare": "",
+        "workingConditions": "",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "INTERNSHIP"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2026-05-14T04:16:22.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "EkiBP_f_87OE",
+        "name": "［ALL］28卒_新卒【総合職】",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/EkiBP_f_87OE/8cfa34b9-d8b2-4685-b981-b1ff3efee310.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "728de531-1579-4528-82a3-1b6ec70a63b4",
+        "location": "■東京オフィス\n東京都千代田区永田町2丁目17-3 住友不動産永田町ビル 1階\n\nアクセス\n赤坂見附駅 徒歩4分\n永田町駅    徒歩4分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・当社purpose、valueに共感し、自身も会社と共に成長していきたい気持ちのある方\n・社会課題の解決に、当社事業を通して貢献したいという想いをお持ちの方\n・保育・教育領域に関心がある方\n・社内関係者や顧客等の外部の方々と良好な関係を構築し、円滑なコミュニケーションが取れる方\n・ベンチャー、スタートアップの柔軟性を受け入れながら行動することができる方\n・ITスタートアップ、SaaS企業で業務経験してみたい方\n・何事にもポジティブマインドで取り組める方\n・変化を楽しめる方",
+        "preferredSkills": "・インターンシップでの就業経験\n・アルバイト・部活動でのご経験",
+        "requiredSkills": "・文系/理系を問わず、2028年3月までに大学院・大学を卒業・修了(見込み)の方\n※ 2028年4月に新卒として入社が可能な方",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファ株式会社は「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスを掲げたITベンチャーです。\nIoTやAIを活用し、保育園・幼稚園などの業務負担を軽減することで、保育者の時間と心のゆとりを確保し、子ども達との豊かな関わりを増やし保育の質を高める「スマート保育園®」の実現を目指しています。\n\n対面やチャットツール等で気軽に業務の相談や雑談をしたり、アットホームな職場です。元保育士から、大手メーカーやメガベンチャー、外資系コンサル、金融など幅広いバックグラウンドの社員が働いています。\n\nユニファでは、2025年に新卒第一期生を迎え、ユニファのこれからの事業成長を推進し、「社会を変える営業から、未来を動かすマネージャーへ」とご活躍いただけることを期待しており、またご活躍をいただいております！\n\nパーパスのもと、保育×DX領域で社会課題の解決をともに進めていただける28年の新卒メンバーを募集しております！\n\n▼新卒一期生インタビュー\nhttps://www.wantedly.com/companies/unifa-e/post_articles/967074\n\n【募集概要】\n総合職での新卒の社員を募集いたします。\n\n【配属について】\n新卒入社後は、営業部への配属となります。\n数年後マネージャーとしてチームを牽引できる人材になっていただくことを期待しており、\nご本人の適性や組織状況も考慮しつつ、成長できる環境をご提供するために、部署異動なども行う想定となります。\n\n\n最初から一人で実践するのではなく、社員と共にチーム一丸となって取り組んでいただきます。\nチャレンジしていける環境は用意させていただきますので、成長意欲やチャレンジ精神のある方大歓迎です！\n\n新卒だからといって、業務を限定することなく、成長に応じて業務レベルは日々上がっていきます。\nベンチャー企業らしく、一人の重要な戦力として皆さまを迎え入れますので、多くの成長機会があると思っていただける環境です！\n\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-05-14T02:11:48.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13101",
+            "cityName": "千代田区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-05-14T02:13:44.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "JivhNVVEZb2V",
+        "name": "［Biz-04］サービスサポート（北九州オフィス）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/JivhNVVEZb2V/e1838460-49bb-4cdc-90f7-f52da82af8db.png",
+        "formOfEmployment": "正社員",
+        "requisitionId": "34389c18-43e0-4361-8725-882067dd1432",
+        "location": "■北九州オフィス\n福岡県北九州市小倉北区京町2-7-8 小倉ビル6F\n└JR小倉駅北口 徒歩2分\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・ユニファのパーパス、バリューへの共感\n・当事者意識（オーナーシップ）を持ち、自ら変化を起こせる方\n・相手の立場に立った、配慮と柔軟性のあるコミュニケーションができる方",
+        "preferredSkills": "・幼稚園や保育園などの各施設での業務経験者\n・営業やカスタマーサクセス経験者",
+        "requiredSkills": "・社内外の関係者と連携し、物事を前に進めるコミュニケーション力\n・課題を整理し、改善に向けて考え行動できる力",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "ユニファ株式会社では、「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパスのもと、保育現場を支えるサービスを展開しています。\n保育施設向け総合ICTサービス「ルクミー」は、多くの保育施設に導入され、今もサービスの成長を続けています。\n\n本ポジションは、より多くのお客様に安心して長くご利用いただけるサービスを目指し、お客様から寄せられる声をもとに、社内の開発チームや関係部署と連携しながら、サービス改善やより良い顧客体験づくりに取り組んでいただくポジションです。\nお客様の声を直接サービスの成長につなげることができる、やりがいのある仕事です。\n\n【組織ミッション】\n私たちは、単なるお問い合わせ対応を担うサポート組織ではなく、お客様の声を起点にサービス価値を高め、事業成長に繋げる“価値創造型組織” を目指しています。\nその実現に向けて、以下の2つを重要テーマとして取り組んでいます。\n\n1. 効率的かつ高品質な顧客対応の実現\n日々多く寄せられるお客様からのご相談や課題に対し、テクノロジーや業務改善を活用しながら、より少ない工数で、より高い顧客満足を実現する仕組みづくりを進めています。\n・業務フロー改善によるオペレーション最適化\n・AIや自動化ツールを活用した業務効率化\n・継続的な業務改善による生産性向上\n\n2. 顧客の声をサービス改善へつなげる仕組みづくり\n日々お客様と接する中で得られるリアルな声を蓄積・分析し、開発チームや社内関係部署と連携しながら、サービス改善や新たな価値創出へつなげていきます。\n・顧客課題の収集・分析\n・開発チームへの改善提案\n・より良い顧客体験を実現するサポート体制の構築\n\n【このポジションの魅力】\n1. お客様の声を、サービスの進化に直接つなげられる\n日々お客様と向き合う中で見えてくる課題やニーズを、単なる対応で終わらせず、プロダクト改善や新たな価値提供へつなげることができます。\n自分の仕事がサービスの成長に直結する、大きなやりがいがあります。\n\n2. “サポート職”の枠を超え、事業成長に関われる\nこのポジションは、問い合わせ対応だけを行う仕事ではありません。\n顧客課題を分析し、業務改善やプロダクト改善に関わることで、事業そのものをより良くしていく役割を担います。\n\n3. 課題解決力・改善力が身につき、市場価値を高められる\n顧客対応を通じて課題発見力や論理的思考力が磨かれ、業務改善やプロダクト改善の経験を積むことで、将来的にカスタマーサクセス、事業企画、プロダクト企画など幅広いキャリアへつながります。\n\n◎働き方◎\n対面でのコミュニケーションも大切にしながら、リモートと出社を組み合わせたハイブリッド勤務を採用しており、週2日をオフィス出社の推奨日としています。\n※出社自体が目的ではないため、ご事情に応じて柔軟に対応可能です。\n\n【変更の範囲：会社の定める業務】\n\n",
+        "title": "",
+        "trial": "３ヶ月（本採用と同条件）",
+        "updatedAt": "2026-07-08T09:41:34.000Z",
+        "welfare": "■各種社会保険完備（関東ITソフトウェア健康保険組合加入）\n └ 提携スポーツクラブ・レストランの割引利用\n └ 保養施設や旅行補助金などの利用可\n └ 高額な医療費自己負担の軽減制度あり\n└ 一般健保より低い保険料水準\n\n■その他の福利厚生\n・生成AIサービスの有料プランを業務で利用可能\n・子育て支援（くるみん認定／ベビーシッター割引券）\n・定期健康診断\n・通勤交通費支給\n・社内勉強会の開催\n・新入社員向けオリエンテーションの実施\n・副業可\n・従業員持株会制度\n・服装自由\n・業務用PC貸与\n・ウォーターサーバー\n\n■スキルアップ支援\n・資格取得や維持にかかる費用を一部補助\n・業務に関連する書籍購入の一部補助\n・社外研修やセミナー参加に対する一部補助\n\n■全社コミュニケーション・カルチャー\n・全社総会（半期に1回）、全社会（月1回）、CEO Talk（月1回）の実施\n　└オフライン／オンラインのハイブリット開催\n・社内交流イベントや懇親会費用の一部補助\n・「UnifaDay」の開催：社員の家族や大切な方を招き、事業や社内の雰囲気を共有するイベント",
+        "workingConditions": "9:30～18:30（休憩60分）\n\n■完全週休2日制（土日祝休み）\n■年末年始休日（12/29~1/3）\n■年次有給休暇（法定通り）\n■その他の休暇\n・入社時特別休暇（1日付与）\n・夏季休暇\n・結婚休暇\n・慶弔休暇\n・子の看護休暇（子の人数に関わらず10日付与）\n・介護休暇\n・生理休暇\n・産前産後休業\n・育児休業",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [
+          {
+            "cityCode": "13117",
+            "cityName": "北区",
+            "prefCode": "13",
+            "prefName": "東京都"
+          },
+          {
+            "cityCode": null,
+            "cityName": null,
+            "prefCode": "40",
+            "prefName": "福岡県"
+          }
+        ],
+        "jobEmploymentTypeIds": [
+          "FULL_TIME"
+        ],
+        "jobRemoteworkType": "HYBRID_REMOTEWORK",
+        "jobPublishedAt": "2026-07-08T09:37:03.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "T1609V6kiLfB",
+        "name": "［Biz-06_03］ルクミー撮影（スクールフォト　フォトグラファー）",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/T1609V6kiLfB/11447867-e20f-40c1-956a-70102baa5cc5.png",
+        "formOfEmployment": "業務委託契約",
+        "requisitionId": "ab1a85e8-af2a-4fa1-9bc0-1c82ed65b63b",
+        "location": "応募者様の出張可能なエリアの保育園・幼稚園\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・状況判断ができ、社会人としてマナーを保持し、園様、保護者様に適切なコミュニケーションを取れる\n・打ち合わせもきちんと対応でき、身だしなみも清潔感のある\n・スクールフォトの特性を理解し、アーティスティックなお写真ではなく、成長記録のお写真を撮影できる方",
+        "preferredSkills": "・スクールフォト、様々な撮影経験者",
+        "requiredSkills": "・撮影経験者\n\n・パソコン、画像データの取り扱い\n　パソコンの基本操作、データの取り扱い等\n\n・補正・レタッチの技術\n　Photoshop、Adobe Lightroomなどの画像編集ツールによる明暗、色彩の調整\n　写ってはいけないモノ（下着など）の補正、光の反射の除去、写り込みNGの人物の削除 等\n\n・コミュニケーション能力の高い方\n・人と接するのが好きな方\n・子どもが好きな方\n\n他社のスクールフォトに登録している方も問題ございません。\n長くお取引いただける方を募集します。",
+        "salary": {
+          "text": "スキル、経験、能力に応じて決定いたします。\n\n・ 報酬\n　基本撮影費￥10,000～￥15,000/1案件・3時間30分 です。\n\n※撮影時間が短い場合でも同額となります。\n※学生の方、経験が浅い方は￥8,000～ となります。\n※研修撮影時は￥5,000 となります。\n\n別途弊社指定の日付をご対応いただく場合は繁忙期料金を適用の上、お支払いします。\n\n基本撮影時間 3時間30分 を超過して撮影した場合は延長料金を適用の上、お支払いします。 (試用期間は除外)\n\n交通費支給！ 税込み1,100円以上をサポートします。\n\n弊社規定のランク制度を設けており、年に1回見直しを実施いたします。※見直しの結果、変更が無い場合もございます。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "◎フォトグラファー＿写真撮影の業務委託\n〈年間を通して保育園・幼稚園のイベント様子の撮影をしていただけるルクミーカメラマンを全国で募集します〉\n\n弊社は「“家族✕テクノロジー”で世界中の家族コミュニケーションを豊かにする」をミッションに、幼稚園・保育園向けのインターネット写真販売サービス「ルクミーフォト」、保育園での園児のお昼寝を見守る「ルクミー午睡チェック」をはじめ、複数のプロダクトを提供しております。(https://unifa-e.com/ )\n\n「ルクミーフォト」では、全国区の幼稚園・保育園のイベントの撮影・日常撮影（スナップ・集合写真）のカメラマン派遣を行っております。\n現在、サービスの拡大に伴い、ご協力いただけるカメラマン様を全国的に多数募集しております。\n\n保育園での運動会、卒園式、様々なイベントでプロカメラマンとして園児、園の写真を撮影を実施し、\n撮影した写真を保育園保護者などに販売するための写真撮影を依頼させて頂きます。\n\n▽こんなことを期待しております\nお願いする撮影は、保護者や園児にとって一生に一度の大事なイベントの撮影になります。\n園の先生としてもプロカメラマンに撮影いただくことを本当に楽しみにされています。\n皆さまの経験や感性をぜひ発揮いただき、素敵なお写真を園や保護者、園児へ届けていただければ幸いです。\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "",
+        "updatedAt": "2025-04-08T05:12:33.000Z",
+        "welfare": "",
+        "workingConditions": "・依頼時間\n　8時から21時の間、基本撮影時間 3時間30分のご依頼となります。\n　保育園・幼稚園の運営時間から8:00～13:00の時間帯のご依頼が大半です。\n\n▽弊社以外のスタジオ・カメラマン派遣サービスへ登録を行っている場合の注意点\n・弊社と契約後、弊社の撮影においては、原則弊社からの依頼のみとし、他社経由での対応はお受けいただけません。\n・二重での対応は禁止としております。\n・弊社の提携するスタジオ・カメラマン派遣サービスへ登録を行っている場合はご契約が出来ない場合があります。",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [],
+        "jobEmploymentTypeIds": [
+          "FREELANCE"
+        ],
+        "jobRemoteworkType": null,
+        "jobPublishedAt": "2025-04-28T09:22:08.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      },
+      {
+        "companyFoundedIn": "2013-05",
+        "companyHeadquarterLocation": "東京都千代田区永田町２丁目１７−３ 住友不動産永田町ビル １F",
+        "companyHow": [
+          "- 保育施設向けICTサービス「ルクミー」を主軸に、保育現場のデジタルトランスフォーメーション（DX）を推進",
+          "- テクノロジーの活用により、保育者の業務負荷削減と、保育の質向上を両立",
+          "- 将来的には、収集したデータを活用し、一人一人に最適化された教育の提供も視野",
+          "- 東京と北九州の2拠点体制で事業を展開"
+        ],
+        "companyId": "C-9JZ06",
+        "companyInvestors": [],
+        "companyLogoUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/logo/ebbda935-75ab-46c5-a717-257a11dff1c7",
+        "companyName": "ユニファ株式会社",
+        "companyNumberOfEmployees": 225,
+        "companyShareCapital": "2025年6月末時点:8億7,486万円（資本準備金含む）",
+        "companySlug": "unifa",
+        "companySynopsis": "保育・幼児教育業界向けICTサービス企業。保育施設運営事業者や自治体を主要顧客とし、「ルクミー」を主軸に保育現場のDXを推進。AIやIoTを活用し、保育者の負荷削減と保育の質向上を目指す。将来的には個別最適化された教育提供も視野に入れている。",
+        "companyTags": [
+          "教育",
+          "AI",
+          "地方創生",
+          "DX"
+        ],
+        "companyUrl": "https://unifa-e.com/",
+        "companyWhat": [
+          "- 保育施設向け総合ICTサービス「ルクミー」の企画、開発、販売、運営",
+          "- 「スマート保育園・スマート幼稚園・スマートこども園」構想の推進・展開",
+          "- AIやIoT等を用いた保育関連テクノロジーの研究開発"
+        ],
+        "companyWhere": [
+          "- 保育・幼児教育業界",
+          "- 保育施設運営事業者や自治体の保育関連部門が主要な顧客"
+        ],
+        "companyWhy": [
+          "- 「家族の幸せを生み出すあたらしい社会インフラを世界中で創り出す」というパーパス（存在意義）のもと、保育・育児関連の社会課題解決に挑むため"
+        ],
+        "companyYearsSinceFounded": 14,
+        "companyCumulativeFunding": 92.8,
+        "companyValuation": 179.4,
+        "companyPrivacyPolicyUrl": "https://unifa-e.com/company/privacy.html",
+        "companyIsApplicationEnabled": false,
+        "companyMembersVoiceCount": null,
+        "id": "i0ZnBT0aVqPZ",
+        "name": "［corp_03］探究コーディネーター",
+        "coverImageUrl": "https://herp.careers:443/careers/api/v1/images/companies/C-9JZ06/careerPages/i0ZnBT0aVqPZ/4bea3285-a3d7-4dc0-b33f-f12dbe299d7e.png",
+        "formOfEmployment": "業務委託契約（原則1年〜）",
+        "requisitionId": "76e6330c-4ecb-4f18-b359-d3dba4c8a0f3",
+        "location": "原則リモートワークとなります。\n※法人や園に出向いていただく場合もございます。\n\n関東近郊の園に出向いていただくことになりますので、\n通える範囲での方に限らせていただいております。\n\n【変更の範囲：会社の定める場所】",
+        "personality": "・当社purpose、valueに共感し、自身も会社と共に成長していきたい気持ちのある方\n・社会課題の解決に、当社事業を通して貢献したいという想いをお持ちの方\n・保育・教育領域に関心がある方\n・社内関係者や顧客等の外部の方々と良好な関係を構築し、円滑なコミュニケーションが取れる方\n・ベンチャー、スタートアップの柔軟性を受け入れながら行動することができる方\n・何事にもポジティブマインドで取り組める方\n・変化を楽しめる方\n・丁寧で温かい対応ができる方\n・チャット等でチームとこまめに連携できる方\n・疑問やトラブルを抱え込まずすぐに相談できる方\n・保育士さんを応援したいとお考えの方",
+        "preferredSkills": "①コンサル/営業経験\n・クライアントとのコミュニケーション経験（課題ヒアリング、提案）\n・論理的な課題分析と解決策の提案能力\n・プロジェクト管理の経験と実行力（目標設定、進捗管理）\n・子供向け教育業務の経験\n・マーケティング戦略策定（特にサービス業、教育分野）\n・データ分析能力（市場調査、競合分析、効果測定）\n・Web/SNSなどデジタルツールを用いた広報戦略の知識\n\n②保育経験\n・主任保育士、リーダー経験など、指導やマネジメントの経験\n・異年齢保育や小規模保育での実践経験\n・研修・ワークショップの企画や実施経験\n・保育士資格があれば尚良し\n\n③探究経験者\n・幼児教育分野での探究学習プログラム開発経験\n・レッジョエミリアなど特定の教育メソッドへの知見\n・地域社会や企業との連携プログラム開発・運営経験\n・アクティブラーニングやプロジェクト学習に関する知識と実践経験\n・指導者（保育士）へのティーチングやファシリテーション経験\n\n【共通事項】\n・ITツールや新しいシステムへの順応性\n・探究学習を実践してみたい、運営力を高めたい方\n・新たなキャリア（複業）の可能性を模索したい方\n・探究学習のノウハウを習得し、自分の子育てにいかしたい方\n・子どもが好き！子どもに関わる仕事がしたい方\n・幅広い学問・職業領域に関する教養を深めたい方\n・知的好奇心が旺盛で、幅広い分野（学問、職業、テーマなど）に対して関心を持ち、論理的・創造的思考力をもって取り組める方\n・知的好奇心が旺盛で、科目・分野・業界に関わらずさまざまなテーマを学ぶことに意欲的な方（知識はなくともも、まずは知りたい、やってみたいとポジティブに思える方）",
+        "requiredSkills": "▶下記①、②のいずれかを満たせば可\n\n①保育・教育経験\n・子ども向け教育や保育関連業務の経験\n・子どもの発達段階に関する深い知識と理解\n・保育者に対する共感的なヒアリングと助言能力\n・保育運営法人での育成・研修等の業務経験\n\n②探究経験\n・子ども（保育園児・幼稚園児が望ましい）に対する授業やワークショップの運営経験\n・子ども（幼小中高生）を対象とした遊び・学び関連プログラムの運営経験がある、もしくは強い関心を持っている方\n・探究的な学びや、内発的動機（自分の内側からあふれる、「学びたい」「やりたい」という気持ち・モチベーション）にもとづく学びに関心のある方\n\n【共通事項】\n・社会人経験あり\n・スムーズな文字入力（ブラインドタッチ目安）\n・Excel入力やチャットツール等のPC基本操作\n・自宅での安定したネット回線と静穏な作業環境\n・ビジネスメールの作成および電話対応スキル\n・担当園を自律的に運営する一方で、本部と適切に連携できる方\n",
+        "salary": {
+          "text": "当社が定めるコーディネーターランクに基づき双方協議のうえ決定します（以後年度毎に見直し機会あり）。\n※正社員採用をご希望の方は、別途ご相談を承ります。\n\n本ポジション（コーディネーター職）を経て更なるステップアップをご希望の方は、本部業務（サポートの企画設計や研修の提供など）に携わっていただくことも可能です。",
+          "minimum": null,
+          "maximum": null,
+          "period": null
+        },
+        "summary": "保育園・幼稚園向け教育・探究活動プログラム「ルクミーみらい教室」の導入・運営を担うポジションです。\n園との初期調整から、講師の手配、当日運営のサポート、振り返りの場の設定、実績報告まで、プログラム実施の全工程に関わります。\n\n---------------------------------------\n\n① 園からの相談対応・問い合わせ窓口\n 活動内容や年間計画に関する相談対応\n 補助金（すくわく等）に関する質問への回答\n 実施可否の判断や条件調整\n 保育士・園長からの要望のヒアリングおよび社内共有\n\n② 園との調整業務（導入〜実施まで）\n 年間スケジュール案の作成・提案\n 園の行事や保育計画に合わせた日程調整\n 園との定例連絡（メール・電話・オンライン）\n 事前準備物（教材・機材・備品）の確認・作成・手配\n\n③ 活動当日の運営サポート\n （現地訪問の有無は状況により変動）\n 実施状況の確認／必要に応じた現地サポート\n 園・講師間の連絡橋渡し\n \n④スケジュール・運用管理\n 担当する複数園の年間スケジュール管理\n 実施状況・進捗の確認\n 月次・年度の実績管理（稼働数・参加人数など）\n トラブル発生時の影響整理・迅速な再調整\n\n⑤書類作成・行政対応（園支援）\n 計画書や報告書に関する案内・提出サポート\n 自治体向け補助金書類のフォロー\n 行政ルールに沿った運営のアドバイス\n 提出期限の管理とリマインド\n \n⑥運用改善・サービス品質向上\n 園からのフィードバックの収集・社内共有\n 活動内容改善のための提案\n 案件管理・オペレーションフロー改善\n 新規園導入時のオンボーディングサポート\n\n---------------------------------------\n\n【変更の範囲：会社の定める業務】",
+        "title": "",
+        "trial": "",
+        "updatedAt": "2026-07-16T06:55:21.000Z",
+        "welfare": "",
+        "workingConditions": "時間数（20時間～100時間/月）",
+        "jobRoles": [
+          {
+            "id": "other",
+            "name": "その他",
+            "parentJobRoleId": "other",
+            "parentJobRoleName": "その他"
+          }
+        ],
+        "jobLocations": [],
+        "jobEmploymentTypeIds": [
+          "FREELANCE"
+        ],
+        "jobRemoteworkType": "FULL_REMOTEWORK",
+        "jobPublishedAt": "2026-04-13T07:21:12.000Z",
+        "source": "herp-hire",
+        "isApplicable": true
+      }
+    ],
+    "numberOfEmployeesHistories": [
+      {
+        "companyNumberOfEmployees": 208,
+        "slug": "unifa",
+        "timestamp": "2024-08-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 207,
+        "slug": "unifa",
+        "timestamp": "2024-09-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 210,
+        "slug": "unifa",
+        "timestamp": "2024-10-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 211,
+        "slug": "unifa",
+        "timestamp": "2024-11-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 212,
+        "slug": "unifa",
+        "timestamp": "2024-12-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 217,
+        "slug": "unifa",
+        "timestamp": "2025-01-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 220,
+        "slug": "unifa",
+        "timestamp": "2025-02-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 221,
+        "slug": "unifa",
+        "timestamp": "2025-03-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 222,
+        "slug": "unifa",
+        "timestamp": "2025-04-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 221,
+        "slug": "unifa",
+        "timestamp": "2025-05-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 221,
+        "slug": "unifa",
+        "timestamp": "2025-06-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 219,
+        "slug": "unifa",
+        "timestamp": "2025-07-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 219,
+        "slug": "unifa",
+        "timestamp": "2025-08-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 219,
+        "slug": "unifa",
+        "timestamp": "2025-09-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 218,
+        "slug": "unifa",
+        "timestamp": "2025-10-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 217,
+        "slug": "unifa",
+        "timestamp": "2025-11-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 221,
+        "slug": "unifa",
+        "timestamp": "2025-12-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 220,
+        "slug": "unifa",
+        "timestamp": "2026-01-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 225,
+        "slug": "unifa",
+        "timestamp": "2026-02-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 227,
+        "slug": "unifa",
+        "timestamp": "2026-03-01T00:00:00.000Z"
+      },
+      {
+        "companyNumberOfEmployees": 225,
+        "slug": "unifa",
+        "timestamp": "2026-07-01T00:00:00.000Z"
+      }
+    ]
+  },
+  "statusCode": 200
+}

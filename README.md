@@ -26,6 +26,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[JOIN](https://join.com)**,
   **[UKG Pro (UltiPro)](https://www.ukg.com/products/ukg-pro)**,
   **[Avature](https://www.avature.net)**,
+  **[HERP Hire](https://lp.herp.cloud/lp/boost-applications)** (Japan),
   and **[BambooHR](https://www.bamboohr.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms

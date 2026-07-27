@@ -35,6 +35,7 @@ var providerOrder = []string{
 	"bamboohr",
 	"eightfold",
 	"greenhouse",
+	"herp",
 	"icims",
 	"join",
 	"lever",
@@ -189,6 +190,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a = ats.NewEightfoldAdapter(&http.Client{Transport: eightfold.BrowserTransport{}})
 		case "greenhouse":
 			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
+		case "herp":
+			a = ats.NewHerpAdapter(hc)
 		case "icims":
 			a = ats.NewICIMSAdapter(hc)
 		case "join":
