@@ -169,11 +169,16 @@ type herpLocationText struct {
 	isRemote    bool
 }
 
-// herpRemoteLabels maps the upstream remote enum to the label the site
-// shows, plus the Latin alias that makes location:"remote" work.
-var herpRemoteLabels = map[herp.JobJobRemoteworkType]struct{ ja, en string }{
-	herp.JobJobRemoteworkTypeFULLREMOTEWORK:   {"フルリモート", "Remote"},
-	herp.JobJobRemoteworkTypeHYBRIDREMOTEWORK: {"ハイブリッドリモート", "Hybrid remote"},
+// herpRemoteLabels maps the upstream remote enum to the label the site shows,
+// the Latin alias that makes location:"remote" work, and the shared
+// workplaceType filter value.
+//
+// Note the missing third mode: a null jobRemoteworkType means the company
+// said nothing, not that the role is on-site, so herp never emits the
+// "On-site" value the other workplaceType adapters can.
+var herpRemoteLabels = map[herp.JobJobRemoteworkType]struct{ ja, en, workplace string }{
+	herp.JobJobRemoteworkTypeFULLREMOTEWORK:   {"フルリモート", "Remote", "Remote"},
+	herp.JobJobRemoteworkTypeHYBRIDREMOTEWORK: {"ハイブリッドリモート", "Hybrid remote", "Hybrid"},
 }
 
 // herpLocation composes a posting's location. Structured entries win; the
@@ -235,8 +240,11 @@ func herpFields(j *herp.Job, loc herpLocationText) map[string][]string {
 	}
 	setHerpField(fields, "employmentType", employment)
 
-	if v, ok := j.JobRemoteworkType.Get(); ok {
-		setHerpField(fields, "remoteWorkType", []string{string(v)})
+	// workplaceType is the shared key ashby, lever, and bamboohr already use,
+	// with bamboohr's normalized labels rather than this upstream's enum —
+	// the same dimension must not answer to two names across adapters.
+	if label, ok := herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
+		setHerpField(fields, "workplaceType", []string{label.workplace})
 	}
 	return fields
 }

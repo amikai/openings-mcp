@@ -119,21 +119,28 @@ Measured over the 991 preview postings on the first five `/jobs` pages:
   | `prefecture` | 東京都, 京都府, … | `jobLocations[].prefName` |
   | `city` | … | `jobLocations[].cityName` |
   | `employmentType` | `FULL_TIME`, `CONTRACT`, `FREELANCE`, `INTERNSHIP`, `PART_TIME` | `jobEmploymentTypeIds[]` |
-  | `remoteWorkType` | `FULL_REMOTEWORK`, `HYBRID_REMOTEWORK` | `jobRemoteworkType` |
+  | `workplaceType` | `Remote`, `Hybrid` | `jobRemoteworkType` |
 
   `FilterSet` is documented as display **labels** (`internal/ats/ats.go:88`)
   and `distinctFilters` returns `fields` values verbatim, so the taxonomy
   keys carry the Japanese names, not `jobRoles[].id`/`parentJobRoleId` —
   otherwise `get_filters_by_company` would hand back opaque ids with no
   label anywhere in the response. `matchFilters` compares with
-  `strings.EqualFold`, so CJK values are fine. The last two keys keep their
-  upstream enum values because upstream has no label form for them; that
-  matches recruitee, whose `employmentType` values are
-  `Offer.EmploymentTypeCode` codes (`internal/ats/recruitee.go:172-174`).
+  `strings.EqualFold`, so CJK values are fine. `employmentType` keeps its
+  upstream enum because upstream has no label form for it, matching
+  recruitee, whose values are `Offer.EmploymentTypeCode` codes
+  (`internal/ats/recruitee.go:172-174`).
 
-  `remoteWorkType` is null on ~50% of postings, so it is absent from
-  `Filters` for a company whose jobs are all onsite — the same
-  per-company-availability behavior every full-dump adapter has, since
+  `workplaceType` is the key ashby, lever, and bamboohr already use for this
+  dimension, so herp uses it too rather than minting a second name for the
+  same thing — the whole point of `internal/ats` is that the caller cannot
+  tell which ATS answered. Its values follow bamboohr's normalization
+  (`internal/provider/bamboohr/workmode.go`), which maps that upstream's
+  equally opaque `"0"/"1"/"2"` codes to `On-site`/`Remote`/`Hybrid`. herp
+  never emits `On-site`: a null `jobRemoteworkType` means the company said
+  nothing, not that the role is on-site. Since it is null on ~50% of
+  postings, the key is absent entirely for a company that specified none —
+  the per-company availability every full-dump adapter has, since
   `validateFilterKeys` derives valid keys from that company's dump.
 
 ### Location composition
@@ -172,7 +179,7 @@ behaviors are documented in `internal/provider/herp/doc.go`.
 
 **Remote semantics.** `isRemote` covers both `FULL_REMOTEWORK` and
 `HYBRID_REMOTEWORK`, so `location: "remote"` is the broad cut and
-`remoteWorkType: FULL_REMOTEWORK` is the precise one. Restricting
+`workplaceType: Remote` is the precise one. Restricting
 `isRemote` to full remote would drop the 396 hybrid postings (vs 97 full
 remote) out of the sampled 991 from any "remote" search while leaving them
 labelled ハイブリッドリモート on screen — a worse default than making the
@@ -266,15 +273,16 @@ New:
   mapping decisions, not just the wiring — following
   `internal/ats/recruitee_test.go:79-171`. Each case names its fixture:
   - *(`company_rsp.json`)* `Filters` returns all six keys, with
-    `jobRole`/`jobCategory`/`prefecture`/`city` carrying Japanese labels and
-    `employmentType`/`remoteWorkType` carrying upstream enum values
+    `jobRole`/`jobCategory`/`prefecture`/`city` carrying Japanese labels,
+    `workplaceType` carrying the shared `Remote`/`Hybrid` labels, and
+    `employmentType` carrying upstream enum values
   - *(`company_rsp.json`)* `Search` narrows correctly under a `jobRole`
     filter and under a `prefecture` filter, and an unknown key is rejected by
     `validateFilterKeys` with the teaching error
   - *(`company_rsp.json`)* `location: "remote"` returns both the
     `FULL_REMOTEWORK` and the `HYBRID_REMOTEWORK` posting and excludes the
-    null-`jobRemoteworkType` one, while `remoteWorkType: FULL_REMOTEWORK`
-    narrows to full remote only
+    null-`jobRemoteworkType` one, while `workplaceType: Remote` narrows to
+    full remote only
   - *(`company_rsp.json`)* `jobRoles` names reach `orgUnit`: the role-name
     match outranks the body-only match for the same query
   - *(`company_rsp.json`)* the Latin alias path — `location: "tokyo"` matches

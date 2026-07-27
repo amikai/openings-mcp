@@ -129,7 +129,9 @@ func TestHerpFilters(t *testing.T) {
 	assert.ElementsMatch(t, []string{"東京都", "京都府"}, fs["prefecture"])
 	assert.Equal(t, []string{"中央区"}, fs["city"])
 	assert.Contains(t, fs["employmentType"], "FULL_TIME")
-	assert.ElementsMatch(t, []string{"FULL_REMOTEWORK", "HYBRID_REMOTEWORK"}, fs["remoteWorkType"])
+	// The shared workplaceType key and bamboohr's label vocabulary, not this
+	// upstream's FULL_REMOTEWORK/HYBRID_REMOTEWORK enum.
+	assert.ElementsMatch(t, []string{"Remote", "Hybrid"}, fs["workplaceType"])
 }
 
 func TestHerpSearchFilters(t *testing.T) {
@@ -172,9 +174,9 @@ func TestHerpRemoteSearchCoversHybrid(t *testing.T) {
 	assert.Contains(t, remote, herpHybridJobID)
 	assert.NotContains(t, remote, herpNoRemoteJobID)
 
-	// remoteWorkType is the precise cut.
+	// workplaceType is the precise cut.
 	full := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{
-		Filters: FilterSet{"remoteWorkType": {"FULL_REMOTEWORK"}},
+		Filters: FilterSet{"workplaceType": {"Remote"}},
 	})
 	assert.Contains(t, full, herpFullRemoteJobID)
 	assert.NotContains(t, full, herpHybridJobID)
