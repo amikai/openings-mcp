@@ -339,6 +339,8 @@ func (s JobJobEmploymentTypeIdsItem) Validate() error {
 		return nil
 	case "PART_TIME":
 		return nil
+	case "TEMPORARY_STAFF":
+		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
@@ -432,6 +434,8 @@ func (s SalaryPeriod) Validate() error {
 	case "MONTHLY":
 		return nil
 	case "HOURLY":
+		return nil
+	case "DAILY":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)

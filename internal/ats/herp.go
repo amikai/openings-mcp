@@ -351,6 +351,8 @@ func herpSalaryRange(s herp.Salary) string {
 		label = "年収"
 	case herp.SalaryPeriodMONTHLY:
 		label = "月給"
+	case herp.SalaryPeriodDAILY:
+		label, unit = "日給", herpYen
 	case herp.SalaryPeriodHOURLY:
 		label, unit = "時給", herpYen
 	}

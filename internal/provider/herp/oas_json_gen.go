@@ -2087,6 +2087,8 @@ func (s *JobJobEmploymentTypeIdsItem) Decode(d *jx.Decoder) error {
 		*s = JobJobEmploymentTypeIdsItemINTERNSHIP
 	case JobJobEmploymentTypeIdsItemPARTTIME:
 		*s = JobJobEmploymentTypeIdsItemPARTTIME
+	case JobJobEmploymentTypeIdsItemTEMPORARYSTAFF:
+		*s = JobJobEmploymentTypeIdsItemTEMPORARYSTAFF
 	default:
 		*s = JobJobEmploymentTypeIdsItem(v)
 	}
@@ -3203,6 +3205,8 @@ func (s *SalaryPeriod) Decode(d *jx.Decoder) error {
 		*s = SalaryPeriodMONTHLY
 	case SalaryPeriodHOURLY:
 		*s = SalaryPeriodHOURLY
+	case SalaryPeriodDAILY:
+		*s = SalaryPeriodDAILY
 	default:
 		*s = SalaryPeriod(v)
 	}
