@@ -30,6 +30,9 @@ var mockJobDetailRsp []byte
 //go:embed testdata/job_detail_salary_rsp.html
 var mockJobDetailSalaryRsp []byte
 
+//go:embed testdata/job_detail_shinsotsu_rsp.html
+var mockJobDetailShinsotsuRsp []byte
+
 // Mock tenant slugs and job IDs, matching the captured fixtures.
 const (
 	MockSlugPaged    = "moneyforward" // 203 jobs across 3 pages, 5 facet groups
@@ -37,9 +40,11 @@ const (
 	MockSlugNoFacets = "hrmos"        // 86 jobs, single page, no facet nav
 	MockSlugNotFound = "no-such-tenant"
 
-	MockJobID         = "0000265" // moneyforward, baseSalary null
-	MockJobIDSalary   = "0000381" // visional, baseSalary populated
-	MockJobIDNotFound = "9999999"
+	MockJobID       = "0000265" // moneyforward, baseSalary null
+	MockJobIDSalary = "0000381" // visional, baseSalary populated
+	// MockJobIDShinsotsu is a 新卒 posting: same page template, no JSON-LD.
+	MockJobIDShinsotsu = "2167257001778999340"
+	MockJobIDNotFound  = "9999999"
 )
 
 // NewMockServer returns an httptest.Server that mimics hrmos.co with canned
@@ -67,6 +72,8 @@ func NewMockServer() *httptest.Server {
 			serveMockHTML(w, mockJobDetailRsp)
 		case slug == MockSlugSmall && id == MockJobIDSalary:
 			serveMockHTML(w, mockJobDetailSalaryRsp)
+		case slug == MockSlugSmall && id == MockJobIDShinsotsu:
+			serveMockHTML(w, mockJobDetailShinsotsuRsp)
 		default:
 			http.NotFound(w, r)
 		}

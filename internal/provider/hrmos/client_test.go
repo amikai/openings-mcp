@@ -102,6 +102,25 @@ func TestJobDetailSalary(t *testing.T) {
 	assert.Equal(t, "YEAR", got.SalaryUnit)
 }
 
+// New-graduate (新卒) postings render without the JobPosting JSON-LD, so the
+// parser must fall back to the surrounding markup instead of failing.
+func TestJobDetailShinsotsuNoJSONLD(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(srv.URL, srv.Client())
+
+	got, err := c.JobDetail(t.Context(), MockSlugSmall, MockJobIDShinsotsu)
+	require.NoError(t, err)
+
+	assert.Equal(t, "【28新卒/内定直結3days】巨大産業を変革し続ける“ラクスル流”事業開発", got.Title)
+	assert.Contains(t, got.Company, "ラクスル")
+	assert.NotEmpty(t, got.Description)
+	assert.NotEmpty(t, got.JobInfo, "pg-descriptions job table still parses")
+	assert.NotEmpty(t, got.CompanyInfo, "pg-descriptions company table still parses")
+	// DatePosted lives only in the JSON-LD, so it is unavailable here.
+	assert.Empty(t, got.DatePosted)
+}
+
 func TestJobDetailNilSalary(t *testing.T) {
 	srv := NewMockServer()
 	defer srv.Close()

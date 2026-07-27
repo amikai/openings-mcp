@@ -55,7 +55,7 @@
 // # Detail: /pages/{slug}/jobs/{id}
 //
 // The detail page embeds exactly one schema.org JobPosting JSON-LD block,
-// stable across every tenant observed:
+// stable across every mid-career tenant observed:
 // @context @type baseSalary datePosted description employmentType
 // hiringOrganization identifier jobLocation title validThrough — notably no
 // "url" key. jobLocation is always a list of Place{address: PostalAddress}.
@@ -69,6 +69,18 @@
 // [JobDetailResponse.JobInfo] / [JobDetailResponse.CompanyInfo] so that
 // data isn't lost even though [internal/ats.JobDetail] only surfaces a
 // subset of it.
+//
+// # The sonar (新卒) surface has no JSON-LD
+//
+// HRMOS absorbed the sonar ATS (new-graduate hiring) in late 2025, and those
+// postings are already served from these same /pages/{slug}/jobs/{id} URLs —
+// e.g. raksul's 【28新卒/内定直結3days】 entry. They use the same page template
+// but omit the JobPosting JSON-LD block entirely, so Client.JobDetail falls
+// back to the surrounding markup (h1.sg-corporate-name, the breadcrumb, and
+// .pg-markdown) and returns an empty DatePosted, which only the JSON-LD
+// carries. Both pg-descriptions tables are still present and still parse.
+// Treating a missing JSON-LD as an error would make every new-graduate
+// posting on a mixed tenant unreachable.
 //
 // Unknown tenant slug and unknown job ID are both a clean HTTP 404.
 package hrmos

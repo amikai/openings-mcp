@@ -197,8 +197,11 @@ func (f *flexString) UnmarshalJSON(data []byte) error {
 }
 
 // parseJobDetailHTML extracts a posting's JSON-LD plus both pg-descriptions
-// tables. rawURL is the request URL, since the JSON-LD carries no "url" key
-// (fact 15).
+// tables. rawURL is the request URL, since the JSON-LD carries no "url" key.
+//
+// New-graduate (新卒) postings render the same page WITHOUT the JSON-LD block,
+// so the fields it would supply are read from the surrounding markup instead
+// and DatePosted is left empty — see the doc.go section on the sonar surface.
 func parseJobDetailHTML(doc *goquery.Document, id, rawURL string) (*JobDetailResponse, error) {
 	var posting *jobPostingLD
 	for _, script := range doc.Find(`script[type="application/ld+json"]`).EachIter() {
@@ -211,34 +214,40 @@ func parseJobDetailHTML(doc *goquery.Document, id, rawURL string) (*JobDetailRes
 			break
 		}
 	}
-	if posting == nil {
-		return nil, errors.New("no JobPosting JSON-LD on page")
-	}
 
-	detail := &JobDetailResponse{
-		ID:             id,
-		URL:            rawURL,
-		Title:          posting.Title,
-		Company:        posting.HiringOrganization.Name,
-		CompanyURL:     posting.HiringOrganization.SameAs,
-		EmploymentType: posting.EmploymentType,
-		DatePosted:     posting.DatePosted,
-		ValidThrough:   posting.ValidThrough,
-		Description:    htmlToText(posting.Description),
-	}
-	for _, place := range posting.JobLocation {
-		detail.Locations = append(detail.Locations, Location{
-			PostalCode: place.Address.PostalCode,
-			Region:     place.Address.Region,
-			Locality:   place.Address.Locality,
-			Street:     place.Address.Street,
-		})
-	}
-	if posting.BaseSalary != nil {
-		detail.SalaryCurrency = posting.BaseSalary.Currency
-		detail.SalaryMin = string(posting.BaseSalary.Value.MinValue)
-		detail.SalaryMax = string(posting.BaseSalary.Value.MaxValue)
-		detail.SalaryUnit = posting.BaseSalary.Value.UnitText
+	detail := &JobDetailResponse{ID: id, URL: rawURL}
+	if posting != nil {
+		detail.Title = posting.Title
+		detail.Company = posting.HiringOrganization.Name
+		detail.CompanyURL = posting.HiringOrganization.SameAs
+		detail.EmploymentType = posting.EmploymentType
+		detail.DatePosted = posting.DatePosted
+		detail.ValidThrough = posting.ValidThrough
+		detail.Description = htmlToText(posting.Description)
+		for _, place := range posting.JobLocation {
+			detail.Locations = append(detail.Locations, Location{
+				PostalCode: place.Address.PostalCode,
+				Region:     place.Address.Region,
+				Locality:   place.Address.Locality,
+				Street:     place.Address.Street,
+			})
+		}
+		if posting.BaseSalary != nil {
+			detail.SalaryCurrency = posting.BaseSalary.Currency
+			detail.SalaryMin = string(posting.BaseSalary.Value.MinValue)
+			detail.SalaryMax = string(posting.BaseSalary.Value.MaxValue)
+			detail.SalaryUnit = posting.BaseSalary.Value.UnitText
+		}
+	} else {
+		detail.Title = strings.TrimSpace(doc.Find("h1.sg-corporate-name").First().Text())
+		detail.Company = strings.TrimSpace(doc.Find("header.sg-breadcrumbs li").Last().Text())
+		body, err := doc.Find(".pg-markdown").First().Html()
+		if err == nil {
+			detail.Description = htmlToText(body)
+		}
+		if detail.Title == "" && detail.Description == "" {
+			return nil, errors.New("no JobPosting JSON-LD and no readable posting markup on page")
+		}
 	}
 
 	tables := doc.Find("section.pg-descriptions")
