@@ -73,7 +73,7 @@ func TestFlowxtraSearchJobsE2E(t *testing.T) {
 				Workplace: "On-site",
 				Salary:    "EUR 21000/year",
 				PostedAt:  "2026-07-23",
-				HasID:     "M88PB",
+				JobID:     "M88PB",
 				URL:       "https://flowxtra.com/apply/M88PB",
 			},
 			{
@@ -83,7 +83,7 @@ func TestFlowxtraSearchJobsE2E(t *testing.T) {
 				Workplace: "Remote",
 				Salary:    "EUR 100/monthly",
 				PostedAt:  "2026-07-21",
-				HasID:     "L99OW",
+				JobID:     "L99OW",
 				URL:       "https://flowxtra.com/apply/L99OW",
 			},
 			{
@@ -92,7 +92,7 @@ func TestFlowxtraSearchJobsE2E(t *testing.T) {
 				Location:  "Alberta, Canada",
 				Workplace: "On-site",
 				PostedAt:  "2026-07-19",
-				HasID:     "KrrNz",
+				JobID:     "KrrNz",
 				URL:       "https://flowxtra.com/apply/KrrNz",
 			},
 		},
@@ -134,7 +134,7 @@ func TestFlowxtraGetJobDetailE2E(t *testing.T) {
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
 		Name: "flowxtra_get_job_detail",
 		Arguments: map[string]any{
-			"has_id": "M88PB",
+			"job_id": "M88PB",
 		},
 	})
 	require.NoError(t, err)
@@ -166,7 +166,7 @@ func TestFlowxtraGetJobDetailNotFoundE2E(t *testing.T) {
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
 		Name: "flowxtra_get_job_detail",
 		Arguments: map[string]any{
-			"has_id": "ZZZZZ99",
+			"job_id": "ZZZZZ99",
 		},
 	})
 	require.NoError(t, err)

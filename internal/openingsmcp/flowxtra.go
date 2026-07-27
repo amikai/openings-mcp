@@ -19,11 +19,11 @@ var flowxtraSearchInputRawSchema = []byte(`{
 	"properties": {
 		"query": {
 			"type": "string",
-			"description": "Free-text job-title search (server-side)."
+			"description": "Free-text job-title search."
 		},
 		"location": {
 			"type": "string",
-			"description": "Location search matching company city, state, or country (server-side), e.g. 'Spain' or 'Barcelona'."
+			"description": "Location search matching company city, state, or country, e.g. 'Spain' or 'Barcelona'."
 		},
 		"workplace": {
 			"type": "string",
@@ -32,7 +32,7 @@ var flowxtraSearchInputRawSchema = []byte(`{
 		},
 		"company": {
 			"type": "string",
-			"description": "Company-name search (server-side)."
+			"description": "Company-name search."
 		},
 		"page": {
 			"type": "integer",
@@ -68,12 +68,12 @@ type flowxtraJobSummary struct {
 	Workplace string `json:"workplace" jsonschema:"On-site, Hybrid, or Remote."`
 	Salary    string `json:"salary,omitempty" jsonschema:"Advertised salary, e.g. 'EUR 21000/year'; empty when the posting lists none."`
 	PostedAt  string `json:"posted_at"`
-	HasID     string `json:"has_id" jsonschema:"Public hashed job id; pass to flowxtra_get_job_detail's has_id param."`
+	JobID     string `json:"job_id" jsonschema:"Public job id; pass to flowxtra_get_job_detail's job_id param."`
 	URL       string `json:"url" jsonschema:"Public apply URL for the posting."`
 }
 
 type flowxtraDetailInput struct {
-	HasID string `json:"has_id" jsonschema:"Public hashed job id (has_id from flowxtra_search_jobs results, e.g. M88PB)."`
+	JobID string `json:"job_id" jsonschema:"Public job id (job_id from flowxtra_search_jobs results, e.g. M88PB)."`
 }
 
 type flowxtraDetailOutput struct {
@@ -170,7 +170,7 @@ func flowxtraHTTPToMCPResponse(res *flowxtra.JobListEnvelope) *flowxtraSearchOut
 			Workplace: j.Workplace,
 			Salary:    flowxtraSalary(j.Currency, j.MinSalary, j.MaxSalary, j.Salary, j.RateSalary),
 			PostedAt:  j.DateShare.Format("2006-01-02"),
-			HasID:     j.HasID,
+			JobID:     j.HasID,
 			URL:       j.UrlJobApplay,
 		})
 	}
@@ -233,19 +233,19 @@ func RegisterFlowxtra(s *mcp.Server, c *flowxtra.Client) {
 
 	mcp.AddTool(s, &mcp.Tool{
 		Name:        "flowxtra_get_job_detail",
-		Description: "Get the full description and company profile for a Flowxtra job by its has_id.",
+		Description: "Get the full description and company profile for a Flowxtra job by its job_id.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Flowxtra job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *flowxtraDetailInput) (*mcp.CallToolResult, *flowxtraDetailOutput, error) {
-		if in.HasID == "" {
-			return errorResult(fmt.Errorf("has_id is required (take it from a flowxtra_search_jobs result)")), nil, nil
+		if in.JobID == "" {
+			return errorResult(fmt.Errorf("job_id is required (take it from a flowxtra_search_jobs result)")), nil, nil
 		}
-		res, err := c.GetJobDetail(ctx, flowxtra.GetJobDetailParams{HasId: in.HasID})
+		res, err := c.GetJobDetail(ctx, flowxtra.GetJobDetailParams{HasId: in.JobID})
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
 		envelope, ok := res.(*flowxtra.JobDetailEnvelope)
 		if !ok {
-			return errorResult(fmt.Errorf("job %q not found (it may have expired)", in.HasID)), nil, nil
+			return errorResult(fmt.Errorf("job %q not found (it may have expired)", in.JobID)), nil, nil
 		}
 		return nil, flowxtraHTTPToMCPDetail(envelope.Data), nil
 	})
