@@ -22,6 +22,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/amikai/openings-mcp/internal/provider/eightfold"
+	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/indeed"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
@@ -43,11 +44,11 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra ATS, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
 
 Tool selection:
 - When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) when the company isn't covered.
-- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
+- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs on supported ATS providers. Do not pass other careers sites; some ATS providers accept URLs only for companies already in the curated roster.
 
@@ -165,6 +166,11 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 	cIndeed := indeed.NewClient("https://apis.indeed.com/graphql", hc)
 
+	cFlowxtra, err := flowxtra.NewClient("https://app.flowxtra.com/api", flowxtra.WithClient(hc))
+	if err != nil {
+		return fmt.Errorf("create Flowxtra client: %w", err)
+	}
+
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", hc)
 
 	cMynavi := mynavi.NewClient("https://tenshoku.mynavi.jp", hc)
@@ -186,6 +192,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 		google:   cGoogle,
 		linkedin: cLinkedin,
 		indeed:   cIndeed,
+		flowxtra: cFlowxtra,
 		jobindex: cJobindex,
 		mynavi:   cMynavi,
 		meta:     cMeta,
@@ -261,6 +268,7 @@ type providerClients struct {
 	google   *google.Client
 	linkedin *linkedin.Client
 	indeed   *indeed.Client
+	flowxtra *flowxtra.Client
 	jobindex *jobindex.Client
 	mynavi   *mynavi.Client
 	meta     *meta.Client
@@ -284,6 +292,7 @@ func newServer(clients providerClients, registry *ats.Registry, logger *slog.Log
 	openingsmcp.RegisterGoogle(server, clients.google)
 	openingsmcp.RegisterLinkedin(server, clients.linkedin)
 	openingsmcp.RegisterIndeed(server, clients.indeed)
+	openingsmcp.RegisterFlowxtra(server, clients.flowxtra)
 	openingsmcp.RegisterJobindex(server, clients.jobindex)
 	openingsmcp.RegisterMynavi(server, clients.mynavi)
 	openingsmcp.RegisterMeta(server, clients.meta)
