@@ -75,10 +75,20 @@
 // HRMOS absorbed the sonar ATS (new-graduate hiring) in late 2025, and those
 // postings are already served from these same /pages/{slug}/jobs/{id} URLs —
 // e.g. raksul's 【28新卒/内定直結3days】 entry. They use the same page template
-// but omit the JobPosting JSON-LD block entirely, so Client.JobDetail falls
-// back to the surrounding markup (h1.sg-corporate-name, the breadcrumb, and
-// .pg-markdown) and returns an empty DatePosted, which only the JSON-LD
-// carries. Both pg-descriptions tables are still present and still parse.
+// but omit the JobPosting JSON-LD block entirely, so Client.JobDetail reads
+// those fields from the surrounding markup instead: the title from
+// h1.sg-corporate-name, the description from .pg-markdown, the employer from
+// the 会社情報 table's 会社名 row, and the address from the 勤務地 row. Both
+// pg-descriptions tables are present and parse normally.
+//
+// Two traps live here. The LAST sg-breadcrumbs entry is the posting title,
+// not the employer — only the first is the company — and each 勤務地 entry
+// ends with a "地図で確認" maps link that is not part of the address.
+//
+// The posting date comes from the #jsi-published-date-start hidden input,
+// which carries the same instant as the JSON-LD's datePosted and is present
+// on both page variants, so it covers this surface too.
+//
 // Treating a missing JSON-LD as an error would make every new-graduate
 // posting on a mixed tenant unreachable.
 //

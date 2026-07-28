@@ -200,8 +200,8 @@ func (f *flexString) UnmarshalJSON(data []byte) error {
 // tables. rawURL is the request URL, since the JSON-LD carries no "url" key.
 //
 // New-graduate (新卒) postings render the same page WITHOUT the JSON-LD block,
-// so the fields it would supply are read from the surrounding markup instead
-// and DatePosted is left empty — see the doc.go section on the sonar surface.
+// so the fields it would supply are read from the surrounding markup instead —
+// see the doc.go section on the sonar surface.
 func parseJobDetailHTML(doc *goquery.Document, id, rawURL string) (*JobDetailResponse, error) {
 	var posting *jobPostingLD
 	for _, script := range doc.Find(`script[type="application/ld+json"]`).EachIter() {
@@ -238,16 +238,6 @@ func parseJobDetailHTML(doc *goquery.Document, id, rawURL string) (*JobDetailRes
 			detail.SalaryMax = string(posting.BaseSalary.Value.MaxValue)
 			detail.SalaryUnit = posting.BaseSalary.Value.UnitText
 		}
-	} else {
-		detail.Title = strings.TrimSpace(doc.Find("h1.sg-corporate-name").First().Text())
-		detail.Company = strings.TrimSpace(doc.Find("header.sg-breadcrumbs li").Last().Text())
-		body, err := doc.Find(".pg-markdown").First().Html()
-		if err == nil {
-			detail.Description = htmlToText(body)
-		}
-		if detail.Title == "" && detail.Description == "" {
-			return nil, errors.New("no JobPosting JSON-LD and no readable posting markup on page")
-		}
 	}
 
 	tables := doc.Find("section.pg-descriptions")
@@ -260,7 +250,88 @@ func parseJobDetailHTML(doc *goquery.Document, id, rawURL string) (*JobDetailRes
 		detail.CompanyInfo = parseDescriptionTable(tables.Eq(1))
 	}
 
+	if posting == nil {
+		fillDetailFromMarkup(doc, detail)
+		if detail.Title == "" && detail.Description == "" {
+			return nil, errors.New("no JobPosting JSON-LD and no readable posting markup on page")
+		}
+	}
+	// #jsi-published-date-start carries the same instant as the JSON-LD's
+	// datePosted and is present on both page variants, so it is the one
+	// source that also covers postings rendered without the JSON-LD.
+	if detail.DatePosted == "" {
+		detail.DatePosted, _ = doc.Find("#jsi-published-date-start").First().Attr("value")
+	}
+
 	return detail, nil
+}
+
+// fillDetailFromMarkup supplies the fields the JSON-LD would have carried,
+// for postings rendered without it. It runs after the pg-descriptions tables
+// are parsed, since the employer's 会社名 row is the authoritative company
+// name on these pages.
+func fillDetailFromMarkup(doc *goquery.Document, detail *JobDetailResponse) {
+	detail.Title = strings.TrimSpace(doc.Find("h1.sg-corporate-name").First().Text())
+
+	// The last breadcrumb is the posting title, not the employer; the first
+	// is the employer's own site link. Prefer the 会社情報 table's 会社名 row,
+	// which states the legal name outright.
+	detail.Company = lookupKV(detail.CompanyInfo, "会社名")
+	firstCrumb := doc.Find("header.sg-breadcrumbs li").First()
+	if detail.Company == "" {
+		detail.Company = strings.TrimSpace(firstCrumb.Text())
+	}
+	if href, ok := firstCrumb.Find("a").First().Attr("href"); ok {
+		detail.CompanyURL = href
+	}
+
+	detail.EmploymentType = lookupKV(detail.JobInfo, "雇用形態")
+
+	if body, err := doc.Find(".pg-markdown").First().Html(); err == nil {
+		detail.Description = htmlToText(body)
+	}
+
+	// The 勤務地 row's <li>s hold "{postal code} {address}" as one run of
+	// text. Only the postal code is separable; the rest stays whole, which
+	// hrmosDetailLocation renders the same way it renders the JSON-LD's
+	// region+locality+street.
+	for _, li := range doc.Find("th:contains('勤務地')").Parent().Find("td li").EachIter() {
+		// Each entry ends with a "地図で確認" Google Maps link; that is UI
+		// chrome, not part of the address.
+		entry := li.Clone()
+		entry.Find("a.pg-descriptions-location").Remove()
+		text := normalizeSpace(entry.Text())
+		if text == "" {
+			continue
+		}
+		var loc Location
+		if m := postalCodePattern.FindStringSubmatch(text); m != nil {
+			loc.PostalCode = m[1]
+			text = normalizeSpace(strings.Replace(text, m[0], "", 1))
+		}
+		loc.Street = text
+		detail.Locations = append(detail.Locations, loc)
+	}
+}
+
+// postalCodePattern matches a Japanese postal code as it appears at the head
+// of a pg-descriptions 勤務地 entry, e.g. "106-0041 東京都港区...".
+var postalCodePattern = regexp.MustCompile(`(\d{3}-\d{4})`)
+
+// lookupKV returns the value of the first pair with the given key.
+func lookupKV(pairs []KV, key string) string {
+	for _, kv := range pairs {
+		if kv.Key == key {
+			return kv.Value
+		}
+	}
+	return ""
+}
+
+// normalizeSpace collapses whitespace runs (including the &nbsp; HRMOS puts
+// after a postal code) to single spaces and trims the ends.
+func normalizeSpace(s string) string {
+	return strings.TrimSpace(strings.Join(strings.Fields(s), " "))
 }
 
 // parseDescriptionTable flattens one pg-descriptions <table>'s rows to

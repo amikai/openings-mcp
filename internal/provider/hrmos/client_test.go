@@ -109,16 +109,27 @@ func TestJobDetailShinsotsuNoJSONLD(t *testing.T) {
 	defer srv.Close()
 	c := NewClient(srv.URL, srv.Client())
 
-	got, err := c.JobDetail(t.Context(), MockSlugSmall, MockJobIDShinsotsu)
+	got, err := c.JobDetail(t.Context(), MockSlugShinsotsu, MockJobIDShinsotsu)
 	require.NoError(t, err)
 
 	assert.Equal(t, "【28新卒/内定直結3days】巨大産業を変革し続ける“ラクスル流”事業開発", got.Title)
-	assert.Contains(t, got.Company, "ラクスル")
+	// Exactly the employer, not the posting title — the last breadcrumb is
+	// the title and merely happens to contain the company name.
+	assert.Equal(t, "ラクスル株式会社", got.Company)
+	assert.NotEqual(t, got.Title, got.Company)
+	assert.Equal(t, "https://recruit.raksul.com/", got.CompanyURL)
 	assert.NotEmpty(t, got.Description)
 	assert.NotEmpty(t, got.JobInfo, "pg-descriptions job table still parses")
 	assert.NotEmpty(t, got.CompanyInfo, "pg-descriptions company table still parses")
-	// DatePosted lives only in the JSON-LD, so it is unavailable here.
-	assert.Empty(t, got.DatePosted)
+
+	// Both survive the missing JSON-LD: the date via #jsi-published-date-start,
+	// the address via the 勤務地 row.
+	assert.Equal(t, "2026-01-08T12:11:37.000Z", got.DatePosted)
+	require.Len(t, got.Locations, 1)
+	assert.Equal(t, "106-0041", got.Locations[0].PostalCode)
+	assert.Equal(t, "東京都港区麻布台一丁目3番1号 麻布台ヒルズ 森JPタワー 19階", got.Locations[0].Street)
+	// 新卒 is its own employment type on this surface, not 正社員.
+	assert.Equal(t, "新卒", got.EmploymentType)
 }
 
 func TestJobDetailNilSalary(t *testing.T) {

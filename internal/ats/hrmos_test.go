@@ -144,6 +144,24 @@ func TestHrmosDetail(t *testing.T) {
 	assert.NotEmpty(t, d.Description)
 }
 
+// A 新卒 posting has no JSON-LD, so Detail must still surface the employer,
+// the posting date, and the location from the page markup — and must not
+// mistake the posting title for the company.
+func TestHrmosDetailShinsotsuKeepsAllFields(t *testing.T) {
+	a := testHrmosAdapter(t)
+	d, err := a.Detail(t.Context(), hrmos.MockSlugShinsotsu, hrmos.MockJobIDShinsotsu)
+	require.NoError(t, err)
+
+	// Company is also roster-backed for this slug; the discriminating
+	// assertion that it is the employer and not the title lives in the
+	// provider package, where the markup is actually read.
+	assert.Equal(t, "ラクスル株式会社", d.Company)
+	assert.NotEqual(t, d.Title, d.Company)
+	assert.Equal(t, "2026-01-08", d.PostedAt)
+	assert.Equal(t, "東京都港区麻布台一丁目3番1号 麻布台ヒルズ 森JPタワー 19階", d.Location)
+	assert.NotEmpty(t, d.Description)
+}
+
 // Detail must round-trip a JobID Search actually returned.
 func TestHrmosDetailRoundTripsSearchJobID(t *testing.T) {
 	a := testHrmosAdapter(t)

@@ -38,7 +38,9 @@ const (
 	MockSlugPaged    = "moneyforward" // 203 jobs across 3 pages, 5 facet groups
 	MockSlugSmall    = "visional"     // 9 jobs, single page, 2 facet groups
 	MockSlugNoFacets = "hrmos"        // 86 jobs, single page, no facet nav
-	MockSlugNotFound = "no-such-tenant"
+	// MockSlugShinsotsu is the tenant serving the 新卒 detail fixture.
+	MockSlugShinsotsu = "raksul"
+	MockSlugNotFound  = "no-such-tenant"
 
 	MockJobID       = "0000265" // moneyforward, baseSalary null
 	MockJobIDSalary = "0000381" // visional, baseSalary populated
@@ -72,7 +74,7 @@ func NewMockServer() *httptest.Server {
 			serveMockHTML(w, mockJobDetailRsp)
 		case slug == MockSlugSmall && id == MockJobIDSalary:
 			serveMockHTML(w, mockJobDetailSalaryRsp)
-		case slug == MockSlugSmall && id == MockJobIDShinsotsu:
+		case slug == MockSlugShinsotsu && id == MockJobIDShinsotsu:
 			serveMockHTML(w, mockJobDetailShinsotsuRsp)
 		default:
 			http.NotFound(w, r)
