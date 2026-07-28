@@ -1,1 +1,5 @@
 cmd/openings-mcp/testdata/*.txt text eol=lf
+# go:embed of companies.yaml must see LF on every OS; CRLF makes YAML
+# fold multi-line double-quoted scalars differently and breaks collision goldens.
+*.yaml text eol=lf
+*.yml text eol=lf

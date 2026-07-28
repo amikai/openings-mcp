@@ -1478,10 +1478,7 @@
   slug: "no1llc"
 - company: "合同会社暗号屋"
   slug: "angoya"
-- company: "吉積ホールディングス株式会社
-クラウドエース株式会社
-吉積情報株式会社
-ガオ株式会社"
+- company: "吉積ホールディングス株式会社 クラウドエース株式会社 吉積情報株式会社 ガオ株式会社"
   slug: "cloud-ace"
 - company: "喪服レスキュー株式会社"
   slug: "mofukurescue"
@@ -4229,8 +4226,7 @@
   slug: "tfchr"
 - company: "株式会社東宝ハウスホールディングス"
   slug: "tohohouse"
-- company: "株式会社東栄住宅
-TOEI HOUSING CORPORATION"
+- company: "株式会社東栄住宅 TOEI HOUSING CORPORATION"
   slug: "touei"
 - company: "株式会社松尾研究所"
   slug: "matsuoinst"
