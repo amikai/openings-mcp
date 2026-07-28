@@ -2,6 +2,8 @@ package openingsmcp
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
@@ -16,7 +18,7 @@ var companySearchInputRawSchema = []byte(`{
 	"properties": {
 		"company": {
 			"type": "string",
-			"description": "Company name or slug, e.g. 'nvidia', or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster.",
+			"description": "Company name or slug, e.g. 'nvidia', or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error.",
 			"minLength": 1
 		},
 		"query": {
@@ -109,7 +111,7 @@ func companySearch(ctx context.Context, reg *ats.Registry, in *companySearchInpu
 }
 
 type companyFiltersInput struct {
-	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster."`
+	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error."`
 }
 
 type companyFiltersOutput struct {
@@ -129,7 +131,7 @@ func companyFilters(ctx context.Context, reg *ats.Registry, in *companyFiltersIn
 }
 
 type companyDetailInput struct {
-	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster."`
+	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error."`
 	JobID   string `json:"job_id" jsonschema:"job_id from search_jobs_by_company results."`
 }
 
@@ -146,6 +148,10 @@ type companyDetailOutput struct {
 func companyDetail(ctx context.Context, reg *ats.Registry, in *companyDetailInput) (*companyDetailOutput, error) {
 	adapter, slug, err := reg.Resolve(in.Company)
 	if err != nil {
+		var ambErr *ats.AmbiguousCompanyError
+		if errors.As(err, &ambErr) {
+			return nil, fmt.Errorf("%w\nuse the same company value that produced this job_id", err)
+		}
 		return nil, err
 	}
 	d, err := adapter.Detail(ctx, slug, in.JobID)

@@ -193,6 +193,50 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
+// TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
+// instruction — retry with one of the careers URLs listed in the error —
+// reaches the host LLM through both channels it can come from:
+// serverInstructions, and each unified company tool's own company
+// parameter description. All three tools need it independently since a
+// host may only ever read the tool description for the one it calls.
+func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
+	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
+
+	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
+
+	ctx := t.Context()
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	server := newServer(providerClients{}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
+	serverTransport, clientTransport := mcp.NewInMemoryTransports()
+	serverSession, err := server.Connect(ctx, serverTransport, nil)
+	require.NoError(t, err)
+	defer serverSession.Close()
+	clientSession, err := client.Connect(ctx, clientTransport, nil)
+	require.NoError(t, err)
+	defer clientSession.Close()
+
+	res, err := clientSession.ListTools(ctx, nil)
+	require.NoError(t, err)
+	got := make(map[string]*mcp.Tool, len(res.Tools))
+	for _, tool := range res.Tools {
+		got[tool.Name] = tool
+	}
+
+	for _, name := range []string{"search_jobs_by_company", "get_filters_by_company", "get_job_detail_by_company"} {
+		tool := got[name]
+		require.NotNil(t, tool, name)
+		input, ok := tool.InputSchema.(map[string]any)
+		require.True(t, ok, name)
+		properties, ok := input["properties"].(map[string]any)
+		require.True(t, ok, name)
+		companyProperty, ok := properties["company"].(map[string]any)
+		require.True(t, ok, name)
+		assert.Contains(t, companyProperty["description"], retryInstruction, name)
+	}
+}
+
 func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 	transport := &mcp.IOTransport{
 		Reader: io.NopCloser(strings.NewReader("")),

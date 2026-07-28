@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"text/tabwriter"
 	"unicode"
 )
 
@@ -25,11 +26,21 @@ type slugEntry struct {
 
 // Registry is the read-only union of every adapter's roster, built once at
 // startup. It owns name resolution; adapters never see unresolved input.
+//
+// The same normalized slug or display name can belong to entries from
+// different adapters — ATS-local identifiers were never a shared
+// namespace. bySlug and byName therefore map to every entry sharing a key,
+// and [Registry.Resolve] disambiguates when more than one survives.
 type Registry struct {
-	adapters []Adapter                // registration order; polled for careers-URL input
-	bySlug   map[string]registryEntry // key: normalize(slug)
-	byName   map[string]registryEntry // key: normalize(display name)
-	slugs    []slugEntry              // sorted by slug, for suggestions
+	adapters []Adapter                  // registration order; polled for careers-URL input
+	bySlug   map[string][]registryEntry // key: normalize(slug)
+	byName   map[string][]registryEntry // key: normalize(display name)
+	slugs    []slugEntry                // sorted by slug, for suggestions; one entry per distinct roster slug
+	// entryCount is the number of roster rows across every adapter — the
+	// figure the miss error advertises. It is not len(bySlug) or
+	// len(byName): those count distinct normalized keys, which undercounts
+	// once cross-adapter collisions share a key.
+	entryCount int
 }
 
 // careersHostPatternsByAdapter maps each known adapter name to the
@@ -56,33 +67,109 @@ var careersHostPatternsByAdapter = map[string]string{
 	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
 }
 
-// NewRegistry unions the adapters' rosters. A slug or normalized display
-// name colliding across entries is a curation bug — fail startup loudly
-// rather than silently shadowing one company with another.
+// CompanyCandidate is one company in an [AmbiguousCompanyError]'s candidate
+// list. CareersURL is empty when the owning adapter has no public URL for
+// this entry; Provider is carried for logs and debug tooling and is never
+// rendered in MCP-facing text.
+type CompanyCandidate struct {
+	Name       string
+	CareersURL string
+	Provider   string
+}
+
+// AmbiguousCompanyError reports that a company input matched more than one
+// roster entry. The caller must retry with the careers URL of the intended
+// candidate (or, when a candidate has none, its display name).
+type AmbiguousCompanyError struct {
+	Input      string
+	Candidates []CompanyCandidate
+}
+
+func (e *AmbiguousCompanyError) Error() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "ambiguous company %q: %d companies match. Retry with the careers URL of the one you want:\n", e.Input, len(e.Candidates))
+	tw := tabwriter.NewWriter(&b, 0, 0, 3, ' ', 0)
+	for _, c := range e.Candidates {
+		if c.CareersURL != "" {
+			fmt.Fprintf(tw, "  %s\t%s\n", c.Name, c.CareersURL)
+		} else {
+			fmt.Fprintf(tw, "  %s\t(no public careers URL; retry with company=%q)\n", c.Name, c.Name)
+		}
+	}
+	tw.Flush()
+	return strings.TrimRight(b.String(), "\n")
+}
+
+// NewRegistry unions the adapters' rosters. Cross-adapter slug and name
+// collisions are expected — ATS-local identifiers are only unique within
+// their own ATS — so they are indexed for [Registry.Resolve] to
+// disambiguate at lookup time, not rejected here.
+//
+// A collision within one adapter's own roster stays a fatal curation bug:
+// two rows sharing a slug would render the same careers URL, so a retry
+// could never disambiguate them, and two rows sharing a name in a roster
+// this repo owns outright has no upstream cause.
+//
+// An entry whose adapter cannot render a careers URL for it (CareersURL
+// returns ok=false) is required to have a normalized name that collides
+// with no other entry's normalized name or slug: that name is the only
+// retry a caller can offer for it, so the name must resolve uniquely.
 func NewRegistry(adapters ...Adapter) (*Registry, error) {
 	r := &Registry{
 		adapters: adapters,
-		bySlug:   make(map[string]registryEntry),
-		byName:   make(map[string]registryEntry),
+		bySlug:   make(map[string][]registryEntry),
+		byName:   make(map[string][]registryEntry),
 	}
+	seenSlugs := make(map[string]bool)
+	var allEntries []registryEntry
 	for _, a := range adapters {
+		localSlugs := make(map[string]string) // normalized -> original slug, this adapter's roster only
+		localNames := make(map[string]string) // normalized -> original name, this adapter's roster only
 		for _, c := range a.Roster() {
 			e := registryEntry{adapter: a, slug: c.Slug, name: c.Name}
+
 			slugKey := normalize(c.Slug)
-			if prev, ok := r.bySlug[slugKey]; ok {
-				return nil, fmt.Errorf("ats: company slug %q from %s collides with %q from %s",
-					c.Slug, a.Name(), prev.slug, prev.adapter.Name())
+			if prev, ok := localSlugs[slugKey]; ok {
+				return nil, fmt.Errorf("ats: company slug %q from %s collides with %q in the same roster", c.Slug, a.Name(), prev)
 			}
-			r.bySlug[slugKey] = e
+			localSlugs[slugKey] = c.Slug
+
 			nameKey := normalize(c.Name)
-			if prev, ok := r.byName[nameKey]; ok {
-				return nil, fmt.Errorf("ats: company name %q from %s collides with %q from %s",
-					c.Name, a.Name(), prev.name, prev.adapter.Name())
+			if prev, ok := localNames[nameKey]; ok {
+				return nil, fmt.Errorf("ats: company name %q from %s collides with %q in the same roster", c.Name, a.Name(), prev)
 			}
-			r.byName[nameKey] = e
-			r.slugs = append(r.slugs, slugEntry{slug: c.Slug, norm: slugKey})
+			localNames[nameKey] = c.Name
+
+			r.bySlug[slugKey] = append(r.bySlug[slugKey], e)
+			r.byName[nameKey] = append(r.byName[nameKey], e)
+			allEntries = append(allEntries, e)
+			r.entryCount++
+			if !seenSlugs[c.Slug] {
+				seenSlugs[c.Slug] = true
+				r.slugs = append(r.slugs, slugEntry{slug: c.Slug, norm: slugKey})
+			}
 		}
 	}
+
+	for _, e := range allEntries {
+		if _, ok := e.adapter.CareersURL(e.slug); ok {
+			continue
+		}
+		nameKey := normalize(e.name)
+		for _, other := range r.byName[nameKey] {
+			if other != e {
+				return nil, fmt.Errorf("ats: company %q from %s has no careers URL and its name collides with %q from %s; its name-only retry could not resolve uniquely",
+					e.name, e.adapter.Name(), other.name, other.adapter.Name())
+			}
+		}
+		for _, other := range r.bySlug[nameKey] {
+			if other != e {
+				return nil, fmt.Errorf("ats: company %q from %s has no careers URL and its name collides with slug %q from %s; its name-only retry could not resolve uniquely",
+					e.name, e.adapter.Name(), other.slug, other.adapter.Name())
+			}
+		}
+	}
+
 	slices.SortFunc(r.slugs, func(a, b slugEntry) int { return strings.Compare(a.slug, b.slug) })
 	return r, nil
 }
@@ -91,32 +178,82 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 // be a roster slug, a display name, or a careers URL. The returned slug is not
 // always a roster key: a careers URL for a company outside the roster resolves
 // to whatever slug the owning adapter minted via [Adapter.ParseCareersURL]
-// (Workday mints the canonical careers URL). Misses return a teaching error
-// carrying the closest slugs, so one retry from the LLM almost always lands.
+// (Workday mints the canonical careers URL).
+//
+// A careers URL is authoritative and answers immediately. Anything else —
+// including a URL shape no adapter recognizes — falls through to the
+// roster union of slug and name hits: exactly one hit resolves, two or
+// more return an [*AmbiguousCompanyError], and zero returns a teaching
+// error (the closest roster slugs, or the supported careers-page hosts
+// when the input was URL-shaped).
 func (r *Registry) Resolve(company string) (Adapter, string, error) {
 	key := normalize(company)
 	if key == "" {
 		return nil, "", errors.New("company is required")
 	}
-	// 1. match slug
-	if e, ok := r.bySlug[key]; ok {
-		return e.adapter, e.slug, nil
-	}
-	// 2. match company name
-	if e, ok := r.byName[key]; ok {
-		return e.adapter, e.slug, nil
-	}
-	// 3. fallback to careers URL to match url slug
+
+	urlShaped := false
 	if u, ok := parseCareersInput(company); ok {
+		urlShaped = true
 		for _, a := range r.adapters {
 			if slug, ok := a.ParseCareersURL(u); ok {
 				return a, slug, nil
 			}
 		}
-		return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
 	}
-	return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
-		company, strings.Join(r.suggest(key, 3), ", "), len(r.bySlug))
+
+	switch candidates := r.candidates(key); len(candidates) {
+	case 1:
+		return candidates[0].adapter, candidates[0].slug, nil
+	case 0:
+		if urlShaped {
+			return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
+		}
+		return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
+			company, strings.Join(r.suggest(key, 3), ", "), r.entryCount)
+	default:
+		return nil, "", r.ambiguousError(company, candidates)
+	}
+}
+
+// candidates returns the deduplicated union of bySlug[key] and byName[key],
+// with identity (adapter, slug) — an entry whose slug and name both
+// normalize to key (common when the two already match, e.g. "bunq") must
+// collapse to one candidate rather than becoming ambiguous with itself.
+func (r *Registry) candidates(key string) []registryEntry {
+	slugHits, nameHits := r.bySlug[key], r.byName[key]
+	if len(slugHits) == 0 && len(nameHits) == 0 {
+		return nil
+	}
+	seen := make(map[registryEntry]bool, len(slugHits)+len(nameHits))
+	out := make([]registryEntry, 0, len(slugHits)+len(nameHits))
+	for _, e := range slugHits {
+		if !seen[e] {
+			seen[e] = true
+			out = append(out, e)
+		}
+	}
+	for _, e := range nameHits {
+		if !seen[e] {
+			seen[e] = true
+			out = append(out, e)
+		}
+	}
+	return out
+}
+
+// ambiguousError renders candidates as an [*AmbiguousCompanyError], with
+// each candidate's careers URL when its adapter can render one.
+func (r *Registry) ambiguousError(input string, candidates []registryEntry) *AmbiguousCompanyError {
+	out := make([]CompanyCandidate, 0, len(candidates))
+	for _, e := range candidates {
+		cand := CompanyCandidate{Name: e.name, Provider: e.adapter.Name()}
+		if url, ok := e.adapter.CareersURL(e.slug); ok {
+			cand.CareersURL = url
+		}
+		out = append(out, cand)
+	}
+	return &AmbiguousCompanyError{Input: input, Candidates: out}
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered
@@ -144,7 +281,9 @@ func normalize(s string) string {
 }
 
 // suggest ranks slugs for a missed lookup: substring hits (either
-// direction) beat everything, then edit distance breaks ties.
+// direction) beat everything, then edit distance breaks ties. r.slugs
+// already carries at most one entry per distinct roster slug, so results
+// need no further deduplication.
 func (r *Registry) suggest(key string, n int) []string {
 	type scored struct {
 		slug string

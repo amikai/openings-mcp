@@ -89,10 +89,38 @@ func TestResolveEmpty(t *testing.T) {
 
 func TestNewRegistryRejectsDuplicateSlug(t *testing.T) {
 	_, err := NewRegistry(
+		&fakeAdapter{name: "workday", roster: []CompanyInfo{
+			{Slug: "acme", Name: "Acme (First)"},
+			{Slug: "acme", Name: "Acme (Second)"},
+		}},
+	)
+	assert.Error(t, err, "want error for duplicate slug within the same adapter's roster")
+}
+
+func TestNewRegistryRejectsDuplicateName(t *testing.T) {
+	_, err := NewRegistry(
+		&fakeAdapter{name: "workday", roster: []CompanyInfo{
+			{Slug: "acme-1", Name: "Acme"},
+			{Slug: "acme-2", Name: "Acme"},
+		}},
+	)
+	assert.Error(t, err, "want error for duplicate name within the same adapter's roster")
+}
+
+func TestNewRegistryAllowsCrossAdapterDuplicateSlug(t *testing.T) {
+	_, err := NewRegistry(
 		&fakeAdapter{name: "workday", roster: []CompanyInfo{{Slug: "acme", Name: "Acme (Workday)"}}},
 		&fakeAdapter{name: "lever", roster: []CompanyInfo{{Slug: "acme", Name: "Acme (Lever)"}}},
 	)
-	assert.Error(t, err, "want error for duplicate slug across adapters")
+	assert.NoError(t, err, "cross-adapter slug collisions are not fatal")
+}
+
+func TestNewRegistryAllowsCrossAdapterDuplicateName(t *testing.T) {
+	_, err := NewRegistry(
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "acme-workday", Name: "Acme"}}},
+		&fakeAdapter{name: "lever", host: "lever.example", roster: []CompanyInfo{{Slug: "acme-lever", Name: "Acme"}}},
+	)
+	assert.NoError(t, err, "cross-adapter name collisions are not fatal")
 }
 
 func TestResolveCareersURL(t *testing.T) {
@@ -116,4 +144,168 @@ func TestResolveUnrecognizedCareersURLTeaches(t *testing.T) {
 	_, _, err := r.Resolve("https://careers.example.com/acme")
 	require.ErrorContains(t, err, "careers URL", "URL misses should get the URL error, not name suggestions")
 	assert.NotContains(t, err.Error(), "closest matches", "no levenshtein suggestions for URLs")
+}
+
+func TestResolveAmbiguousSlug(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", host: "herp.example", roster: []CompanyInfo{{Slug: "nature", Name: "Nature KK"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
+	)
+	require.NoError(t, err)
+
+	_, _, err = r.Resolve("nature")
+	var ambErr *AmbiguousCompanyError
+	require.ErrorAs(t, err, &ambErr)
+	require.Len(t, ambErr.Candidates, 2)
+	var names []string
+	for _, c := range ambErr.Candidates {
+		names = append(names, c.Name)
+		assert.NotEmpty(t, c.CareersURL, "both candidates render a careers URL")
+	}
+	assert.ElementsMatch(t, []string{"Nature KK", "Nature Research"}, names)
+	assert.Contains(t, err.Error(), "Retry with the careers URL")
+	assert.Contains(t, err.Error(), "https://herp.example/nature")
+	assert.Contains(t, err.Error(), "https://workday.example/nature")
+}
+
+func TestResolveAmbiguousName(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "greenhouse", host: "greenhouse.example", roster: []CompanyInfo{{Slug: "beta-gh", Name: "BETA Technologies"}}},
+		&fakeAdapter{name: "lever", host: "lever.example", roster: []CompanyInfo{{Slug: "beta-lv", Name: "BETA Technologies"}}},
+	)
+	require.NoError(t, err)
+
+	_, _, err = r.Resolve("BETA Technologies")
+	var ambErr *AmbiguousCompanyError
+	require.ErrorAs(t, err, &ambErr)
+	assert.Len(t, ambErr.Candidates, 2)
+}
+
+// TestResolveAmbiguousSlugVersusName covers the case the options survey
+// missed: one entry's slug and a different entry's name normalize to the
+// same key. The union must list both rather than the slug index silently
+// shadowing the name hit.
+func TestResolveAmbiguousSlugVersusName(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", host: "herp.example", roster: []CompanyInfo{{Slug: "fusion", Name: "株式会社FUSION"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "fusion-wd", Name: "Fusion"}}},
+	)
+	require.NoError(t, err)
+
+	_, _, err = r.Resolve("fusion")
+	var ambErr *AmbiguousCompanyError
+	require.ErrorAs(t, err, &ambErr)
+	assert.Len(t, ambErr.Candidates, 2)
+}
+
+// TestResolveCareersURLWinsOverAmbiguousToken checks that a careers URL is
+// authoritative even when its bare slug alone would be ambiguous.
+func TestResolveCareersURLWinsOverAmbiguousToken(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", host: "herp.example", roster: []CompanyInfo{{Slug: "acme", Name: "Acme HERP"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "acme", Name: "Acme Workday"}}},
+	)
+	require.NoError(t, err)
+
+	a, slug, err := r.Resolve("https://workday.example/acme")
+	require.NoError(t, err)
+	assert.Equal(t, "workday", a.Name())
+	assert.Equal(t, "acme", slug)
+}
+
+// TestResolveAmbiguousCandidateDegradesToName covers a candidate whose
+// adapter has no public careers URL: the ambiguity message must fall back
+// to its display name instead of an empty URL, and that name must resolve
+// on its own afterward.
+func TestResolveAmbiguousCandidateDegradesToName(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "roster-only", roster: []CompanyInfo{{Slug: "nature", Name: "Foo Corp"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
+	)
+	require.NoError(t, err)
+
+	_, _, err = r.Resolve("nature")
+	var ambErr *AmbiguousCompanyError
+	require.ErrorAs(t, err, &ambErr)
+	assert.Contains(t, err.Error(), `no public careers URL; retry with company="Foo Corp"`)
+
+	// The suggested retry must itself resolve to exactly one candidate.
+	a, slug, err := r.Resolve("Foo Corp")
+	require.NoError(t, err)
+	assert.Equal(t, "roster-only", a.Name())
+	assert.Equal(t, "nature", slug)
+}
+
+// TestResolveSlugAndNameSameKeyIsOneCandidate ensures an entry whose slug
+// and name both normalize to the same key (e.g. "bunq"/"bunq") does not
+// become ambiguous with itself: it appears in both bySlug and byName for
+// that key, and the union must collapse it to one candidate.
+func TestResolveSlugAndNameSameKeyIsOneCandidate(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "bunq", Name: "bunq"}}},
+	)
+	require.NoError(t, err)
+	a, slug, err := r.Resolve("bunq")
+	require.NoError(t, err)
+	assert.Equal(t, "workday", a.Name())
+	assert.Equal(t, "bunq", slug)
+}
+
+func TestNewRegistryRejectsNoURLEntryNameCollidingWithName(t *testing.T) {
+	_, err := NewRegistry(
+		&fakeAdapter{name: "roster-only", roster: []CompanyInfo{{Slug: "foo", Name: "Acme"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "acme-wd", Name: "Acme"}}},
+	)
+	assert.Error(t, err, "an ok=false entry's name must not collide with another entry's name")
+}
+
+func TestNewRegistryRejectsNoURLEntryNameCollidingWithSlug(t *testing.T) {
+	_, err := NewRegistry(
+		&fakeAdapter{name: "roster-only", roster: []CompanyInfo{{Slug: "foo", Name: "Fusion"}}},
+		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "fusion", Name: "Something Else"}}},
+	)
+	assert.Error(t, err, "an ok=false entry's name must not collide with another entry's slug")
+}
+
+// TestResolveURLShapedRosterSlugFallsThroughToUnion covers Oracle- and
+// Avature-style roster slugs that are themselves careers-URL shaped but
+// unparseable by their own adapter's ParseCareersURL. The ①→② fallthrough
+// must still resolve them through the slug index.
+func TestResolveURLShapedRosterSlugFallsThroughToUnion(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "oracle", roster: []CompanyInfo{{Slug: "abc.fa.us2.oraclecloud.com/CX_1", Name: "Acme Health"}}},
+	)
+	require.NoError(t, err)
+	a, slug, err := r.Resolve("abc.fa.us2.oraclecloud.com/CX_1")
+	require.NoError(t, err)
+	assert.Equal(t, "oracle", a.Name())
+	assert.Equal(t, "abc.fa.us2.oraclecloud.com/CX_1", slug)
+}
+
+// TestSuggestDedupesCollidingSlug ensures a miss whose nearest slug is a
+// cross-adapter collision does not list that slug twice.
+func TestSuggestDedupesCollidingSlug(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", roster: []CompanyInfo{{Slug: "nature", Name: "Nature KK"}}},
+		&fakeAdapter{name: "workday", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
+		&fakeAdapter{name: "lever", roster: []CompanyInfo{{Slug: "other", Name: "Other Co"}}},
+	)
+	require.NoError(t, err)
+	_, _, err = r.Resolve("natur")
+	require.Error(t, err)
+	assert.Equal(t, 1, strings.Count(err.Error(), "nature"), "colliding slug must be suggested once, not once per adapter")
+}
+
+// TestMissErrorCountsRosterEntriesNotKeys ensures the advertised company
+// count is roster rows, not distinct normalized keys — those diverge once
+// a cross-adapter collision shares a key.
+func TestMissErrorCountsRosterEntriesNotKeys(t *testing.T) {
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", roster: []CompanyInfo{{Slug: "nature", Name: "Nature KK"}}},
+		&fakeAdapter{name: "workday", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
+	)
+	require.NoError(t, err)
+	_, _, err = r.Resolve("zzz-totally-unknown")
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "2 companies are supported")
 }
