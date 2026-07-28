@@ -484,6 +484,7 @@ ism	recruitee|valantic NL|https://ism.recruitee.com	workday|ISM|https://kyndryl.
 itec	herp|株式会社アイテック|https://herp.careers/careers/companies/itec	smartrecruiters|ITEC|https://jobs.smartrecruiters.com/ITEC2
 jobgether	lever|Jobgether|https://jobs.lever.co/jobgether	workable|Jobgether|https://apply.workable.com/jobgether/
 journey	bamboohr|Journey Church|https://journey.bamboohr.com/careers	workable|Journey|https://apply.workable.com/journeylive/
+kaonavi	herp|株式会社カオナビ|https://herp.careers/careers/companies/kaonavi	hrmos|株式会社カオナビ|https://hrmos.co/pages/kaonavi/jobs
 keepsafe	lever|Keepsafe|https://jobs.lever.co/keepsafe	workable|Keepsafe|https://apply.workable.com/keepsafe/
 kinsta	lever|Kinsta|https://jobs.lever.co/kinsta	workable|Kinsta|https://apply.workable.com/kinsta/
 kipp	herp|Kipp Financial Technologies株式会社|https://herp.careers/careers/companies/kipp	smartrecruiters|KIPP|https://jobs.smartrecruiters.com/KIPP
@@ -504,6 +505,7 @@ mattson	workable|Mattson|https://apply.workable.com/mattson/	oracle|Mattson|http
 mckesson	workday|McKesson Corporation|https://mckesson.wd3.myworkdayjobs.com/en-US/External_Careers	smartrecruiters|McKesson|https://jobs.smartrecruiters.com/McKesson4
 medicom	herp|メディコム株式会社|https://herp.careers/careers/companies/medicom	rippling|Medicom|https://ats.rippling.com/medicom-careers/jobs
 mfs	workday|MFS Careers|https://mfs.wd1.myworkdayjobs.com/en-US/MFS-Careers	smartrecruiters|MFS|https://jobs.smartrecruiters.com/MFS1
+moneyforward	herp|株式会社マネーフォワード|https://herp.careers/careers/companies/moneyforward	hrmos|株式会社マネーフォワード|https://hrmos.co/pages/moneyforward/jobs
 moneysmart	bamboohr|MoneySmart (moneysmart)|https://moneysmart.bamboohr.com/careers	smartrecruiters|moneysmart|https://jobs.smartrecruiters.com/Moneysmart1
 morganstanley	eightfold|Morgan Stanley Inc.|https://morganstanley.eightfold.ai/careers	workday|Morgan Stanley|https://ms.wd5.myworkdayjobs.com/en-US/External
 mota	herp|株式会社MOTA|https://herp.careers/careers/companies/mota	smartrecruiters|MOTA|https://jobs.smartrecruiters.com/MOTA
@@ -759,3 +761,5 @@ zerofox	bamboohr|ZeroFOX|https://zerofox.bamboohr.com/careers	workable|ZeroFox|h
 zincnetwork	bamboohr|Zinc Network|https://zincnetwork.bamboohr.com/careers	workable|Zinc Network|https://apply.workable.com/zincnetwork/
 zipdev	bamboohr|Zipdev|https://zipdev.bamboohr.com/careers	workable|Zipdev|https://apply.workable.com/zipdev/
 zyte	bamboohr|Zyte Group Ltd.|https://zyte.bamboohr.com/careers	workable|Zyte|https://apply.workable.com/zyte/
+株式会社カオナビ	herp|株式会社カオナビ|https://herp.careers/careers/companies/kaonavi	hrmos|株式会社カオナビ|https://hrmos.co/pages/kaonavi/jobs
+株式会社マネーフォワード	herp|株式会社マネーフォワード|https://herp.careers/careers/companies/moneyforward	hrmos|株式会社マネーフォワード|https://hrmos.co/pages/moneyforward/jobs
