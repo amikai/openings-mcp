@@ -1,16 +1,1 @@
-# Live Oracle Recruiting Cloud boards with unconfirmed or shared display
-# names. Promote into internal/provider/oracle/companies.yaml only after
-# the company name is confirmed from an authoritative source.
-
-# Shared Portsmouth City Council external board; jobs span multiple local
-# employers (including Gosport Borough Council).
-- company: "PCC External Site Minimal Template"
-  host: "fa-enmi-saasfaprod1.fa.ocs.oraclecloud.com"
-  site: "CX_3001"
-  site_number: "CX_3001"
-
-# Weak page title; company identity unconfirmed.
-- company: "edyo CX"
-  host: "edyo.fa.us2.oraclecloud.com"
-  site: "CX"
-  site_number: "CX"
+# Oracle entries awaiting verification; remove candidates after promotion or matching curated records.
