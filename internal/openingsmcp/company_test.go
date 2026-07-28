@@ -2,13 +2,16 @@ package openingsmcp
 
 import (
 	"context"
+	"encoding/json"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/amikai/openings-mcp/internal/ats"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
 // stubAdapter returns canned results so tests exercise only the MCP
@@ -17,6 +20,7 @@ import (
 // two stub adapters.
 type stubAdapter struct {
 	name         string
+	host         string
 	roster       []ats.CompanyInfo
 	searchResult *ats.SearchResult
 	filterSet    ats.FilterSet
@@ -26,6 +30,7 @@ type stubAdapter struct {
 	searchCalled  bool
 	filtersCalled bool
 	detailCalled  bool
+	filterCompany string
 }
 
 func (s *stubAdapter) Name() string {
@@ -40,15 +45,27 @@ func (s *stubAdapter) Roster() []ats.CompanyInfo {
 	}
 	return []ats.CompanyInfo{{Slug: "acme", Name: "Acme Corp"}}
 }
-func (s *stubAdapter) ParseCareersURL(*url.URL) (string, bool) { return "", false }
-func (s *stubAdapter) CareersURL(string) (string, bool)        { return "", false }
+func (s *stubAdapter) ParseCareersURL(u *url.URL) (string, bool) {
+	if s.host == "" || u.Hostname() != s.host {
+		return "", false
+	}
+	slug := strings.Trim(u.Path, "/")
+	return slug, slug != ""
+}
+func (s *stubAdapter) CareersURL(slug string) (string, bool) {
+	if s.host == "" {
+		return "", false
+	}
+	return "https://" + s.host + "/" + slug, true
+}
 func (s *stubAdapter) Search(_ context.Context, _ string, p ats.SearchParams) (*ats.SearchResult, error) {
 	s.searchCalled = true
 	s.gotParams = p
 	return s.searchResult, nil
 }
-func (s *stubAdapter) Filters(context.Context, string) (ats.FilterSet, error) {
+func (s *stubAdapter) Filters(_ context.Context, company string) (ats.FilterSet, error) {
 	s.filtersCalled = true
+	s.filterCompany = company
 	return s.filterSet, nil
 }
 func (s *stubAdapter) Detail(context.Context, string, string) (*ats.JobDetail, error) {
@@ -127,12 +144,14 @@ func ambiguousCompanyRegistry(t *testing.T) (*ats.Registry, *stubAdapter, *stubA
 	// than panicking on a nil result and taking the rest of the package with it.
 	stubA := &stubAdapter{
 		name:         "stubA",
+		host:         "nature-a.example",
 		roster:       []ats.CompanyInfo{{Slug: "nature", Name: "Nature A"}},
 		searchResult: &ats.SearchResult{},
 		detail:       &ats.JobDetail{},
 	}
 	stubB := &stubAdapter{
 		name:         "stubB",
+		host:         "nature-b.example",
 		roster:       []ats.CompanyInfo{{Slug: "nature", Name: "Nature B"}},
 		searchResult: &ats.SearchResult{},
 		detail:       &ats.JobDetail{},
@@ -181,4 +200,94 @@ func TestCompanyDetailAmbiguityAddsPreviousKeySentence(t *testing.T) {
 	_, detailErr := companyDetail(t.Context(), reg, &companyDetailInput{Company: "nature", JobID: "j1"})
 	require.Error(t, detailErr)
 	assert.Contains(t, detailErr.Error(), sentence)
+}
+
+func TestCompanyFiltersElicitsAmbiguousCompany(t *testing.T) {
+	reg, stubA, stubB := ambiguousCompanyRegistry(t)
+	stubA.filterSet = ats.FilterSet{"team": {"A"}}
+	stubB.filterSet = ats.FilterSet{"team": {"B"}}
+
+	var elicitationMessage string
+	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
+		ElicitationHandler: func(_ context.Context, req *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
+			elicitationMessage = req.Params.Message
+			return &mcp.ElicitResult{
+				Action:  "accept",
+				Content: map[string]any{"choice": "2"},
+			}, nil
+		},
+	})
+
+	assert.False(t, result.IsError)
+	var out companyFiltersOutput
+	data, err := json.Marshal(result.StructuredContent)
+	require.NoError(t, err)
+	require.NoError(t, json.Unmarshal(data, &out))
+	assert.Equal(t, []string{"B"}, out.Filters["team"])
+
+	assert.Contains(t, elicitationMessage, "1. Nature A")
+	assert.Contains(t, elicitationMessage, "2. Nature B")
+	assert.Contains(t, elicitationMessage, "https://nature-a.example/nature")
+	assert.Contains(t, elicitationMessage, "https://nature-b.example/nature")
+	assert.NotContains(t, elicitationMessage, "stubA", "provider names must stay internal")
+	assert.NotContains(t, elicitationMessage, "stubB", "provider names must stay internal")
+
+	assert.False(t, stubA.filtersCalled)
+	assert.True(t, stubB.filtersCalled)
+	assert.Equal(t, "nature", stubB.filterCompany)
+}
+
+func TestCompanyFiltersElicitationCancellation(t *testing.T) {
+	reg, stubA, stubB := ambiguousCompanyRegistry(t)
+	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
+		ElicitationHandler: func(context.Context, *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
+			return &mcp.ElicitResult{Action: "cancel"}, nil
+		},
+	})
+
+	assert.True(t, result.IsError)
+	require.Len(t, result.Content, 1)
+	text, ok := result.Content[0].(*mcp.TextContent)
+	require.True(t, ok)
+	assert.Contains(t, text.Text, "company selection cancelled")
+	assert.False(t, stubA.filtersCalled)
+	assert.False(t, stubB.filtersCalled)
+}
+
+func TestCompanyFiltersAmbiguityFallsBackWithoutElicitation(t *testing.T) {
+	reg, stubA, stubB := ambiguousCompanyRegistry(t)
+	result := callCompanyFilters(t, reg, nil)
+
+	assert.True(t, result.IsError)
+	require.Len(t, result.Content, 1)
+	text, ok := result.Content[0].(*mcp.TextContent)
+	require.True(t, ok)
+	assert.Contains(t, text.Text, `ambiguous company "nature"`)
+	assert.False(t, stubA.filtersCalled)
+	assert.False(t, stubB.filtersCalled)
+}
+
+func callCompanyFilters(t *testing.T, reg *ats.Registry, options *mcp.ClientOptions) *mcp.CallToolResult {
+	t.Helper()
+
+	server := mcp.NewServer(&mcp.Implementation{Name: "test-server", Version: "v0"}, nil)
+	RegisterCompany(server, reg)
+
+	clientTransport, serverTransport := mcp.NewInMemoryTransports()
+	serverSession, err := server.Connect(t.Context(), serverTransport, nil)
+	require.NoError(t, err)
+	defer serverSession.Close()
+
+	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, options)
+	clientSession, err := client.Connect(t.Context(), clientTransport, nil)
+	require.NoError(t, err)
+	defer clientSession.Close()
+
+	result, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
+		Name:      "get_filters_by_company",
+		Arguments: map[string]any{"company": "nature"},
+	})
+	require.NoError(t, err)
+	require.NotNil(t, result)
+	return result
 }

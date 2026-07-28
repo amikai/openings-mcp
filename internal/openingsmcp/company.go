@@ -4,8 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/amikai/openings-mcp/internal/ats"
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -111,12 +114,14 @@ func companySearch(ctx context.Context, reg *ats.Registry, in *companySearchInpu
 }
 
 type companyFiltersInput struct {
-	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error."`
+	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL on a supported ATS. Other careers URLs are unsupported; some ATS providers accept URLs only for companies in the curated roster. If the company is ambiguous and the client supports elicitation, the tool asks the user to choose; otherwise it lists careers URLs for a retry."`
 }
 
 type companyFiltersOutput struct {
 	Filters map[string][]string `json:"filters" jsonschema:"Filter dimension to its currently valid values. Pass any subset to search_jobs_by_company's filters param."`
 }
+
+const companySelectionRequestID = "company_selection"
 
 func companyFilters(ctx context.Context, reg *ats.Registry, in *companyFiltersInput) (*companyFiltersOutput, error) {
 	adapter, slug, err := reg.Resolve(in.Company)
@@ -128,6 +133,132 @@ func companyFilters(ctx context.Context, reg *ats.Registry, in *companyFiltersIn
 		return nil, err
 	}
 	return &companyFiltersOutput{Filters: fs}, nil
+}
+
+// companyFiltersTool adds one multi-round-trip step around companyFilters:
+// an elicitation-capable client asks the user to choose an ambiguous company,
+// then retries the same call with that choice in InputResponses.
+func companyFiltersTool(
+	ctx context.Context,
+	req *mcp.CallToolRequest,
+	reg *ats.Registry,
+	in *companyFiltersInput,
+) (*mcp.CallToolResult, *companyFiltersOutput, error) {
+	out, err := companyFilters(ctx, reg, in)
+	if err == nil {
+		return nil, out, nil
+	}
+
+	var ambiguous *ats.AmbiguousCompanyError
+	if !errors.As(err, &ambiguous) {
+		return nil, nil, err
+	}
+
+	choice, answered, selectionErr := companySelection(req, len(ambiguous.Candidates))
+	if selectionErr != nil {
+		return nil, nil, selectionErr
+	}
+	if answered {
+		candidate := ambiguous.Candidates[choice]
+		selectedCompany := candidate.CareersURL
+		if selectedCompany == "" {
+			selectedCompany = candidate.Name
+		}
+		out, err := companyFilters(ctx, reg, &companyFiltersInput{Company: selectedCompany})
+		if err != nil {
+			return nil, nil, err
+		}
+		return nil, out, nil
+	}
+
+	if !supportsFormElicitation(req) {
+		return nil, nil, ambiguous
+	}
+	return companySelectionRequest(ambiguous), nil, nil
+}
+
+// companySelection reads a form-elicitation response. The returned choice is
+// zero-based; answered is false only on the first pass through the handler.
+func companySelection(req *mcp.CallToolRequest, candidateCount int) (choice int, answered bool, err error) {
+	if len(req.Params.InputResponses) == 0 {
+		return 0, false, nil
+	}
+
+	raw, ok := req.Params.InputResponses[companySelectionRequestID]
+	if !ok {
+		return 0, true, errors.New("company selection response is missing")
+	}
+	response, ok := raw.(*mcp.ElicitResult)
+	if !ok {
+		return 0, true, fmt.Errorf("company selection response has unexpected type %T", raw)
+	}
+
+	switch response.Action {
+	case "accept":
+		// Continue below.
+	case "decline":
+		return 0, true, errors.New("company selection declined")
+	case "cancel":
+		return 0, true, errors.New("company selection cancelled")
+	default:
+		return 0, true, fmt.Errorf("company selection returned unknown action %q", response.Action)
+	}
+
+	value, ok := response.Content["choice"].(string)
+	if !ok {
+		return 0, true, errors.New("company selection choice must be a string")
+	}
+	n, err := strconv.Atoi(value)
+	if err != nil || n < 1 || n > candidateCount {
+		return 0, true, fmt.Errorf("company selection choice %q is out of range", value)
+	}
+	return n - 1, true, nil
+}
+
+func supportsFormElicitation(req *mcp.CallToolRequest) bool {
+	capabilities := req.ClientCapabilities()
+	if capabilities == nil || capabilities.Elicitation == nil {
+		return false
+	}
+	elicitation := capabilities.Elicitation
+	// Per the MCP SDK, an empty elicitation capability means form support.
+	return elicitation.Form != nil || elicitation.URL == nil
+}
+
+func companySelectionRequest(ambiguous *ats.AmbiguousCompanyError) *mcp.CallToolResult {
+	var message strings.Builder
+	fmt.Fprintf(&message, "More than one company matches %q. Choose the company you mean:\n", ambiguous.Input)
+
+	choices := make([]any, 0, len(ambiguous.Candidates))
+	for i, candidate := range ambiguous.Candidates {
+		number := strconv.Itoa(i + 1)
+		choices = append(choices, number)
+		fmt.Fprintf(&message, "%s. %s", number, candidate.Name)
+		if candidate.CareersURL != "" {
+			fmt.Fprintf(&message, " — %s", candidate.CareersURL)
+		}
+		message.WriteByte('\n')
+	}
+
+	return &mcp.CallToolResult{
+		InputRequests: mcp.InputRequestMap{
+			companySelectionRequestID: &mcp.ElicitParams{
+				Message: strings.TrimRight(message.String(), "\n"),
+				RequestedSchema: &jsonschema.Schema{
+					Type:     "object",
+					Required: []string{"choice"},
+					Properties: map[string]*jsonschema.Schema{
+						"choice": {
+							Type:        "string",
+							Title:       "Company",
+							Description: "The number of the intended company.",
+							Enum:        choices,
+						},
+					},
+				},
+			},
+		},
+	}
 }
 
 type companyDetailInput struct {
@@ -188,12 +319,8 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 		Name:        "get_filters_by_company",
 		Description: "Get company-specific filters when a job search needs narrowing beyond query and location.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get company job filters", ReadOnlyHint: true},
-	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companyFiltersInput) (*mcp.CallToolResult, *companyFiltersOutput, error) {
-		out, err := companyFilters(ctx, reg, in)
-		if err != nil {
-			return errorResult(err), nil, nil
-		}
-		return nil, out, nil
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in *companyFiltersInput) (*mcp.CallToolResult, *companyFiltersOutput, error) {
+		return companyFiltersTool(ctx, req, reg, in)
 	})
 
 	mcp.AddTool(s, &mcp.Tool{

@@ -209,16 +209,14 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
-// TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
-// instruction — retry with one of the careers URLs listed in the error —
-// reaches the host LLM through both channels it can come from:
-// serverInstructions, and each unified company tool's own company
-// parameter description. All three tools need it independently since a
-// host may only ever read the tool description for the one it calls.
-func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
+// TestAmbiguousCompanyGuidanceIsTaught asserts that filters advertises its
+// elicitation path while search and detail retain the careers-URL retry
+// fallback.
+func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
 	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
 
-	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
+	assert.Contains(t, serverInstructions, "get_filters_by_company asks the user to choose when the client supports form elicitation")
+	assert.Contains(t, serverInstructions, "receive the matching careers URLs and should retry")
 
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
@@ -240,7 +238,7 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 		got[tool.Name] = tool
 	}
 
-	for _, name := range []string{"search_jobs_by_company", "get_filters_by_company", "get_job_detail_by_company"} {
+	for _, name := range []string{"search_jobs_by_company", "get_job_detail_by_company"} {
 		tool := got[name]
 		require.NotNil(t, tool, name)
 		input, ok := tool.InputSchema.(map[string]any)
@@ -251,6 +249,17 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 		require.True(t, ok, name)
 		assert.Contains(t, companyProperty["description"], retryInstruction, name)
 	}
+
+	filtersTool := got["get_filters_by_company"]
+	require.NotNil(t, filtersTool)
+	input, ok := filtersTool.InputSchema.(map[string]any)
+	require.True(t, ok)
+	properties, ok := input["properties"].(map[string]any)
+	require.True(t, ok)
+	companyProperty, ok := properties["company"].(map[string]any)
+	require.True(t, ok)
+	assert.Contains(t, companyProperty["description"], "client supports elicitation")
+	assert.Contains(t, companyProperty["description"], "asks the user to choose")
 }
 
 func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
