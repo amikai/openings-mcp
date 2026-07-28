@@ -201,7 +201,7 @@ func TestServerListsJobTools(t *testing.T) {
 
 func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.Contains(t, serverInstructions, "A company name by itself is not a source selection.")
-	assert.Contains(t, serverInstructions, "recognized public careers-page URLs supported by available career systems")
+	assert.Contains(t, serverInstructions, "recognized public careers-page URLs from the career systems this server supports")
 	assert.Contains(t, serverInstructions, "some career systems accept URLs only for companies already in the curated roster")
 	assert.NotContains(t, serverInstructions, "Eightfold")
 	assert.NotContains(t, serverInstructions, "SuccessFactors")

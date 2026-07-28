@@ -302,10 +302,9 @@ func companySelectionFallbackError(
 	message.WriteString(" This client cannot display a company choice form; retry with the public careers URL shown below, or the exact company name when no URL is available:")
 	for _, candidate := range candidates {
 		fmt.Fprintf(&message, "\n  %s", formatCompanyCandidate(candidate))
-		if candidate.CareersURL != "" {
-			continue
+		if candidate.CareersURL == "" {
+			fmt.Fprintf(&message, " — retry with company=%q", candidate.Name)
 		}
-		fmt.Fprintf(&message, " — retry with company=%q", candidate.Name)
 	}
 	return errors.New(message.String())
 }
