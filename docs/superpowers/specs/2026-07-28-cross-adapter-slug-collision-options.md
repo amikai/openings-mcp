@@ -617,7 +617,72 @@ The measured "intra-adapter collisions: 0" predates the enrichment batch that in
 
 ### PR 3 — Roster policy
 
-Restore the #252 drops. Add the non-fatal collision report and wire it into CI. Update the roster curation rules that assert global name uniqueness — the comment at the head of `internal/provider/ultipro/companies.yaml` and the discover-companies / verify-companies skills.
+**Outcome:** the rosters stop being distorted to satisfy a uniqueness rule that no longer exists, and new collisions stay visible without blocking startup.
+
+**Owned files:** `internal/provider/herp/companies.yaml`; the header comments of `internal/provider/{ultipro,icims,avature,oracle}/companies.yaml`; `.agents/skills/{discover-companies,verify-companies,integrate-new-provider}/SKILL.md`; the collision report test, its golden file under `cmd/openings-mcp/testdata/`, and a new `.gitattributes`.
+
+**Non-goals:** no change to `internal/ats` or any adapter; no roster additions beyond the restored rows; PR 1's `ok=false` set stays empty. `f33d617` swapped HRMOS seed companies to dodge HERP collisions — those are different companies rather than dropped ones, so re-sourcing them is discover-companies work, not this slice.
+
+### 1. Restore the dropped HERP rows
+
+`c949038` ("roster: drop HERP slugs that collide across adapters") removed exactly 17 rows from `internal/provider/herp/companies.yaml`. Restore them; a reviewer diffs the result against `git show c949038^:internal/provider/herp/companies.yaml` and expects an exact match on those rows.
+
+They have not been live-checked in roughly 28 commits. Run `go run ./cmd/verify-companies --provider herp` over the restored rows; a row that no longer resolves is dropped again and **named in the PR body**, not re-sourced by hand.
+
+A restored row must clear three live gates, and failing any of them blocks the slice rather than being absorbed: the intra-adapter duplicate check (still fatal), decision point 3's rule for `ok=false` entries, and PR 1's `TestATSCareersURLRoundTripsThroughRegistry`. No restored row may be turned into an `ok=false` exemption.
+
+### 2. Collision report
+
+`NewRegistry` no longer fails, so without a report roster quality degrades silently — decision point 9.
+
+**Form:** a Go test in `cmd/openings-mcp/main_test.go`, over the same `atsAdapters` enumeration PR 1's sweep uses. It runs under the `go test` step CI already has — `cmd/verify-companies` is not a candidate, since it performs live HTTP per entry.
+
+**It keys by `Resolve`, not by a normalizer.** `normalize` is unexported and this slice may not touch `internal/ats`, so the report must not reimplement it — a private copy that drifts would pin a baseline describing collisions the resolver does not actually have. Instead, for every roster entry the report resolves its slug and its display name through the production registry and records a finding whenever either returns an `*ats.AmbiguousCompanyError`. That is exactly the set of inputs a caller experiences as ambiguous, expressed entirely in exported API.
+
+**Golden file:** `cmd/openings-mcp/testdata/company_collisions.txt`. One finding per line:
+
+```text
+<probed input>\t<provider>|<display name>|<careers URL>\t<provider>|<display name>|<careers URL>…
+```
+
+Every field comes from something already exported: the probed input is the raw slug or display name as it appears in the roster (not a normalized key), and each candidate is `CompanyCandidate`'s `Provider`, `Name` and `CareersURL`. **There is deliberately no slug field** — `CompanyCandidate` does not carry one, and adding it would breach this slice's non-goal against touching `internal/ats`. An empty `CareersURL` renders as an empty field rather than being omitted.
+
+Candidates follow the order `Resolve` returns them, which is adapter registration order. Findings are de-duplicated by probed input and the file is sorted by it, so the two entries of one collision — whose slug probes yield the same input — produce one line, not two, while two genuinely different inputs that happen to share a candidate set stay separate lines.
+
+Records are **LF-terminated**. CI runs `go test ./...` on Windows runners and the repo has no `.gitattributes`, so a `.txt` golden generated with `\n` would be checked out CRLF-converted there and fail a byte comparison for no roster reason. This slice adds a `.gitattributes` pinning `cmd/openings-mcp/testdata/*.txt` to LF. The repo has no golden-file convention yet and `cmd/openings-mcp` has no `testdata/`; this slice establishes both.
+
+**Regeneration:** the report test takes an `-update` flag. `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update` rewrites the file; on mismatch without it, the test prints the full expected content so the diff is actionable from CI output alone.
+
+**Pass/fail:** the findings are written sorted and compared against a golden file under `cmd/openings-mcp/testdata/`. **Any** difference fails — added or removed — so a class growing while another shrinks cannot cancel out, and reverting the HERP restore cannot leave a baseline quietly admitting seventeen future collisions. Regenerating the golden file is a deliberate edit whose every line shows up in review. The report never blocks startup.
+
+### 3. Curation rules
+
+Four rosters carry a "Display names must stay unique across all ATS rosters" header — ultipro, icims, avature, oracle. Three skills assert the rule for **slugs as well as names**: discover-companies, verify-companies, and integrate-new-provider (which additionally states that `ats.NewRegistry` fails at startup by design).
+
+Replace all of them with the rule that now holds: cross-adapter slug and display-name collisions are allowed and surface as runtime ambiguity; duplicates inside one roster stay a fatal `NewRegistry` error; an entry whose adapter cannot render a careers URL needs a name colliding with no other entry's name or slug.
+
+`discover-companies` also tells contributors that `go test ./...` catches collisions — which after this slice is how they will meet a **red** report on a legitimate addition. Both it and `verify-companies` gain the remedy: when a new company genuinely collides across adapters, regenerate the golden file with `-update` and show its diff in the PR. Without that sentence the slice leaves its own documented workflow broken.
+
+### Acceptance
+
+- `go test ./...` green, explicitly including `TestATSCareersURLRoundTripsThroughRegistry` and the per-adapter `NewRegistry(oneAdapter)` tests
+- `go run ./cmd/verify-companies --provider herp` clean over the restored rows, or every failure named in the PR body
+- introducing a synthetic cross-adapter collision in any roster turns the report test red, **and so does removing one** — the golden file is compared both ways
+- each of the seven named files carries a positive statement of the new rule: the four roster headers (`internal/provider/{ultipro,icims,avature,oracle}/companies.yaml`) and the three skills (`.agents/skills/{discover-companies,verify-companies,integrate-new-provider}/SKILL.md`)
+- `discover-companies` and `verify-companies` each name the golden file path and the `-update` step as the remedy for a red report — without this the slice documents `go test ./...` as a gate contributors cannot legitimately clear
+- the report test passes on the Windows legs of the existing CI matrix with the golden file committed as generated
+
+Check the curation rewrite per file, not with a line-based grep: `discover-companies` wraps the phrase across a line break ("…globally" / "unique across all adapters…"), so any single-line pattern reports green on text it never inspected. Use `rg -U --multiline` with a whitespace-tolerant pattern, or simply read all seven.
+
+**Rollback**, per part, with everything that must revert alongside it:
+
+| Revert | Must revert with it |
+|---|---|
+| Curation-rule statements (four roster headers, three skills) | nothing |
+| The report (test, golden file, `.gitattributes`) | the `-update` remedy sentences in discover-companies and verify-companies, which name a file and a command that would no longer exist |
+| The HERP restore | the golden file — it records the collisions those rows create, so it must be reverted or regenerated in the same commit |
+
+Only the curation-rule statements are freely independent. The other two couplings are the price of a golden set that fails in both directions, and it is worth paying: the alternative, a bare count, lets one collision class grow while another shrinks.
 
 ## Decision checklist, answered
 
