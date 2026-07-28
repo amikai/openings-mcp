@@ -38,6 +38,16 @@ func (c Company) BaseURL() string {
 	return fmt.Sprintf("https://%s.%s.myworkdayjobs.com/wday/cxs/%s/%s", c.Tenant, c.Instance, c.Tenant, c.Site)
 }
 
+// CareersURL returns the company's human-facing career site, e.g.
+// https://3m.wd1.myworkdayjobs.com/en-US/3M. The locale segment is
+// mandatory here, unlike BaseURL: [ParseCareersURL] rejects a bare
+// two-letter site path as a locale-only path with no site (see
+// careers_url.go), which a locale-less URL would trip for a site as short
+// as Johnson & Johnson's "JJ".
+func (c Company) CareersURL() string {
+	return fmt.Sprintf("https://%s.%s.myworkdayjobs.com/en-US/%s", c.Tenant, c.Instance, c.Site)
+}
+
 // Companies holds every confirmed Workday tenant, sorted by company name.
 var Companies = mustLoadCompanies()
 

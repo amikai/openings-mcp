@@ -202,6 +202,18 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 // hcEightfold is separate because Eightfold's edge requires a browser-shaped
 // User-Agent that the other adapters don't need.
 func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
+	adapters, err := atsAdapters(hc, hcEightfold)
+	if err != nil {
+		return nil, err
+	}
+	return ats.NewRegistry(adapters...)
+}
+
+// atsAdapters builds the production adapter list newATSRegistry registers,
+// in registration order. Pulled out of newATSRegistry so tests can walk the
+// same list the server actually runs, rather than a redeclared copy that
+// could drift from it.
+func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc)
 	if err != nil {
 		return nil, fmt.Errorf("create Lever ATS adapter: %w", err)
@@ -227,7 +239,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		return nil, fmt.Errorf("create Rippling ATS adapter: %w", err)
 	}
 
-	return ats.NewRegistry(
+	return []ats.Adapter{
 		ats.NewWorkdayAdapter(hc),
 		leverAdapter,
 		ashbyAdapter,
@@ -246,7 +258,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		ats.NewOracleAdapter(hc),
 		ats.NewJoinAdapter("https://join.com", hc),
 		ats.NewUltiProAdapter(hc),
-	)
+	}, nil
 }
 
 // providerClients bundles one client per per-provider tool family, so

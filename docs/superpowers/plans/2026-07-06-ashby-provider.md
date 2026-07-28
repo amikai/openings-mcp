@@ -363,7 +363,7 @@ git commit -m "test(ashby): add mock server and client tests backed by live fixt
 - Test: `internal/provider/ashby/companies_test.go`
 
 **Interfaces:**
-- Produces: `type Company struct { Name, Board string }` with `BoardURL() string`, exported vars `Companies []Company` (sorted by name) and `CompaniesByBoard map[string]Company` (keyed by lowercased board slug).
+- Produces: `type Company struct { Name, Board string }` with `CareersURL() string`, exported vars `Companies []Company` (sorted by name) and `CompaniesByBoard map[string]Company` (keyed by lowercased board slug).
 
 - [ ] **Step 1: Write `internal/provider/ashby/companies.yaml`**
 
@@ -524,7 +524,7 @@ func TestCompanies(t *testing.T) {
 		seen[c.Board] = c.Name
 	}
 
-	assert.Equal(t, "https://jobs.ashbyhq.com/openai", CompaniesByBoard["openai"].BoardURL())
+	assert.Equal(t, "https://jobs.ashbyhq.com/openai", CompaniesByBoard["openai"].CareersURL())
 }
 ```
 
@@ -565,10 +565,10 @@ type Company struct {
 	Board string `yaml:"board" json:"board"`
 }
 
-// BoardURL returns the company's human-facing job board page, e.g.
+// CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.ashbyhq.com/openai. API calls instead pass Board directly as
 // the jobBoardName parameter.
-func (c Company) BoardURL() string {
+func (c Company) CareersURL() string {
 	return fmt.Sprintf("https://jobs.ashbyhq.com/%s", c.Board)
 }
 

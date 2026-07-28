@@ -23,6 +23,12 @@ type Company struct {
 	Site string `yaml:"site" json:"site"`
 }
 
+// CareersURL returns the company's human-facing job board page, e.g.
+// https://jobs.lever.co/leverdemo. API calls instead pass Site directly.
+func (c Company) CareersURL() string {
+	return fmt.Sprintf("https://jobs.lever.co/%s", c.Site)
+}
+
 // Companies holds every confirmed Lever tenant, sorted by company name.
 var Companies = mustLoadCompanies()
 

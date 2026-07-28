@@ -28,6 +28,10 @@ type Adapter interface {
 	// tenant name alone cannot identify its site. It returns ("", false) when
 	// u is not a careers URL for this ATS.
 	ParseCareersURL(u *url.URL) (slug string, ok bool)
+	// CareersURL renders the public careers page for a curated company.
+	// slug must come from [Adapter.Roster]; it returns ok=false when this ATS
+	// has no stable public URL for that company.
+	CareersURL(slug string) (url string, ok bool)
 	// Search returns one page of jobs for the company identified by slug.
 	// Pass a result's [JobSummary.JobID] and the same slug to [Adapter.Detail].
 	Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error)

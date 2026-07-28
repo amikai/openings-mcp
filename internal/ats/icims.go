@@ -73,6 +73,15 @@ func (a *ICIMSAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return host, true
 }
 
+// CareersURL renders the roster company's public job search page.
+func (a *ICIMSAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := icims.CompaniesByHost[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	host, _, err := a.resolveHost(slug)
 	if err != nil {

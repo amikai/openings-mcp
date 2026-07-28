@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
@@ -267,4 +268,50 @@ func TestATSRegistryIncludesBambooHR(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "unlisted", slug)
+}
+
+// TestATSCareersURLRoundTripsThroughRegistry sweeps every roster entry of
+// every production adapter: its rendered [ats.Adapter.CareersURL] must
+// resolve, through the same registry the server actually runs, back to the
+// (adapter, slug) it came from. Resolving through the registry rather than
+// the originating adapter alone matters because Resolve polls every
+// registered adapter's ParseCareersURL in order — a URL that round-trips
+// within its own adapter could still be shadowed by a different adapter
+// registered earlier.
+//
+// The enumerated ok=false set is asserted exactly (currently empty): every
+// roster row of every adapter renders a URL today, so both a renderer
+// regressing to ok=false and an unnamed new exemption fail this test rather
+// than being silently absorbed.
+func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	registry, err := ats.NewRegistry(adapters...)
+	require.NoError(t, err)
+
+	wantNoURL := map[string]bool{}
+
+	var gotNoURL []string
+	for _, a := range adapters {
+		for _, c := range a.Roster() {
+			careersURL, ok := a.CareersURL(c.Slug)
+			if !ok {
+				gotNoURL = append(gotNoURL, a.Name()+":"+c.Slug)
+				continue
+			}
+			gotAdapter, gotSlug, err := registry.Resolve(careersURL)
+			if !assert.NoError(t, err, "%s %q: resolve %q", a.Name(), c.Slug, careersURL) {
+				continue
+			}
+			assert.Equal(t, a.Name(), gotAdapter.Name(), "%s %q: resolve %q", a.Name(), c.Slug, careersURL)
+			assert.Equal(t, c.Slug, gotSlug, "%s %q: resolve %q", a.Name(), c.Slug, careersURL)
+		}
+	}
+
+	for _, entry := range gotNoURL {
+		assert.True(t, wantNoURL[entry], "unexpected ok=false entry %q; name it in the plan before exempting it", entry)
+	}
+	for entry := range wantNoURL {
+		assert.Contains(t, gotNoURL, entry, "expected ok=false entry %q no longer is one", entry)
+	}
 }

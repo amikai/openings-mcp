@@ -28,6 +28,12 @@ func (f *fakeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 
 func (f *fakeAdapter) Name() string          { return f.name }
 func (f *fakeAdapter) Roster() []CompanyInfo { return f.roster }
+func (f *fakeAdapter) CareersURL(slug string) (string, bool) {
+	if f.host == "" {
+		return "", false
+	}
+	return "https://" + f.host + "/" + slug, true
+}
 func (f *fakeAdapter) Search(context.Context, string, SearchParams) (*SearchResult, error) {
 	return nil, nil
 }

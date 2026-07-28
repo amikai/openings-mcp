@@ -24,10 +24,10 @@ type Company struct {
 	Board string `yaml:"board" json:"board"`
 }
 
-// BoardURL returns the company's human-facing job board page, e.g.
+// CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.ashbyhq.com/openai. API calls instead pass Board directly as
 // the jobBoardName parameter.
-func (c Company) BoardURL() string {
+func (c Company) CareersURL() string {
 	return fmt.Sprintf("https://jobs.ashbyhq.com/%s", c.Board)
 }
 

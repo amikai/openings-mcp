@@ -94,6 +94,15 @@ func (a *EightfoldAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return tenant, true
 }
 
+// CareersURL renders the roster company's public career site.
+func (a *EightfoldAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := eightfold.CompaniesByTenant[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *EightfoldAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	c, err := a.resolveSlug(slug)
 	if err != nil {

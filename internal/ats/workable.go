@@ -85,6 +85,15 @@ func (a *WorkableAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return strings.ToLower(slug), true
 }
 
+// CareersURL renders the roster company's public careers page.
+func (a *WorkableAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := workable.CompaniesByAccount[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 // resolveWorkableCompany maps a slug to the roster display name. Non-roster
 // slugs from ParseCareersURL pass through as both.
 func resolveWorkableCompany(slug string) (account, name string) {

@@ -53,6 +53,7 @@ type fakeAdapter struct {
 func (f *fakeAdapter) Name() string                            { return "fake" }
 func (f *fakeAdapter) Roster() []ats.CompanyInfo               { return nil }
 func (f *fakeAdapter) ParseCareersURL(*url.URL) (string, bool) { return "", false }
+func (f *fakeAdapter) CareersURL(string) (string, bool)        { return "", false }
 
 func (f *fakeAdapter) Search(context.Context, string, ats.SearchParams) (*ats.SearchResult, error) {
 	if f.searchErr != nil {

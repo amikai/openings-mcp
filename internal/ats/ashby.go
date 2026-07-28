@@ -57,6 +57,15 @@ func (a *AshbyAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return matchCareersSlug(ashbyCareersURLRE, u)
 }
 
+// CareersURL renders the roster company's public job board page.
+func (a *AshbyAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := ashby.CompaniesByBoard[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *AshbyAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	jobs, err := a.dump(ctx, slug)
 	if err != nil {

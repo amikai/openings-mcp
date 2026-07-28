@@ -25,10 +25,10 @@ type Company struct {
 	BoardSlug string `yaml:"board_slug" json:"board_slug"`
 }
 
-// BoardURL returns the company's human-facing job board page, e.g.
+// CareersURL returns the company's human-facing job board page, e.g.
 // https://ats.rippling.com/pythian/jobs. API calls instead pass BoardSlug
 // directly as the board_slug parameter.
-func (c Company) BoardURL() string {
+func (c Company) CareersURL() string {
 	return fmt.Sprintf("https://ats.rippling.com/%s/jobs", c.BoardSlug)
 }
 

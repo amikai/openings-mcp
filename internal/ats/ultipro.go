@@ -74,6 +74,15 @@ func (a *UltiProAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return site.CanonicalURL(), true
 }
 
+// CareersURL renders the roster company's public job board page.
+func (a *UltiProAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := ultipro.CompaniesByCode[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 // resolveSlug maps a slug to its board: roster company code first, then
 // the canonical-URL form ParseCareersURL hands out for non-roster boards.
 // name feeds JobDetail.Company; site addresses the board for [ultipro.NewClient].

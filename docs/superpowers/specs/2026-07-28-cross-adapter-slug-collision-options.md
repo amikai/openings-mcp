@@ -386,6 +386,16 @@ nudge omni pros sidekicks siro smartbank stable union
 
 Display names survive because `normalize` keeps Unicode letters, so a Japanese legal suffix is part of the key: `Nature株式会社` normalizes to `nature株式会社`, not `nature`.
 
+### The name-collision count did not stay at zero
+
+Twenty-eight commits later, on `6520026`, it is no longer 0:
+
+```text
+ats: company name "BETA Technologies" from greenhouse collides with "BETA Technologies" from lever
+```
+
+`main` fails to build a registry today because of it, so `cmd/openings-mcp` is red on a clean checkout. This arrived within one batch of roster enrichment PRs — much sooner than "rosters keep growing, name collisions are inevitable" anticipated, and it removes the argument for the smaller D + C1 alternative entirely. Relaxing name uniqueness is no longer forward-looking work; it is the fix for a live breakage.
+
 ### The case the options survey missed
 
 Three of the 17 have a sharper shape — **one company's slug equals a different company's display name**:
@@ -516,6 +526,8 @@ Ambiguity must hard-fail rather than pick. `job_id` is adapter-local and opaque 
 
 Three PRs. Slice 1 is additive apart from one named exception; slice 2 carries the resolution behavior change and its tests. Keeping them apart keeps each independently verifiable.
 
+**Ordering correction, found in implementation.** PR 1's code is independent of PR 2, but its acceptance is not: the sweep builds the production registry, and `NewRegistry` currently hard-fails on the live rosters — `nature` before the #252 drops, `BETA Technologies` on `main` today. So the sweep cannot execute a single assertion until PR 2 relaxes the collision checks. PR 1 therefore lands with its implementation complete and its sweep red, and **PR 2 is what turns it green**. Five rounds of plan review missed this because they read the spec and the code without ever constructing a registry from the real rosters.
+
 ### PR 1 — `Adapter.CareersURL`
 
 ```go
@@ -573,17 +585,35 @@ Nothing guarantees any of this today. The two directions were written independen
 
 Multi-entry `bySlug` / `byName`; `NewRegistry` stops erroring on cross-adapter collisions; union resolve with the ①→② fallthrough; `AmbiguousCompanyError`; the ambiguity message; de-duplicated suggestions and an entry-count in the miss error.
 
+**In scope beyond `internal/ats/registry.go`**, because no other slice claims them:
+
+- `internal/openingsmcp/company.go` — the three `company` parameter descriptions, and `companyDetail`'s ambiguity wrap
+- `cmd/openings-mcp/main.go` — `serverInstructions`
+
+All four texts must teach one thing: **when a company is ambiguous, retry with one of the careers URLs listed in the error.** That instruction is what makes the loop terminate in practice — without it the agent has no reason to prefer the listed URL over re-typing the name it started with. Their existing pinned substrings stay asserted.
+
+**Rendering and detection.** `(*ats.AmbiguousCompanyError).Error()` renders the message block verbatim as specified in the Tool contract, so the existing `errorResult` path needs no change. The type is exported from `internal/ats`; `companyDetail` detects it with `errors.As` and appends its previous-key sentence to that text. That `errors.As` branch is the only tool-local handling anywhere — `companySearch` and `companyFilters` propagate unchanged. `Provider` is rendered by neither.
+
 Fixtures:
 
 - unique hit; ambiguous slug; ambiguous name; slug-versus-name cross (`fusion`)
 - careers URL wins over an ambiguous bare token
 - a candidate whose adapter returns `ok=false`
 - filters and detail rejected while ambiguous
+- the detail path's ambiguity text contains the previous-key sentence and the search and filters paths' text does not
 - an entry whose slug and name normalize to the same key yields exactly **one** candidate
 - intra-adapter duplicate slug **and** duplicate name still fail `NewRegistry`, so the nine per-adapter `NewRegistry(oneAdapter)` tests still assert something
 - an `ok=false` entry whose normalized name equals another entry's normalized **name** fails `NewRegistry`, and so does one whose normalized name equals another adapter's roster **slug** (point 3)
 - a roster slug that is URL-shaped but unparseable by its own adapter (Oracle `<host>/CX_n`, custom-domain Avature) still resolves to its entry
 - a miss whose nearest slug is a colliding token: no repeated slug in the suggestions
+- a miss against a roster with a duplicated key: the advertised company count equals roster entries, not distinct keys
+- the retry instruction is present in `serverInstructions` and in each of the three `company` parameter descriptions
+
+`internal/ats/registry_test.go`'s `TestNewRegistryRejectsDuplicateSlug` asserts today that a cross-adapter duplicate slug errors — the exact behavior this slice inverts. It is rewritten to the intra-adapter form rather than deleted, so the surviving fatal case stays covered.
+
+**Acceptance.** `newATSRegistry` succeeds on the live rosters, `cmd/openings-mcp` goes green, and PR 1's `TestATSCareersURLRoundTripsThroughRegistry` passes — that sweep is PR 1's acceptance and PR 2 is what unblocks it.
+
+The measured "intra-adapter collisions: 0" predates the enrichment batch that introduced `BETA Technologies`, so treat it as unverified until this slice actually builds the registry. If one surfaces, decision point 2 keeps the check fatal and the `companies.yaml` de-duplication lands **inside PR 2**, or in a roster-only PR merged before it — never deferred to PR 3, which would leave PR 2 unable to close and PR 1's sweep red behind it. PR 3 keeps only policy, the restored #252 drops, and the non-fatal report. Both branches — duplicate found or not — end with the production registry building at PR 2's merge commit.
 
 ### PR 3 — Roster policy
 

@@ -214,6 +214,15 @@ func (a *WorkdayAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return site.CanonicalURL(), true
 }
 
+// CareersURL renders the roster tenant's public career site.
+func (a *WorkdayAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := workday.CompaniesByTenant[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 // resolveSlug maps a slug to its career site: roster key first, then the
 // canonical-URL form ParseCareersURL hands out for non-roster tenants.
 // name feeds JobDetail.Company; base is the CXS base URL.

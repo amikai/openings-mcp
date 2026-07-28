@@ -65,6 +65,15 @@ func (a *SuccessFactorsAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return host, true
 }
 
+// CareersURL renders the roster company's public job search page.
+func (a *SuccessFactorsAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := successfactors.CompaniesByHost[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *SuccessFactorsAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	c, err := a.resolveSlug(slug)
 	if err != nil {

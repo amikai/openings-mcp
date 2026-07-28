@@ -61,7 +61,8 @@ func TestAvatureParseCareersURL(t *testing.T) {
 		{"https://dpdhlgroup.avature.net/en_US/jobs/SearchJobs", true, "dpdhlgroup.avature.net/jobs"},
 		{"https://bloomberg.avature.net/", false, ""},
 		{"https://www.avature.net/career-sites/", false, ""},
-		{"https://careers.unifiservice.com/careers/SearchJobs", false, ""},
+		{"https://careers.unifiservice.com/careers/SearchJobs", true, "careers.unifiservice.com/careers"},
+		{"https://unknown-custom-domain.example.com/careers/SearchJobs", false, ""},
 		{"https://boards.greenhouse.io/x", false, ""},
 	}
 	for _, tc := range cases {

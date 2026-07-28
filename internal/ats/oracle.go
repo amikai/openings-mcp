@@ -76,6 +76,15 @@ func (a *OracleAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return canonical, true
 }
 
+// CareersURL renders the roster company's public job search page.
+func (a *OracleAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := oracle.CompaniesByKey[slug]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *OracleAdapter) Search(
 	ctx context.Context,
 	slug string,
