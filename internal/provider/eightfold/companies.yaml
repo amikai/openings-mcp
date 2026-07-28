@@ -1,6 +1,9 @@
 - company: 10x Genomics
   tenant: 10xgenomics
   domain: 10xgenomics.com
+- company: Alnylam Pharmaceuticals
+  tenant: alnylam
+  domain: alnylam.com
 - company: ATB Financial
   tenant: atb
   domain: atb.com
@@ -19,6 +22,12 @@
 - company: Bimbo Bakeries USA
   tenant: grupobimbo
   domain: grupobimbo.com
+- company: Blue Crab Consulting
+  tenant: bluecrabconsulting
+  domain: bluecrabconsulting.com
+- company: Boston Consulting Group
+  tenant: bcg
+  domain: bcg.com
 - company: Boston Scientific
   tenant: bostonscientific
   domain: bostonscientific.com
@@ -28,6 +37,9 @@
 - company: Circana
   tenant: circana
   domain: circana.com
+- company: Citi
+  tenant: citi
+  domain: citi.com
 - company: Coca-Cola Europacific Partners
   tenant: ccep
   domain: ccep.com
@@ -43,6 +55,9 @@
 - company: Eaton
   tenant: eaton
   domain: eaton.com
+- company: Eightfold
+  tenant: app
+  domain: eightfold.ai
 - company: Ericsson
   tenant: ericsson
   domain: ericsson.com
@@ -70,7 +85,10 @@
 - company: Houston Independent School District
   tenant: houstonisd
   domain: houstonisd.org
-- company: Infineon
+- company: HP
+  tenant: hp
+  domain: hp.com
+- company: Infineon Technologies
   tenant: infineon
   domain: infineon.com
 - company: Insight Enterprises
@@ -88,6 +106,9 @@
 - company: Lam Research
   tenant: lamresearch
   domain: lamresearch.com
+- company: LG CNS
+  tenant: lgcns
+  domain: lgcns.com
 - company: Liberty Mutual Insurance
   tenant: libertymutual
   domain: libertymutual.com
@@ -115,27 +136,39 @@
 - company: New York Life
   tenant: newyorklife
   domain: newyorklife.com
+- company: nformal
+  tenant: nformal
+  domain: nformal.com
+- company: OATRH
+  tenant: puertoricogov
+  domain: puertoricogov.com
+- company: Plexus
+  tenant: plexus
+  domain: plexus.com
 - company: Qualcomm
   tenant: qualcomm
   domain: qualcomm.com
 - company: Ralliant
   tenant: ralliant
   domain: ralliant.com
-- company: SLB
-  tenant: slb
-  domain: slb.com
-- company: STMicroelectronics
-  tenant: stmicroelectronics
-  domain: stmicroelectronics.com
+- company: Rotoplas
+  tenant: rotoplas
+  domain: rotoplas.com
 - company: Sephora
   tenant: sephora
   domain: sephora.com
+- company: SLB
+  tenant: slb
+  domain: slb.com
 - company: Softtek
   tenant: softtek
   domain: softtek.com
 - company: Starbucks
   tenant: starbucks
   domain: starbucks.com
+- company: STMicroelectronics
+  tenant: stmicroelectronics
+  domain: stmicroelectronics.com
 - company: Symetra
   tenant: symetra
   domain: symetra.com
@@ -145,6 +178,9 @@
 - company: Teva Pharmaceutical Industries
   tenant: tevapharm
   domain: tevapharm.com
+- company: Trimble
+  tenant: trimble
+  domain: trimble.com
 - company: TriNet
   tenant: trinet
   domain: trinet.com
@@ -154,6 +190,9 @@
 - company: Vale
   tenant: vale
   domain: vale.com
+- company: Vialto Partners
+  tenant: vialto
+  domain: vialto.com
 - company: Vodafone
   tenant: vodafone
   domain: vodafone.com
