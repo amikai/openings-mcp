@@ -52,7 +52,7 @@ Tool selection:
 - When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs from the career systems this server supports. Do not pass other careers sites; some career systems accept URLs only for companies already in the curated roster.
-- When a company is ambiguous, every unified company tool asks the user to choose from human-readable company names and public careers URLs when the client supports form elicitation. Clients without elicitation receive the same choices in an error and should retry with the intended public careers URL.
+- When a company is ambiguous, the unified company tools reject the call and list the matching companies by name with their public careers URLs; retry the same tool with one of the listed careers URLs, not with the original name.
 
 Query construction:
 - Use dedicated parameters for structured criteria whenever available. Use keyword only for free-text terms that have no better matching parameter, and evaluate unsupported criteria from the results or job details.

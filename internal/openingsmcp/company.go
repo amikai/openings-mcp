@@ -4,11 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
 	"strings"
+	"text/tabwriter"
 
 	"github.com/amikai/openings-mcp/internal/ats"
-	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -21,7 +20,7 @@ var companySearchInputRawSchema = []byte(`{
 	"properties": {
 		"company": {
 			"type": "string",
-			"description": "Company name or slug, e.g. 'nvidia', or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If more than one company matches and the client supports elicitation, the tool asks the user to choose using company names and public careers URLs.",
+			"description": "Company name or slug, e.g. 'nvidia', or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error.",
 			"minLength": 1
 		},
 		"query": {
@@ -115,7 +114,7 @@ func companySearch(
 }
 
 type companyFiltersInput struct {
-	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If more than one company matches and the client supports elicitation, the tool asks the user to choose using company names and public careers URLs."`
+	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error."`
 }
 
 type companyFiltersOutput struct {
@@ -134,183 +133,65 @@ func companyFilters(
 	return &companyFiltersOutput{Filters: fs}, nil
 }
 
-type companyToolResolution struct {
-	adapter ats.Adapter
-	slug    string
-	pending *mcp.CallToolResult
+// AmbiguousCompanyError reports that a company input matched more than one
+// roster entry. The caller must retry with the careers URL of the intended
+// candidate, or with its display name when that candidate has no public URL.
+//
+// It lives at the MCP boundary rather than in internal/ats because several
+// candidates are a successful [ats.CompanyResolution]: whether that needs an
+// error depends on what the client can do with the choices. A client able to
+// ask its user would consume the same resolution and never build this.
+type AmbiguousCompanyError struct {
+	Input      string
+	Candidates []ats.CompanyCandidate
+	// Hint is tool-specific guidance rendered after the candidate list.
+	Hint string
 }
 
-// resolveCompanyForTool resolves unique company input immediately. For an
-// ambiguous input, it either consumes the client's elicitation response or
-// pauses the tool call with a form request that contains human-readable
-// company choices.
-func resolveCompanyForTool(
-	req *mcp.CallToolRequest,
-	reg *ats.Registry,
-	input string,
-	selectionHint string,
-) (companyToolResolution, error) {
+func (e *AmbiguousCompanyError) Error() string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "ambiguous company %q: %d companies match. Retry with the careers URL of the one you want:\n",
+		e.Input, len(e.Candidates))
+	tw := tabwriter.NewWriter(&b, 0, 0, 3, ' ', 0)
+	for _, c := range e.Candidates {
+		if c.CareersURL != "" {
+			fmt.Fprintf(tw, "  %s\t%s\n", c.Name, c.CareersURL)
+		} else {
+			fmt.Fprintf(tw, "  %s\t(no public careers URL; retry with company=%q)\n", c.Name, c.Name)
+		}
+	}
+	tw.Flush()
+	if e.Hint != "" {
+		b.WriteString(e.Hint)
+	}
+	return strings.TrimRight(b.String(), "\n")
+}
+
+// resolveCompany narrows a company input to the single adapter and
+// provider-local slug the tools need. An input matching several roster
+// entries yields an [*AmbiguousCompanyError] carrying the same
+// human-readable candidates the user would otherwise pick from; hint adds
+// tool-specific guidance to it.
+func resolveCompany(reg *ats.Registry, input, hint string) (ats.Adapter, string, error) {
 	resolution, err := reg.Resolve(input)
 	if err != nil {
-		return companyToolResolution{}, err
+		return nil, "", err
 	}
-
 	if adapter, slug, ok := resolution.Single(); ok {
-		return companyToolResolution{adapter: adapter, slug: slug}, nil
+		return adapter, slug, nil
 	}
 	if !resolution.IsAmbiguous() {
-		return companyToolResolution{}, errors.New("company resolution returned no candidates")
+		return nil, "", errors.New("company resolution returned no candidates")
 	}
-
-	candidates := resolution.Candidates()
-	choice, answered, selectionErr := companySelection(req, len(candidates))
-	if selectionErr != nil {
-		return companyToolResolution{}, selectionErr
+	return nil, "", &AmbiguousCompanyError{
+		Input:      input,
+		Candidates: resolution.Candidates(),
+		Hint:       hint,
 	}
-	if answered {
-		adapter, slug, ok := resolution.Select(choice)
-		if !ok {
-			return companyToolResolution{}, fmt.Errorf("company selection %d is out of range", choice+1)
-		}
-		return companyToolResolution{adapter: adapter, slug: slug}, nil
-	}
-
-	if !supportsFormElicitation(req) {
-		return companyToolResolution{}, companySelectionFallbackError(input, candidates, selectionHint)
-	}
-	return companyToolResolution{
-		pending: companySelectionRequest(input, candidates, selectionHint),
-	}, nil
-}
-
-const companySelectionRequestID = "company_selection"
-
-// companySelection reads a form-elicitation response. The returned choice is
-// zero-based; answered is false only on the first pass through the handler.
-func companySelection(req *mcp.CallToolRequest, candidateCount int) (choice int, answered bool, err error) {
-	if len(req.Params.InputResponses) == 0 {
-		return 0, false, nil
-	}
-
-	raw, ok := req.Params.InputResponses[companySelectionRequestID]
-	if !ok {
-		return 0, true, errors.New("company selection response is missing")
-	}
-	response, ok := raw.(*mcp.ElicitResult)
-	if !ok {
-		return 0, true, fmt.Errorf("company selection response has unexpected type %T", raw)
-	}
-
-	switch response.Action {
-	case "accept":
-		// Continue below.
-	case "decline":
-		return 0, true, errors.New(
-			"the user declined to choose a company; ask them which company they meant instead of retrying the tool",
-		)
-	case "cancel":
-		return 0, true, errors.New(
-			"the user cancelled company selection; ask them which company they meant instead of retrying the tool",
-		)
-	default:
-		return 0, true, fmt.Errorf("company selection returned unknown action %q", response.Action)
-	}
-
-	value, ok := response.Content["choice"].(string)
-	if !ok {
-		return 0, true, errors.New("company selection choice must be a string")
-	}
-	n, err := strconv.Atoi(value)
-	if err != nil || n < 1 || n > candidateCount {
-		return 0, true, fmt.Errorf("company selection choice %q is out of range", value)
-	}
-	return n - 1, true, nil
-}
-
-func supportsFormElicitation(req *mcp.CallToolRequest) bool {
-	capabilities := req.ClientCapabilities()
-	if capabilities == nil || capabilities.Elicitation == nil {
-		return false
-	}
-	elicitation := capabilities.Elicitation
-	// Per the MCP SDK, an empty elicitation capability means form support.
-	return elicitation.Form != nil || elicitation.URL == nil
-}
-
-func formatCompanyCandidate(candidate ats.CompanyCandidate) string {
-	if candidate.CareersURL == "" {
-		return candidate.Name
-	}
-	return candidate.Name + " — " + candidate.CareersURL
-}
-
-func companySelectionRequest(
-	input string,
-	candidates []ats.CompanyCandidate,
-	selectionHint string,
-) *mcp.CallToolResult {
-	var message strings.Builder
-	fmt.Fprintf(&message, "More than one company matches %q. Choose the company you mean:", input)
-	if selectionHint != "" {
-		fmt.Fprintf(&message, " %s", selectionHint)
-	}
-	message.WriteByte('\n')
-
-	choices := make([]*jsonschema.Schema, 0, len(candidates))
-	for i, candidate := range candidates {
-		number := strconv.Itoa(i + 1)
-		value := any(number)
-		title := formatCompanyCandidate(candidate)
-		choices = append(choices, &jsonschema.Schema{
-			Const: &value,
-			Title: title,
-		})
-		fmt.Fprintf(&message, "%s. %s\n", number, title)
-	}
-
-	return &mcp.CallToolResult{
-		InputRequests: mcp.InputRequestMap{
-			companySelectionRequestID: &mcp.ElicitParams{
-				Message: strings.TrimRight(message.String(), "\n"),
-				RequestedSchema: &jsonschema.Schema{
-					Type:     "object",
-					Required: []string{"choice"},
-					Properties: map[string]*jsonschema.Schema{
-						"choice": {
-							Type:        "string",
-							Title:       "Company",
-							Description: "Select the intended company.",
-							OneOf:       choices,
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
-func companySelectionFallbackError(
-	input string,
-	candidates []ats.CompanyCandidate,
-	selectionHint string,
-) error {
-	var message strings.Builder
-	fmt.Fprintf(&message, "ambiguous company %q: %d companies match.", input, len(candidates))
-	if selectionHint != "" {
-		fmt.Fprintf(&message, " %s", selectionHint)
-	}
-	message.WriteString(" This client cannot display a company choice form; retry with the public careers URL shown below, or the exact company name when no URL is available:")
-	for _, candidate := range candidates {
-		fmt.Fprintf(&message, "\n  %s", formatCompanyCandidate(candidate))
-		if candidate.CareersURL == "" {
-			fmt.Fprintf(&message, " — retry with company=%q", candidate.Name)
-		}
-	}
-	return errors.New(message.String())
 }
 
 type companyDetailInput struct {
-	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If more than one company matches and the client supports elicitation, the tool asks the user to choose using company names and public careers URLs."`
+	Company string `json:"company" jsonschema:"Company name or slug, or a recognized public careers-page URL. Other careers URLs are unsupported; some career systems accept URLs only for companies in the curated roster. If the company is ambiguous, retry with one of the careers URLs listed in the error."`
 	JobID   string `json:"job_id" jsonschema:"job_id from search_jobs_by_company results."`
 }
 
@@ -352,15 +233,12 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 		Description: "Search official job postings for a specific company.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search jobs by company", ReadOnlyHint: true},
 		InputSchema: companySearchInputSchema,
-	}, func(ctx context.Context, req *mcp.CallToolRequest, in *companySearchInput) (*mcp.CallToolResult, *companySearchOutput, error) {
-		resolved, err := resolveCompanyForTool(req, reg, in.Company, "")
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companySearchInput) (*mcp.CallToolResult, *companySearchOutput, error) {
+		adapter, slug, err := resolveCompany(reg, in.Company, "")
 		if err != nil {
 			return nil, nil, err
 		}
-		if resolved.pending != nil {
-			return resolved.pending, nil, nil
-		}
-		out, err := companySearch(ctx, resolved.adapter, resolved.slug, in)
+		out, err := companySearch(ctx, adapter, slug, in)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -371,15 +249,12 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 		Name:        "get_filters_by_company",
 		Description: "Get company-specific filters when a job search needs narrowing beyond query and location.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get company job filters", ReadOnlyHint: true},
-	}, func(ctx context.Context, req *mcp.CallToolRequest, in *companyFiltersInput) (*mcp.CallToolResult, *companyFiltersOutput, error) {
-		resolved, err := resolveCompanyForTool(req, reg, in.Company, "")
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companyFiltersInput) (*mcp.CallToolResult, *companyFiltersOutput, error) {
+		adapter, slug, err := resolveCompany(reg, in.Company, "")
 		if err != nil {
 			return nil, nil, err
 		}
-		if resolved.pending != nil {
-			return resolved.pending, nil, nil
-		}
-		out, err := companyFilters(ctx, resolved.adapter, resolved.slug)
+		out, err := companyFilters(ctx, adapter, slug)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -390,16 +265,13 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 		Name:        "get_job_detail_by_company",
 		Description: "Get one job's full description (plain text) by company plus the job_id from search_jobs_by_company.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get company job detail", ReadOnlyHint: true},
-	}, func(ctx context.Context, req *mcp.CallToolRequest, in *companyDetailInput) (*mcp.CallToolResult, *companyDetailOutput, error) {
-		const hint = "Choose the same company that produced this job_id."
-		resolved, err := resolveCompanyForTool(req, reg, in.Company, hint)
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companyDetailInput) (*mcp.CallToolResult, *companyDetailOutput, error) {
+		const hint = "Use the same company value that produced this job_id."
+		adapter, slug, err := resolveCompany(reg, in.Company, hint)
 		if err != nil {
 			return nil, nil, err
 		}
-		if resolved.pending != nil {
-			return resolved.pending, nil, nil
-		}
-		out, err := companyDetail(ctx, resolved.adapter, resolved.slug, in)
+		out, err := companyDetail(ctx, adapter, slug, in)
 		if err != nil {
 			return nil, nil, err
 		}
