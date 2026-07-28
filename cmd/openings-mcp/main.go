@@ -129,6 +129,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 	// same 1 GiB budget, so a repeated query anywhere is served from
 	// memory for up to an hour instead of re-fetching upstream.
 	cache := httpcache.New(1<<30, 60*time.Minute, logger)
+	defer cache.Close()
 
 	// One connection pool, with a ceiling so a hung upstream fails that call
 	// instead of stalling the MCP session.

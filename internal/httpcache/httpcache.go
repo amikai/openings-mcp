@@ -13,6 +13,7 @@ import (
 	"log/slog"
 	"math"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/maypok86/otter/v2"
@@ -48,6 +49,15 @@ func New(maxBytes uint64, ttl time.Duration, logger *slog.Logger) *Cache {
 		}),
 		logger: logger,
 	}
+}
+
+// Close stops the background maintenance goroutine that Otter runs to
+// enforce the expiry policy. Otter otherwise only stops it once the Cache
+// becomes unreachable and the garbage collector runs, which keeps the
+// goroutine alive for the rest of a test binary. A closed Cache must not
+// be used again.
+func (c *Cache) Close() {
+	c.store.StopAllGoroutines()
 }
 
 // weigh charges an entry for its body, key, and header bytes so the cache's
@@ -107,12 +117,16 @@ func (t *transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	return e.response(req), nil
 }
 
-// cacheKey identifies a request by method, URL, and body content. Headers
-// stay out of the key on purpose: cookies (LinkedIn's per-process guest
-// session) would only fragment the cache. A consumed request body is
-// restored so the delegated round trip still sends it.
+// cacheKey identifies a request by method, URL, request headers, and body
+// content. Headers belong in the key because a provider may select the
+// representation with a header rather than the URL: Indeed sends the
+// search country in indeed-co against one fixed GraphQL endpoint, so two
+// countries' searches are otherwise indistinguishable and one would be
+// served the other's postings. A consumed request body is restored so the
+// delegated round trip still sends it.
 func cacheKey(req *http.Request) (string, error) {
 	sum := sha256.New()
+	writeCanonicalHeader(sum, req.Header)
 	if req.Body != nil {
 		b, err := io.ReadAll(req.Body)
 		req.Body.Close()
@@ -123,6 +137,36 @@ func cacheKey(req *http.Request) (string, error) {
 		req.Body = io.NopCloser(bytes.NewReader(b))
 	}
 	return req.Method + " " + req.URL.String() + " " + hex.EncodeToString(sum.Sum(nil)), nil
+}
+
+// unkeyedHeaders are request headers deliberately left out of the key.
+// They carry per-process session state rather than selecting a
+// representation, so keying on them would fragment the cache without
+// preventing a wrong hit. Every other header is keyed: one that varies
+// without changing the response only costs hit rate, whereas one that
+// changes the response and is missing from the key serves wrong data.
+var unkeyedHeaders = map[string]bool{
+	"Cookie": true,
+}
+
+// writeCanonicalHeader folds h into sum by ascending header name, so two
+// requests carrying the same headers hash alike whatever order the headers
+// were set in. Fields are NUL-separated because a header name or value
+// cannot contain NUL, which keeps "ab" + "c" from hashing like "a" + "bc".
+func writeCanonicalHeader(sum io.Writer, h http.Header) {
+	names := make([]string, 0, len(h))
+	for name := range h {
+		if !unkeyedHeaders[http.CanonicalHeaderKey(name)] {
+			names = append(names, name)
+		}
+	}
+	slices.Sort(names)
+	for _, name := range names {
+		_, _ = io.WriteString(sum, name+"\x00")
+		for _, v := range h[name] {
+			_, _ = io.WriteString(sum, v+"\x00")
+		}
+	}
 }
 
 // hopByHop are connection-scoped response headers that must not be

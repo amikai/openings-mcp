@@ -13,6 +13,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+// newCache returns a Cache that stops its background maintenance
+// goroutine when the test ends.
+func newCache(t *testing.T, maxBytes uint64, ttl time.Duration) *Cache {
+	t.Helper()
+	c := New(maxBytes, ttl, nil)
+	t.Cleanup(c.Close)
+	return c
+}
+
 // newUpstream returns a stub server counting how many requests actually
 // reached it, and a client whose transport is wrapped by c.
 func newUpstream(t *testing.T, c *Cache, status int, body string) (*httptest.Server, *atomic.Int64, *http.Client) {
@@ -39,7 +48,7 @@ func get(t *testing.T, hc *http.Client, url string) (int, string) {
 }
 
 func TestGetServedFromCache(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, `{"jobs":[]}`)
 
 	status, body := get(t, hc, srv.URL+"/board")
@@ -54,7 +63,7 @@ func TestGetServedFromCache(t *testing.T) {
 }
 
 func TestCachedResponseKeepsHeaders(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, _, hc := newUpstream(t, c, http.StatusOK, "x")
 
 	resp1, err := hc.Get(srv.URL)
@@ -68,7 +77,7 @@ func TestCachedResponseKeepsHeaders(t *testing.T) {
 }
 
 func TestNon2xxNotCached(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusNotFound, "nope")
 
 	get(t, hc, srv.URL)
@@ -77,7 +86,7 @@ func TestNon2xxNotCached(t *testing.T) {
 }
 
 func TestDistinctURLsDistinctEntries(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, "x")
 
 	get(t, hc, srv.URL+"/a")
@@ -86,7 +95,7 @@ func TestDistinctURLsDistinctEntries(t *testing.T) {
 }
 
 func TestPostBodiesKeyedSeparately(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	var hits atomic.Int64
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		hits.Add(1)
@@ -112,7 +121,7 @@ func TestPostBodiesKeyedSeparately(t *testing.T) {
 }
 
 func TestCookieHeaderExcludedFromKey(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, "x")
 
 	req1, _ := http.NewRequest(http.MethodGet, srv.URL, nil)
@@ -130,8 +139,40 @@ func TestCookieHeaderExcludedFromKey(t *testing.T) {
 	assert.Equal(t, int64(1), hits.Load(), "cookie must not fragment the cache")
 }
 
+// TestRepresentationHeaderKeyedSeparately mirrors Indeed: one fixed
+// GraphQL endpoint where the search country travels in indeed-co, so two
+// countries' searches share a URL and a body and are told apart only by
+// that header.
+func TestRepresentationHeaderKeyedSeparately(t *testing.T) {
+	c := newCache(t, 1<<30, time.Hour)
+	var hits atomic.Int64
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits.Add(1)
+		_, _ = io.WriteString(w, r.Header.Get("indeed-co")) // echo, so a wrong hit is visible
+	}))
+	t.Cleanup(srv.Close)
+	hc := &http.Client{Transport: c.Wrap(http.DefaultTransport)}
+
+	search := func(country string) string {
+		req, err := http.NewRequest(http.MethodPost, srv.URL+"/graphql", strings.NewReader(`{"query":"jobSearch"}`))
+		require.NoError(t, err)
+		req.Header.Set("indeed-co", country)
+		resp, err := hc.Do(req)
+		require.NoError(t, err)
+		defer resp.Body.Close()
+		b, err := io.ReadAll(resp.Body)
+		require.NoError(t, err)
+		return string(b)
+	}
+
+	assert.Equal(t, "TW", search("TW"))
+	assert.Equal(t, "US", search("US"), "a different country must not be served Taiwan's response")
+	assert.Equal(t, "TW", search("TW"), "repeat country must replay its own entry")
+	assert.Equal(t, int64(2), hits.Load(), "each country must be fetched exactly once")
+}
+
 func TestNonGetPostPassesThrough(t *testing.T) {
-	c := New(1<<30, time.Hour, nil)
+	c := newCache(t, 1<<30, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, "x")
 
 	for range 2 {
@@ -144,7 +185,7 @@ func TestNonGetPostPassesThrough(t *testing.T) {
 }
 
 func TestTTLExpiry(t *testing.T) {
-	c := New(1<<30, 50*time.Millisecond, nil)
+	c := newCache(t, 1<<30, 50*time.Millisecond)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, "x")
 
 	get(t, hc, srv.URL)
@@ -156,7 +197,7 @@ func TestTTLExpiry(t *testing.T) {
 func TestWeightBudgetEvicts(t *testing.T) {
 	// Budget far smaller than one entry: the entry must not be servable
 	// on the second request.
-	c := New(16, time.Hour, nil)
+	c := newCache(t, 16, time.Hour)
 	srv, hits, hc := newUpstream(t, c, http.StatusOK, strings.Repeat("x", 1024))
 
 	get(t, hc, srv.URL)
