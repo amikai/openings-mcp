@@ -2,6 +2,12 @@
 # locale segment, verified live: GET <url>/SearchJobs returns HTTP 200.
 # Display names must stay unique across all ATS rosters.
 
+- company: 1-800-FLOWERS
+  url: "https://one800flowers.avature.net/careersmarketplace"
+- company: 1WorldSync
+  url: "https://gsowstalentmatching.avature.net/1worldsync"
+- company: Accenture Contractor Exchange
+  url: "https://globalcxaccenture.avature.net/contractorexchangemarketplace"
 - company: Adecco Recruiting
   url: "https://pontoonsolutions.avature.net/careers"
 - company: Advocate Health
@@ -28,8 +34,18 @@
   url: "https://careers.baloise.com/careers"
 - company: bankerslife
   url: "https://bankerslife.avature.net/careers"
+- company: "Bath & Body Works"
+  url: "https://bbw.avature.net/dcjobs"
 - company: baufest
   url: "https://baufest.avature.net/jobs"
+- company: BCG Platinion Germany
+  url: "https://platinion.avature.net/careersde"
+- company: BCG Platinion Germany English
+  url: "https://platinion.avature.net/careersdeen"
+- company: BCG Platinion Nordics
+  url: "https://platinion.avature.net/careersnordics"
+- company: BCG Platinion Poland
+  url: "https://platinion.avature.net/careerspl"
 - company: Berenberg
   url: "https://berenberg.avature.net/careers"
 - company: Bloomberg
@@ -40,22 +56,46 @@
   url: "https://emplois.bnc.ca/careers"
 - company: Booz Allen Hamilton
   url: "https://careers.boozallen.com/careers"
+- company: Booz Allen Hamilton Jobs
+  url: "https://boozallen.avature.net/jobs"
+- company: Brady Plus
+  url: "https://bradyplus.avature.net/careersmarketplace"
 - company: Bravura Solutions Limited
   url: "https://bravura.avature.net/careers"
 - company: Broad Institute
   url: "https://broadinstitute.avature.net/careers"
+- company: BUPA ANZ
+  url: "https://bupaanz.avature.net/careersau"
 - company: cchbc
   url: "https://careers.coca-colahellenic.com/careers"
+- company: Cicor
+  url: "https://cicor.avature.net/careersmarketplace"
 - company: cisco (jobs)
   url: "https://cisco.avature.net/jobs"
+- company: Cisco Agency Management
+  url: "https://cisco.avature.net/agency"
+- company: Cisco France
+  url: "https://cisco2.avature.net/jobsfr"
 - company: ciusss
   url: "https://ciusss.avature.net/careers"
+- company: Coca-Cola HBC
+  url: "https://cchbc.avature.net/careers"
 - company: colorado
   url: "https://jobs.colorado.edu/jobs"
 - company: Consumer Direct Care Network
   url: "https://cdcn.avature.net/careers"
+- company: Council of Europe
+  url: "https://coeint.avature.net/careersmarketplace"
+- company: Credicorp
+  url: "https://credicorpats.avature.net/careersmarketplace"
+- company: Crown Kemble
+  url: "https://crownkemble.avature.net/jobs"
 - company: "Cycle & Carriage"
   url: "https://cyclecarriage.avature.net/careers"
+- company: Daikin
+  url: "https://resourcebank.avature.net/daikincareers"
+- company: DB Schenker
+  url: "https://schenker.avature.net/jobsglobal"
 - company: dbgroup
   url: "https://jobs.deutschebahngroup.careers/jobsGlobal"
 - company: Deloitte Belgium
@@ -64,6 +104,8 @@
   url: "https://deloittecm.avature.net/careers"
 - company: Deloitte PNG
   url: "https://deloittepng.avature.net/careers"
+- company: Deloitte Switzerland
+  url: "https://deloitteuk.avature.net/chcareers"
 - company: Deloitte US
   url: "https://apply.deloitte.com/careers"
 - company: DFI Retail Group
@@ -76,78 +118,162 @@
   url: "https://dpdhlgroup.avature.net/jobs"
 - company: Electronic Arts
   url: "https://jobs.ea.com/careers"
+- company: Encompass Health
+  url: "https://encompasshealth.avature.net/careers"
+- company: Entelar Group
+  url: "https://sparknz.avature.net/jobs"
 - company: epic
   url: "https://epic.avature.net/careers"
 - company: fb
   url: "https://careers.fbcareers.com/careers"
+- company: Fletcher Building
+  url: "https://fb.avature.net/careers"
+- company: Fletcher Building Careers
+  url: "https://adeccorecruiting.avature.net/fbcareers"
 - company: fmlogistic
   url: "https://fmlogistic.avature.net/careers"
 - company: Fonterra
   url: "https://careers.fonterra.com/careers"
+- company: Forvis Mazars Campus
+  url: "https://forvis.avature.net/campuscareers"
+- company: Forvis Mazars Experienced Hires
+  url: "https://forvis.avature.net/experiencedcareers"
 - company: Frequentis (careers)
   url: "https://jobs.frequentis.com/careers"
+- company: Frito-Lay
+  url: "https://pepsicoglobalpontoon.avature.net/fritocareers"
 - company: Genpact
   url: "https://genpact.avature.net/careers"
+- company: giffgaff
+  url: "https://virginmediao2.avature.net/giffgaffcareers"
 - company: GPS Hospitality
   url: "https://gpshospitality.avature.net/careers"
 - company: HARMAN
   url: "https://jobsearch.harman.com/careers"
 - company: healthfirst (careers)
   url: "https://healthfirst.avature.net/careers"
+- company: Hilti
+  url: "https://hilticareers.avature.net/careersmarketplace"
+- company: IKEA
+  url: "https://ikea.avature.net/external"
+- company: IKEA Careers
+  url: "https://ikea.avature.net/externalcareers"
+- company: IKEA Finland
+  url: "https://ikea.avature.net/externalcareersfi"
+- company: IKEA India
+  url: "https://ikea.avature.net/externalcareersin"
+- company: IKEA Job Room
+  url: "https://ikea.avature.net/jobroom"
+- company: IKEA Netherlands
+  url: "https://ikea.avature.net/externalcareersnl"
+- company: IKEA Sweden
+  url: "https://ikea.avature.net/externalcareersse"
+- company: IKEA UK
+  url: "https://ikea.avature.net/externalcareersuk"
+- company: IKEA US
+  url: "https://ikea.avature.net/externalcareersus"
+- company: In-N-Out Burger
+  url: "https://ino.avature.net/careers"
+- company: Ingka Group
+  url: "https://ikea.avature.net/externalingka"
+- company: Inizio Engage Germany
+  url: "https://ashfieldhealthcare.avature.net/careersde"
 - company: Insperity (careers)
   url: "https://insperity.avature.net/careers"
 - company: Intercare Therapy
   url: "https://intercaretherapy.avature.net/careers"
 - company: Jack Henry
   url: "https://jackhenry.avature.net/careers"
+- company: Jacobs
+  url: "https://jacobs.avature.net/careers"
+- company: Jakala
+  url: "https://jakala.avature.net/careers"
 - company: Jardine Matheson
   url: "https://jardinematheson.avature.net/careers"
 - company: JRG
   url: "https://jrg.avature.net/careers"
+- company: Kaiser Permanente Temporary Contracts
+  url: "https://kp.avature.net/temporarycontract"
+- company: Kienbaum
+  url: "https://kienbaum.avature.net/hiring"
 - company: Koch Industries
   url: "https://koch.avature.net/careers"
+- company: Koch Industries College Recruiting
+  url: "https://koch.avature.net/collegerecruiting"
 - company: KPMG Ireland
   url: "https://kpmgireland.avature.net/careers"
+- company: KPMG Ireland Experienced Hires
+  url: "https://kpmgireland.avature.net/experiencedhires"
+- company: "L'Oréal"
+  url: "https://loa.avature.net/careers"
 - company: laplanduk
   url: "https://laplanduk.avature.net/careers"
+- company: Lawson Products
+  url: "https://lawson.avature.net/lawsoncareers"
 - company: Lenovo
   url: "https://jobs.lenovo.com/careers"
+- company: Leonard Cheshire
+  url: "https://leonardcheshire.avature.net/careersmarketplace"
 - company: lindner
   url: "https://lindner.avature.net/careers"
 - company: loa
   url: "https://careers.loreal.com/jobs"
 - company: lol
   url: "https://lol.avature.net/careers"
+- company: ManpowerGroup North America
+  url: "https://manpowergroup.avature.net/workmywayna"
 - company: ManTech (careers)
   url: "https://careers.mantech.com/careers"
 - company: Maximus
   url: "https://maximus.avature.net/careers"
 - company: McLaren
   url: "https://mclarencareers.mclaren.com/careers"
+- company: Melchor
+  url: "https://monadelphous.avature.net/careersmelchor"
 - company: Mercadona
   url: "https://mercadona.avature.net/careers"
 - company: Metrobank
   url: "https://metrobank.avature.net/amazingcareers"
+- company: METTLER TOLEDO
+  url: "https://mt.avature.net/careers"
 - company: mgl
   url: "https://recruitment.macquarie.com/careers"
+- company: Middleby Corporation
+  url: "https://resourcebank.avature.net/middlebycareers"
 - company: Ministry of Justice (careers)
   url: "https://jobs.justice.gov.uk/careers"
+- company: Mission Pet Health
+  url: "https://missionpethealth.avature.net/careersmarketplace"
 - company: Monadelphous
   url: "https://jobs.monadelphous.com.au/careers"
 - company: mt
   url: "https://careers.mt.com/careers"
 - company: Murphy-Hoffman Company
   url: "https://mhcta.avature.net/careers"
+- company: National Bank of Canada
+  url: "https://bnc.avature.net/careers"
 - company: NVA
   url: "https://nva.avature.net/careers"
+- company: NVA Jobs
+  url: "https://nva.avature.net/jobs"
+- company: Ocasa
+  url: "https://ocasata.avature.net/empleos"
 - company: One Call
   url: "https://onecall.avature.net/careers"
+- company: Optavise
+  url: "https://optavise.avature.net/careersmarketplace"
+- company: Optavise LinkedIn
+  url: "https://optavise.avature.net/linkedinapp"
+- company: PAYBACK GROUP
+  url: "https://paybackgroup.avature.net/careers"
 - company: pepsicoglobalpontoon
   url: "https://pepsicoglobalpontoon.avature.net/careers"
 - company: Pomerleau
   url: "https://pomerleau.avature.net/careers"
 - company: Primero
   url: "https://primero.avature.net/careers"
+- company: Public Sector Resourcing
+  url: "https://amspsr.avature.net/careersmarketplace"
 - company: Radiology Partners
   url: "https://radpartners.avature.net/careers"
 - company: Regis
@@ -164,38 +290,80 @@
   url: "https://skanska.avature.net/careers"
 - company: Smurfit Westrock
   url: "https://smurfitwestrockta.avature.net/careers"
+- company: Spark New Zealand
+  url: "https://sparknz.avature.net/careers"
+- company: Steelcase External Careers
+  url: "https://steelcase.avature.net/external"
 - company: Synopsys
   url: "https://synopsys.avature.net/careers"
+- company: TenneT
+  url: "https://tennet.avature.net/careers"
 - company: Tesco
   url: "https://careers.tesco.com/careers"
 - company: Tesco Bank
   url: "https://tescoinsuranceandmoneyservices.avature.net/careers"
+- company: "Tesco Bank Search & Apply"
+  url: "https://tescobank.avature.net/searchapply"
+- company: Tesco Careers Marketplace
+  url: "https://tesco.avature.net/careersmarketplace"
 - company: The a2 Milk Company
   url: "https://a2milkkf.avature.net/careers"
+- company: TMF Group
+  url: "https://tmf.avature.net/careersmarketplace"
 - company: totalenergies
   url: "https://jobs.totalenergies.com/careers"
 - company: "Trader Joe's"
   url: "https://traderjoes.avature.net/careers"
 - company: Transcom
   url: "https://apply.careers.transcom.com/careers"
+- company: Travis Perkins
+  url: "https://travisperkins.avature.net/careers"
+- company: Trip.com Group
+  url: "https://trip.avature.net/careers"
+- company: TSMC
+  url: "https://tsmc.avature.net/careers"
 - company: UCLA Health
   url: "https://uclahealth.avature.net/careers"
+- company: UniCredit
+  url: "https://unicredit.avature.net/jobsuche"
+- company: Unifi
+  url: "https://unifi.avature.net/careers"
 - company: Unifi Aviation
   url: "https://careers.unifiservice.com/careers"
+- company: Unifi Ireland
+  url: "https://unifi.avature.net/irecareersmarketplace"
+- company: Unifi UK
+  url: "https://unifi.avature.net/ukcareersmarketplace"
 - company: UOP
   url: "https://uop.avature.net/careers"
 - company: vanoord
   url: "https://vanoord.avature.net/careers"
+- company: "Victoria's Secret & Co."
+  url: "https://vs.avature.net/dcjobs"
 - company: Virgin Media O2
   url: "https://jobs.virginmediao2.co.uk/careersmarketplace"
+- company: Voutique
+  url: "https://techwriting.avature.net/career"
+- company: Voutique Germany
+  url: "https://techwriting.avature.net/careersde"
+- company: Voutique Portugal
+  url: "https://techwriting.avature.net/careerspt"
+- company: Voutique Spain
+  url: "https://techwriting.avature.net/careerses"
 - company: Voutiqueintegrations
   url: "https://voutiqueintegrations.avature.net/careers"
+- company: WestRock
+  url: "https://westrockta.avature.net/careers"
 - company: Wickes
   url: "https://wickes.avature.net/careers"
 - company: William Hill
   url: "https://amswh.avature.net/careers"
+- company: Wilson HCG
+  url: "https://wilsonhcg.avature.net/ctscareers"
 - company: workmyway
   url: "https://emea.workmyway.com/careers"
+- company: World Duty Free
+  url: "https://resourcebank.avature.net/worlddutyfreejobs"
 - company: Xerox (careers)
   url: "https://xerox.avature.net/careers"
 - company: Zung Fu
