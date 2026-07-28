@@ -4,18 +4,21 @@
 - company: Alnylam Pharmaceuticals
   tenant: alnylam
   domain: alnylam.com
-- company: ATB Financial
-  tenant: atb
-  domain: atb.com
 - company: Amdocs
   tenant: amdocs
   domain: amdocs.com
+- company: Applied Materials
+  tenant: appliedmaterials
+  domain: appliedmaterials.com
 - company: Arcadis
   tenant: arcadis
   domain: arcadis.com
 - company: AstraZeneca
   tenant: astrazeneca
   domain: astrazeneca.com
+- company: ATB Financial
+  tenant: atb
+  domain: atb.com
 - company: Bayer
   tenant: bayer
   domain: bayer.com
@@ -31,33 +34,48 @@
 - company: Boston Scientific
   tenant: bostonscientific
   domain: bostonscientific.com
+- company: Bristol Myers Squibb
+  tenant: bms
+  domain: bms.com
 - company: British Council
   tenant: britishcouncil
   domain: britishcouncil.org
+- company: CACI
+  tenant: caci
+  domain: caci.com
 - company: Circana
   tenant: circana
   domain: circana.com
 - company: Citi
   tenant: citi
   domain: citi.com
+- company: Climate LLC
+  tenant: climate
+  domain: climate.com
 - company: Coca-Cola Europacific Partners
   tenant: ccep
   domain: ccep.com
 - company: Coca-Cola FEMSA
   tenant: coca-colafemsa
   domain: coca-colafemsa.com
+- company: Corteva Agriscience
+  tenant: corteva
+  domain: corteva.com
 - company: Deutsche Telekom
   tenant: telekom-growthhub
   domain: telekom-growthhub.com
+- company: Dexcom
+  tenant: dexcom
+  domain: dexcom.com
 - company: Dolby
   tenant: dolby
   domain: dolby.com
+- company: dsm-firmenich
+  tenant: dsm
+  domain: dsm.com
 - company: Eaton
   tenant: eaton
   domain: eaton.com
-- company: Eightfold
-  tenant: app
-  domain: eightfold.ai
 - company: Ericsson
   tenant: ericsson
   domain: ericsson.com
@@ -79,15 +97,15 @@
 - company: Frontier Communications
   tenant: ftr
   domain: ftr.com
-- company: HSBC
-  tenant: hsbc
-  domain: hsbc.com
 - company: Houston Independent School District
   tenant: houstonisd
   domain: houstonisd.org
 - company: HP
   tenant: hp
   domain: hp.com
+- company: HSBC
+  tenant: hsbc
+  domain: hsbc.com
 - company: Infineon Technologies
   tenant: infineon
   domain: infineon.com
@@ -112,18 +130,21 @@
 - company: Liberty Mutual Insurance
   tenant: libertymutual
   domain: libertymutual.com
-- company: MM Group
-  tenant: mm-group
-  domain: mm-group.com
 - company: Mercado Libre
   tenant: mercadolibre
   domain: mercadolibre.com
+- company: Micron Technology
+  tenant: micron
+  domain: micron.com
 - company: Microsoft
   tenant: microsoft
   domain: microsoft.com
 - company: Millennium
   tenant: mlp
   domain: mlp.com
+- company: MM Group
+  tenant: mm-group
+  domain: mm-group.com
 - company: Modern Technology Solutions Inc
   tenant: mtsi-va
   domain: mtsi-va.com
@@ -136,15 +157,27 @@
 - company: New York Life
   tenant: newyorklife
   domain: newyorklife.com
-- company: nformal
+- company: nFormal
   tenant: nformal
   domain: nformal.com
+- company: Northrop Grumman
+  tenant: ngc
+  domain: ngc.com
+- company: NVIDIA
+  tenant: nvidia
+  domain: nvidia.com
 - company: OATRH
   tenant: puertoricogov
   domain: puertoricogov.com
+- company: PayPal
+  tenant: paypal
+  domain: paypal.com
 - company: Plexus
   tenant: plexus
   domain: plexus.com
+- company: Premier Health
+  tenant: premierhealth
+  domain: premierhealth.com
 - company: Qualcomm
   tenant: qualcomm
   domain: qualcomm.com
@@ -184,6 +217,9 @@
 - company: TriNet
   tenant: trinet
   domain: trinet.com
+- company: Twilio
+  tenant: twilio
+  domain: twilio.com
 - company: UKG
   tenant: ukg
   domain: ukg.com
@@ -202,6 +238,3 @@
 - company: Worley
   tenant: worley
   domain: worley.com
-- company: dsm-firmenich
-  tenant: dsm
-  domain: dsm.com
