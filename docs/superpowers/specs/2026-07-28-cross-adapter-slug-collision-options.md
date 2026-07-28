@@ -1,7 +1,7 @@
 # Cross-adapter slug collision options
 
 Date: 2026-07-28  
-Status: options (not decided)  
+Status: **decided** — see [Decision](#decision) at the end. Everything above it is the options survey that led there, kept as written.  
 Related:
 
 - [2026-07-06 unified company tools](2026-07-06-unified-company-tools-design.md) — global slug/name uniqueness; ATS invisible
@@ -359,3 +359,187 @@ When choosing:
 | **E** | Careers URL is authoritative; roster suggests; collisions teach URLs |
 
 **Filters implication:** multi-company ambiguity never shares one filter set. Two companies means up to two full `get_filters` + `search` pipelines—only after each company is uniquely identified.
+
+---
+
+# Decision
+
+Everything above was written before the roster was measured. This section records what was chosen, the evidence that moved it, and where it departs from the *Recommended composition* sketched above.
+
+## Measured baseline
+
+Every adapter's `Roster()` unioned and keyed through `normalize`, measured on `a9c1a05` (#251 merged, before the #252 collision drops):
+
+| | Count |
+|---|---|
+| Roster entries across all ATS adapters | 20,367 |
+| Cross-adapter **slug** collisions | 17 |
+| Cross-adapter **display name** collisions | 0 |
+| Intra-adapter collisions (either kind) | 0 |
+
+Every slug collision is HERP against one of workday / ashby / greenhouse / smartrecruiters, and every one is the same shape — a short generic English token:
+
+```text
+adglobe believe chime fusion garage helios kipp mota nature
+nudge omni pros sidekicks siro smartbank stable union
+```
+
+Display names survive because `normalize` keeps Unicode letters, so a Japanese legal suffix is part of the key: `Nature株式会社` normalizes to `nature株式会社`, not `nature`.
+
+### The case the options survey missed
+
+Three of the 17 have a sharper shape — **one company's slug equals a different company's display name**:
+
+| Input | Slug index | Name index |
+|---|---|---|
+| `fusion` | herp `株式会社FUSION`, workday `Fusion` | workday `Fusion` |
+| `stable` | herp `stable株式会社`, ashby `Stable` | ashby `Stable` |
+| `chime` | herp `有限会社チャイム`, greenhouse `Chime` | greenhouse `Chime` |
+
+`Resolve` checks slug before name, so Option D — and the *Recommended composition*, which inherits D's storage and keeps the current lookup order — resolves these to whichever entry the slug index happens to hold, silently shadowing the other. None of A–E addresses this. The decision below removes the precedence question instead of answering it.
+
+## What was decided
+
+1. **Registry storage (D):** index by `(adapter, slug)`. `bySlug` and `byName` map to `[]registryEntry`. `NewRegistry` no longer fails on collisions of either kind — **display name uniqueness is relaxed along with slug uniqueness**, which is further than D goes.
+2. **Resolve (E + C1), with one change:** careers URL is authoritative; roster lookup takes the **union** of slug and name hits, not slug-then-name; two or more distinct entries is a runtime ambiguity error, never a silent pick.
+3. **Disambiguation key (E):** the candidate's **careers URL**, rendered by a new `Adapter.CareersURL(slug)`. Display name is the fallback only when an adapter cannot render one.
+4. **Tools (C1):** filters, filtered search, and detail all require a single resolved company. This falls out of `Resolve` being the single entry point; no per-tool logic.
+5. **Option B stays internal:** kept as a field on the ambiguity error for logs and debug CLIs, never rendered in MCP-facing text.
+6. **Option A is not the fallback for whole adapter families**, only for individual entries no adapter can render a URL for. The #252 drops are restored.
+7. **Collision reporting survives.** `NewRegistry` stops failing, but a non-fatal report keeps new collisions visible in CI — otherwise roster quality degrades silently, which is what the fatal check was protecting.
+
+### Why relax name uniqueness now
+
+Name uniqueness is currently intact, so keeping it would work today and let disambiguation quote display names instead of URLs — that alternative (D + C1 only, no E) was considered and would have closed 100% of the measured collisions with a smaller diff.
+
+It was rejected as deferred cost rather than avoided cost. Rosters keep growing, name collisions are inevitable at this rate, and the fix at that point is the same `Adapter.CareersURL` interface change across all 18 adapters. Doing it once, now, avoids a second pass.
+
+### Correction to Option E's cons
+
+> Roster-only providers without a parseable public board URL need a fallback
+
+This is backwards. All 18 adapters already implement `ParseCareersURL`, including the roster-gated ones (Eightfold, SuccessFactors, JOIN) named in Option C's cons. The missing direction is the **reverse** — slug → URL — which is what a teaching error needs and which `ats.Adapter` has no method for. Thirteen provider packages already have a `CareersURL() string` on their roster type, reachable today only from the join and oracle adapters and two debug CLIs. So E's real cost is lower than written, and lands somewhere else.
+
+## Resolve contract
+
+```text
+key := normalize(company)
+
+① careers-URL shaped input → adapter.ParseCareersURL (authoritative, single answer)
+
+② candidates := dedupe(bySlug[key] ∪ byName[key])   // one entry counted once
+     1  → (adapter, slug)
+     ≥2 → *AmbiguousCompanyError
+     0  → fuzzy suggest (unchanged)
+```
+
+The union is the load-bearing part: dropping slug-before-name is what makes `fusion` / `stable` / `chime` list both companies instead of shadowing one. Its cost is that an input which resolves to a single company today becomes ambiguous — accepted, since that resolution is an artifact of index order, not of the input being unambiguous.
+
+Ordering ① first is presentational, not functional: `parseCareersInput` requires both a `.` and a `/`, which roster slugs and display names do not have, so URL inputs never reach ②.
+
+```go
+type AmbiguousCompanyError struct {
+    Input      string
+    Candidates []CompanyCandidate // Name, CareersURL, Provider
+}
+```
+
+`Provider` is populated but not rendered in the user-facing message.
+
+## Tool contract
+
+Ambiguity reaches the client through `errorResult` as `IsError: true` text content. **No input schema, output struct, or tool is added or changed** — only the `company` parameter descriptions, the error text, and `serverInstructions`. The change is invisible to clients that never hit a collision.
+
+### Ambiguity message
+
+```text
+ambiguous company "nature": 2 companies match. Retry with the careers URL of the
+one you want:
+  Nature株式会社     https://herp.careers/careers/companies/nature
+  Nature Research   https://nature.wd108.myworkdayjobs.com/ExternalCareers
+```
+
+Candidates whose adapter returns `ok=false` degrade to the display name:
+
+```text
+  Foo Corp   (no public careers URL; retry with company="Foo Corp")
+```
+
+Instructing the URL rather than the name is what relaxing name uniqueness costs: with names no longer guaranteed unique, quoting a name is not always a resolvable retry, and the message would otherwise have to distinguish which candidate names still are.
+
+### `search_jobs_by_company`
+
+| Case | Behavior |
+|---|---|
+| Unique hit | Unchanged |
+| Careers URL | Unchanged (now the primary disambiguation path) |
+| Miss | Unchanged fuzzy suggest |
+| Ambiguous | Ambiguity message; no upstream call |
+
+### `get_filters_by_company`
+
+Same ambiguity message, and **no `FilterSet` is fetched for any candidate**. This settles the *"Is two filters the same as search twice?"* question posed under C1 — returning one table per candidate is rejected outright:
+
+- It defers the ambiguity by one hop rather than resolving it — the next `search_jobs_by_company` call still needs a single `company`.
+- Filter keys are tenant-specific and do not overlap (`{職種, 雇用形態}` vs `{Location, Job Family}`). A merged view invites a filter map mixing both, which the chosen adapter then rejects or, worse, ignores.
+- `companyFiltersOutput.Filters` is a `map[string][]string`. Returning several would mean a breaking output change on every call, including the overwhelming majority with no ambiguity.
+
+After disambiguation the careers URL is the handle for the whole pipeline — the same string goes to filters, search, and detail.
+
+### `get_job_detail_by_company`
+
+Same ambiguity message plus a pointer back to the caller's own previous key: *use the same company value that produced this job_id*. The useful answer here is not "which company do you want" but "which one did you just search".
+
+Ambiguity must hard-fail rather than pick. `job_id` is adapter-local and opaque with no cross-provider format guarantee, so a wrong pick can return a complete, plausible-looking posting belonging to the other company. Using `job_id` to auto-disambiguate is also rejected: verifying it costs one upstream `Detail` per candidate, and the case where several candidates accept the same id is exactly the case where guessing is most dangerous.
+
+## Implementation plan
+
+Three PRs. Slice 1 is a pure addition with no behavior change; slice 2 carries the behavior change and its tests. Keeping them apart keeps each independently verifiable.
+
+### PR 1 — `Adapter.CareersURL`
+
+```go
+// CareersURL renders the public careers page for a curated company.
+// slug must come from Roster; it returns ok=false when this ATS has no
+// stable public URL for that company.
+CareersURL(slug string) (url string, ok bool)
+```
+
+Scoping the contract to **roster slugs only** is what keeps this cheap. Ambiguity candidates are always roster entries — a careers-URL input resolves uniquely and never produces candidates — so the method never sees a slug an adapter minted from a URL. Workday in particular does not have to handle its dual-shaped slug; it composes tenant/instance/site from the roster entry.
+
+Five providers need the renderer written — ashby, greenhouse, lever, rippling, workday — and their URL shapes are already spelled out in `careersHostPatternsByAdapter`. Each adapter then wires slug → roster company through its existing lookup (`resolveSlug`, or the package's `CompaniesBySlug` / `CompaniesByHost` / `CompaniesByAccount` / … index) and delegates.
+
+**Required invariant test.** The ambiguity message tells the agent to paste the URL back into `company`, so the rendered URL must parse back to the slug it came from:
+
+```text
+for every roster entry: ParseCareersURL(CareersURL(slug)) == slug
+```
+
+Nothing guarantees this today. The two directions were written independently — `fmt.Sprintf` on one side, a regexp on the other — and their formats already differ in detail (trailing slashes on workable and ultipro, `?ss=1` on icims, `/search/` on successfactors against `/search` in the host-pattern table). This whole-roster sweep is cheap and is what makes the disambiguation loop trustworthy.
+
+### PR 2 — Registry and Resolve
+
+Multi-entry `bySlug` / `byName`; `NewRegistry` stops erroring; union resolve; `AmbiguousCompanyError`; the ambiguity message.
+
+Fixtures: unique hit, ambiguous slug, ambiguous name, slug-versus-name cross, careers URL wins over an ambiguous bare token, a candidate whose adapter returns `ok=false`, and filters/detail rejected while ambiguous.
+
+### PR 3 — Roster policy
+
+Restore the #252 drops. Add the non-fatal collision report and wire it into CI. Update the roster curation rules that assert global name uniqueness — the comment at the head of `internal/provider/ultipro/companies.yaml` and the discover-companies / verify-companies skills.
+
+## Decision checklist, answered
+
+The five questions posed above:
+
+1. **Is ATS invisible non-negotiable?** Yes. B is rejected as primary UX and survives only as an internal error field.
+2. **Must both colliding companies stay searchable via roster?** Yes. Both stay indexed; neither is dropped, and neither wins silently.
+3. **Are duplicate display names allowed?** Yes — relaxed together with slugs, which makes the careers URL the disambiguation key rather than the name.
+4. **Is unfiltered fan-out (C2) desirable?** No. It relocates the ambiguity to `get_job_detail_by_company`, where it is harder to handle, and it breaks the single-entry-point property that gives all three tools consistent behavior for free.
+5. **How do roster-only adapters participate?** They already can — see the correction above. `ok=false` remains the escape hatch for individual entries, degrading that candidate to its display name.
+
+## Non-goals
+
+- Cross-company fan-out search
+- Merged multi-company filter schemas
+- A dedicated disambiguation tool — teaching errors and a retry on the same tool are enough
+- ATS vendor names anywhere in the user-visible contract
