@@ -30,6 +30,7 @@ OPENAPI_SPECS := \
 	internal/provider/smartrecruiters/openapi.yaml \
 	internal/provider/successfactors/openapi.yaml \
 	internal/provider/synopsys/openapi.yaml \
+	internal/provider/taiwanjobs/openapi.yaml \
 	internal/provider/teamtailor/openapi.yaml \
 	internal/provider/tsmc/openapi.yaml \
 	internal/provider/ultipro/openapi.yaml \

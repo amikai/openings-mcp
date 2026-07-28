@@ -30,6 +30,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
 	"github.com/amikai/openings-mcp/internal/provider/nvidia"
+	"github.com/amikai/openings-mcp/internal/provider/taiwanjobs"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -43,17 +44,17 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me and TaiwanJobs (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
 
 Tool selection:
 - When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) when the company isn't covered.
-- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
-- When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
+- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, TaiwanJobs/台灣就業通, Jobindex, マイナビ転職/Mynavi, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
+- When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, TaiwanJobs for Taiwan government listings, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs on supported ATS providers. Do not pass other careers sites; some ATS providers accept URLs only for companies already in the curated roster.
 
 Query construction:
 - Use dedicated parameters for structured criteria whenever available. Use keyword only for free-text terms that have no better matching parameter, and evaluate unsupported criteria from the results or job details.
-- Every provider follows the same search-then-detail flow: <provider>_search_jobs returns summaries carrying an identifier (job code, ID, or path), and <provider>_get_job_detail exchanges that identifier for the full posting. Identifiers are provider-specific and not interchangeable. The detail step is conditional, not automatic: when a summary from the search step fails the user's criteria, drop it and never call get_job_detail for it.
+- Every provider except TaiwanJobs follows the same search-then-detail flow (TaiwanJobs search rows already carry the full posting, so it has no detail tool): <provider>_search_jobs returns summaries carrying an identifier (job code, ID, or path), and <provider>_get_job_detail exchanges that identifier for the full posting. Identifiers are provider-specific and not interchangeable. The detail step is conditional, not automatic: when a summary from the search step fails the user's criteria, drop it and never call get_job_detail for it.
 
 Context management:
 - Search results are paginated; fetch additional pages rather than broadening the query.
@@ -171,24 +172,27 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 	cMeta := meta.NewClient("https://www.metacareers.com", hc)
 
+	cTaiwanjobs := taiwanjobs.NewClient("https://free.taiwanjobs.gov.tw", hc)
+
 	registry, err := newATSRegistry(hc, hcEightfold)
 	if err != nil {
 		return err
 	}
 
 	server := newServer(providerClients{
-		amazon:   cAmazon,
-		job104:   c104,
-		apple:    cApple,
-		cake:     cCake,
-		nvidia:   cNvidia,
-		tsmc:     cTsmc,
-		google:   cGoogle,
-		linkedin: cLinkedin,
-		indeed:   cIndeed,
-		jobindex: cJobindex,
-		mynavi:   cMynavi,
-		meta:     cMeta,
+		amazon:     cAmazon,
+		job104:     c104,
+		apple:      cApple,
+		cake:       cCake,
+		nvidia:     cNvidia,
+		tsmc:       cTsmc,
+		google:     cGoogle,
+		linkedin:   cLinkedin,
+		indeed:     cIndeed,
+		jobindex:   cJobindex,
+		mynavi:     cMynavi,
+		meta:       cMeta,
+		taiwanjobs: cTaiwanjobs,
 	}, registry, logger)
 
 	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
@@ -252,18 +256,19 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 // providerClients bundles one client per per-provider tool family, so
 // newServer's signature doesn't grow with every provider added.
 type providerClients struct {
-	amazon   *amazon.Client
-	job104   *job104.Client
-	apple    *apple.JobsClient
-	cake     *cake.Client
-	nvidia   *nvidia.Client
-	tsmc     *tsmc.Client
-	google   *google.Client
-	linkedin *linkedin.Client
-	indeed   *indeed.Client
-	jobindex *jobindex.Client
-	mynavi   *mynavi.Client
-	meta     *meta.Client
+	amazon     *amazon.Client
+	job104     *job104.Client
+	apple      *apple.JobsClient
+	cake       *cake.Client
+	nvidia     *nvidia.Client
+	tsmc       *tsmc.Client
+	google     *google.Client
+	linkedin   *linkedin.Client
+	indeed     *indeed.Client
+	jobindex   *jobindex.Client
+	mynavi     *mynavi.Client
+	meta       *meta.Client
+	taiwanjobs *taiwanjobs.Client
 }
 
 func newServer(clients providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
@@ -287,6 +292,7 @@ func newServer(clients providerClients, registry *ats.Registry, logger *slog.Log
 	openingsmcp.RegisterJobindex(server, clients.jobindex)
 	openingsmcp.RegisterMynavi(server, clients.mynavi)
 	openingsmcp.RegisterMeta(server, clients.meta)
+	openingsmcp.RegisterTaiwanjobs(server, clients.taiwanjobs)
 	openingsmcp.RegisterCompany(server, registry)
 	return server
 }

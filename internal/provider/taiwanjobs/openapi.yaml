@@ -1,0 +1,79 @@
+openapi: 3.1.0
+
+info:
+  title: TaiwanJobs Open Job Feed
+  version: "1.0.0"
+  description: >
+    Open XML feed of job vacancies on TaiwanJobs (台灣就業通), the Taiwan
+    Ministry of Labor's official job-matching service, as published on the
+    government open-data platform (https://data.gov.tw/dataset/44062).
+
+    The feed is keyless. It caps every response at 1000 rows, has no keyword
+    parameter and no pagination, and each row already carries the full posting
+    body — there is no separate detail endpoint. Element names embed Chinese
+    annotations in fullwidth parentheses, e.g. <OCCU_DESC（職務名稱）>; the
+    client strips the annotations before decoding because they are not legal
+    XML name characters for strict parsers.
+
+servers:
+  - url: https://free.taiwanjobs.gov.tw
+    description: TaiwanJobs open-data feed
+
+tags:
+  - name: Jobs
+    description: Job vacancy feed
+
+paths:
+  /webservice_taipei/Webservice.ashx:
+    get:
+      tags: [Jobs]
+      summary: Fetch job vacancies
+      description: >
+        Returns up to `count` job vacancies, optionally filtered by postal
+        code and/or job category code. All parameters are optional.
+      operationId: fetchJobs
+      parameters:
+        - name: count
+          in: query
+          required: false
+          description: Maximum rows to return; the service caps this at 1000.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+          example: 100
+        - name: zipno
+          in: query
+          required: false
+          description: >
+            Taiwan postal code of the work location, e.g. 110 for Taipei
+            Xinyi District.
+          schema:
+            type: string
+            pattern: "^[0-9]{3,6}$"
+          example: "110"
+        - name: jobno
+          in: query
+          required: false
+          description: >
+            Official job category code: 2-digit major category (e.g. 07 for
+            engineering/R&D) or 6-digit minor category (e.g. 070113).
+          schema:
+            type: string
+            pattern: "^[0-9]{2}([0-9]{4})?$"
+          example: "07"
+      responses:
+        "200":
+          description: >
+            XML DataList of Data rows. Notable elements (annotations
+            stripped): OCCU_DESC (title), COMPNAME (company), CITYNAME
+            (location), JOB_DETAIL (full posting body), WK_TYPE (employment
+            type), SALARYCD/NT_L/NT_U (salary type and range), EXPERIENCE,
+            EDGRDESC (minimum education), JOB_PERSON (openings), STOP_DATE
+            (application deadline, YYYYMMDD), TRANDATE (last update,
+            YYYYMMDD), URL_QUERY (public listing page), CJOB1_COUNT /
+            CJOB_NAME1 / CJOB2_COUNT / CJOB_NAME2 (category codes and names).
+          content:
+            text/xml:
+              schema:
+                type: string
