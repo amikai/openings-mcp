@@ -51,6 +51,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"avature":         "<tenant>.avature.net/<portal> (custom-domain portals via roster only)",
 	"bamboohr":        "<company>.bamboohr.com/careers",
 	"greenhouse":      "job-boards.greenhouse.io/<board>",
+	"hrmos":           "hrmos.co/pages/<slug>",
 	"lever":           "jobs.lever.co/<org>",
 	"ashby":           "jobs.ashbyhq.com/<org>",
 	"teamtailor":      "<company>[.na|.au].teamtailor.com/jobs",

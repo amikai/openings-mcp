@@ -37,6 +37,7 @@ var providerOrder = []string{
 	"engage",
 	"greenhouse",
 	"herp",
+	"hrmos",
 	"icims",
 	"join",
 	"lever",
@@ -195,6 +196,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
 		case "herp":
 			a = ats.NewHerpAdapter(hc)
+		case "hrmos":
+			a = ats.NewHrmosAdapter("https://hrmos.co", hc)
 		case "icims":
 			a = ats.NewICIMSAdapter(hc)
 		case "join":
