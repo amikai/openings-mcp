@@ -205,9 +205,13 @@ func companySelection(req *mcp.CallToolRequest, candidateCount int) (choice int,
 	case "accept":
 		// Continue below.
 	case "decline":
-		return 0, true, errors.New("company selection declined")
+		return 0, true, errors.New(
+			"the user declined to choose a company; ask them which company they meant instead of retrying the tool",
+		)
 	case "cancel":
-		return 0, true, errors.New("company selection cancelled")
+		return 0, true, errors.New(
+			"the user cancelled company selection; ask them which company they meant instead of retrying the tool",
+		)
 	default:
 		return 0, true, fmt.Errorf("company selection returned unknown action %q", response.Action)
 	}

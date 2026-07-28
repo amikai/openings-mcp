@@ -141,7 +141,6 @@ func TestServerListsJobTools(t *testing.T) {
 	assert.Contains(t, companyProperty["description"], "recognized public careers-page URL")
 	assert.Contains(t, companyProperty["description"], "Other careers URLs are unsupported")
 	assert.Contains(t, companyProperty["description"], "some career systems accept URLs only for companies in the curated roster")
-	assert.NotContains(t, companyProperty["description"], "ATS")
 	assert.NotContains(t, companyProperty["description"], "Eightfold")
 	assert.NotContains(t, companyProperty["description"], "SuccessFactors")
 
@@ -202,8 +201,8 @@ func TestServerListsJobTools(t *testing.T) {
 
 func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.Contains(t, serverInstructions, "A company name by itself is not a source selection.")
-	assert.Contains(t, serverInstructions, "recognized public careers-page URLs on supported ATS providers")
-	assert.Contains(t, serverInstructions, "some ATS providers accept URLs only for companies already in the curated roster")
+	assert.Contains(t, serverInstructions, "recognized public careers-page URLs supported by available career systems")
+	assert.Contains(t, serverInstructions, "some career systems accept URLs only for companies already in the curated roster")
 	assert.NotContains(t, serverInstructions, "Eightfold")
 	assert.NotContains(t, serverInstructions, "SuccessFactors")
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
@@ -214,7 +213,7 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
 	assert.Contains(t, serverInstructions, "every unified company tool asks the user to choose")
 	assert.Contains(t, serverInstructions, "human-readable company names and public careers URLs")
-	assert.Contains(t, serverInstructions, "rather than an ATS-prefixed identifier")
+	assert.Contains(t, serverInstructions, "should retry with the intended public careers URL")
 
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)

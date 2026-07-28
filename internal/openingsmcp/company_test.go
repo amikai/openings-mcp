@@ -280,9 +280,148 @@ func TestCompanyFiltersElicitationCancellation(t *testing.T) {
 	require.Len(t, result.Content, 1)
 	text, ok := result.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
-	assert.Contains(t, text.Text, "company selection cancelled")
+	assert.Contains(t, text.Text, "the user cancelled company selection")
+	assert.Contains(t, text.Text, "instead of retrying the tool")
 	assert.False(t, stubA.filtersCalled)
 	assert.False(t, stubB.filtersCalled)
+}
+
+func TestCompanySelectionResponses(t *testing.T) {
+	tests := []struct {
+		name           string
+		responses      mcp.InputResponseMap
+		candidateCount int
+		wantChoice     int
+		wantAnswered   bool
+		wantError      string
+	}{
+		{
+			name:           "first pass",
+			candidateCount: 2,
+		},
+		{
+			name: "missing response key",
+			responses: mcp.InputResponseMap{
+				"other": &mcp.ElicitResult{Action: "accept"},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      "company selection response is missing",
+		},
+		{
+			name: "wrong response type",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ListRootsResult{},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      "unexpected type",
+		},
+		{
+			name: "decline",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{Action: "decline"},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      "ask them which company they meant instead of retrying the tool",
+		},
+		{
+			name: "cancel",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{Action: "cancel"},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      "ask them which company they meant instead of retrying the tool",
+		},
+		{
+			name: "unknown action",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{Action: "later"},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      `unknown action "later"`,
+		},
+		{
+			name: "choice is not a string",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{
+					Action:  "accept",
+					Content: map[string]any{"choice": 2},
+				},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      "choice must be a string",
+		},
+		{
+			name: "choice is not numeric",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{
+					Action:  "accept",
+					Content: map[string]any{"choice": "second"},
+				},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      `choice "second" is out of range`,
+		},
+		{
+			name: "choice is below range",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{
+					Action:  "accept",
+					Content: map[string]any{"choice": "0"},
+				},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      `choice "0" is out of range`,
+		},
+		{
+			name: "choice is above range",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{
+					Action:  "accept",
+					Content: map[string]any{"choice": "3"},
+				},
+			},
+			candidateCount: 2,
+			wantAnswered:   true,
+			wantError:      `choice "3" is out of range`,
+		},
+		{
+			name: "accept",
+			responses: mcp.InputResponseMap{
+				companySelectionRequestID: &mcp.ElicitResult{
+					Action:  "accept",
+					Content: map[string]any{"choice": "2"},
+				},
+			},
+			candidateCount: 2,
+			wantChoice:     1,
+			wantAnswered:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := &mcp.CallToolRequest{
+				Params: &mcp.CallToolParamsRaw{InputResponses: tt.responses},
+			}
+			choice, answered, err := companySelection(req, tt.candidateCount)
+
+			assert.Equal(t, tt.wantChoice, choice)
+			assert.Equal(t, tt.wantAnswered, answered)
+			if tt.wantError == "" {
+				require.NoError(t, err)
+				return
+			}
+			require.ErrorContains(t, err, tt.wantError)
+		})
+	}
 }
 
 func TestCompanyFiltersAmbiguityFallsBackWithoutElicitation(t *testing.T) {
@@ -298,6 +437,70 @@ func TestCompanyFiltersAmbiguityFallsBackWithoutElicitation(t *testing.T) {
 	assert.Contains(t, text.Text, "https://nature-b.example/nature")
 	assert.NotContains(t, text.Text, "stubA")
 	assert.NotContains(t, text.Text, "stubB")
+	assert.False(t, stubA.filtersCalled)
+	assert.False(t, stubB.filtersCalled)
+}
+
+func TestAmbiguousCompanyDoesNotCallAdaptersBeforeSelection(t *testing.T) {
+	tests := []struct {
+		name      string
+		tool      string
+		arguments map[string]any
+	}{
+		{
+			name:      "search",
+			tool:      "search_jobs_by_company",
+			arguments: map[string]any{"company": "nature"},
+		},
+		{
+			name:      "filters",
+			tool:      "get_filters_by_company",
+			arguments: map[string]any{"company": "nature"},
+		},
+		{
+			name:      "detail",
+			tool:      "get_job_detail_by_company",
+			arguments: map[string]any{"company": "nature", "job_id": "j1"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			reg, stubA, stubB := ambiguousCompanyRegistry(t)
+			result := callCompanyTool(t, reg, nil, tt.tool, tt.arguments)
+
+			assert.True(t, result.IsError)
+			assert.False(t, stubA.searchCalled)
+			assert.False(t, stubA.filtersCalled)
+			assert.False(t, stubA.detailCalled)
+			assert.False(t, stubB.searchCalled)
+			assert.False(t, stubB.filtersCalled)
+			assert.False(t, stubB.detailCalled)
+		})
+	}
+}
+
+func TestURLOnlyElicitationCapabilityUsesFallback(t *testing.T) {
+	reg, stubA, stubB := ambiguousCompanyRegistry(t)
+	handlerCalled := false
+	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
+		Capabilities: &mcp.ClientCapabilities{
+			Elicitation: &mcp.ElicitationCapabilities{
+				URL: &mcp.URLElicitationCapabilities{},
+			},
+		},
+		ElicitationHandler: func(context.Context, *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
+			handlerCalled = true
+			return &mcp.ElicitResult{Action: "cancel"}, nil
+		},
+	})
+
+	assert.True(t, result.IsError)
+	require.Len(t, result.Content, 1)
+	text, ok := result.Content[0].(*mcp.TextContent)
+	require.True(t, ok)
+	assert.Contains(t, text.Text, "cannot display a company choice form")
+	assert.False(t, handlerCalled)
 	assert.False(t, stubA.filtersCalled)
 	assert.False(t, stubB.filtersCalled)
 }

@@ -700,3 +700,27 @@ The five questions posed above:
 - Merged multi-company filter schemas
 - A dedicated disambiguation tool — teaching errors and a retry on the same tool are enough
 - ATS vendor names anywhere in the user-visible contract
+
+## Decision update — 2026-07-29: typed resolution and elicitation
+
+The implementation after this options analysis supersedes the
+`AmbiguousCompanyError` and teaching-error design described above:
+
+- `Registry.Resolve` returns a `CompanyResolution`. Ambiguity is a successful
+  resolution with multiple candidates, not an error. Callers use `Single`,
+  `Candidates`, and `Select` without exposing provider identifiers.
+- All three unified company tools request MCP form elicitation when a company
+  is ambiguous. Each choice has an internal numeric value and a
+  human-readable label containing the company name and, when available, its
+  public careers URL.
+- The client returns the chosen value through `InputResponses`, and the same
+  logical tool call resumes. The server maps that choice to its private
+  adapter and provider-local slug before invoking the adapter.
+- Clients without form elicitation receive the same human-readable candidates
+  in an MCP-boundary fallback error. That fallback is not part of registry
+  resolution and does not introduce a public provider-prefixed identifier.
+
+This update supersedes the earlier tool-contract sections that name
+`AmbiguousCompanyError`, as well as the non-goal stating that teaching errors
+alone are sufficient. The historical alternatives and collision analysis
+remain useful context.
