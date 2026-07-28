@@ -31,6 +31,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[HERP Hire](https://lp.herp.cloud/lp/boost-applications)** (Japan),
   **[engage](https://en-gage.net)** (Japan),
   **[HRMOS 採用](https://hrmos.co)** (Japan),
+  **[MokaHR](https://www.mokahr.com)** (China),
   and **[BambooHR](https://www.bamboohr.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms

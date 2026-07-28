@@ -114,6 +114,7 @@ Circuit	lever|Circuit|https://jobs.lever.co/getcircuit	workable|Circuit|https://
 Citi	workday|Citigroup|https://citi.wd5.myworkdayjobs.com/en-US/2	eightfold|Citi|https://citi.eightfold.ai/careers
 Clay	recruitee|Clay Hospitality|https://clay.recruitee.com	workable|Clay|https://apply.workable.com/clayglobal/
 Clear	greenhouse|Clear|https://job-boards.greenhouse.io/clear	bamboohr|CLEAR Global|https://clear.bamboohr.com/careers
+CloudWalk	lever|CloudWalk|https://jobs.lever.co/cloudwalk	mokahr|CloudWalk|https://app.mokahr.com/social-recruitment/cloudwalk/4871
 Clutch	greenhouse|Clutch Technologies Inc.|https://job-boards.greenhouse.io/clutch	ashby|Clutch|https://jobs.ashbyhq.com/withclutch
 Coast	greenhouse|Coast|https://job-boards.greenhouse.io/coast	bamboohr|Coast (coast)|https://coast.bamboohr.com/careers
 Commvault	workday|Commvault Careers|https://commvault.wd1.myworkdayjobs.com/en-US/commvault	greenhouse|Commvault|https://job-boards.greenhouse.io/commvault
@@ -134,7 +135,9 @@ Daikin	successfactors|Daikin|https://careers.daikin.eu/search/	avature|Daikin|ht
 Dashlane	greenhouse|Dashlane|https://job-boards.greenhouse.io/dashlane	bamboohr|Dashlane (dashlane)|https://dashlane.bamboohr.com/careers
 Datacamp	greenhouse|Datacamp|https://job-boards.greenhouse.io/datacamp	bamboohr|DataCamp (datacamp)|https://datacamp.bamboohr.com/careers
 Datacor	greenhouse|Datacor|https://job-boards.greenhouse.io/datacor	bamboohr|Datacor (datacor)|https://datacor.bamboohr.com/careers
+DeepRoute.ai	workable|Deeproute.ai|https://apply.workable.com/deeproute-dot-a-i/	mokahr|DeepRoute.ai|https://app.mokahr.com/social-recruitment/deeproute/143885
 Deepintent	greenhouse|Deepintent|https://job-boards.greenhouse.io/deepintent	bamboohr|DeepIntent (deepintent)|https://deepintent.bamboohr.com/careers
+Deeproute.ai	workable|Deeproute.ai|https://apply.workable.com/deeproute-dot-a-i/	mokahr|DeepRoute.ai|https://app.mokahr.com/social-recruitment/deeproute/143885
 Delinea	ashby|Delinea|https://jobs.ashbyhq.com/delinea	workday|Delinea|https://centrify.wd1.myworkdayjobs.com/en-US/external
 Deloitte	herp|デロイトトーマツウェブサービス株式会社|https://herp.careers/careers/companies/deloitte	smartrecruiters|Deloitte|https://jobs.smartrecruiters.com/Deloitte6
 Deluxe	workday|Deluxe (CAN)|https://deluxe.wd5.myworkdayjobs.com/en-US/USA_CAN	workday|Deluxe|https://bydeluxe.wd5.myworkdayjobs.com/en-US/Deluxe_External
@@ -355,6 +358,7 @@ Pinely	bamboohr|Pinely|https://pinely.bamboohr.com/careers	workable|Pinely|https
 Pirata Group	bamboohr|Pirata Group|https://piratagroup.bamboohr.com/careers	workable|Pirata Group|https://apply.workable.com/piratagroup/
 Plan A	bamboohr|Plan A|https://plana.bamboohr.com/careers	workable|Plan A|https://apply.workable.com/plana/
 Plexus	lever|Plexus|https://jobs.lever.co/plexus	eightfold|Plexus|https://plexus.eightfold.ai/careers
+PlusAI	lever|PlusAI|https://jobs.lever.co/plus-2	mokahr|PlusAI|https://app.mokahr.com/social-recruitment/plus/69931
 Press Ganey	workday|Company Description Press Ganey|https://pressganey.wd1.myworkdayjobs.com/en-US/Careers	smartrecruiters|Press Ganey|https://jobs.smartrecruiters.com/PressGaney2
 Principle	herp|株式会社プリンシプル|https://herp.careers/careers/companies/principle	smartrecruiters|Principle|https://jobs.smartrecruiters.com/Principle2
 ProCogia	bamboohr|ProCogia|https://procogia.bamboohr.com/careers	rippling|ProCogia|https://ats.rippling.com/procogia/jobs
@@ -400,7 +404,7 @@ Rystad Energy	bamboohr|Rystad Energy|https://rystadenergy.bamboohr.com/careers	w
 SAGA Diagnostics	workable|SAGA Diagnostics|https://apply.workable.com/saga-diagnostics/	rippling|SAGA Diagnostics|https://ats.rippling.com/saga-diagnostics-careers/jobs
 SAR	lever|SAR Academy & SAR High School|https://jobs.lever.co/sar	oracle|SAR|https://fa-eqlf-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 SECURE	herp|株式会社セキュア|https://herp.careers/careers/companies/secure	icims|SECURE|https://careers-canada-secure.icims.com/jobs/search?ss=1
-SHEIN	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs
+SHEIN	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs	mokahr|SHEIN|https://app.mokahr.com/social-recruitment/shein/2933
 SMB Team	bamboohr|SMB Team|https://smbteam.bamboohr.com/careers	workable|SMB Team|https://apply.workable.com/smb-team/
 SPOKE	recruitee|spoke|https://spoke.recruitee.com	workable|SPOKE|https://apply.workable.com/spoke/
 SSC Advisors, Inc	bamboohr|SSC Advisors, Inc|https://ssccpas.bamboohr.com/careers	workable|SSC Advisors, Inc.|https://apply.workable.com/ssccpas/
@@ -662,6 +666,7 @@ circadiahealth	lever|Circadia Health|https://jobs.lever.co/circadiahealth	workab
 citi	workday|Citigroup|https://citi.wd5.myworkdayjobs.com/en-US/2	eightfold|Citi|https://citi.eightfold.ai/careers
 clay	recruitee|Clay Hospitality|https://clay.recruitee.com	workable|Clay|https://apply.workable.com/clayglobal/
 clear	greenhouse|Clear|https://job-boards.greenhouse.io/clear	bamboohr|CLEAR Global|https://clear.bamboohr.com/careers
+cloudwalk	lever|CloudWalk|https://jobs.lever.co/cloudwalk	mokahr|CloudWalk|https://app.mokahr.com/social-recruitment/cloudwalk/4871
 clutch	greenhouse|Clutch Technologies Inc.|https://job-boards.greenhouse.io/clutch	ashby|Clutch|https://jobs.ashbyhq.com/withclutch
 cmu	workday|Careers @ Carnegie Mellon|https://cmu.wd5.myworkdayjobs.com/en-US/CMU	workday|CMU|https://coloradomesa.wd501.myworkdayjobs.com/en-US/CMUCareers
 coast	greenhouse|Coast|https://job-boards.greenhouse.io/coast	bamboohr|Coast (coast)|https://coast.bamboohr.com/careers
@@ -949,7 +954,7 @@ sei	bamboohr|Samson Electric Inc|https://sei.bamboohr.com/careers	workable|Stock
 seismic	workable|Seismic|https://apply.workable.com/seismic/	icims|Seismic|https://careers-seismic.icims.com/jobs/search?ss=1
 semaphore	bamboohr|Semaphore|https://semaphore.bamboohr.com/careers	workable|Semaphore|https://apply.workable.com/semaphore/
 servicetitan	workday|ServiceTitan Careers|https://servicetitan.wd1.myworkdayjobs.com/en-US/servicetitan	smartrecruiters|ServiceTitan|https://jobs.smartrecruiters.com/ServiceTitan
-shein	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs
+shein	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs	mokahr|SHEIN|https://app.mokahr.com/social-recruitment/shein/2933
 shepherd	workday|Shepherd|https://shepherd.wd5.myworkdayjobs.com/en-US/ShepherdCenter	ashby|Shepherd|https://jobs.ashbyhq.com/shepherd
 shipenergy	bamboohr|Energy Transportation Group|https://shipenergy.bamboohr.com/careers	workable|Energy Transportation Group|https://apply.workable.com/shipenergy/
 shippabo	bamboohr|Shippabo|https://shippabo.bamboohr.com/careers	workable|Shippabo|https://apply.workable.com/shippabo/
