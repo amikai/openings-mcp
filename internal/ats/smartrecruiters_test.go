@@ -516,11 +516,17 @@ func TestSmartRecruitersResolvesThroughRegistry(t *testing.T) {
 	r, err := NewRegistry(a)
 	require.NoError(t, err)
 
-	got, slug := selectResolvedCompany(t, r, "Equinox")
+	resolution, err := r.Resolve("Equinox")
+	require.NoError(t, err)
+	got, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "smartrecruiters", got.Name())
 	assert.Equal(t, "equinox", slug)
 
-	got, slug = selectResolvedCompany(t, r, "https://jobs.smartrecruiters.com/SomeUnknownCo")
+	resolution, err = r.Resolve("https://jobs.smartrecruiters.com/SomeUnknownCo")
+	require.NoError(t, err)
+	got, slug, ok = resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "smartrecruiters", got.Name())
 	assert.Equal(t, "someunknownco", slug)
 }

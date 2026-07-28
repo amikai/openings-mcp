@@ -91,6 +91,16 @@ func (r CompanyResolution) IsAmbiguous() bool {
 	return len(r.entries) > 1
 }
 
+// Single returns the adapter and provider-local slug when exactly one company
+// matched.
+func (r CompanyResolution) Single() (Adapter, string, bool) {
+	if len(r.entries) != 1 {
+		return nil, "", false
+	}
+	entry := r.entries[0]
+	return entry.adapter, entry.slug, true
+}
+
 // Candidates returns the human-readable choices in registration order.
 func (r CompanyResolution) Candidates() []CompanyCandidate {
 	candidates := make([]CompanyCandidate, 0, len(r.entries))
@@ -108,7 +118,6 @@ func (r CompanyResolution) Candidates() []CompanyCandidate {
 }
 
 // Select returns the adapter and provider-local slug for a candidate index.
-// Callers should select index zero directly when IsAmbiguous is false.
 func (r CompanyResolution) Select(index int) (Adapter, string, bool) {
 	if index < 0 || index >= len(r.entries) {
 		return nil, "", false

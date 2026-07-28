@@ -57,21 +57,30 @@ func testRegistry(t *testing.T) *Registry {
 	return r
 }
 
-func selectResolvedCompany(t *testing.T, r *Registry, input string) (Adapter, string) {
-	t.Helper()
-	resolution, err := r.Resolve(input)
-	require.NoError(t, err)
-	require.False(t, resolution.IsAmbiguous())
-	adapter, slug, ok := resolution.Select(0)
-	require.True(t, ok)
-	return adapter, slug
-}
-
 func TestResolveBySlug(t *testing.T) {
 	r := testRegistry(t)
-	a, slug := selectResolvedCompany(t, r, "nvidia")
+	resolution, err := r.Resolve("nvidia")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "nvidia", slug)
+}
+
+func TestCompanyResolutionSingleRejectsNonUniqueResults(t *testing.T) {
+	_, _, ok := (CompanyResolution{}).Single()
+	assert.False(t, ok)
+
+	r, err := NewRegistry(
+		&fakeAdapter{name: "herp", roster: []CompanyInfo{{Slug: "nature", Name: "Nature KK"}}},
+		&fakeAdapter{name: "workday", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
+	)
+	require.NoError(t, err)
+	resolution, err := r.Resolve("nature")
+	require.NoError(t, err)
+
+	_, _, ok = resolution.Single()
+	assert.False(t, ok)
 }
 
 func TestCompanyResolutionSelectRejectsInvalidIndex(t *testing.T) {
@@ -144,14 +153,20 @@ func TestNewRegistryAllowsCrossAdapterDuplicateName(t *testing.T) {
 
 func TestResolveCareersURL(t *testing.T) {
 	r := testRegistry(t)
-	a, slug := selectResolvedCompany(t, r, "https://jobs.fake-lever.example/somestartup")
+	resolution, err := r.Resolve("https://jobs.fake-lever.example/somestartup")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "lever", a.Name())
 	assert.Equal(t, "somestartup", slug)
 }
 
 func TestResolveCareersURLSchemeless(t *testing.T) {
 	r := testRegistry(t)
-	a, slug := selectResolvedCompany(t, r, "jobs.fake-workday.example/acme")
+	resolution, err := r.Resolve("jobs.fake-workday.example/acme")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "acme", slug)
 }
@@ -227,7 +242,10 @@ func TestResolveCareersURLWinsOverAmbiguousToken(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	a, slug := selectResolvedCompany(t, r, "https://workday.example/acme")
+	resolution, err := r.Resolve("https://workday.example/acme")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "acme", slug)
 }
@@ -265,7 +283,10 @@ func TestResolveSlugAndNameSameKeyIsOneCandidate(t *testing.T) {
 		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "bunq", Name: "bunq"}}},
 	)
 	require.NoError(t, err)
-	a, slug := selectResolvedCompany(t, r, "bunq")
+	resolution, err := r.Resolve("bunq")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "bunq", slug)
 }
@@ -295,7 +316,10 @@ func TestResolveURLShapedRosterSlugFallsThroughToUnion(t *testing.T) {
 		&fakeAdapter{name: "oracle", roster: []CompanyInfo{{Slug: "abc.fa.us2.oraclecloud.com/CX_1", Name: "Acme Health"}}},
 	)
 	require.NoError(t, err)
-	a, slug := selectResolvedCompany(t, r, "abc.fa.us2.oraclecloud.com/CX_1")
+	resolution, err := r.Resolve("abc.fa.us2.oraclecloud.com/CX_1")
+	require.NoError(t, err)
+	a, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "oracle", a.Name())
 	assert.Equal(t, "abc.fa.us2.oraclecloud.com/CX_1", slug)
 }

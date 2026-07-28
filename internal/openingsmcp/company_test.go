@@ -87,15 +87,6 @@ func testCompanyRegistry(t *testing.T, stub *stubAdapter) *ats.Registry {
 	return r
 }
 
-func selectTestCompany(t *testing.T, reg *ats.Registry, input string) (ats.Adapter, string) {
-	t.Helper()
-	resolution, err := reg.Resolve(input)
-	require.NoError(t, err)
-	adapter, slug, ok := resolution.Select(0)
-	require.True(t, ok)
-	return adapter, slug
-}
-
 func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 	stub := &stubAdapter{searchResult: &ats.SearchResult{
 		Jobs: []ats.JobSummary{{
@@ -104,7 +95,10 @@ func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 		TotalCount: 41, Page: 2, TotalPages: 3,
 	}}
 	reg := testCompanyRegistry(t, stub)
-	adapter, slug := selectTestCompany(t, reg, "Acme Corp")
+	resolution, err := reg.Resolve("Acme Corp")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 
 	out, err := companySearch(t.Context(), adapter, slug, &companySearchInput{
 		Company:  "Acme Corp",
@@ -130,7 +124,7 @@ func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 
 func TestCompanySearchUnknownCompanyTeaches(t *testing.T) {
 	reg := testCompanyRegistry(t, &stubAdapter{})
-	_, _, _, err := resolveCompanyForTool(
+	_, err := resolveCompanyForTool(
 		&mcp.CallToolRequest{},
 		reg,
 		"acme corp intl",
@@ -142,7 +136,10 @@ func TestCompanySearchUnknownCompanyTeaches(t *testing.T) {
 func TestCompanyFilters(t *testing.T) {
 	stub := &stubAdapter{filterSet: ats.FilterSet{"team": {"ML", "Web"}}}
 	reg := testCompanyRegistry(t, stub)
-	adapter, slug := selectTestCompany(t, reg, "acme")
+	resolution, err := reg.Resolve("acme")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	out, err := companyFilters(t.Context(), adapter, slug)
 	require.NoError(t, err)
 	assert.Len(t, out.Filters["team"], 2)
@@ -151,7 +148,10 @@ func TestCompanyFilters(t *testing.T) {
 func TestCompanyDetail(t *testing.T) {
 	stub := &stubAdapter{detail: &ats.JobDetail{JobID: "j1", Title: "Engineer", Company: "Acme Corp", Description: "plain text"}}
 	reg := testCompanyRegistry(t, stub)
-	adapter, slug := selectTestCompany(t, reg, "acme")
+	resolution, err := reg.Resolve("acme")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	out, err := companyDetail(t.Context(), adapter, slug, &companyDetailInput{Company: "acme", JobID: "j1"})
 	require.NoError(t, err)
 	assert.Equal(t, "Engineer", out.Title)
@@ -303,7 +303,7 @@ func TestCompanyFiltersAmbiguityFallsBackWithoutElicitation(t *testing.T) {
 }
 
 func TestAmbiguousCompanyFallbackUsesExactNameWithoutCareersURL(t *testing.T) {
-	err := ambiguousCompanyError("nature", []ats.CompanyCandidate{
+	err := companySelectionFallbackError("nature", []ats.CompanyCandidate{
 		{Name: "Nature A"},
 		{Name: "Nature B", CareersURL: "https://nature-b.example/nature"},
 	}, "")

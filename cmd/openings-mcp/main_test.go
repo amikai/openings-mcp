@@ -44,20 +44,6 @@ type writeCloser struct {
 
 func (writeCloser) Close() error { return nil }
 
-func selectRegistryCompany(
-	t *testing.T,
-	registry *ats.Registry,
-	input string,
-) (ats.Adapter, string) {
-	t.Helper()
-	resolution, err := registry.Resolve(input)
-	require.NoError(t, err)
-	require.False(t, resolution.IsAmbiguous())
-	adapter, slug, ok := resolution.Select(0)
-	require.True(t, ok)
-	return adapter, slug
-}
-
 func TestServerListsJobTools(t *testing.T) {
 	ctx := t.Context()
 	cAmazon, err := amazon.NewClient("https://www.amazon.jobs", amazon.WithClient(http.DefaultClient))
@@ -282,11 +268,17 @@ func TestATSRegistryIncludesTeamtailor(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug := selectRegistryCompany(t, registry, "Teamtailor")
+	resolution, err := registry.Resolve("Teamtailor")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "teamtailor", adapter.Name())
 	assert.Equal(t, "career.teamtailor.com", slug)
 
-	adapter, slug = selectRegistryCompany(t, registry, "https://unlisted.na.teamtailor.com/jobs")
+	resolution, err = registry.Resolve("https://unlisted.na.teamtailor.com/jobs")
+	require.NoError(t, err)
+	adapter, slug, ok = resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "teamtailor", adapter.Name())
 	assert.Equal(t, "unlisted.na.teamtailor.com", slug)
 }
@@ -295,16 +287,20 @@ func TestATSRegistryIncludesOracle(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug := selectRegistryCompany(t, registry, "Mayo Clinic")
+	resolution, err := registry.Resolve("Mayo Clinic")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "oracle", adapter.Name())
 	assert.Equal(t, "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1", slug)
 
-	adapter, slug = selectRegistryCompany(
-		t,
-		registry,
-		"https://fa-example.fa.us2.oraclecloud.com/"+
+	resolution, err = registry.Resolve(
+		"https://fa-example.fa.us2.oraclecloud.com/" +
 			"hcmUI/CandidateExperience/en/sites/Acme/jobs",
 	)
+	require.NoError(t, err)
+	adapter, slug, ok = resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "oracle", adapter.Name())
 	assert.Equal(
 		t,
@@ -318,11 +314,17 @@ func TestATSRegistryIncludesJoin(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug := selectRegistryCompany(t, registry, "Routine Labs")
+	resolution, err := registry.Resolve("Routine Labs")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "join", adapter.Name())
 	assert.Equal(t, "routinelabs", slug)
 
-	adapter, slug = selectRegistryCompany(t, registry, "https://join.com/companies/routinelabs")
+	resolution, err = registry.Resolve("https://join.com/companies/routinelabs")
+	require.NoError(t, err)
+	adapter, slug, ok = resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "join", adapter.Name())
 	assert.Equal(t, "routinelabs", slug)
 }
@@ -331,11 +333,17 @@ func TestATSRegistryIncludesBambooHR(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug := selectRegistryCompany(t, registry, "Concept2")
+	resolution, err := registry.Resolve("Concept2")
+	require.NoError(t, err)
+	adapter, slug, ok := resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "concept2", slug)
 
-	adapter, slug = selectRegistryCompany(t, registry, "https://unlisted.bamboohr.com/careers")
+	resolution, err = registry.Resolve("https://unlisted.bamboohr.com/careers")
+	require.NoError(t, err)
+	adapter, slug, ok = resolution.Single()
+	require.True(t, ok)
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "unlisted", slug)
 }
