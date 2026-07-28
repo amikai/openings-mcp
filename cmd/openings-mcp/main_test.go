@@ -208,12 +208,16 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
-// TestAmbiguousCompanyGuidanceIsTaught asserts that every unified company
-// tool advertises the shared elicitation path.
-func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
-	assert.Contains(t, serverInstructions, "every unified company tool asks the user to choose")
-	assert.Contains(t, serverInstructions, "human-readable company names and public careers URLs")
-	assert.Contains(t, serverInstructions, "should retry with the intended public careers URL")
+// TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
+// instruction — retry with one of the careers URLs listed in the error —
+// reaches the host LLM through both channels it can come from:
+// serverInstructions, and each unified company tool's own company
+// parameter description. All three tools need it independently since a
+// host may only ever read the tool description for the one it calls.
+func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
+	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
+
+	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
 
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
@@ -248,9 +252,7 @@ func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
 		require.True(t, ok, name)
 		companyProperty, ok := properties["company"].(map[string]any)
 		require.True(t, ok, name)
-		assert.Contains(t, companyProperty["description"], "client supports elicitation", name)
-		assert.Contains(t, companyProperty["description"], "asks the user to choose", name)
-		assert.Contains(t, companyProperty["description"], "public careers URLs", name)
+		assert.Contains(t, companyProperty["description"], retryInstruction, name)
 	}
 }
 

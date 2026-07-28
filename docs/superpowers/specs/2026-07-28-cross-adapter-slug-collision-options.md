@@ -724,3 +724,26 @@ This update supersedes the earlier tool-contract sections that name
 `AmbiguousCompanyError`, as well as the non-goal stating that teaching errors
 alone are sufficient. The historical alternatives and collision analysis
 remain useful context.
+
+## Decision update — 2026-07-29: elicitation reverted, error rebuilt on the resolution
+
+Elicitation shipped and then met its first real client: agy does not support
+it. A tool call that pauses for a form the client cannot render disambiguates
+nothing, so the teaching error is back as the MCP-facing behavior — the Tool
+contract sections above hold again, including the ambiguity message and the
+detail tool's previous-key sentence.
+
+What does **not** revert is the typed resolution. `Registry.Resolve` still
+returns a `CompanyResolution`, and `Single`, `Candidates`, `IsAmbiguous`, and
+`Select` stay as they are:
+
+- `internal/openingsmcp` owns `AmbiguousCompanyError` now, built from an
+  ambiguous resolution's `Candidates()`. The registry reports what matched;
+  the MCP boundary decides that a client which cannot choose gets an error.
+  `Provider` stays unrendered, as before.
+- The detail tool's guidance is a `Hint` field on that error rather than an
+  `errors.As` wrap at the call site, so one renderer owns the whole message.
+- `Select` keeps a caller only in tests. It is deliberately left in place:
+  when a client that can ask its user arrives, it consumes the same
+  resolution and skips the error entirely — which is the point of resolution
+  and presentation being separate.

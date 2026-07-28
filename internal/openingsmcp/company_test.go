@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -31,10 +30,7 @@ type stubAdapter struct {
 	searchCalled  bool
 	filtersCalled bool
 	detailCalled  bool
-	searchCompany string
 	filterCompany string
-	detailCompany string
-	detailJobID   string
 }
 
 func (s *stubAdapter) Name() string {
@@ -62,9 +58,8 @@ func (s *stubAdapter) CareersURL(slug string) (string, bool) {
 	}
 	return "https://" + s.host + "/" + slug, true
 }
-func (s *stubAdapter) Search(_ context.Context, company string, p ats.SearchParams) (*ats.SearchResult, error) {
+func (s *stubAdapter) Search(_ context.Context, _ string, p ats.SearchParams) (*ats.SearchResult, error) {
 	s.searchCalled = true
-	s.searchCompany = company
 	s.gotParams = p
 	return s.searchResult, nil
 }
@@ -73,10 +68,8 @@ func (s *stubAdapter) Filters(_ context.Context, company string) (ats.FilterSet,
 	s.filterCompany = company
 	return s.filterSet, nil
 }
-func (s *stubAdapter) Detail(_ context.Context, company, jobID string) (*ats.JobDetail, error) {
+func (s *stubAdapter) Detail(context.Context, string, string) (*ats.JobDetail, error) {
 	s.detailCalled = true
-	s.detailCompany = company
-	s.detailJobID = jobID
 	return s.detail, nil
 }
 
@@ -124,12 +117,7 @@ func TestCompanySearchMapsParamsAndResult(t *testing.T) {
 
 func TestCompanySearchUnknownCompanyTeaches(t *testing.T) {
 	reg := testCompanyRegistry(t, &stubAdapter{})
-	_, err := resolveCompanyForTool(
-		&mcp.CallToolRequest{},
-		reg,
-		"acme corp intl",
-		"",
-	)
+	_, _, err := resolveCompany(reg, "acme corp intl", "")
 	require.ErrorContains(t, err, "acme", "want teaching error")
 }
 
@@ -182,270 +170,17 @@ func ambiguousCompanyRegistry(t *testing.T) (*ats.Registry, *stubAdapter, *stubA
 	return reg, stubA, stubB
 }
 
-func TestCompanySearchElicitsAmbiguousCompany(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	stubA.searchResult = &ats.SearchResult{Jobs: []ats.JobSummary{{JobID: "a", Title: "From A"}}}
-	stubB.searchResult = &ats.SearchResult{Jobs: []ats.JobSummary{{JobID: "b", Title: "From B"}}}
+// TestCompanyToolsRejectedWhileAmbiguous asserts that every unified company
+// tool turns an ambiguous company into a teaching error listing all
+// candidates, and that none of them reaches an adapter first.
+func TestCompanyToolsRejectedWhileAmbiguous(t *testing.T) {
+	const detailHint = "Use the same company value that produced this job_id."
 
-	result := callCompanyTool(
-		t,
-		reg,
-		acceptCompanyChoice("2", nil),
-		"search_jobs_by_company",
-		map[string]any{"company": "nature", "query": "go"},
-	)
-
-	assert.False(t, result.IsError)
-	var out companySearchOutput
-	decodeStructuredContent(t, result, &out)
-	require.Len(t, out.Data, 1)
-	assert.Equal(t, "From B", out.Data[0].Title)
-	assert.False(t, stubA.searchCalled)
-	assert.True(t, stubB.searchCalled)
-	assert.Equal(t, "nature", stubB.searchCompany)
-	assert.Equal(t, "go", stubB.gotParams.Query)
-}
-
-func TestCompanyFiltersElicitsAmbiguousCompany(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	stubA.filterSet = ats.FilterSet{"team": {"A"}}
-	stubB.filterSet = ats.FilterSet{"team": {"B"}}
-
-	var elicitationMessage string
-	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
-		ElicitationHandler: func(_ context.Context, req *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
-			elicitationMessage = req.Params.Message
-			return &mcp.ElicitResult{
-				Action:  "accept",
-				Content: map[string]any{"choice": "2"},
-			}, nil
-		},
-	})
-
-	assert.False(t, result.IsError)
-	var out companyFiltersOutput
-	data, err := json.Marshal(result.StructuredContent)
-	require.NoError(t, err)
-	require.NoError(t, json.Unmarshal(data, &out))
-	assert.Equal(t, []string{"B"}, out.Filters["team"])
-
-	assert.Contains(t, elicitationMessage, "1. Nature A")
-	assert.Contains(t, elicitationMessage, "2. Nature B")
-	assert.Contains(t, elicitationMessage, "https://nature-a.example/nature")
-	assert.Contains(t, elicitationMessage, "https://nature-b.example/nature")
-	assert.NotContains(t, elicitationMessage, "stubA", "provider names must stay internal")
-	assert.NotContains(t, elicitationMessage, "stubB", "provider names must stay internal")
-
-	assert.False(t, stubA.filtersCalled)
-	assert.True(t, stubB.filtersCalled)
-	assert.Equal(t, "nature", stubB.filterCompany)
-}
-
-func TestCompanyDetailElicitsAmbiguousCompany(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	stubA.detail = &ats.JobDetail{JobID: "j1", Title: "From A"}
-	stubB.detail = &ats.JobDetail{JobID: "j1", Title: "From B"}
-
-	var elicitationMessage string
-	result := callCompanyTool(
-		t,
-		reg,
-		acceptCompanyChoice("2", func(message string) {
-			elicitationMessage = message
-		}),
-		"get_job_detail_by_company",
-		map[string]any{"company": "nature", "job_id": "j1"},
-	)
-
-	assert.False(t, result.IsError)
-	var out companyDetailOutput
-	decodeStructuredContent(t, result, &out)
-	assert.Equal(t, "From B", out.Title)
-	assert.Contains(t, elicitationMessage, "Choose the same company that produced this job_id.")
-	assert.False(t, stubA.detailCalled)
-	assert.True(t, stubB.detailCalled)
-	assert.Equal(t, "nature", stubB.detailCompany)
-	assert.Equal(t, "j1", stubB.detailJobID)
-}
-
-func TestCompanyFiltersElicitationCancellation(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
-		ElicitationHandler: func(context.Context, *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
-			return &mcp.ElicitResult{Action: "cancel"}, nil
-		},
-	})
-
-	assert.True(t, result.IsError)
-	require.Len(t, result.Content, 1)
-	text, ok := result.Content[0].(*mcp.TextContent)
-	require.True(t, ok)
-	assert.Contains(t, text.Text, "the user cancelled company selection")
-	assert.Contains(t, text.Text, "instead of retrying the tool")
-	assert.False(t, stubA.filtersCalled)
-	assert.False(t, stubB.filtersCalled)
-}
-
-func TestCompanySelectionResponses(t *testing.T) {
-	tests := []struct {
-		name           string
-		responses      mcp.InputResponseMap
-		candidateCount int
-		wantChoice     int
-		wantAnswered   bool
-		wantError      string
-	}{
-		{
-			name:           "first pass",
-			candidateCount: 2,
-		},
-		{
-			name: "missing response key",
-			responses: mcp.InputResponseMap{
-				"other": &mcp.ElicitResult{Action: "accept"},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      "company selection response is missing",
-		},
-		{
-			name: "wrong response type",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ListRootsResult{},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      "unexpected type",
-		},
-		{
-			name: "decline",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{Action: "decline"},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      "ask them which company they meant instead of retrying the tool",
-		},
-		{
-			name: "cancel",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{Action: "cancel"},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      "ask them which company they meant instead of retrying the tool",
-		},
-		{
-			name: "unknown action",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{Action: "later"},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      `unknown action "later"`,
-		},
-		{
-			name: "choice is not a string",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{
-					Action:  "accept",
-					Content: map[string]any{"choice": 2},
-				},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      "choice must be a string",
-		},
-		{
-			name: "choice is not numeric",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{
-					Action:  "accept",
-					Content: map[string]any{"choice": "second"},
-				},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      `choice "second" is out of range`,
-		},
-		{
-			name: "choice is below range",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{
-					Action:  "accept",
-					Content: map[string]any{"choice": "0"},
-				},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      `choice "0" is out of range`,
-		},
-		{
-			name: "choice is above range",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{
-					Action:  "accept",
-					Content: map[string]any{"choice": "3"},
-				},
-			},
-			candidateCount: 2,
-			wantAnswered:   true,
-			wantError:      `choice "3" is out of range`,
-		},
-		{
-			name: "accept",
-			responses: mcp.InputResponseMap{
-				companySelectionRequestID: &mcp.ElicitResult{
-					Action:  "accept",
-					Content: map[string]any{"choice": "2"},
-				},
-			},
-			candidateCount: 2,
-			wantChoice:     1,
-			wantAnswered:   true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := &mcp.CallToolRequest{
-				Params: &mcp.CallToolParamsRaw{InputResponses: tt.responses},
-			}
-			choice, answered, err := companySelection(req, tt.candidateCount)
-
-			assert.Equal(t, tt.wantChoice, choice)
-			assert.Equal(t, tt.wantAnswered, answered)
-			if tt.wantError == "" {
-				require.NoError(t, err)
-				return
-			}
-			require.ErrorContains(t, err, tt.wantError)
-		})
-	}
-}
-
-func TestCompanyFiltersAmbiguityFallsBackWithoutElicitation(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	result := callCompanyFilters(t, reg, nil)
-
-	assert.True(t, result.IsError)
-	require.Len(t, result.Content, 1)
-	text, ok := result.Content[0].(*mcp.TextContent)
-	require.True(t, ok)
-	assert.Contains(t, text.Text, `ambiguous company "nature"`)
-	assert.Contains(t, text.Text, "https://nature-a.example/nature")
-	assert.Contains(t, text.Text, "https://nature-b.example/nature")
-	assert.NotContains(t, text.Text, "stubA")
-	assert.NotContains(t, text.Text, "stubB")
-	assert.False(t, stubA.filtersCalled)
-	assert.False(t, stubB.filtersCalled)
-}
-
-func TestAmbiguousCompanyDoesNotCallAdaptersBeforeSelection(t *testing.T) {
 	tests := []struct {
 		name      string
 		tool      string
 		arguments map[string]any
+		wantHint  bool
 	}{
 		{
 			name:      "search",
@@ -461,15 +196,34 @@ func TestAmbiguousCompanyDoesNotCallAdaptersBeforeSelection(t *testing.T) {
 			name:      "detail",
 			tool:      "get_job_detail_by_company",
 			arguments: map[string]any{"company": "nature", "job_id": "j1"},
+			wantHint:  true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			reg, stubA, stubB := ambiguousCompanyRegistry(t)
-			result := callCompanyTool(t, reg, nil, tt.tool, tt.arguments)
+			result := callCompanyTool(t, reg, tt.tool, tt.arguments)
 
-			assert.True(t, result.IsError)
+			require.True(t, result.IsError)
+			require.Len(t, result.Content, 1)
+			text, ok := result.Content[0].(*mcp.TextContent)
+			require.True(t, ok)
+
+			assert.Contains(t, text.Text, `ambiguous company "nature"`)
+			assert.Contains(t, text.Text, "Nature A")
+			assert.Contains(t, text.Text, "https://nature-a.example/nature")
+			assert.Contains(t, text.Text, "Nature B")
+			assert.Contains(t, text.Text, "https://nature-b.example/nature")
+			assert.NotContains(t, text.Text, "stubA", "provider names must stay internal")
+			assert.NotContains(t, text.Text, "stubB", "provider names must stay internal")
+
+			if tt.wantHint {
+				assert.Contains(t, text.Text, detailHint)
+			} else {
+				assert.NotContains(t, text.Text, detailHint)
+			}
+
 			assert.False(t, stubA.searchCalled)
 			assert.False(t, stubA.filtersCalled)
 			assert.False(t, stubA.detailCalled)
@@ -480,97 +234,37 @@ func TestAmbiguousCompanyDoesNotCallAdaptersBeforeSelection(t *testing.T) {
 	}
 }
 
-func TestURLOnlyElicitationCapabilityUsesFallback(t *testing.T) {
-	reg, stubA, stubB := ambiguousCompanyRegistry(t)
-	handlerCalled := false
-	result := callCompanyFilters(t, reg, &mcp.ClientOptions{
-		Capabilities: &mcp.ClientCapabilities{
-			Elicitation: &mcp.ElicitationCapabilities{
-				URL: &mcp.URLElicitationCapabilities{},
-			},
+// TestAmbiguousCompanyErrorNamesCandidateWithoutCareersURL covers the
+// candidate an adapter cannot render a URL for: its display name is the
+// retry key, and the internal provider stays out of the message.
+func TestAmbiguousCompanyErrorNamesCandidateWithoutCareersURL(t *testing.T) {
+	err := &AmbiguousCompanyError{
+		Input: "nature",
+		Candidates: []ats.CompanyCandidate{
+			{Name: "Nature A", Provider: "internal-a"},
+			{Name: "Nature B", CareersURL: "https://nature-b.example/nature", Provider: "internal-b"},
 		},
-		ElicitationHandler: func(context.Context, *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
-			handlerCalled = true
-			return &mcp.ElicitResult{Action: "cancel"}, nil
-		},
-	})
-
-	assert.True(t, result.IsError)
-	require.Len(t, result.Content, 1)
-	text, ok := result.Content[0].(*mcp.TextContent)
-	require.True(t, ok)
-	assert.Contains(t, text.Text, "cannot display a company choice form")
-	assert.False(t, handlerCalled)
-	assert.False(t, stubA.filtersCalled)
-	assert.False(t, stubB.filtersCalled)
-}
-
-func TestAmbiguousCompanyFallbackUsesExactNameWithoutCareersURL(t *testing.T) {
-	err := companySelectionFallbackError("nature", []ats.CompanyCandidate{
-		{Name: "Nature A"},
-		{Name: "Nature B", CareersURL: "https://nature-b.example/nature"},
-	}, "")
+	}
 
 	assert.ErrorContains(t, err, `retry with company="Nature A"`)
 	assert.ErrorContains(t, err, "https://nature-b.example/nature")
+	assert.NotContains(t, err.Error(), "internal-a")
+	assert.NotContains(t, err.Error(), "internal-b")
 }
 
-func TestCompanySelectionRequestLabelsChoiceValues(t *testing.T) {
-	result := companySelectionRequest("nature", []ats.CompanyCandidate{
-		{
-			Name:       "Nature A",
-			CareersURL: "https://nature-a.example/nature",
-			Provider:   "internal-a",
-		},
-		{
-			Name:     "Nature B",
-			Provider: "internal-b",
-		},
-	}, "")
+// TestCompanyToolResolvesUniqueCompany pins the other side of the same
+// wiring: a company matching one roster entry reaches its adapter.
+func TestCompanyToolResolvesUniqueCompany(t *testing.T) {
+	stub := &stubAdapter{filterSet: ats.FilterSet{"team": {"ML"}}}
+	reg := testCompanyRegistry(t, stub)
 
-	params, ok := result.InputRequests[companySelectionRequestID].(*mcp.ElicitParams)
-	require.True(t, ok)
-	schema, ok := params.RequestedSchema.(*jsonschema.Schema)
-	require.True(t, ok)
-	choice := schema.Properties["choice"]
-	require.NotNil(t, choice)
-	assert.Empty(t, choice.Enum)
-	require.Len(t, choice.OneOf, 2)
+	result := callCompanyTool(t, reg, "get_filters_by_company", map[string]any{"company": "acme"})
 
-	require.NotNil(t, choice.OneOf[0].Const)
-	assert.Equal(t, "1", *choice.OneOf[0].Const)
-	assert.Equal(t, "Nature A — https://nature-a.example/nature", choice.OneOf[0].Title)
-	require.NotNil(t, choice.OneOf[1].Const)
-	assert.Equal(t, "2", *choice.OneOf[1].Const)
-	assert.Equal(t, "Nature B", choice.OneOf[1].Title)
-
-	assert.NotContains(t, choice.OneOf[0].Title, "internal-a")
-	assert.NotContains(t, choice.OneOf[1].Title, "internal-b")
-}
-
-func callCompanyFilters(t *testing.T, reg *ats.Registry, options *mcp.ClientOptions) *mcp.CallToolResult {
-	t.Helper()
-	return callCompanyTool(
-		t,
-		reg,
-		options,
-		"get_filters_by_company",
-		map[string]any{"company": "nature"},
-	)
-}
-
-func acceptCompanyChoice(choice string, inspectMessage func(string)) *mcp.ClientOptions {
-	return &mcp.ClientOptions{
-		ElicitationHandler: func(_ context.Context, req *mcp.ElicitRequest) (*mcp.ElicitResult, error) {
-			if inspectMessage != nil {
-				inspectMessage(req.Params.Message)
-			}
-			return &mcp.ElicitResult{
-				Action:  "accept",
-				Content: map[string]any{"choice": choice},
-			}, nil
-		},
-	}
+	assert.False(t, result.IsError)
+	var out companyFiltersOutput
+	decodeStructuredContent(t, result, &out)
+	assert.Equal(t, []string{"ML"}, out.Filters["team"])
+	assert.Equal(t, "acme", stub.filterCompany)
 }
 
 func decodeStructuredContent(t *testing.T, result *mcp.CallToolResult, target any) {
@@ -583,7 +277,6 @@ func decodeStructuredContent(t *testing.T, result *mcp.CallToolResult, target an
 func callCompanyTool(
 	t *testing.T,
 	reg *ats.Registry,
-	options *mcp.ClientOptions,
 	name string,
 	arguments map[string]any,
 ) *mcp.CallToolResult {
@@ -597,7 +290,7 @@ func callCompanyTool(
 	require.NoError(t, err)
 	defer serverSession.Close()
 
-	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, options)
+	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, nil)
 	clientSession, err := client.Connect(t.Context(), clientTransport, nil)
 	require.NoError(t, err)
 	defer clientSession.Close()
