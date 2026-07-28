@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -309,6 +310,39 @@ func TestAmbiguousCompanyFallbackUsesExactNameWithoutCareersURL(t *testing.T) {
 
 	assert.ErrorContains(t, err, `retry with company="Nature A"`)
 	assert.ErrorContains(t, err, "https://nature-b.example/nature")
+}
+
+func TestCompanySelectionRequestLabelsChoiceValues(t *testing.T) {
+	result := companySelectionRequest("nature", []ats.CompanyCandidate{
+		{
+			Name:       "Nature A",
+			CareersURL: "https://nature-a.example/nature",
+			Provider:   "internal-a",
+		},
+		{
+			Name:     "Nature B",
+			Provider: "internal-b",
+		},
+	}, "")
+
+	params, ok := result.InputRequests[companySelectionRequestID].(*mcp.ElicitParams)
+	require.True(t, ok)
+	schema, ok := params.RequestedSchema.(*jsonschema.Schema)
+	require.True(t, ok)
+	choice := schema.Properties["choice"]
+	require.NotNil(t, choice)
+	assert.Empty(t, choice.Enum)
+	require.Len(t, choice.OneOf, 2)
+
+	require.NotNil(t, choice.OneOf[0].Const)
+	assert.Equal(t, "1", *choice.OneOf[0].Const)
+	assert.Equal(t, "Nature A — https://nature-a.example/nature", choice.OneOf[0].Title)
+	require.NotNil(t, choice.OneOf[1].Const)
+	assert.Equal(t, "2", *choice.OneOf[1].Const)
+	assert.Equal(t, "Nature B", choice.OneOf[1].Title)
+
+	assert.NotContains(t, choice.OneOf[0].Title, "internal-a")
+	assert.NotContains(t, choice.OneOf[1].Title, "internal-b")
 }
 
 func callCompanyFilters(t *testing.T, reg *ats.Registry, options *mcp.ClientOptions) *mcp.CallToolResult {

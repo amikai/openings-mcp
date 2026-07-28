@@ -238,10 +238,18 @@ func companySelectionRequest(
 	}
 	message.WriteByte('\n')
 
-	choices := make([]any, 0, len(candidates))
+	choices := make([]*jsonschema.Schema, 0, len(candidates))
 	for i, candidate := range candidates {
 		number := strconv.Itoa(i + 1)
-		choices = append(choices, number)
+		value := any(number)
+		title := candidate.Name
+		if candidate.CareersURL != "" {
+			title += " — " + candidate.CareersURL
+		}
+		choices = append(choices, &jsonschema.Schema{
+			Const: &value,
+			Title: title,
+		})
 		fmt.Fprintf(&message, "%s. %s", number, candidate.Name)
 		if candidate.CareersURL != "" {
 			fmt.Fprintf(&message, " — %s", candidate.CareersURL)
@@ -260,8 +268,8 @@ func companySelectionRequest(
 						"choice": {
 							Type:        "string",
 							Title:       "Company",
-							Description: "The number of the intended company.",
-							Enum:        choices,
+							Description: "Select the intended company.",
+							OneOf:       choices,
 						},
 					},
 				},
