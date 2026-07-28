@@ -679,7 +679,7 @@ Check the curation rewrite per file, not with a line-based grep: `discover-compa
 | Revert | Must revert with it |
 |---|---|
 | Curation-rule statements (four roster headers, three skills) | nothing |
-| The report (test, golden file, `.gitattributes`) | the `-update` remedy sentences in discover-companies and verify-companies, which name a file and a command that would no longer exist |
+| The report (test, golden file, `.gitattributes`) | every skill sentence naming the golden file or `TestCompanyCollisionReport` — the `-update` remedy in discover-companies and verify-companies, and integrate-new-provider's reference to the golden file — all of which would otherwise dangle |
 | The HERP restore | the golden file — it records the collisions those rows create, so it must be reverted or regenerated in the same commit |
 
 Only the curation-rule statements are freely independent. The other two couplings are the price of a golden set that fails in both directions, and it is worth paying: the alternative, a bare count, lets one collision class grow while another shrinks.

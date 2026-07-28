@@ -1,7 +1,13 @@
 # Curated Oracle Recruiting Cloud career sites. Each host + site_number was verified live against recruitingCEJobRequisitions (HTTP 200 + TotalJobsCount).
 # site is the public URL path segment under /sites/; site_number is the
 # internal finder value from the career-site HTML (data-sitenumber).
-# Display names must stay unique across all ATS rosters.
+# Slugs and display names may collide with other ATS rosters; Resolve
+# disambiguates that at runtime instead of NewRegistry failing at startup.
+# Two rules stay fatal at startup: no two entries in this file may share a
+# slug or a display name, and an entry whose adapter cannot render a careers
+# URL must have a display name colliding with no other entry's name or slug
+# anywhere — that name is its only disambiguation key. Comparison folds case
+# and punctuation, so "Foo Inc." and "foo inc" are the same name.
 
 - company: "ABM US"
   host: "eiqg.fa.us2.oraclecloud.com"

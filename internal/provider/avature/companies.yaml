@@ -1,6 +1,12 @@
 # Curated Avature career portals. Each url is a portal base without a
 # locale segment, verified live: GET <url>/SearchJobs returns HTTP 200.
-# Display names must stay unique across all ATS rosters.
+# Slugs and display names may collide with other ATS rosters; Resolve
+# disambiguates that at runtime instead of NewRegistry failing at startup.
+# Two rules stay fatal at startup: no two entries in this file may share a
+# slug or a display name, and an entry whose adapter cannot render a careers
+# URL must have a display name colliding with no other entry's name or slug
+# anywhere — that name is its only disambiguation key. Comparison folds case
+# and punctuation, so "Foo Inc." and "foo inc" are the same name.
 
 - company: 1-800-FLOWERS
   url: "https://one800flowers.avature.net/careersmarketplace"

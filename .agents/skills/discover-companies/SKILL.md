@@ -48,9 +48,16 @@ rosters in one session.
 
 1. Dedupe first: `grep -ri "<name-or-slug>"
    internal/provider/*/companies.yaml unverified/*.yaml`.
-   `ats.NewRegistry` requires display names and slugs to be globally
-   unique across all adapters, so a hit anywhere disqualifies or
-   renames the candidate.
+   `ats.NewRegistry` only requires unique display names and slugs
+   within one adapter's own roster; a hit inside the target provider's
+   file disqualifies or renames the candidate. A hit in a *different*
+   provider's roster is fine — cross-adapter collisions are allowed and
+   `Registry.Resolve` disambiguates them by careers URL at runtime,
+   not a curation bug to dodge here. The one exception: when the target
+   adapter cannot render a careers URL for the candidate, its display
+   name is the only disambiguation key left, so that name must collide
+   with no other entry's name *or slug* anywhere — `NewRegistry` fails
+   otherwise.
 2. Copy the YAML key shape from the target `companies.yaml` — every
    provider names its identifier differently, and workday needs the
    tenant/instance/site triple from the careers URL, one row per
@@ -69,7 +76,12 @@ rosters in one session.
    verify-companies skill's audit steps). `zero-job` entries are fine —
    board live, no current openings.
 3. `go test ./...` — registry tests catch collisions and shape
-   mistakes.
+   mistakes. A red `TestCompanyCollisionReport` from a genuine new
+   cross-adapter collision (not a curation mistake) is expected as
+   rosters grow: regenerate
+   `cmd/openings-mcp/testdata/company_collisions.txt` with
+   `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update`
+   and show its diff in the PR.
 4. Commit per the `roster:` convention in CLAUDE.md: one batch, one
    commit, one PR.
 

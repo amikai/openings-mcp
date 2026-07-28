@@ -1,9 +1,14 @@
 package main
 
 import (
+	"errors"
+	"flag"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
+	"sort"
 	"strings"
 	"testing"
 
@@ -22,6 +27,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// update regenerates testdata/company_collisions.txt from the current
+// production rosters. Run with:
+//
+//	go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update
+var update = flag.Bool("update", false, "regenerate the collision-report golden file")
+
+// collisionGoldenPath is the golden file TestCompanyCollisionReport compares
+// against. NewRegistry no longer fails on a cross-adapter slug or name
+// collision, so this report is what keeps new ones visible.
+const collisionGoldenPath = "testdata/company_collisions.txt"
 
 type writeCloser struct {
 	io.Writer
@@ -357,5 +373,72 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 	}
 	for entry := range wantNoURL {
 		assert.Contains(t, gotNoURL, entry, "expected ok=false entry %q no longer is one", entry)
+	}
+}
+
+// TestCompanyCollisionReport walks every roster entry of every production
+// adapter (the same atsAdapters enumeration TestATSCareersURLRoundTripsThroughRegistry
+// uses) and resolves both its slug and its display name through the
+// production registry. Any input that comes back as an
+// [*ats.AmbiguousCompanyError] is a collision, recorded as one line in
+// testdata/company_collisions.txt.
+//
+// It keys by Resolve rather than by a private normalizer: internal/ats is
+// out of scope for this slice, and a reimplemented normalizer could drift
+// from the one the resolver actually uses, pinning a baseline that
+// describes collisions callers don't actually experience.
+func TestCompanyCollisionReport(t *testing.T) {
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	registry, err := ats.NewRegistry(adapters...)
+	require.NoError(t, err)
+
+	findings := map[string][]ats.CompanyCandidate{}
+	probed := map[string]bool{}
+	for _, a := range adapters {
+		for _, c := range a.Roster() {
+			for _, probe := range []string{c.Slug, c.Name} {
+				if probed[probe] {
+					continue
+				}
+				probed[probe] = true
+
+				_, _, err := registry.Resolve(probe)
+				var ambiguous *ats.AmbiguousCompanyError
+				if errors.As(err, &ambiguous) {
+					findings[probe] = ambiguous.Candidates
+				}
+			}
+		}
+	}
+
+	inputs := make([]string, 0, len(findings))
+	for input := range findings {
+		inputs = append(inputs, input)
+	}
+	sort.Strings(inputs)
+
+	var b strings.Builder
+	for _, input := range inputs {
+		b.WriteString(input)
+		for _, c := range findings[input] {
+			fmt.Fprintf(&b, "\t%s|%s|%s", c.Provider, c.Name, c.CareersURL)
+		}
+		b.WriteString("\n")
+	}
+	got := b.String()
+
+	if *update {
+		require.NoError(t, os.WriteFile(collisionGoldenPath, []byte(got), 0o644))
+		return
+	}
+
+	want, err := os.ReadFile(collisionGoldenPath)
+	require.NoError(t, err)
+	if got != string(want) {
+		t.Errorf(
+			"%s is stale; regenerate with `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update`.\n\nExpected content:\n%s",
+			collisionGoldenPath, got,
+		)
 	}
 }

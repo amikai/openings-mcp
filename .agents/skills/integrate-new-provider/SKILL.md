@@ -208,6 +208,15 @@ has a stable, roster-able feed URL and multi-company routing is worth it.
   the same site.
 - Adopting an RSS feed without stable item ids, or with title+link only
   and no plan for detail.
-- Roster slug or display-name collisions across adapters:
-  `ats.NewRegistry` fails at startup by design — check the other
-  `companies.yaml` files before adding entries.
+- Roster slug or display-name collisions *within this provider's own*
+  `companies.yaml`: `ats.NewRegistry` fails at startup by design — those
+  stay a curation bug to fix before adding entries. Collisions with
+  *another* provider's roster are expected and allowed;
+  `Registry.Resolve` disambiguates them by careers URL at runtime, and
+  they only need to be named in the `TestCompanyCollisionReport` golden
+  file.
+- A new adapter whose `CareersURL` returns `ok=false` for some roster
+  rows: those rows fall back to their display name as the only
+  disambiguation key, so each must collide with no other entry's name
+  *or slug* anywhere, or `NewRegistry` fails. Prefer making the renderer
+  cover every row — no adapter needs an exemption today.
