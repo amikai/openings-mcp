@@ -34,6 +34,7 @@ var providerOrder = []string{
 	"avature",
 	"bamboohr",
 	"eightfold",
+	"engage",
 	"greenhouse",
 	"herp",
 	"icims",
@@ -188,6 +189,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			// Eightfold's edge 403s Go's default User-Agent instead of
 			// returning JSON, so it gets its own client rather than hc.
 			a = ats.NewEightfoldAdapter(&http.Client{Transport: eightfold.BrowserTransport{}})
+		case "engage":
+			a = ats.NewEngageAdapter(hc)
 		case "greenhouse":
 			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
 		case "herp":
