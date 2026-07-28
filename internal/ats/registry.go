@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-	"text/tabwriter"
 	"unicode"
 )
 
@@ -70,9 +69,9 @@ var careersHostPatternsByAdapter = map[string]string{
 	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
 }
 
-// CompanyCandidate is one company in an [AmbiguousCompanyError]'s candidate
-// list. CareersURL is empty when the owning adapter has no public URL for
-// this entry; Provider is carried for logs and debug tooling and is never
+// CompanyCandidate is one human-readable choice in a [CompanyResolution].
+// CareersURL is empty when the owning adapter has no public URL for this
+// entry; Provider is carried for logs and debug tooling and is never
 // rendered in MCP-facing text.
 type CompanyCandidate struct {
 	Name       string
@@ -80,27 +79,42 @@ type CompanyCandidate struct {
 	Provider   string
 }
 
-// AmbiguousCompanyError reports that a company input matched more than one
-// roster entry. The caller must retry with the careers URL of the intended
-// candidate (or, when a candidate has none, its display name).
-type AmbiguousCompanyError struct {
-	Input      string
-	Candidates []CompanyCandidate
+// CompanyResolution is the successful result of resolving a company input.
+// It may contain one exact match or multiple choices that the caller must
+// disambiguate with the user.
+type CompanyResolution struct {
+	entries []registryEntry
 }
 
-func (e *AmbiguousCompanyError) Error() string {
-	var b strings.Builder
-	fmt.Fprintf(&b, "ambiguous company %q: %d companies match. Retry with the careers URL of the one you want:\n", e.Input, len(e.Candidates))
-	tw := tabwriter.NewWriter(&b, 0, 0, 3, ' ', 0)
-	for _, c := range e.Candidates {
-		if c.CareersURL != "" {
-			fmt.Fprintf(tw, "  %s\t%s\n", c.Name, c.CareersURL)
-		} else {
-			fmt.Fprintf(tw, "  %s\t(no public careers URL; retry with company=%q)\n", c.Name, c.Name)
+// IsAmbiguous reports whether the input matched more than one company.
+func (r CompanyResolution) IsAmbiguous() bool {
+	return len(r.entries) > 1
+}
+
+// Candidates returns the human-readable choices in registration order.
+func (r CompanyResolution) Candidates() []CompanyCandidate {
+	candidates := make([]CompanyCandidate, 0, len(r.entries))
+	for _, entry := range r.entries {
+		candidate := CompanyCandidate{
+			Name:     entry.name,
+			Provider: entry.adapter.Name(),
 		}
+		if url, ok := entry.adapter.CareersURL(entry.slug); ok {
+			candidate.CareersURL = url
+		}
+		candidates = append(candidates, candidate)
 	}
-	tw.Flush()
-	return strings.TrimRight(b.String(), "\n")
+	return candidates
+}
+
+// Select returns the adapter and provider-local slug for a candidate index.
+// Callers should select index zero directly when IsAmbiguous is false.
+func (r CompanyResolution) Select(index int) (Adapter, string, bool) {
+	if index < 0 || index >= len(r.entries) {
+		return nil, "", false
+	}
+	entry := r.entries[index]
+	return entry.adapter, entry.slug, true
 }
 
 // NewRegistry unions the adapters' rosters. Cross-adapter slug and name
@@ -177,22 +191,22 @@ func NewRegistry(adapters ...Adapter) (*Registry, error) {
 	return r, nil
 }
 
-// Resolve maps a user-supplied company string to (adapter, slug). The input can
-// be a roster slug, a display name, or a careers URL. The returned slug is not
-// always a roster key: a careers URL for a company outside the roster resolves
-// to whatever slug the owning adapter minted via [Adapter.ParseCareersURL]
-// (Workday mints the canonical careers URL).
+// Resolve maps a user-supplied company string to a [CompanyResolution]. The
+// input can be a roster slug, a display name, or a careers URL. A selected
+// slug is not always a roster key: a careers URL for a company outside the
+// roster resolves to whatever slug the owning adapter minted via
+// [Adapter.ParseCareersURL] (Workday mints the canonical careers URL).
 //
 // A careers URL is authoritative and answers immediately. Anything else —
 // including a URL shape no adapter recognizes — falls through to the
-// roster union of slug and name hits: exactly one hit resolves, two or
-// more return an [*AmbiguousCompanyError], and zero returns a teaching
-// error (the closest roster slugs, or the supported careers-page hosts
-// when the input was URL-shaped).
-func (r *Registry) Resolve(company string) (Adapter, string, error) {
+// roster union of slug and name hits. One or more hits are a successful
+// resolution; callers decide how to handle multiple choices. Zero returns
+// a teaching error with either the closest roster slugs or the supported
+// careers-page hosts when the input was URL-shaped.
+func (r *Registry) Resolve(company string) (CompanyResolution, error) {
 	key := normalize(company)
 	if key == "" {
-		return nil, "", errors.New("company is required")
+		return CompanyResolution{}, errors.New("company is required")
 	}
 
 	urlShaped := false
@@ -200,23 +214,22 @@ func (r *Registry) Resolve(company string) (Adapter, string, error) {
 		urlShaped = true
 		for _, a := range r.adapters {
 			if slug, ok := a.ParseCareersURL(u); ok {
-				return a, slug, nil
+				return CompanyResolution{
+					entries: []registryEntry{{adapter: a, slug: slug}},
+				}, nil
 			}
 		}
 	}
 
-	switch candidates := r.candidates(key); len(candidates) {
-	case 1:
-		return candidates[0].adapter, candidates[0].slug, nil
-	case 0:
+	candidates := r.candidates(key)
+	if len(candidates) == 0 {
 		if urlShaped {
-			return nil, "", fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
+			return CompanyResolution{}, fmt.Errorf("unrecognized careers URL %q; supported careers-page hosts: %s", company, strings.Join(r.careersHostPatterns(), ", "))
 		}
-		return nil, "", fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
+		return CompanyResolution{}, fmt.Errorf("unknown company %q; closest matches: %s. %d companies are supported — pass one of the suggested slugs",
 			company, strings.Join(r.suggest(key, 3), ", "), r.entryCount)
-	default:
-		return nil, "", r.ambiguousError(company, candidates)
 	}
+	return CompanyResolution{entries: candidates}, nil
 }
 
 // candidates returns the deduplicated union of bySlug[key] and byName[key],
@@ -243,20 +256,6 @@ func (r *Registry) candidates(key string) []registryEntry {
 		}
 	}
 	return out
-}
-
-// ambiguousError renders candidates as an [*AmbiguousCompanyError], with
-// each candidate's careers URL when its adapter can render one.
-func (r *Registry) ambiguousError(input string, candidates []registryEntry) *AmbiguousCompanyError {
-	out := make([]CompanyCandidate, 0, len(candidates))
-	for _, e := range candidates {
-		cand := CompanyCandidate{Name: e.name, Provider: e.adapter.Name()}
-		if url, ok := e.adapter.CareersURL(e.slug); ok {
-			cand.CareersURL = url
-		}
-		out = append(out, cand)
-	}
-	return &AmbiguousCompanyError{Input: input, Candidates: out}
 }
 
 // careersHostPatterns lists the careers-page URL shapes for r's registered

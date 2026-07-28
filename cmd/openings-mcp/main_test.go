@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -44,6 +43,20 @@ type writeCloser struct {
 }
 
 func (writeCloser) Close() error { return nil }
+
+func selectRegistryCompany(
+	t *testing.T,
+	registry *ats.Registry,
+	input string,
+) (ats.Adapter, string) {
+	t.Helper()
+	resolution, err := registry.Resolve(input)
+	require.NoError(t, err)
+	require.False(t, resolution.IsAmbiguous())
+	adapter, slug, ok := resolution.Select(0)
+	require.True(t, ok)
+	return adapter, slug
+}
 
 func TestServerListsJobTools(t *testing.T) {
 	ctx := t.Context()
@@ -141,7 +154,8 @@ func TestServerListsJobTools(t *testing.T) {
 	assert.Equal(t, float64(1), companyProperty["minLength"])
 	assert.Contains(t, companyProperty["description"], "recognized public careers-page URL")
 	assert.Contains(t, companyProperty["description"], "Other careers URLs are unsupported")
-	assert.Contains(t, companyProperty["description"], "some ATS providers accept URLs only for companies in the curated roster")
+	assert.Contains(t, companyProperty["description"], "some career systems accept URLs only for companies in the curated roster")
+	assert.NotContains(t, companyProperty["description"], "ATS")
 	assert.NotContains(t, companyProperty["description"], "Eightfold")
 	assert.NotContains(t, companyProperty["description"], "SuccessFactors")
 
@@ -209,14 +223,12 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
-// TestAmbiguousCompanyGuidanceIsTaught asserts that filters advertises its
-// elicitation path while search and detail retain the careers-URL retry
-// fallback.
+// TestAmbiguousCompanyGuidanceIsTaught asserts that every unified company
+// tool advertises the shared elicitation path.
 func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
-	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
-
-	assert.Contains(t, serverInstructions, "get_filters_by_company asks the user to choose when the client supports form elicitation")
-	assert.Contains(t, serverInstructions, "receive the matching careers URLs and should retry")
+	assert.Contains(t, serverInstructions, "every unified company tool asks the user to choose")
+	assert.Contains(t, serverInstructions, "human-readable company names and public careers URLs")
+	assert.Contains(t, serverInstructions, "rather than an ATS-prefixed identifier")
 
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
@@ -238,7 +250,11 @@ func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
 		got[tool.Name] = tool
 	}
 
-	for _, name := range []string{"search_jobs_by_company", "get_job_detail_by_company"} {
+	for _, name := range []string{
+		"search_jobs_by_company",
+		"get_filters_by_company",
+		"get_job_detail_by_company",
+	} {
 		tool := got[name]
 		require.NotNil(t, tool, name)
 		input, ok := tool.InputSchema.(map[string]any)
@@ -247,19 +263,10 @@ func TestAmbiguousCompanyGuidanceIsTaught(t *testing.T) {
 		require.True(t, ok, name)
 		companyProperty, ok := properties["company"].(map[string]any)
 		require.True(t, ok, name)
-		assert.Contains(t, companyProperty["description"], retryInstruction, name)
+		assert.Contains(t, companyProperty["description"], "client supports elicitation", name)
+		assert.Contains(t, companyProperty["description"], "asks the user to choose", name)
+		assert.Contains(t, companyProperty["description"], "public careers URLs", name)
 	}
-
-	filtersTool := got["get_filters_by_company"]
-	require.NotNil(t, filtersTool)
-	input, ok := filtersTool.InputSchema.(map[string]any)
-	require.True(t, ok)
-	properties, ok := input["properties"].(map[string]any)
-	require.True(t, ok)
-	companyProperty, ok := properties["company"].(map[string]any)
-	require.True(t, ok)
-	assert.Contains(t, companyProperty["description"], "client supports elicitation")
-	assert.Contains(t, companyProperty["description"], "asks the user to choose")
 }
 
 func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
@@ -275,13 +282,11 @@ func TestATSRegistryIncludesTeamtailor(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Teamtailor")
-	require.NoError(t, err)
+	adapter, slug := selectRegistryCompany(t, registry, "Teamtailor")
 	assert.Equal(t, "teamtailor", adapter.Name())
 	assert.Equal(t, "career.teamtailor.com", slug)
 
-	adapter, slug, err = registry.Resolve("https://unlisted.na.teamtailor.com/jobs")
-	require.NoError(t, err)
+	adapter, slug = selectRegistryCompany(t, registry, "https://unlisted.na.teamtailor.com/jobs")
 	assert.Equal(t, "teamtailor", adapter.Name())
 	assert.Equal(t, "unlisted.na.teamtailor.com", slug)
 }
@@ -290,16 +295,16 @@ func TestATSRegistryIncludesOracle(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Mayo Clinic")
-	require.NoError(t, err)
+	adapter, slug := selectRegistryCompany(t, registry, "Mayo Clinic")
 	assert.Equal(t, "oracle", adapter.Name())
 	assert.Equal(t, "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1", slug)
 
-	adapter, slug, err = registry.Resolve(
-		"https://fa-example.fa.us2.oraclecloud.com/" +
+	adapter, slug = selectRegistryCompany(
+		t,
+		registry,
+		"https://fa-example.fa.us2.oraclecloud.com/"+
 			"hcmUI/CandidateExperience/en/sites/Acme/jobs",
 	)
-	require.NoError(t, err)
 	assert.Equal(t, "oracle", adapter.Name())
 	assert.Equal(
 		t,
@@ -313,13 +318,11 @@ func TestATSRegistryIncludesJoin(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Routine Labs")
-	require.NoError(t, err)
+	adapter, slug := selectRegistryCompany(t, registry, "Routine Labs")
 	assert.Equal(t, "join", adapter.Name())
 	assert.Equal(t, "routinelabs", slug)
 
-	adapter, slug, err = registry.Resolve("https://join.com/companies/routinelabs")
-	require.NoError(t, err)
+	adapter, slug = selectRegistryCompany(t, registry, "https://join.com/companies/routinelabs")
 	assert.Equal(t, "join", adapter.Name())
 	assert.Equal(t, "routinelabs", slug)
 }
@@ -328,13 +331,11 @@ func TestATSRegistryIncludesBambooHR(t *testing.T) {
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
 	require.NoError(t, err)
 
-	adapter, slug, err := registry.Resolve("Concept2")
-	require.NoError(t, err)
+	adapter, slug := selectRegistryCompany(t, registry, "Concept2")
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "concept2", slug)
 
-	adapter, slug, err = registry.Resolve("https://unlisted.bamboohr.com/careers")
-	require.NoError(t, err)
+	adapter, slug = selectRegistryCompany(t, registry, "https://unlisted.bamboohr.com/careers")
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "unlisted", slug)
 }
@@ -368,8 +369,15 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 				gotNoURL = append(gotNoURL, a.Name()+":"+c.Slug)
 				continue
 			}
-			gotAdapter, gotSlug, err := registry.Resolve(careersURL)
+			resolution, err := registry.Resolve(careersURL)
 			if !assert.NoError(t, err, "%s %q: resolve %q", a.Name(), c.Slug, careersURL) {
+				continue
+			}
+			if !assert.False(t, resolution.IsAmbiguous(), "%s %q: resolve %q", a.Name(), c.Slug, careersURL) {
+				continue
+			}
+			gotAdapter, gotSlug, ok := resolution.Select(0)
+			if !assert.True(t, ok, "%s %q: resolve %q", a.Name(), c.Slug, careersURL) {
 				continue
 			}
 			assert.Equal(t, a.Name(), gotAdapter.Name(), "%s %q: resolve %q", a.Name(), c.Slug, careersURL)
@@ -388,9 +396,8 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 // TestCompanyCollisionReport walks every roster entry of every production
 // adapter (the same atsAdapters enumeration TestATSCareersURLRoundTripsThroughRegistry
 // uses) and resolves both its slug and its display name through the
-// production registry. Any input that comes back as an
-// [*ats.AmbiguousCompanyError] is a collision, recorded as one line in
-// testdata/company_collisions.txt.
+// production registry. Any input that resolves to multiple candidates is a
+// collision, recorded as one line in testdata/company_collisions.txt.
 //
 // It keys by Resolve rather than by a private normalizer: internal/ats is
 // out of scope for this slice, and a reimplemented normalizer could drift
@@ -412,10 +419,10 @@ func TestCompanyCollisionReport(t *testing.T) {
 				}
 				probed[probe] = true
 
-				_, _, err := registry.Resolve(probe)
-				var ambiguous *ats.AmbiguousCompanyError
-				if errors.As(err, &ambiguous) {
-					findings[probe] = ambiguous.Candidates
+				resolution, err := registry.Resolve(probe)
+				require.NoError(t, err)
+				if resolution.IsAmbiguous() {
+					findings[probe] = resolution.Candidates()
 				}
 			}
 		}

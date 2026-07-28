@@ -57,33 +57,52 @@ func testRegistry(t *testing.T) *Registry {
 	return r
 }
 
+func selectResolvedCompany(t *testing.T, r *Registry, input string) (Adapter, string) {
+	t.Helper()
+	resolution, err := r.Resolve(input)
+	require.NoError(t, err)
+	require.False(t, resolution.IsAmbiguous())
+	adapter, slug, ok := resolution.Select(0)
+	require.True(t, ok)
+	return adapter, slug
+}
+
 func TestResolveBySlug(t *testing.T) {
 	r := testRegistry(t)
-	a, slug, err := r.Resolve("nvidia")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "nvidia")
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "nvidia", slug)
+}
+
+func TestCompanyResolutionSelectRejectsInvalidIndex(t *testing.T) {
+	resolution, err := testRegistry(t).Resolve("nvidia")
+	require.NoError(t, err)
+
+	_, _, ok := resolution.Select(-1)
+	assert.False(t, ok)
+	_, _, ok = resolution.Select(1)
+	assert.False(t, ok)
 }
 
 func TestResolveByDisplayName(t *testing.T) {
 	r := testRegistry(t)
 	// Case, punctuation, and spaces must not matter.
 	for _, input := range []string{"NVIDIA Corp", "nvidia corp", "Workday, Inc.", "workday inc"} {
-		_, _, err := r.Resolve(input)
+		_, err := r.Resolve(input)
 		assert.NoErrorf(t, err, "Resolve(%q)", input)
 	}
 }
 
 func TestResolveUnknownTeaches(t *testing.T) {
 	r := testRegistry(t)
-	_, _, err := r.Resolve("palantir tech")
+	_, err := r.Resolve("palantir tech")
 	require.ErrorContains(t, err, "palantir", "suggestions should contain the input")
 	assert.ErrorContains(t, err, "3 companies", "error should state supported count")
 }
 
 func TestResolveEmpty(t *testing.T) {
 	r := testRegistry(t)
-	_, _, err := r.Resolve("  ")
+	_, err := r.Resolve("  ")
 	assert.Error(t, err, "want error for empty company")
 }
 
@@ -125,23 +144,21 @@ func TestNewRegistryAllowsCrossAdapterDuplicateName(t *testing.T) {
 
 func TestResolveCareersURL(t *testing.T) {
 	r := testRegistry(t)
-	a, slug, err := r.Resolve("https://jobs.fake-lever.example/somestartup")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "https://jobs.fake-lever.example/somestartup")
 	assert.Equal(t, "lever", a.Name())
 	assert.Equal(t, "somestartup", slug)
 }
 
 func TestResolveCareersURLSchemeless(t *testing.T) {
 	r := testRegistry(t)
-	a, slug, err := r.Resolve("jobs.fake-workday.example/acme")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "jobs.fake-workday.example/acme")
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "acme", slug)
 }
 
 func TestResolveUnrecognizedCareersURLTeaches(t *testing.T) {
 	r := testRegistry(t)
-	_, _, err := r.Resolve("https://careers.example.com/acme")
+	_, err := r.Resolve("https://careers.example.com/acme")
 	require.ErrorContains(t, err, "careers URL", "URL misses should get the URL error, not name suggestions")
 	assert.NotContains(t, err.Error(), "closest matches", "no levenshtein suggestions for URLs")
 }
@@ -153,19 +170,22 @@ func TestResolveAmbiguousSlug(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, _, err = r.Resolve("nature")
-	var ambErr *AmbiguousCompanyError
-	require.ErrorAs(t, err, &ambErr)
-	require.Len(t, ambErr.Candidates, 2)
+	resolution, err := r.Resolve("nature")
+	require.NoError(t, err)
+	require.True(t, resolution.IsAmbiguous())
+	candidates := resolution.Candidates()
+	require.Len(t, candidates, 2)
 	var names []string
-	for _, c := range ambErr.Candidates {
+	for _, c := range candidates {
 		names = append(names, c.Name)
 		assert.NotEmpty(t, c.CareersURL, "both candidates render a careers URL")
 	}
 	assert.ElementsMatch(t, []string{"Nature KK", "Nature Research"}, names)
-	assert.Contains(t, err.Error(), "Retry with the careers URL")
-	assert.Contains(t, err.Error(), "https://herp.example/nature")
-	assert.Contains(t, err.Error(), "https://workday.example/nature")
+
+	adapter, slug, ok := resolution.Select(1)
+	require.True(t, ok)
+	assert.Equal(t, "workday", adapter.Name())
+	assert.Equal(t, "nature", slug)
 }
 
 func TestResolveAmbiguousName(t *testing.T) {
@@ -175,10 +195,10 @@ func TestResolveAmbiguousName(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, _, err = r.Resolve("BETA Technologies")
-	var ambErr *AmbiguousCompanyError
-	require.ErrorAs(t, err, &ambErr)
-	assert.Len(t, ambErr.Candidates, 2)
+	resolution, err := r.Resolve("BETA Technologies")
+	require.NoError(t, err)
+	assert.True(t, resolution.IsAmbiguous())
+	assert.Len(t, resolution.Candidates(), 2)
 }
 
 // TestResolveAmbiguousSlugVersusName covers the case the options survey
@@ -192,10 +212,10 @@ func TestResolveAmbiguousSlugVersusName(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	_, _, err = r.Resolve("fusion")
-	var ambErr *AmbiguousCompanyError
-	require.ErrorAs(t, err, &ambErr)
-	assert.Len(t, ambErr.Candidates, 2)
+	resolution, err := r.Resolve("fusion")
+	require.NoError(t, err)
+	assert.True(t, resolution.IsAmbiguous())
+	assert.Len(t, resolution.Candidates(), 2)
 }
 
 // TestResolveCareersURLWinsOverAmbiguousToken checks that a careers URL is
@@ -207,31 +227,31 @@ func TestResolveCareersURLWinsOverAmbiguousToken(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	a, slug, err := r.Resolve("https://workday.example/acme")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "https://workday.example/acme")
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "acme", slug)
 }
 
-// TestResolveAmbiguousCandidateDegradesToName covers a candidate whose
-// adapter has no public careers URL: the ambiguity message must fall back
-// to its display name instead of an empty URL, and that name must resolve
-// on its own afterward.
-func TestResolveAmbiguousCandidateDegradesToName(t *testing.T) {
+// TestResolveAmbiguousCandidateWithoutCareersURL covers a candidate whose
+// adapter has no public careers URL. Its human-readable choice still carries
+// the display name, and selecting it returns the original registry entry.
+func TestResolveAmbiguousCandidateWithoutCareersURL(t *testing.T) {
 	r, err := NewRegistry(
 		&fakeAdapter{name: "roster-only", roster: []CompanyInfo{{Slug: "nature", Name: "Foo Corp"}}},
 		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
 	)
 	require.NoError(t, err)
 
-	_, _, err = r.Resolve("nature")
-	var ambErr *AmbiguousCompanyError
-	require.ErrorAs(t, err, &ambErr)
-	assert.Contains(t, err.Error(), `no public careers URL; retry with company="Foo Corp"`)
-
-	// The suggested retry must itself resolve to exactly one candidate.
-	a, slug, err := r.Resolve("Foo Corp")
+	resolution, err := r.Resolve("nature")
 	require.NoError(t, err)
+	require.True(t, resolution.IsAmbiguous())
+	candidates := resolution.Candidates()
+	require.Len(t, candidates, 2)
+	assert.Equal(t, "Foo Corp", candidates[0].Name)
+	assert.Empty(t, candidates[0].CareersURL)
+
+	a, slug, ok := resolution.Select(0)
+	require.True(t, ok)
 	assert.Equal(t, "roster-only", a.Name())
 	assert.Equal(t, "nature", slug)
 }
@@ -245,8 +265,7 @@ func TestResolveSlugAndNameSameKeyIsOneCandidate(t *testing.T) {
 		&fakeAdapter{name: "workday", host: "workday.example", roster: []CompanyInfo{{Slug: "bunq", Name: "bunq"}}},
 	)
 	require.NoError(t, err)
-	a, slug, err := r.Resolve("bunq")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "bunq")
 	assert.Equal(t, "workday", a.Name())
 	assert.Equal(t, "bunq", slug)
 }
@@ -276,8 +295,7 @@ func TestResolveURLShapedRosterSlugFallsThroughToUnion(t *testing.T) {
 		&fakeAdapter{name: "oracle", roster: []CompanyInfo{{Slug: "abc.fa.us2.oraclecloud.com/CX_1", Name: "Acme Health"}}},
 	)
 	require.NoError(t, err)
-	a, slug, err := r.Resolve("abc.fa.us2.oraclecloud.com/CX_1")
-	require.NoError(t, err)
+	a, slug := selectResolvedCompany(t, r, "abc.fa.us2.oraclecloud.com/CX_1")
 	assert.Equal(t, "oracle", a.Name())
 	assert.Equal(t, "abc.fa.us2.oraclecloud.com/CX_1", slug)
 }
@@ -291,7 +309,7 @@ func TestSuggestDedupesCollidingSlug(t *testing.T) {
 		&fakeAdapter{name: "lever", roster: []CompanyInfo{{Slug: "other", Name: "Other Co"}}},
 	)
 	require.NoError(t, err)
-	_, _, err = r.Resolve("natur")
+	_, err = r.Resolve("natur")
 	require.Error(t, err)
 	assert.Equal(t, 1, strings.Count(err.Error(), "nature"), "colliding slug must be suggested once, not once per adapter")
 }
@@ -305,7 +323,7 @@ func TestMissErrorCountsRosterEntriesNotKeys(t *testing.T) {
 		&fakeAdapter{name: "workday", roster: []CompanyInfo{{Slug: "nature", Name: "Nature Research"}}},
 	)
 	require.NoError(t, err)
-	_, _, err = r.Resolve("zzz-totally-unknown")
+	_, err = r.Resolve("zzz-totally-unknown")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "2 companies are supported")
 }
