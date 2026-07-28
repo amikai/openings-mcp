@@ -56,6 +56,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"teamtailor":      "<company>[.na|.au].teamtailor.com/jobs",
 	"recruitee":       "<company>.recruitee.com",
 	"herp":            "herp.careers/careers/companies/<company> (also herp.careers/v1/<company>)",
+	"engage":          "en-gage.net/<company>",
 	"eightfold":       "<tenant>.eightfold.ai/careers (roster tenants only)",
 	"successfactors":  "jobs.<company>.com/search (roster tenants only)",
 	"smartrecruiters": "jobs.smartrecruiters.com/<company>",

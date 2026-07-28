@@ -255,6 +255,7 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 		ats.NewTeamtailorAdapter(hc),
 		ats.NewRecruiteeAdapter(hc),
 		ats.NewHerpAdapter(hc),
+		ats.NewEngageAdapter(hc),
 		ats.NewBambooHRAdapter(hc),
 		ats.NewEightfoldAdapter(hcEightfold),
 		ats.NewSuccessFactorsAdapter(hc),
