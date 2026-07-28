@@ -66,6 +66,15 @@ func (a *HerpAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return "", false
 }
 
+// CareersURL renders the roster company's public HERP Career board.
+func (a *HerpAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := herp.CompaniesBySlug[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *HerpAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	jobs, _, err := a.dump(ctx, slug)
 	if err != nil {

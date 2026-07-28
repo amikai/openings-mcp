@@ -77,7 +77,7 @@ new shape. The reference implementation is `internal/provider/workday/`
   addressing (one slug instead of tenant/instance/site):
   - `//go:embed companies.yaml`
   - `type Company struct { Name string; Board string }` with yaml/json tags
-  - `func (c Company) BoardURL() string` →
+  - `func (c Company) CareersURL() string` →
     `https://jobs.ashbyhq.com/{board}` (the human-facing board page; API
     calls take `Board` directly as the path parameter)
   - `var Companies = mustLoadCompanies()` — sorted by company name

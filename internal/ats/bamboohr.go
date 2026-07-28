@@ -101,6 +101,15 @@ func (a *BambooHRAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return slug, true
 }
 
+// CareersURL renders the roster company's public careers page.
+func (a *BambooHRAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := bamboohr.CompaniesBySlug[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *BambooHRAdapter) Search(
 	ctx context.Context,
 	slug string,

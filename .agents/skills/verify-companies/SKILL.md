@@ -79,9 +79,18 @@ go:embed'd, so it never affects the built binary.
    go:embed'd, so `go run` picks the additions up. Drop entries that
    ERROR (re-check stale vs transient as in the audit).
 4. `go test ./...` — `ats.NewRegistry` requires every display name and
-   slug to be globally unique across all adapters combined. Move
-   collisions back to `unverified/` for a human to sort out rather than
-   inventing disambiguated names.
+   slug to be unique within the promoting provider's own roster; move a
+   collision there back to `unverified/` for a human to sort out rather
+   than inventing a disambiguated name. When the adapter
+   cannot render a careers URL for an entry, its display name is the only
+   disambiguation key left, so keep that name unique against every other
+   entry's name *and slug* anywhere — `NewRegistry` fails if it collides.
+   A collision with a *different* provider's roster is otherwise allowed
+   and expected as rosters grow — it
+   surfaces as a red `TestCompanyCollisionReport`. Regenerate
+   `cmd/openings-mcp/testdata/company_collisions.txt` with
+   `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update`
+   and show its diff in the PR.
 5. One roster per PR, one `roster:` commit (AGENTS.md).
 
 ## Common mistakes

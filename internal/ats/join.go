@@ -60,6 +60,15 @@ func (a *JoinAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return c.Slug, true
 }
 
+// CareersURL renders the roster company's public career page.
+func (a *JoinAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := join.CompaniesBySlug[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *JoinAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
 	jobs, _, err := a.dump(ctx, slug)
 	if err != nil {

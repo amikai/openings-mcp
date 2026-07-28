@@ -89,6 +89,15 @@ func (a *TeamtailorAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return host, true
 }
 
+// CareersURL renders the roster company's public jobs page.
+func (a *TeamtailorAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := teamtailor.CompaniesByHost[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 func (a *TeamtailorAdapter) Search(
 	ctx context.Context,
 	slug string,

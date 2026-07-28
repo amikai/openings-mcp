@@ -56,9 +56,6 @@ func (a *AvatureAdapter) Roster() []CompanyInfo {
 // rejected: the portal name cannot be inferred.
 func (a *AvatureAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
-	if !strings.HasSuffix(host, ".avature.net") || host == "www.avature.net" {
-		return "", false
-	}
 	segs := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")
 	if len(segs) > 0 && avatureLocaleSegmentRE.MatchString(segs[0]) {
 		segs = segs[1:]
@@ -66,7 +63,28 @@ func (a *AvatureAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	if len(segs) == 0 || segs[0] == "" {
 		return "", false
 	}
-	return host + "/" + strings.ToLower(segs[0]), true
+	portal := segs[0]
+
+	if strings.HasSuffix(host, ".avature.net") && host != "www.avature.net" {
+		return host + "/" + strings.ToLower(portal), true
+	}
+	// Custom domain: verifiable as Avature only through the curated roster —
+	// fold back through the roster's own slug rather than lowercasing here,
+	// since a lowercased portal would corrupt a mixed-case one (e.g.
+	// jobs.deutschebahngroup.careers/jobsGlobal).
+	if c, ok := avature.CompaniesBySlug[strings.ToLower(host+"/"+portal)]; ok {
+		return c.Slug(), true
+	}
+	return "", false
+}
+
+// CareersURL renders the roster company's public job search page.
+func (a *AvatureAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := avature.CompaniesBySlug[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
 }
 
 // Search maps the unified page onto jobOffset requests. The portal page

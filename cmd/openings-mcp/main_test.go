@@ -1,12 +1,18 @@
 package main
 
 import (
+	"errors"
+	"flag"
+	"fmt"
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
+	"sort"
 	"strings"
 	"testing"
 
+	"github.com/amikai/openings-mcp/internal/ats"
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
@@ -21,6 +27,17 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+// update regenerates testdata/company_collisions.txt from the current
+// production rosters. Run with:
+//
+//	go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update
+var update = flag.Bool("update", false, "regenerate the collision-report golden file")
+
+// collisionGoldenPath is the golden file TestCompanyCollisionReport compares
+// against. NewRegistry no longer fails on a cross-adapter slug or name
+// collision, so this report is what keeps new ones visible.
+const collisionGoldenPath = "testdata/company_collisions.txt"
 
 type writeCloser struct {
 	io.Writer
@@ -192,6 +209,50 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
+// TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
+// instruction — retry with one of the careers URLs listed in the error —
+// reaches the host LLM through both channels it can come from:
+// serverInstructions, and each unified company tool's own company
+// parameter description. All three tools need it independently since a
+// host may only ever read the tool description for the one it calls.
+func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
+	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
+
+	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
+
+	ctx := t.Context()
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	server := newServer(providerClients{}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
+	serverTransport, clientTransport := mcp.NewInMemoryTransports()
+	serverSession, err := server.Connect(ctx, serverTransport, nil)
+	require.NoError(t, err)
+	defer serverSession.Close()
+	clientSession, err := client.Connect(ctx, clientTransport, nil)
+	require.NoError(t, err)
+	defer clientSession.Close()
+
+	res, err := clientSession.ListTools(ctx, nil)
+	require.NoError(t, err)
+	got := make(map[string]*mcp.Tool, len(res.Tools))
+	for _, tool := range res.Tools {
+		got[tool.Name] = tool
+	}
+
+	for _, name := range []string{"search_jobs_by_company", "get_filters_by_company", "get_job_detail_by_company"} {
+		tool := got[name]
+		require.NotNil(t, tool, name)
+		input, ok := tool.InputSchema.(map[string]any)
+		require.True(t, ok, name)
+		properties, ok := input["properties"].(map[string]any)
+		require.True(t, ok, name)
+		companyProperty, ok := properties["company"].(map[string]any)
+		require.True(t, ok, name)
+		assert.Contains(t, companyProperty["description"], retryInstruction, name)
+	}
+}
+
 func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 	transport := &mcp.IOTransport{
 		Reader: io.NopCloser(strings.NewReader("")),
@@ -267,4 +328,117 @@ func TestATSRegistryIncludesBambooHR(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "bamboohr", adapter.Name())
 	assert.Equal(t, "unlisted", slug)
+}
+
+// TestATSCareersURLRoundTripsThroughRegistry sweeps every roster entry of
+// every production adapter: its rendered [ats.Adapter.CareersURL] must
+// resolve, through the same registry the server actually runs, back to the
+// (adapter, slug) it came from. Resolving through the registry rather than
+// the originating adapter alone matters because Resolve polls every
+// registered adapter's ParseCareersURL in order — a URL that round-trips
+// within its own adapter could still be shadowed by a different adapter
+// registered earlier.
+//
+// The enumerated ok=false set is asserted exactly (currently empty): every
+// roster row of every adapter renders a URL today, so both a renderer
+// regressing to ok=false and an unnamed new exemption fail this test rather
+// than being silently absorbed.
+func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	registry, err := ats.NewRegistry(adapters...)
+	require.NoError(t, err)
+
+	wantNoURL := map[string]bool{}
+
+	var gotNoURL []string
+	for _, a := range adapters {
+		for _, c := range a.Roster() {
+			careersURL, ok := a.CareersURL(c.Slug)
+			if !ok {
+				gotNoURL = append(gotNoURL, a.Name()+":"+c.Slug)
+				continue
+			}
+			gotAdapter, gotSlug, err := registry.Resolve(careersURL)
+			if !assert.NoError(t, err, "%s %q: resolve %q", a.Name(), c.Slug, careersURL) {
+				continue
+			}
+			assert.Equal(t, a.Name(), gotAdapter.Name(), "%s %q: resolve %q", a.Name(), c.Slug, careersURL)
+			assert.Equal(t, c.Slug, gotSlug, "%s %q: resolve %q", a.Name(), c.Slug, careersURL)
+		}
+	}
+
+	for _, entry := range gotNoURL {
+		assert.True(t, wantNoURL[entry], "unexpected ok=false entry %q; name it in the plan before exempting it", entry)
+	}
+	for entry := range wantNoURL {
+		assert.Contains(t, gotNoURL, entry, "expected ok=false entry %q no longer is one", entry)
+	}
+}
+
+// TestCompanyCollisionReport walks every roster entry of every production
+// adapter (the same atsAdapters enumeration TestATSCareersURLRoundTripsThroughRegistry
+// uses) and resolves both its slug and its display name through the
+// production registry. Any input that comes back as an
+// [*ats.AmbiguousCompanyError] is a collision, recorded as one line in
+// testdata/company_collisions.txt.
+//
+// It keys by Resolve rather than by a private normalizer: internal/ats is
+// out of scope for this slice, and a reimplemented normalizer could drift
+// from the one the resolver actually uses, pinning a baseline that
+// describes collisions callers don't actually experience.
+func TestCompanyCollisionReport(t *testing.T) {
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	require.NoError(t, err)
+	registry, err := ats.NewRegistry(adapters...)
+	require.NoError(t, err)
+
+	findings := map[string][]ats.CompanyCandidate{}
+	probed := map[string]bool{}
+	for _, a := range adapters {
+		for _, c := range a.Roster() {
+			for _, probe := range []string{c.Slug, c.Name} {
+				if probed[probe] {
+					continue
+				}
+				probed[probe] = true
+
+				_, _, err := registry.Resolve(probe)
+				var ambiguous *ats.AmbiguousCompanyError
+				if errors.As(err, &ambiguous) {
+					findings[probe] = ambiguous.Candidates
+				}
+			}
+		}
+	}
+
+	inputs := make([]string, 0, len(findings))
+	for input := range findings {
+		inputs = append(inputs, input)
+	}
+	sort.Strings(inputs)
+
+	var b strings.Builder
+	for _, input := range inputs {
+		b.WriteString(input)
+		for _, c := range findings[input] {
+			fmt.Fprintf(&b, "\t%s|%s|%s", c.Provider, c.Name, c.CareersURL)
+		}
+		b.WriteString("\n")
+	}
+	got := b.String()
+
+	if *update {
+		require.NoError(t, os.WriteFile(collisionGoldenPath, []byte(got), 0o644))
+		return
+	}
+
+	want, err := os.ReadFile(collisionGoldenPath)
+	require.NoError(t, err)
+	if got != string(want) {
+		t.Errorf(
+			"%s is stale; regenerate with `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update`.\n\nExpected content:\n%s",
+			collisionGoldenPath, got,
+		)
+	}
 }

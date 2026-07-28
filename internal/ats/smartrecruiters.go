@@ -76,6 +76,15 @@ func (a *SmartRecruitersAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	return strings.ToLower(id), true
 }
 
+// CareersURL renders the roster company's public career site.
+func (a *SmartRecruitersAdapter) CareersURL(slug string) (string, bool) {
+	c, ok := smartrecruiters.CompaniesByIdentifier[strings.ToLower(slug)]
+	if !ok {
+		return "", false
+	}
+	return c.CareersURL(), true
+}
+
 // resolveSmartRecruitersCompany maps a slug to the roster's
 // canonically-cased identifier (used in derived public URLs) and display
 // name. Non-roster slugs from ParseCareersURL pass through as both.

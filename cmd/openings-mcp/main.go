@@ -51,6 +51,7 @@ Tool selection:
 - When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs on supported ATS providers. Do not pass other careers sites; some ATS providers accept URLs only for companies already in the curated roster.
+- When a company is ambiguous, the unified company tools reject the call and list the matching companies' careers URLs; retry the same tool with one of the listed careers URLs, not with the original name.
 
 Query construction:
 - Use dedicated parameters for structured criteria whenever available. Use keyword only for free-text terms that have no better matching parameter, and evaluate unsupported criteria from the results or job details.
@@ -209,6 +210,18 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 // hcEightfold is separate because Eightfold's edge requires a browser-shaped
 // User-Agent that the other adapters don't need.
 func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
+	adapters, err := atsAdapters(hc, hcEightfold)
+	if err != nil {
+		return nil, err
+	}
+	return ats.NewRegistry(adapters...)
+}
+
+// atsAdapters builds the production adapter list newATSRegistry registers,
+// in registration order. Pulled out of newATSRegistry so tests can walk the
+// same list the server actually runs, rather than a redeclared copy that
+// could drift from it.
+func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc)
 	if err != nil {
 		return nil, fmt.Errorf("create Lever ATS adapter: %w", err)
@@ -234,7 +247,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		return nil, fmt.Errorf("create Rippling ATS adapter: %w", err)
 	}
 
-	return ats.NewRegistry(
+	return []ats.Adapter{
 		ats.NewWorkdayAdapter(hc),
 		leverAdapter,
 		ashbyAdapter,
@@ -253,7 +266,7 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 		ats.NewOracleAdapter(hc),
 		ats.NewJoinAdapter("https://join.com", hc),
 		ats.NewUltiProAdapter(hc),
-	)
+	}, nil
 }
 
 // providerClients bundles one client per per-provider tool family, so

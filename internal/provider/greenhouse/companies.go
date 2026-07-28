@@ -23,10 +23,10 @@ type Company struct {
 	BoardToken string `yaml:"board_token" json:"board_token"`
 }
 
-// BoardURL returns the company's human-facing job board page, e.g.
+// CareersURL returns the company's human-facing job board page, e.g.
 // https://job-boards.greenhouse.io/anthropic. API calls instead pass
 // BoardToken directly as the board_token parameter.
-func (c Company) BoardURL() string {
+func (c Company) CareersURL() string {
 	return fmt.Sprintf("https://job-boards.greenhouse.io/%s", c.BoardToken)
 }
 
