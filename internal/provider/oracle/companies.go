@@ -26,14 +26,24 @@ type Company struct {
 	SiteNumber string `yaml:"site_number" json:"site_number"`
 }
 
+// careersURLTpl formats an Oracle Recruiting Cloud job search page URL.
+// Parameters: 1: Host (e.g. "jpmc.fa.oraclecloud.com"), 2: Site (e.g. "CX_1").
+// Example: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs"
+const careersURLTpl = "https://%s/hcmUI/CandidateExperience/en/sites/%s/jobs"
+
+// apiBaseURLTpl formats an Oracle Fusion API origin URL.
+// Parameters: 1: Host (e.g. "jpmc.fa.oraclecloud.com").
+// Example: "https://jpmc.fa.oraclecloud.com"
+const apiBaseURLTpl = "https://%s"
+
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s/hcmUI/CandidateExperience/en/sites/%s/jobs", c.Host, c.Site)
+	return fmt.Sprintf(careersURLTpl, c.Host, c.Site)
 }
 
 // APIBaseURL returns the Fusion origin used for Candidate Experience REST calls.
 func (c Company) APIBaseURL() string {
-	return "https://" + c.Host
+	return fmt.Sprintf(apiBaseURLTpl, c.Host)
 }
 
 // Companies holds every confirmed Oracle career site, sorted by company name.
