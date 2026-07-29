@@ -23,11 +23,14 @@ type RosterCompany struct {
 	Account string `yaml:"account" json:"account"`
 }
 
+// careersURLTpl formats a Workable careers page URL (e.g. "https://apply.workable.com/blueground/").
+const careersURLTpl = "https://apply.workable.com/%s/"
+
 // CareersURL returns the company's human-facing careers page, e.g.
 // https://apply.workable.com/blueground/. API calls instead pass Account
 // directly as the account parameter.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf("https://apply.workable.com/%s/", c.Account)
+	return fmt.Sprintf(careersURLTpl, c.Account)
 }
 
 // Companies holds every confirmed Workable company, sorted by company name.

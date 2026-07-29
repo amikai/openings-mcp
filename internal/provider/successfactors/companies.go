@@ -24,9 +24,12 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
+// careersURLTpl formats a SuccessFactors job search page URL (e.g. "https://jobs.sap.com/search/").
+const careersURLTpl = "https://%s/search/"
+
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s/search/", c.Host)
+	return fmt.Sprintf(careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed SuccessFactors career site, sorted by

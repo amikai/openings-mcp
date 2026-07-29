@@ -25,11 +25,14 @@ type Company struct {
 	BoardSlug string `yaml:"board_slug" json:"board_slug"`
 }
 
+// careersURLTpl formats a Rippling job board page URL (e.g. "https://ats.rippling.com/pythian/jobs").
+const careersURLTpl = "https://ats.rippling.com/%s/jobs"
+
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://ats.rippling.com/pythian/jobs. API calls instead pass BoardSlug
 // directly as the board_slug parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://ats.rippling.com/%s/jobs", c.BoardSlug)
+	return fmt.Sprintf(careersURLTpl, c.BoardSlug)
 }
 
 // Companies holds every confirmed Rippling board, sorted by company name.

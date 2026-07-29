@@ -62,13 +62,23 @@ func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 	return CareersSite{Host: host, Tenant: tenant, Site: site}, true
 }
 
+// siteBaseURLTpl formats a non-roster Workday CareersSite CXS API base URL.
+// Parameters: 1: Host (e.g. "stripe.wd5.myworkdayjobs.com"), 2: Tenant (e.g. "stripe"), 3: Site (e.g. "Stripe_Careers").
+// Example: "https://stripe.wd5.myworkdayjobs.com/wday/cxs/stripe/Stripe_Careers"
+const siteBaseURLTpl = "https://%s/wday/cxs/%s/%s"
+
+// siteCanonicalURLTpl formats a non-roster Workday career site canonical URL.
+// Parameters: 1: Host (e.g. "stripe.wd5.myworkdayjobs.com"), 2: Site (e.g. "Stripe_Careers").
+// Example: "https://stripe.wd5.myworkdayjobs.com/Stripe_Careers"
+const siteCanonicalURLTpl = "https://%s/%s"
+
 // BaseURL derives the CXS API base URL, mirroring Company.BaseURL.
 func (s CareersSite) BaseURL() string {
-	return fmt.Sprintf("https://%s/wday/cxs/%s/%s", s.Host, s.Tenant, s.Site)
+	return fmt.Sprintf(siteBaseURLTpl, s.Host, s.Tenant, s.Site)
 }
 
 // CanonicalURL renders the slug form the ats layer circulates for
 // non-roster tenants: locale, deep links, query, and fragment stripped.
 func (s CareersSite) CanonicalURL() string {
-	return fmt.Sprintf("https://%s/%s", s.Host, s.Site)
+	return fmt.Sprintf(siteCanonicalURLTpl, s.Host, s.Site)
 }

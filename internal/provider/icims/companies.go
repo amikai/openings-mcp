@@ -23,9 +23,12 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
+// careersURLTpl formats an iCIMS job search page URL (e.g. "https://careers-peraton.icims.com/jobs/search?ss=1").
+const careersURLTpl = "https://%s/jobs/search?ss=1"
+
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s/jobs/search?ss=1", c.Host)
+	return fmt.Sprintf(careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed iCIMS career portal, sorted by company name.

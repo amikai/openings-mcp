@@ -26,9 +26,12 @@ type RosterCompany struct {
 	Domain string `yaml:"domain" json:"domain"`
 }
 
+// careersURLTpl formats an Eightfold career site URL (e.g. "https://nutanix.eightfold.ai/careers").
+const careersURLTpl = "https://%s.eightfold.ai/careers"
+
 // CareersURL returns the company's human-facing career site.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf("https://%s.eightfold.ai/careers", c.Tenant)
+	return fmt.Sprintf(careersURLTpl, c.Tenant)
 }
 
 // Companies holds every confirmed Eightfold company, sorted by company

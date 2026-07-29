@@ -29,11 +29,14 @@ type RosterCompany struct {
 	CompanyIdentifier string `yaml:"company_identifier" json:"company_identifier"`
 }
 
+// careersURLTpl formats a SmartRecruiters career site URL (e.g. "https://jobs.smartrecruiters.com/Equinox").
+const careersURLTpl = "https://jobs.smartrecruiters.com/%s"
+
 // CareersURL returns the company's human-facing career site, e.g.
 // https://jobs.smartrecruiters.com/Equinox. API calls instead pass
 // CompanyIdentifier directly as the companyIdentifier parameter.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf("https://jobs.smartrecruiters.com/%s", c.CompanyIdentifier)
+	return fmt.Sprintf(careersURLTpl, c.CompanyIdentifier)
 }
 
 // Companies holds every confirmed SmartRecruiters company, sorted by

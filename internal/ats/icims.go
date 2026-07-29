@@ -41,10 +41,13 @@ type ICIMSAdapter struct {
 	baseURL func(host string) string
 }
 
+// icimsBaseURLTpl formats a portal host into a base URL (e.g. "https://careers-peraton.icims.com").
+const icimsBaseURLTpl = "https://%s"
+
 func NewICIMSAdapter(hc *http.Client) *ICIMSAdapter {
 	return &ICIMSAdapter{
 		hc:      hc,
-		baseURL: func(host string) string { return "https://" + host },
+		baseURL: func(host string) string { return fmt.Sprintf(icimsBaseURLTpl, host) },
 	}
 }
 

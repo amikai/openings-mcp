@@ -23,9 +23,12 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
+// careersURLTpl formats a Teamtailor jobs page URL (e.g. "https://career.teamtailor.com/jobs").
+const careersURLTpl = "https://%s/jobs"
+
 // CareersURL returns the company's human-facing Teamtailor jobs page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s/jobs", c.Host)
+	return fmt.Sprintf(careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed Teamtailor career site, sorted by company

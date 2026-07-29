@@ -33,14 +33,24 @@ type Company struct {
 	BoardID     string `yaml:"board_id" json:"board_id"`
 }
 
+// careersURLTpl formats an UltiPro job board page URL.
+// Parameters: 1: Host (e.g. "recruiting.ultipro.com"), 2: CompanyCode (e.g. "TEC1006TESER"), 3: BoardID (e.g. "guid").
+// Example: "https://recruiting.ultipro.com/TEC1006TESER/JobBoard/guid/"
+const careersURLTpl = "https://%s/%s/JobBoard/%s/"
+
+// baseURLTpl formats an UltiPro job board API base URL.
+// Parameters: 1: Host (e.g. "recruiting.ultipro.com"), 2: CompanyCode (e.g. "TEC1006TESER"), 3: BoardID (e.g. "guid").
+// Example: "https://recruiting.ultipro.com/TEC1006TESER/JobBoard/guid"
+const baseURLTpl = "https://%s/%s/JobBoard/%s"
+
 // CareersURL returns the company's human-facing job board page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s/%s/JobBoard/%s/", c.Host, c.CompanyCode, c.BoardID)
+	return fmt.Sprintf(careersURLTpl, c.Host, c.CompanyCode, c.BoardID)
 }
 
 // BaseURL returns the board's API base URL, for [NewClient].
 func (c Company) BaseURL() string {
-	return fmt.Sprintf("https://%s/%s/JobBoard/%s", c.Host, c.CompanyCode, c.BoardID)
+	return fmt.Sprintf(baseURLTpl, c.Host, c.CompanyCode, c.BoardID)
 }
 
 // Companies holds every confirmed UltiPro board, sorted by company name.

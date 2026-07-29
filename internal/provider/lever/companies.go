@@ -23,10 +23,13 @@ type Company struct {
 	Site string `yaml:"site" json:"site"`
 }
 
+// careersURLTpl formats a Lever job board page URL (e.g. "https://jobs.lever.co/leverdemo").
+const careersURLTpl = "https://jobs.lever.co/%s"
+
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.lever.co/leverdemo. API calls instead pass Site directly.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://jobs.lever.co/%s", c.Site)
+	return fmt.Sprintf(careersURLTpl, c.Site)
 }
 
 // Companies holds every confirmed Lever tenant, sorted by company name.

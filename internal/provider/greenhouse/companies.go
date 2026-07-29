@@ -23,11 +23,14 @@ type Company struct {
 	BoardToken string `yaml:"board_token" json:"board_token"`
 }
 
+// careersURLTpl formats a Greenhouse job board page URL (e.g. "https://job-boards.greenhouse.io/anthropic").
+const careersURLTpl = "https://job-boards.greenhouse.io/%s"
+
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://job-boards.greenhouse.io/anthropic. API calls instead pass
 // BoardToken directly as the board_token parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://job-boards.greenhouse.io/%s", c.BoardToken)
+	return fmt.Sprintf(careersURLTpl, c.BoardToken)
 }
 
 // Companies holds every confirmed Greenhouse board, sorted by company name.
