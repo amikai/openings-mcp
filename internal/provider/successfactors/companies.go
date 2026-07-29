@@ -24,14 +24,6 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
-// baseURLTpl formats a SuccessFactors API base URL (e.g. "https://jobs.sap.com").
-const baseURLTpl = "https://%s"
-
-// BaseURL returns the company's SuccessFactors API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return fmt.Sprintf(baseURLTpl, c.Host)
-}
-
 // careersURLTpl formats a SuccessFactors job search page URL (e.g. "https://jobs.sap.com/search/").
 const careersURLTpl = "https://%s/search/"
 

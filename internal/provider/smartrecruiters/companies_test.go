@@ -49,11 +49,6 @@ func TestNoDuplicateIdentifiers(t *testing.T) {
 	}
 }
 
-func TestBaseURL(t *testing.T) {
-	c := RosterCompany{Name: "Equinox", CompanyIdentifier: "Equinox"}
-	assert.Equal(t, "https://api.smartrecruiters.com", c.BaseURL())
-}
-
 func TestCareersURL(t *testing.T) {
 	c := RosterCompany{Name: "Equinox", CompanyIdentifier: "Equinox"}
 	assert.Equal(t, "https://jobs.smartrecruiters.com/Equinox", c.CareersURL())

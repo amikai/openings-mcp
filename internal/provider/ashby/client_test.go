@@ -172,10 +172,3 @@ func TestGetJobBoardNotFound(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, "Not Found", strings.TrimSpace(string(body)))
 }
-
-func TestCompanyURLs(t *testing.T) {
-	c := Company{Name: "OpenAI", Board: "openai"}
-	assert.Equal(t, "https://api.ashbyhq.com", c.BaseURL())
-	assert.Equal(t, "https://jobs.ashbyhq.com/openai", c.CareersURL())
-}
-

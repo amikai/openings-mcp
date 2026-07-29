@@ -26,14 +26,6 @@ type RosterCompany struct {
 	Domain string `yaml:"domain" json:"domain"`
 }
 
-// baseURLTpl formats an Eightfold API base URL (e.g. "https://nutanix.eightfold.ai").
-const baseURLTpl = "https://%s.eightfold.ai"
-
-// BaseURL returns the company's Eightfold API base URL, for [NewClient].
-func (c RosterCompany) BaseURL() string {
-	return fmt.Sprintf(baseURLTpl, c.Tenant)
-}
-
 // careersURLTpl formats an Eightfold career site URL (e.g. "https://nutanix.eightfold.ai/careers").
 const careersURLTpl = "https://%s.eightfold.ai/careers"
 

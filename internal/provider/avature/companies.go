@@ -29,14 +29,6 @@ func (c Company) Slug() string {
 	return strings.TrimPrefix(c.URL, "https://")
 }
 
-// baseURLTpl formats an Avature portal base URL (e.g. "https://koch.avature.net/careers").
-const baseURLTpl = "https://%s"
-
-// BaseURL returns the portal's API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return fmt.Sprintf(baseURLTpl, c.Slug())
-}
-
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
 	return c.URL + "/SearchJobs"

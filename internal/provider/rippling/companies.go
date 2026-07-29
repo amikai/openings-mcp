@@ -25,14 +25,6 @@ type Company struct {
 	BoardSlug string `yaml:"board_slug" json:"board_slug"`
 }
 
-// baseURL is the base URL for Rippling Job Board API calls.
-const baseURL = "https://api.rippling.com/platform/api/ats/v1"
-
-// BaseURL returns the Rippling API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats a Rippling job board page URL (e.g. "https://ats.rippling.com/pythian/jobs").
 const careersURLTpl = "https://ats.rippling.com/%s/jobs"
 

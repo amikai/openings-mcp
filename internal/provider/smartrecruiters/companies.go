@@ -28,13 +28,6 @@ type RosterCompany struct {
 	Name              string `yaml:"company" json:"company"`
 	CompanyIdentifier string `yaml:"company_identifier" json:"company_identifier"`
 }
-// baseURL is the origin for SmartRecruiters API calls.
-const baseURL = "https://api.smartrecruiters.com"
-
-// BaseURL returns the SmartRecruiters API base URL, for [NewClient].
-func (c RosterCompany) BaseURL() string {
-	return baseURL
-}
 
 // careersURLTpl formats a SmartRecruiters career site URL (e.g. "https://jobs.smartrecruiters.com/Equinox").
 const careersURLTpl = "https://jobs.smartrecruiters.com/%s"

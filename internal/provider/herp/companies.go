@@ -29,14 +29,6 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
-// baseURL is the origin for HERP Career API calls.
-const baseURL = "https://herp.careers"
-
-// BaseURL returns the HERP API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // CareersURL returns the company's human-facing HERP Career board.
 func (c Company) CareersURL() string {
 	return "https://herp.careers/careers/companies/" + c.Slug

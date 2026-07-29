@@ -41,11 +41,6 @@ func (c Company) CareersURL() string {
 	return fmt.Sprintf(careersURLTpl, c.Host, c.Site)
 }
 
-// BaseURL returns the Fusion origin used for Candidate Experience REST calls, for [NewClient].
-func (c Company) BaseURL() string {
-	return c.APIBaseURL()
-}
-
 // APIBaseURL returns the Fusion origin used for Candidate Experience REST calls.
 func (c Company) APIBaseURL() string {
 	return fmt.Sprintf(apiBaseURLTpl, c.Host)

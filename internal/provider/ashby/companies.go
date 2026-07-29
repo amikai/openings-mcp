@@ -24,14 +24,6 @@ type Company struct {
 	Board string `yaml:"board" json:"board"`
 }
 
-// baseURL is the origin for Ashby job board API calls.
-const baseURL = "https://api.ashbyhq.com"
-
-// BaseURL returns the Ashby API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats an Ashby job board page URL (e.g. "https://jobs.ashbyhq.com/openai").
 const careersURLTpl = "https://jobs.ashbyhq.com/%s"
 

@@ -23,14 +23,6 @@ type Company struct {
 	Site string `yaml:"site" json:"site"`
 }
 
-// baseURL is the origin for Lever API calls.
-const baseURL = "https://api.lever.co"
-
-// BaseURL returns the Lever API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats a Lever job board page URL (e.g. "https://jobs.lever.co/leverdemo").
 const careersURLTpl = "https://jobs.lever.co/%s"
 

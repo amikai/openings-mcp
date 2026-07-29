@@ -29,14 +29,6 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
-// baseURL is the origin for Engage tenant board API calls.
-const baseURL = "https://en-gage.net"
-
-// BaseURL returns the Engage API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // CareersURL returns the company's human-facing engage tenant board.
 func (c Company) CareersURL() string {
 	return "https://en-gage.net/" + c.Slug + "/"

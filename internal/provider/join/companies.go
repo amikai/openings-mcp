@@ -28,14 +28,6 @@ type RosterCompany struct {
 	CompanyID int    `yaml:"company_id" json:"company_id"`
 }
 
-// baseURL is the origin for join.com API calls.
-const baseURL = "https://join.com"
-
-// BaseURL returns the Join API base URL, for [NewClient].
-func (c RosterCompany) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats a Join career page URL (e.g. "https://join.com/companies/routinelabs").
 const careersURLTpl = "https://join.com/companies/%s"
 

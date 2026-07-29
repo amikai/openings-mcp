@@ -23,14 +23,6 @@ type RosterCompany struct {
 	Account string `yaml:"account" json:"account"`
 }
 
-// baseURL is the origin for Workable API calls.
-const baseURL = "https://apply.workable.com"
-
-// BaseURL returns the Workable API base URL, for [NewClient].
-func (c RosterCompany) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats a Workable careers page URL (e.g. "https://apply.workable.com/blueground/").
 const careersURLTpl = "https://apply.workable.com/%s/"
 

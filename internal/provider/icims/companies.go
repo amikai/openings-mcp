@@ -23,14 +23,6 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
-// baseURLTpl formats an iCIMS API base URL (e.g. "https://careers-peraton.icims.com").
-const baseURLTpl = "https://%s"
-
-// BaseURL returns the company's iCIMS API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return fmt.Sprintf(baseURLTpl, c.Host)
-}
-
 // careersURLTpl formats an iCIMS job search page URL (e.g. "https://careers-peraton.icims.com/jobs/search?ss=1").
 const careersURLTpl = "https://%s/jobs/search?ss=1"
 

@@ -23,14 +23,6 @@ type Company struct {
 	BoardToken string `yaml:"board_token" json:"board_token"`
 }
 
-// baseURL is the origin for Greenhouse Job Board API calls.
-const baseURL = "https://boards-api.greenhouse.io"
-
-// BaseURL returns the Greenhouse API base URL, for [NewClient].
-func (c Company) BaseURL() string {
-	return baseURL
-}
-
 // careersURLTpl formats a Greenhouse job board page URL (e.g. "https://job-boards.greenhouse.io/anthropic").
 const careersURLTpl = "https://job-boards.greenhouse.io/%s"
 
