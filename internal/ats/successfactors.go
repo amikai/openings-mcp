@@ -31,10 +31,13 @@ type SuccessFactorsAdapter struct {
 	baseURL func(host string) string
 }
 
+// successFactorsBaseURLTpl formats a portal host into a base URL (e.g. "https://jobs.siemens.com").
+const successFactorsBaseURLTpl = "https://%s"
+
 func NewSuccessFactorsAdapter(hc *http.Client) *SuccessFactorsAdapter {
 	return &SuccessFactorsAdapter{
 		hc:      hc,
-		baseURL: func(host string) string { return "https://" + host },
+		baseURL: func(host string) string { return fmt.Sprintf(successFactorsBaseURLTpl, host) },
 	}
 }
 

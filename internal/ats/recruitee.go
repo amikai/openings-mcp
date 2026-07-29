@@ -38,11 +38,14 @@ type RecruiteeAdapter struct {
 	dumpCache *DumpCache
 }
 
+// recruiteeBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://mous.recruitee.com").
+const recruiteeBaseURLTpl = "https://%s.recruitee.com"
+
 func NewRecruiteeAdapter(hc *http.Client, dumpCache *DumpCache) *RecruiteeAdapter {
 	return &RecruiteeAdapter{
 		hc: hc,
 		baseURL: func(slug string) string {
-			return "https://" + slug + ".recruitee.com"
+			return fmt.Sprintf(recruiteeBaseURLTpl, slug)
 		},
 		dumpCache: dumpCache,
 	}

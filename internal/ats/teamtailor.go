@@ -38,10 +38,13 @@ type TeamtailorAdapter struct {
 	dumpCache *DumpCache
 }
 
+// teamtailorBaseURLTpl formats a portal host into a base URL (e.g. "https://company.teamtailor.com").
+const teamtailorBaseURLTpl = "https://%s"
+
 func NewTeamtailorAdapter(hc *http.Client, dumpCache *DumpCache) *TeamtailorAdapter {
 	return &TeamtailorAdapter{
 		hc:        hc,
-		baseURL:   func(host string) string { return "https://" + host },
+		baseURL:   func(host string) string { return fmt.Sprintf(teamtailorBaseURLTpl, host) },
 		dumpCache: dumpCache,
 	}
 }

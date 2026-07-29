@@ -455,6 +455,9 @@ func v2JobSummaries(positions []eightfold.V2Position) []JobSummary {
 	return jobs
 }
 
+// eightfoldBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://nutanix.eightfold.ai").
+const eightfoldBaseURLTpl = "https://%s.eightfold.ai"
+
 func eightfoldBaseURL(tenant string) string {
-	return fmt.Sprintf("https://%s.eightfold.ai", tenant)
+	return fmt.Sprintf(eightfoldBaseURLTpl, tenant)
 }

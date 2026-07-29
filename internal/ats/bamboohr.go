@@ -43,10 +43,11 @@ type BambooHRAdapter struct {
 	dumpCache *DumpCache
 }
 
-// bambooHRDetailConcurrency caps concurrent detail fetches when Search
-// enriches descriptions for query matching. BambooHR boards are typically
-// small SMB boards; this keeps a large board from opening unbounded sockets.
-const bambooHRDetailConcurrency = 8
+const (
+	bambooHRDetailConcurrency = 8
+	// bambooHRBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://curtinmaritime.bamboohr.com").
+	bambooHRBaseURLTpl = "https://%s.bamboohr.com"
+)
 
 // NewBambooHRAdapter derives a redirect-blocking copy of hc: BambooHR
 // 302-redirects unknown tenants to its marketing site, and following that
@@ -60,7 +61,7 @@ func NewBambooHRAdapter(hc *http.Client, dumpCache *DumpCache) *BambooHRAdapter 
 	return &BambooHRAdapter{
 		hc: &c,
 		baseURL: func(slug string) string {
-			return "https://" + slug + ".bamboohr.com"
+			return fmt.Sprintf(bambooHRBaseURLTpl, slug)
 		},
 		dumpCache: dumpCache,
 	}

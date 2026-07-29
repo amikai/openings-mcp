@@ -33,10 +33,13 @@ type AvatureAdapter struct {
 	baseURL func(slug string) string
 }
 
+// avatureBaseURLTpl formats a portal slug/host into a base URL (e.g. "https://bloomberg.avature.net/careers").
+const avatureBaseURLTpl = "https://%s"
+
 func NewAvatureAdapter(hc *http.Client) *AvatureAdapter {
 	return &AvatureAdapter{
 		hc:      hc,
-		baseURL: func(slug string) string { return "https://" + slug },
+		baseURL: func(slug string) string { return fmt.Sprintf(avatureBaseURLTpl, slug) },
 	}
 }
 
