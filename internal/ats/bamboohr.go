@@ -38,8 +38,9 @@ var bambooHRCareersHostRE = regexp.MustCompile(
 // /careers/{id}/detail so tier-3 skill/technology matching can see full
 // JDs. Detail hits the per-job endpoint directly.
 type BambooHRAdapter struct {
-	hc      *http.Client
-	baseURL func(slug string) string
+	hc        *http.Client
+	baseURL   func(slug string) string
+	dumpCache *DumpCache
 }
 
 // bambooHRDetailConcurrency caps concurrent detail fetches when Search
@@ -51,7 +52,7 @@ const bambooHRDetailConcurrency = 8
 // 302-redirects unknown tenants to its marketing site, and following that
 // redirect would turn a diagnosable "no such tenant" into an HTML decode
 // error.
-func NewBambooHRAdapter(hc *http.Client) *BambooHRAdapter {
+func NewBambooHRAdapter(hc *http.Client, dumpCache *DumpCache) *BambooHRAdapter {
 	c := *hc
 	c.CheckRedirect = func(*http.Request, []*http.Request) error {
 		return http.ErrUseLastResponse
@@ -61,6 +62,7 @@ func NewBambooHRAdapter(hc *http.Client) *BambooHRAdapter {
 		baseURL: func(slug string) string {
 			return "https://" + slug + ".bamboohr.com"
 		},
+		dumpCache: dumpCache,
 	}
 }
 
@@ -121,7 +123,9 @@ func (a *BambooHRAdapter) Search(
 	}
 	// The list feed has no JD text. Populate descriptions from detail so
 	// the unified query contract (titles + skills/technologies) holds.
+	// dump() results are read-only (may be cache-shared); clone before mutate.
 	if strings.TrimSpace(p.Query) != "" {
+		jobs = cloneDumpJobs(jobs)
 		if err := a.enrichDescriptions(ctx, slug, jobs); err != nil {
 			return nil, err
 		}
@@ -185,8 +189,22 @@ func (a *BambooHRAdapter) client(slug string) (*bamboohr.Client, error) {
 	return client, nil
 }
 
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled. The returned slice is read-only (see dumpJob).
+// Description enrichment for query matching is a Search concern: it clones
+// first, then fills fields the list endpoint omitted — never write through
+// dump()'s return value.
 func (a *BambooHRAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
 	slug = strings.ToLower(slug)
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads list rows for the subdomain (no JD text).
+func (a *BambooHRAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	client, err := a.client(slug)
 	if err != nil {
 		return nil, err

@@ -21,7 +21,7 @@ func testGreenhouseAdapter(t *testing.T) *GreenhouseAdapter {
 	t.Helper()
 	srv := greenhouse.NewMockServer()
 	t.Cleanup(srv.Close)
-	a, err := NewGreenhouseAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	a, err := NewGreenhouseAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 	require.NoError(t, err)
 	return a
 }

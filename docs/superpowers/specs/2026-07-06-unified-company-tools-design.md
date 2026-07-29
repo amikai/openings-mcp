@@ -41,7 +41,7 @@ cmd/openings-mcp/main.go   組裝:http.Client → 三個 adapter → registry �
 
 關鍵不變式:
 
-- **無狀態**:每次 tool call 重新走完整流程,無任何快取。workday adapter 按公司臨時建 `workday.Client` 是零成本包裝,連線池在共用的 `http.Client` 上
+- **無跨 process 狀態**:每次 tool call 重新走完整流程;不持久化、不跨 process 共用結果。full-dump 家族可選啟用 process-local 短 TTL 的 `[]dumpJob` dump cache(預設 10m; `--dump-cache-ttl<=0` 關閉),讓同一 session 內 Filters→Search→page→Detail 共用一次上游整板抓取——見 [2026-07-29-ats-dump-cache-design.md](2026-07-29-ats-dump-cache-design.md)。server-side 搜尋家族(含 Workday)仍不快取。workday adapter 按公司臨時建 `workday.Client` 是零成本包裝,連線池在共用的 `http.Client` 上
 - **兩個實作家族對 LLM 不可區分**:同樣的參數語意、同樣的回傳形狀
 - **JD 全文不進搜尋結果**(context 紅線),只有 `get_job_detail_by_company` 回全文
 

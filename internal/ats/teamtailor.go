@@ -1,6 +1,7 @@
 package ats
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"net/http"
@@ -32,14 +33,16 @@ var teamtailorCareersHostRE = regexp.MustCompile(
 // endpoint returns the complete board with full descriptions, so all search,
 // filter, and detail behavior is implemented over that dump.
 type TeamtailorAdapter struct {
-	hc      *http.Client
-	baseURL func(host string) string
+	hc        *http.Client
+	baseURL   func(host string) string
+	dumpCache *DumpCache
 }
 
-func NewTeamtailorAdapter(hc *http.Client) *TeamtailorAdapter {
+func NewTeamtailorAdapter(hc *http.Client, dumpCache *DumpCache) *TeamtailorAdapter {
 	return &TeamtailorAdapter{
-		hc:      hc,
-		baseURL: func(host string) string { return "https://" + host },
+		hc:        hc,
+		baseURL:   func(host string) string { return "https://" + host },
+		dumpCache: dumpCache,
 	}
 }
 
@@ -123,23 +126,25 @@ func (a *TeamtailorAdapter) Detail(
 	slug string,
 	jobID string,
 ) (*JobDetail, error) {
-	feed, err := a.feed(ctx, slug)
+	// Route through dump so Search → Detail reuses the process-local dump
+	// cache. Company is roster name or host slug (not feed.Title) for v1.
+	jobs, err := a.dump(ctx, slug)
 	if err != nil {
 		return nil, err
 	}
-	for _, j := range feed.Items {
-		if j.ID.String() != jobID {
+	company := cmp.Or(teamtailor.CompaniesByHost[strings.ToLower(slug)].Name, slug)
+	for _, j := range jobs {
+		if j.summary.JobID != jobID {
 			continue
 		}
-		location := teamtailorLocations(j.Jobposting.JobLocation)
 		return &JobDetail{
 			JobID:       jobID,
-			Title:       j.Title,
-			Company:     feed.Title,
-			Location:    location.display,
-			PostedAt:    isoDate(j.DatePublished),
-			URL:         j.URL,
-			Description: teamtailorDescription(j.ContentHTML),
+			Title:       j.summary.Title,
+			Company:     company,
+			Location:    j.summary.Location,
+			PostedAt:    j.summary.PostedAt,
+			URL:         j.summary.URL,
+			Description: j.description,
 		}, nil
 	}
 	return nil, fmt.Errorf(
@@ -178,7 +183,19 @@ func (a *TeamtailorAdapter) feed(
 	}
 }
 
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
 func (a *TeamtailorAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	slug = strings.ToLower(slug)
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads the career feed and reshapes items for filtering.
+func (a *TeamtailorAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	feed, err := a.feed(ctx, slug)
 	if err != nil {
 		return nil, err

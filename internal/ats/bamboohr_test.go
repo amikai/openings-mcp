@@ -17,7 +17,7 @@ func testBambooHRAdapter(t *testing.T) *BambooHRAdapter {
 	t.Helper()
 	srv := bamboohr.NewMockServer()
 	t.Cleanup(srv.Close)
-	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 	return a
 }
@@ -26,7 +26,7 @@ func testBambooHRVarietyAdapter(t *testing.T) *BambooHRAdapter {
 	t.Helper()
 	srv := bamboohr.NewVarietyMockServer()
 	t.Cleanup(srv.Close)
-	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 	return a
 }
@@ -201,7 +201,7 @@ func TestBambooHRDetailAtsLocationFallback(t *testing.T) {
 	srv := httptest.NewServer(mux)
 	t.Cleanup(srv.Close)
 
-	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
 	detail, err := a.Detail(t.Context(), "ashteadtechnology", "35")
@@ -228,7 +228,7 @@ func TestBambooHRDetailNotFound(t *testing.T) {
 func TestBambooHRSearchEmptyBoard(t *testing.T) {
 	srv := bamboohr.NewEmptyMockServer()
 	t.Cleanup(srv.Close)
-	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
 	res, err := a.Search(t.Context(), "zapier", SearchParams{})
@@ -243,7 +243,7 @@ func TestBambooHRSearchEmptyBoard(t *testing.T) {
 func TestBambooHRUnknownTenantUpstream(t *testing.T) {
 	srv := bamboohr.NewRedirectMockServer()
 	t.Cleanup(srv.Close)
-	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewBambooHRAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
 	_, err := a.Search(t.Context(), "no-such-tenant", SearchParams{})

@@ -22,8 +22,9 @@ var _ Adapter = (*HerpAdapter)(nil)
 // company's whole board with full posting text, so all search, filter, and
 // detail behavior is implemented over that dump.
 type HerpAdapter struct {
-	hc      *http.Client
-	baseURL string
+	hc        *http.Client
+	baseURL   string
+	dumpCache *DumpCache
 }
 
 // herpCareersURLRE matches HERP Career company pages, and herpHireCareersURLRE
@@ -38,8 +39,8 @@ var (
 	herpHireCareersURLRE = regexp.MustCompile(`(?i)^herp\.careers/v1/(?P<slug>[^/]+)`)
 )
 
-func NewHerpAdapter(hc *http.Client) *HerpAdapter {
-	return &HerpAdapter{hc: hc, baseURL: "https://herp.careers"}
+func NewHerpAdapter(hc *http.Client, dumpCache *DumpCache) *HerpAdapter {
+	return &HerpAdapter{hc: hc, baseURL: "https://herp.careers", dumpCache: dumpCache}
 }
 
 func (a *HerpAdapter) Name() string { return "herp" }
@@ -117,8 +118,30 @@ func (a *HerpAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetai
 	)
 }
 
+// dump returns a full-board intermediate dump plus the company board
+// metadata Detail needs, reusing the process-local dump cache when enabled.
+// Board is stored as a read-only side payload.
 func (a *HerpAdapter) dump(ctx context.Context, slug string) ([]dumpJob, *herp.CompanyBoard, error) {
 	slug = strings.ToLower(slug)
+	jobs, side, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, board, err := a.fetchDump(ctx, slug)
+		if err != nil {
+			return nil, nil, err
+		}
+		return jobs, board, nil
+	})
+	if err != nil {
+		return nil, nil, err
+	}
+	board, _ := side.(*herp.CompanyBoard)
+	if board == nil {
+		return nil, nil, fmt.Errorf("herp: internal: missing board for %q", slug)
+	}
+	return jobs, board, nil
+}
+
+// fetchDump loads the company board and reshapes jobs for filtering.
+func (a *HerpAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, *herp.CompanyBoard, error) {
 	client, err := herp.NewClient(a.baseURL, herp.WithClient(a.hc))
 	if err != nil {
 		return nil, nil, fmt.Errorf("herp: create client for %q: %w", slug, err)

@@ -20,7 +20,8 @@ import (
 // matching covers titles and departments only, and ordering falls back to
 // job id. Detail uses the per-job endpoint, one light request.
 type RipplingAdapter struct {
-	client *rippling.Client
+	client    *rippling.Client
+	dumpCache *DumpCache
 }
 
 // ripplingCareersURLRE matches Rippling board URLs and captures the board
@@ -33,12 +34,12 @@ var ripplingCareersURLRE = regexp.MustCompile(
 	`(?i)^ats\.rippling\.com/(?P<slug>[^/]+)`,
 )
 
-func NewRipplingAdapter(baseURL string, hc *http.Client) (*RipplingAdapter, error) {
+func NewRipplingAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) (*RipplingAdapter, error) {
 	c, err := rippling.NewClient(baseURL, rippling.WithClient(hc))
 	if err != nil {
 		return nil, err
 	}
-	return &RipplingAdapter{client: c}, nil
+	return &RipplingAdapter{client: c, dumpCache: dumpCache}, nil
 }
 
 func (a *RipplingAdapter) Name() string { return "rippling" }
@@ -112,10 +113,20 @@ func (a *RipplingAdapter) Detail(ctx context.Context, slug, jobID string) (*JobD
 	}
 }
 
-// dump fetches the full board and reshapes it for the filter engine,
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
+func (a *RipplingAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump fetches the full board and reshapes it for the filter engine,
 // merging the upstream's one-entry-per-(job, location) rows into one
 // dumpJob per posting.
-func (a *RipplingAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+func (a *RipplingAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	res, err := a.client.ListJobs(ctx, rippling.ListJobsParams{BoardSlug: slug})
 	if err != nil {
 		return nil, fmt.Errorf("rippling: list jobs for %q: %w", slug, err)

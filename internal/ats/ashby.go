@@ -15,10 +15,11 @@ import (
 // AshbyAdapter serves Ashby-hosted companies. Ashby's public API is a
 // single full-board endpoint — no server-side search and no per-job
 // endpoint (returns 401) — so Search filters the dump via searchDump and
-// Detail refetches the board and picks the one job out. The refetch is a
-// bandwidth cost between this server and Ashby, invisible to the client.
+// Detail scans the same dump. When the process-local dump cache is enabled,
+// Search/Filters/Detail for one board share a single upstream fetch.
 type AshbyAdapter struct {
-	client *ashby.Client
+	client    *ashby.Client
+	dumpCache *DumpCache
 }
 
 // ashbyCareersURLRE matches Ashby board URLs and captures the organization
@@ -32,12 +33,12 @@ var ashbyCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.ashbyhq\.com/(?P<slug>[^/]+)`,
 )
 
-func NewAshbyAdapter(baseURL string, hc *http.Client) (*AshbyAdapter, error) {
+func NewAshbyAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) (*AshbyAdapter, error) {
 	c, err := ashby.NewClient(baseURL, ashby.WithClient(hc))
 	if err != nil {
 		return nil, err
 	}
-	return &AshbyAdapter{client: c}, nil
+	return &AshbyAdapter{client: c, dumpCache: dumpCache}, nil
 }
 
 func (a *AshbyAdapter) Name() string { return "ashby" }
@@ -83,22 +84,28 @@ func (a *AshbyAdapter) Filters(ctx context.Context, slug string) (FilterSet, err
 }
 
 func (a *AshbyAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {
-	board, err := a.board(ctx, slug)
+	// Route through dump so Search → Detail reuses the process-local dump
+	// cache instead of re-fetching the board. Ashby has no public per-job API.
+	jobs, err := a.dump(ctx, slug)
 	if err != nil {
 		return nil, err
 	}
-	for _, j := range board.Jobs {
-		if j.ID.Value != jobID {
+	for _, j := range jobs {
+		if j.summary.JobID != jobID {
 			continue
 		}
+		loc := j.summary.Location
+		if j.locations != "" {
+			loc = j.locations
+		}
 		return &JobDetail{
-			JobID:       j.ID.Value,
-			Title:       j.Title.Value,
-			Company:     cmp.Or(ashby.CompaniesByBoard[slug].Name, slug),
-			Location:    ashbyLocations(&j),
-			PostedAt:    ashbyPostedAt(j.PublishedAt),
-			URL:         j.JobUrl.Value,
-			Description: j.DescriptionPlain.Value,
+			JobID:       j.summary.JobID,
+			Title:       j.summary.Title,
+			Company:     cmp.Or(ashby.CompaniesByBoard[strings.ToLower(slug)].Name, slug),
+			Location:    loc,
+			PostedAt:    j.summary.PostedAt,
+			URL:         j.summary.URL,
+			Description: j.description,
 		}, nil
 	}
 	return nil, fmt.Errorf("ashby: job %q not found for company %q; pass a job_id exactly as returned by the job search", jobID, slug)
@@ -120,7 +127,18 @@ func (a *AshbyAdapter) board(ctx context.Context, slug string) (*ashby.JobBoardR
 	}
 }
 
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
 func (a *AshbyAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads the board and reshapes listed jobs for the filter engine.
+func (a *AshbyAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	board, err := a.board(ctx, slug)
 	if err != nil {
 		return nil, err

@@ -17,7 +17,7 @@ func testHrmosAdapter(t *testing.T) *HrmosAdapter {
 	t.Helper()
 	srv := hrmos.NewMockServer()
 	t.Cleanup(srv.Close)
-	return NewHrmosAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	return NewHrmosAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 }
 
 func TestHrmosRoster(t *testing.T) {
@@ -61,7 +61,7 @@ func TestHrmosSearchFilterEngineer(t *testing.T) {
 	srv := hrmos.NewMockServer()
 	t.Cleanup(srv.Close)
 	hc := &http.Client{Timeout: 5 * time.Second}
-	a := NewHrmosAdapter(srv.URL, hc)
+	a := NewHrmosAdapter(srv.URL, hc, nil)
 
 	dump, err := hrmos.NewClient(srv.URL, hc).AllJobs(t.Context(), hrmos.MockSlugPaged)
 	require.NoError(t, err)

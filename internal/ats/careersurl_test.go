@@ -41,11 +41,11 @@ func TestParseCareersInput(t *testing.T) {
 }
 
 func TestSlugAdaptersParseCareersURL(t *testing.T) {
-	gh, err := NewGreenhouseAdapter("https://example.invalid", http.DefaultClient)
+	gh, err := NewGreenhouseAdapter("https://example.invalid", http.DefaultClient, nil)
 	require.NoError(t, err)
-	lv, err := NewLeverAdapter("https://example.invalid", http.DefaultClient)
+	lv, err := NewLeverAdapter("https://example.invalid", http.DefaultClient, nil)
 	require.NoError(t, err)
-	ab, err := NewAshbyAdapter("https://example.invalid", http.DefaultClient)
+	ab, err := NewAshbyAdapter("https://example.invalid", http.DefaultClient, nil)
 	require.NoError(t, err)
 
 	tests := []struct {

@@ -16,7 +16,7 @@ func testLeverAdapter(t *testing.T) *LeverAdapter {
 	t.Helper()
 	srv := lever.NewMockServer()
 	t.Cleanup(srv.Close)
-	a, err := NewLeverAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	a, err := NewLeverAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 	require.NoError(t, err)
 	return a
 }

@@ -25,8 +25,9 @@ var _ Adapter = (*EngageAdapter)(nil)
 // For a tenant over that ceiling, Search results and TotalCount are a lower
 // bound on the true board.
 type EngageAdapter struct {
-	hc      *http.Client
-	baseURL string
+	hc        *http.Client
+	baseURL   string
+	dumpCache *DumpCache
 }
 
 // engageCareersURLRE matches an engage tenant careers page and captures the
@@ -51,8 +52,8 @@ var engageReservedPaths = map[string]bool{
 	"imagefile_user": true,
 }
 
-func NewEngageAdapter(hc *http.Client) *EngageAdapter {
-	return &EngageAdapter{hc: hc, baseURL: "https://en-gage.net"}
+func NewEngageAdapter(hc *http.Client, dumpCache *DumpCache) *EngageAdapter {
+	return &EngageAdapter{hc: hc, baseURL: "https://en-gage.net", dumpCache: dumpCache}
 }
 
 func (a *EngageAdapter) Name() string { return "engage" }
@@ -136,8 +137,20 @@ func (a *EngageAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 	}, nil
 }
 
+// dump returns a (possibly capped) board dump, reusing the process-local
+// dump cache when enabled. Caching does not change lower-bound TotalCount
+// semantics from engage.CategoryCap.
 func (a *EngageAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
 	slug = strings.ToLower(slug)
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads the engage board HTML and reshapes jobs for filtering.
+func (a *EngageAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	board, err := engage.NewClient(a.baseURL, a.hc).Board(ctx, slug)
 	if err != nil {
 		switch {

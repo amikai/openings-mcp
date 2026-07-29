@@ -22,7 +22,8 @@ import (
 // on the content variant — and filters it via searchDump. Detail uses the
 // per-job endpoint, one light request.
 type GreenhouseAdapter struct {
-	client *greenhouse.Client
+	client    *greenhouse.Client
+	dumpCache *DumpCache
 }
 
 // greenhouseCareersURLRE matches Greenhouse board URLs and captures the
@@ -36,12 +37,12 @@ var greenhouseCareersURLRE = regexp.MustCompile(
 	`(?i)^(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/(?P<slug>[^/]+)`,
 )
 
-func NewGreenhouseAdapter(baseURL string, hc *http.Client) (*GreenhouseAdapter, error) {
+func NewGreenhouseAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) (*GreenhouseAdapter, error) {
 	c, err := greenhouse.NewClient(baseURL, greenhouse.WithClient(hc))
 	if err != nil {
 		return nil, err
 	}
-	return &GreenhouseAdapter{client: c}, nil
+	return &GreenhouseAdapter{client: c, dumpCache: dumpCache}, nil
 }
 
 func (a *GreenhouseAdapter) Name() string { return "greenhouse" }
@@ -118,9 +119,19 @@ func errGreenhouseJobNotFound(slug, jobID string) error {
 	return fmt.Errorf("greenhouse: job %q not found for company %q; pass a job_id exactly as returned by the job search", jobID, slug)
 }
 
-// dump fetches the full board with content and reshapes it for the filter
-// engine.
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
 func (a *GreenhouseAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump fetches the full board with content and reshapes it for the
+// filter engine.
+func (a *GreenhouseAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	res, err := a.client.ListJobs(ctx, greenhouse.ListJobsParams{
 		BoardToken: slug,
 		Content:    greenhouse.NewOptBool(true),

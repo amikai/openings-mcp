@@ -20,7 +20,8 @@ import (
 // one — so Detail is a separate SSR page scrape, and searchDump's
 // full-text tier only ever matches title and category.
 type JoinAdapter struct {
-	client *join.Client
+	client    *join.Client
+	dumpCache *DumpCache
 }
 
 // joinCareersURLRE matches join.com company page URLs and captures the
@@ -29,8 +30,8 @@ type JoinAdapter struct {
 // Example (hostname + escaped path): join.com/companies/routinelabs
 var joinCareersURLRE = regexp.MustCompile(`(?i)^join\.com/companies/(?P<slug>[^/]+)`)
 
-func NewJoinAdapter(baseURL string, hc *http.Client) *JoinAdapter {
-	return &JoinAdapter{client: join.NewClient(baseURL, hc)}
+func NewJoinAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) *JoinAdapter {
+	return &JoinAdapter{client: join.NewClient(baseURL, hc), dumpCache: dumpCache}
 }
 
 func (a *JoinAdapter) Name() string { return "join" }
@@ -120,15 +121,24 @@ func errJoinJobNotFound(slug, jobID string) error {
 // engine. Requires slug to be a curated roster entry — join.com's
 // companyId can't be resolved from an arbitrary slug without a network
 // call (see ParseCareersURL), so this adapter never serves non-roster
-// companies, unlike Workday.
+// companies, unlike Workday. Roster lookup stays outside the dump cache.
 func (a *JoinAdapter) dump(ctx context.Context, slug string) ([]dumpJob, join.RosterCompany, error) {
 	c, ok := join.CompaniesBySlug[strings.ToLower(slug)]
 	if !ok {
 		return nil, join.RosterCompany{}, errJoinCompanyNotFound(slug)
 	}
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), c.Slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDumpJobs(ctx, c)
+		return jobs, nil, err
+	})
+	return jobs, c, err
+}
+
+// fetchDumpJobs loads jobs for a roster company and reshapes them.
+func (a *JoinAdapter) fetchDumpJobs(ctx context.Context, c join.RosterCompany) ([]dumpJob, error) {
 	jobs, err := a.client.Jobs(ctx, c.CompanyID)
 	if err != nil {
-		return nil, c, fmt.Errorf("join: list jobs for %q: %w", slug, err)
+		return nil, fmt.Errorf("join: list jobs for %q: %w", c.Slug, err)
 	}
 	out := make([]dumpJob, 0, len(jobs))
 	for _, j := range jobs {
@@ -158,7 +168,7 @@ func (a *JoinAdapter) dump(ctx context.Context, slug string) ([]dumpJob, join.Ro
 			isRemote:  j.WorkplaceType == "REMOTE",
 		})
 	}
-	return out, c, nil
+	return out, nil
 }
 
 // joinLocation renders a job's location for display and fuzzy search.

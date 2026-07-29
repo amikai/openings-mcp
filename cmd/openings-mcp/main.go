@@ -75,6 +75,7 @@ func run() int {
 		logLevel             = fs.StringLong("log-level", "info", "minimum log level: debug, info, warn, or error")
 		enableCommandLogging = fs.BoolLong("enable-command-logging", "log raw JSON-RPC traffic to the log output")
 		versionFlag          = fs.BoolLong("version", "print version information and exit")
+		dumpCacheTTL         = fs.DurationLong("dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
 	)
 	cmd := &ff.Command{
 		Name:      "openings-mcp",
@@ -112,19 +113,32 @@ func run() int {
 	}
 	logger := slog.New(slog.NewTextHandler(logOutput, &slog.HandlerOptions{Level: level}))
 
+	// Process-local dump cache for full-dump ATS adapters. Injected into
+	// adapters; nil when --dump-cache-ttl <= 0 (opt out by not constructing).
+	ttl := *dumpCacheTTL
+	var dumpCache *ats.DumpCache
+	if ttl > 0 {
+		dumpCache = ats.NewDumpCache(ats.DumpCacheConfig{TTL: ttl})
+	}
+	logger.Info("dump cache configured",
+		"enabled", dumpCache != nil,
+		"ttl", ttl.String(),
+		"max_entries", ats.DefaultDumpCacheMaxEntries,
+	)
+
 	var transport mcp.Transport = &mcp.StdioTransport{}
 	if *enableCommandLogging {
 		transport = &mcp.LoggingTransport{Transport: transport, Writer: logOutput}
 	}
 
-	if err := runWithTransport(transport, logger); err != nil {
+	if err := runWithTransport(transport, logger, dumpCache); err != nil {
 		logger.Error("server terminated", "error", err)
 		return 1
 	}
 	return 0
 }
 
-func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
+func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpCache) error {
 	// One connection pool, with a ceiling so a hung upstream fails that call
 	// instead of stalling the MCP session.
 	hc104 := &http.Client{Timeout: 30 * time.Second, Transport: job104.BrowserTransport{}}
@@ -179,7 +193,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 
 	cMeta := meta.NewClient("https://www.metacareers.com", hc)
 
-	registry, err := newATSRegistry(hc, hcEightfold)
+	registry, err := newATSRegistry(hc, hcEightfold, dumpCache)
 	if err != nil {
 		return err
 	}
@@ -210,8 +224,8 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger) error {
 // connection pool, against the providers' production endpoints.
 // hcEightfold is separate because Eightfold's edge requires a browser-shaped
 // User-Agent that the other adapters don't need.
-func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
-	adapters, err := atsAdapters(hc, hcEightfold)
+func newATSRegistry(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) (*ats.Registry, error) {
+	adapters, err := atsAdapters(hc, hcEightfold, dumpCache)
 	if err != nil {
 		return nil, err
 	}
@@ -221,17 +235,17 @@ func newATSRegistry(hc, hcEightfold *http.Client) (*ats.Registry, error) {
 // atsAdapters builds the production adapter list newATSRegistry registers,
 // in registration order. Pulled out of newATSRegistry so tests can walk the
 // same list the server actually runs, rather than a redeclared copy that
-// could drift from it.
-func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
-	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc)
+// could drift from it. dumpCache is injected into full-dump adapters (nil is fine).
+func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.Adapter, error) {
+	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Lever ATS adapter: %w", err)
 	}
-	ashbyAdapter, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
+	ashbyAdapter, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Ashby ATS adapter: %w", err)
 	}
-	greenhouseAdapter, err := ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
+	greenhouseAdapter, err := ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Greenhouse ATS adapter: %w", err)
 	}
@@ -243,7 +257,7 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 	if err != nil {
 		return nil, fmt.Errorf("create Workable ATS adapter: %w", err)
 	}
-	ripplingAdapter, err := ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc)
+	ripplingAdapter, err := ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Rippling ATS adapter: %w", err)
 	}
@@ -257,11 +271,11 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 		leverAdapter,
 		ashbyAdapter,
 		greenhouseAdapter,
-		ats.NewTeamtailorAdapter(hc),
-		ats.NewRecruiteeAdapter(hc),
-		ats.NewHerpAdapter(hc),
-		ats.NewEngageAdapter(hc),
-		ats.NewBambooHRAdapter(hc),
+		ats.NewTeamtailorAdapter(hc, dumpCache),
+		ats.NewRecruiteeAdapter(hc, dumpCache),
+		ats.NewHerpAdapter(hc, dumpCache),
+		ats.NewEngageAdapter(hc, dumpCache),
+		ats.NewBambooHRAdapter(hc, dumpCache),
 		ats.NewEightfoldAdapter(hcEightfold),
 		ats.NewSuccessFactorsAdapter(hc),
 		smartrecruitersAdapter,
@@ -270,9 +284,9 @@ func atsAdapters(hc, hcEightfold *http.Client) ([]ats.Adapter, error) {
 		ats.NewICIMSAdapter(hc),
 		ats.NewAvatureAdapter(hc),
 		ats.NewOracleAdapter(hc),
-		ats.NewJoinAdapter("https://join.com", hc),
+		ats.NewJoinAdapter("https://join.com", hc, dumpCache),
 		ats.NewUltiProAdapter(hc),
-		ats.NewHrmosAdapter("https://hrmos.co", hc),
+		ats.NewHrmosAdapter("https://hrmos.co", hc, dumpCache),
 		mokahrAdapter,
 	}, nil
 }
