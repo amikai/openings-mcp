@@ -17,7 +17,7 @@ func testEngageAdapter(t *testing.T) *EngageAdapter {
 	t.Helper()
 	srv := engage.NewMockServer()
 	t.Cleanup(srv.Close)
-	a := NewEngageAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewEngageAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = srv.URL
 	return a
 }

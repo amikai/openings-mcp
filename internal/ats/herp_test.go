@@ -28,7 +28,7 @@ func testHerpAdapter(t *testing.T) *HerpAdapter {
 	t.Helper()
 	srv := herp.NewMockServer()
 	t.Cleanup(srv.Close)
-	a := NewHerpAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewHerpAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = srv.URL
 	return a
 }

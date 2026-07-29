@@ -183,43 +183,43 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 		)
 		switch name {
 		case "ashby":
-			a, err = ats.NewAshbyAdapter("https://api.ashbyhq.com", hc)
+			a, err = ats.NewAshbyAdapter("https://api.ashbyhq.com", hc, nil)
 		case "avature":
 			a = ats.NewAvatureAdapter(hc)
 		case "bamboohr":
-			a = ats.NewBambooHRAdapter(hc)
+			a = ats.NewBambooHRAdapter(hc, nil)
 		case "eightfold":
 			// Eightfold's edge 403s Go's default User-Agent instead of
 			// returning JSON, so it gets its own client rather than hc.
 			a = ats.NewEightfoldAdapter(&http.Client{Transport: eightfold.BrowserTransport{}})
 		case "engage":
-			a = ats.NewEngageAdapter(hc)
+			a = ats.NewEngageAdapter(hc, nil)
 		case "greenhouse":
-			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc)
+			a, err = ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc, nil)
 		case "herp":
-			a = ats.NewHerpAdapter(hc)
+			a = ats.NewHerpAdapter(hc, nil)
 		case "hrmos":
-			a = ats.NewHrmosAdapter("https://hrmos.co", hc)
+			a = ats.NewHrmosAdapter("https://hrmos.co", hc, nil)
 		case "icims":
 			a = ats.NewICIMSAdapter(hc)
 		case "join":
-			a = ats.NewJoinAdapter("https://join.com", hc)
+			a = ats.NewJoinAdapter("https://join.com", hc, nil)
 		case "lever":
-			a, err = ats.NewLeverAdapter("https://api.lever.co", hc)
+			a, err = ats.NewLeverAdapter("https://api.lever.co", hc, nil)
 		case "mokahr":
 			a, err = ats.NewMokaHRAdapter(mokahr.DefaultBaseURL, hc)
 		case "oracle":
 			a = ats.NewOracleAdapter(hc)
 		case "recruitee":
-			a = ats.NewRecruiteeAdapter(hc)
+			a = ats.NewRecruiteeAdapter(hc, nil)
 		case "rippling":
-			a, err = ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc)
+			a, err = ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc, nil)
 		case "smartrecruiters":
 			a, err = ats.NewSmartRecruitersAdapter("https://api.smartrecruiters.com", hc)
 		case "successfactors":
 			a = ats.NewSuccessFactorsAdapter(hc)
 		case "teamtailor":
-			a = ats.NewTeamtailorAdapter(hc)
+			a = ats.NewTeamtailorAdapter(hc, nil)
 		case "ultipro":
 			a = ats.NewUltiProAdapter(hc)
 		case "workable":

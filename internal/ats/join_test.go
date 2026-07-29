@@ -16,7 +16,7 @@ func testJoinAdapter(t *testing.T) *JoinAdapter {
 	t.Helper()
 	srv := join.NewMockServer()
 	t.Cleanup(srv.Close)
-	return NewJoinAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	return NewJoinAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 }
 
 func TestJoinRoster(t *testing.T) {

@@ -24,7 +24,8 @@ var hrmosRemoteMarkers = []string{"リモート", "フルリモート", "在宅"
 // Search fetches a tenant's whole job dump and filters it via searchDump,
 // the same shape as Lever and join.com.
 type HrmosAdapter struct {
-	client *hrmos.Client
+	client    *hrmos.Client
+	dumpCache *DumpCache
 }
 
 // hrmosCareersURLRE matches hrmos.co tenant URLs and captures the slug: it
@@ -34,8 +35,8 @@ type HrmosAdapter struct {
 // Example (hostname + escaped path): hrmos.co/pages/moneyforward/jobs
 var hrmosCareersURLRE = regexp.MustCompile(`(?i)^hrmos\.co/pages/(?P<slug>[^/]+)`)
 
-func NewHrmosAdapter(baseURL string, hc *http.Client) *HrmosAdapter {
-	return &HrmosAdapter{client: hrmos.NewClient(baseURL, hc)}
+func NewHrmosAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) *HrmosAdapter {
+	return &HrmosAdapter{client: hrmos.NewClient(baseURL, hc), dumpCache: dumpCache}
 }
 
 func (a *HrmosAdapter) Name() string { return "hrmos" }
@@ -108,10 +109,19 @@ func errHrmosJobNotFound(slug, jobID string) error {
 	return fmt.Errorf("hrmos: job %q not found for company %q; pass a job_id exactly as returned by the job search", jobID, slug)
 }
 
-// dump fetches a tenant's whole board and reshapes it for the filter
-// engine. Unlike join.com, slug needs no roster lookup to resolve — any
-// hrmos.co tenant slug works directly against the client.
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled. Unlike join.com, slug needs no roster lookup —
+// any hrmos.co tenant slug works directly against the client.
 func (a *HrmosAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads a tenant's whole board and reshapes it for filtering.
+func (a *HrmosAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	resp, err := a.client.AllJobs(ctx, slug)
 	if err != nil {
 		if errors.Is(err, hrmos.ErrNotFound) {

@@ -17,7 +17,7 @@ func testTeamtailorAdapter(t *testing.T) (*TeamtailorAdapter, string) {
 	t.Helper()
 	srv := teamtailor.NewMockServer()
 	t.Cleanup(srv.Close)
-	a := NewTeamtailorAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewTeamtailorAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 	return a, srv.URL
 }
@@ -83,7 +83,7 @@ func TestTeamtailorSearchAll(t *testing.T) {
 func TestTeamtailorSearchMissingJobLocation(t *testing.T) {
 	srv := teamtailor.NewMissingLocationMockServer()
 	t.Cleanup(srv.Close)
-	a := NewTeamtailorAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewTeamtailorAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
 	res, err := a.Search(t.Context(), "carrtalent.na.teamtailor.com", SearchParams{})
@@ -145,7 +145,9 @@ func TestTeamtailorDetail(t *testing.T) {
 	)
 	require.NoError(t, err)
 	assert.Equal(t, "Electromécanicien de maintenance (H/F/X)", detail.Title)
-	assert.Equal(t, "Knauf Belgium", detail.Company)
+	// Company is roster name or host slug (not feed.Title) so dump-cache
+	// Detail can reuse the intermediate dump without a side payload.
+	assert.Equal(t, teamtailor.MockHost, detail.Company)
 	assert.Equal(t, "Engis", detail.Location)
 	assert.Equal(t, "2026-06-11", detail.PostedAt)
 	assert.NotEmpty(t, detail.Description)

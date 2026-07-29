@@ -33,16 +33,18 @@ var recruiteeCareersHostRE = regexp.MustCompile(
 // endpoint returns the complete board with full descriptions, so all search,
 // filter, and detail behavior is implemented over that dump.
 type RecruiteeAdapter struct {
-	hc      *http.Client
-	baseURL func(slug string) string
+	hc        *http.Client
+	baseURL   func(slug string) string
+	dumpCache *DumpCache
 }
 
-func NewRecruiteeAdapter(hc *http.Client) *RecruiteeAdapter {
+func NewRecruiteeAdapter(hc *http.Client, dumpCache *DumpCache) *RecruiteeAdapter {
 	return &RecruiteeAdapter{
 		hc: hc,
 		baseURL: func(slug string) string {
 			return "https://" + slug + ".recruitee.com"
 		},
+		dumpCache: dumpCache,
 	}
 }
 
@@ -141,8 +143,19 @@ func (a *RecruiteeAdapter) Detail(
 	)
 }
 
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
 func (a *RecruiteeAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
 	slug = strings.ToLower(slug)
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump loads offers for the subdomain and reshapes them for filtering.
+func (a *RecruiteeAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	client, err := recruitee.NewClient(a.baseURL(slug), recruitee.WithClient(a.hc))
 	if err != nil {
 		return nil, fmt.Errorf("recruitee: create client for %q: %w", slug, err)

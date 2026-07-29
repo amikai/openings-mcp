@@ -19,7 +19,7 @@ func testRecruiteeAdapter(t *testing.T) (*RecruiteeAdapter, string) {
 	t.Helper()
 	srv := recruitee.NewMockServer()
 	t.Cleanup(srv.Close)
-	a := NewRecruiteeAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewRecruiteeAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 	return a, srv.URL
 }
@@ -123,7 +123,7 @@ func TestRecruiteeSearchSecondaryLocationFilters(t *testing.T) {
 func TestRecruiteeUnknownLocationIsNotRemote(t *testing.T) {
 	srv := recruitee.NewNullMockServer()
 	t.Cleanup(srv.Close)
-	a := NewRecruiteeAdapter(&http.Client{Timeout: 5 * time.Second})
+	a := NewRecruiteeAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
 	remote, err := a.Search(t.Context(), "minimal", SearchParams{Location: remoteLocation})

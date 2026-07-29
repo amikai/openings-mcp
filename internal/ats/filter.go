@@ -13,6 +13,13 @@ import (
 // full-dump provider (lever, ashby): the unified summary plus the
 // searchable text and structured fields filtering needs. Adapters build
 // these; the engine never touches provider types.
+//
+// Immutability contract: slices of dumpJob returned by adapter dump methods
+// (and by DumpCache.getOrLoadDump) are read-only. Callers must not mutate
+// dumpJob fields, nested slices/maps, or the slice header in place. If a
+// caller needs a mutable copy — for example to fill fields the upstream list
+// omitted — it must deep-clone first (see cloneDumpJobs). searchDump and
+// distinctFilters only read.
 type dumpJob struct {
 	summary     JobSummary
 	sortKey     time.Time           // posting time, for deterministic newest-first ordering
@@ -27,6 +34,7 @@ type dumpJob struct {
 // no usable server-side search, so this layer IS the search — lossless,
 // since the dump is complete. Ordering is deterministic (rank, then posted
 // desc, then id) because stateless pagination depends on it.
+// jobs is treated as read-only (see dumpJob immutability contract).
 func searchDump(jobs []dumpJob, p SearchParams) (*SearchResult, error) {
 	if err := validateFilterKeys(jobs, p.Filters); err != nil {
 		return nil, err

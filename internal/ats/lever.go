@@ -19,7 +19,8 @@ import (
 // the whole board (its native filter params are exact-match only, verified
 // useless for fuzzy search), so searching happens in searchDump.
 type LeverAdapter struct {
-	client *lever.Client
+	client    *lever.Client
+	dumpCache *DumpCache
 }
 
 // leverCareersURLRE matches Lever board URLs and captures the organization
@@ -33,12 +34,12 @@ var leverCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs(?:\.eu)?\.lever\.co/(?P<slug>[^/]+)`,
 )
 
-func NewLeverAdapter(baseURL string, hc *http.Client) (*LeverAdapter, error) {
+func NewLeverAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) (*LeverAdapter, error) {
 	c, err := lever.NewClient(baseURL, lever.WithClient(hc))
 	if err != nil {
 		return nil, err
 	}
-	return &LeverAdapter{client: c}, nil
+	return &LeverAdapter{client: c, dumpCache: dumpCache}, nil
 }
 
 func (a *LeverAdapter) Name() string { return "lever" }
@@ -102,8 +103,18 @@ func (a *LeverAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 	}, nil
 }
 
-// dump fetches the full board and reshapes it for the filter engine.
+// dump returns a full-board intermediate dump, reusing the process-local
+// dump cache when enabled.
 func (a *LeverAdapter) dump(ctx context.Context, slug string) ([]dumpJob, error) {
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.fetchDump(ctx, slug)
+		return jobs, nil, err
+	})
+	return jobs, err
+}
+
+// fetchDump fetches the full board and reshapes it for the filter engine.
+func (a *LeverAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, error) {
 	postings, err := a.client.ListPostings(ctx, lever.ListPostingsParams{
 		Site: slug,
 		Mode: lever.ListPostingsModeJSON,

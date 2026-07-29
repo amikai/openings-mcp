@@ -22,7 +22,7 @@ func testRipplingAdapter(t *testing.T) *RipplingAdapter {
 	t.Helper()
 	srv := rippling.NewMockServer()
 	t.Cleanup(srv.Close)
-	a, err := NewRipplingAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	a, err := NewRipplingAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 	require.NoError(t, err)
 	return a
 }

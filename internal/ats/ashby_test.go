@@ -3,6 +3,7 @@ package ats
 import (
 	"net/http"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -16,7 +17,7 @@ func testAshbyAdapter(t *testing.T) *AshbyAdapter {
 	t.Helper()
 	srv := ashby.NewMockServer()
 	t.Cleanup(srv.Close)
-	a, err := NewAshbyAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second})
+	a, err := NewAshbyAdapter(srv.URL, &http.Client{Timeout: 5 * time.Second}, nil)
 	require.NoError(t, err)
 	return a
 }
@@ -61,13 +62,50 @@ func TestAshbyFilters(t *testing.T) {
 	}
 }
 
-func TestAshbyDetailRefetchesBoard(t *testing.T) {
+func TestAshbyDetailFromDump(t *testing.T) {
 	a := testAshbyAdapter(t)
 	d, err := a.Detail(t.Context(), ashby.MockBoardName, "7724fbe3-6a27-4418-9705-2dcc40751a16")
 	require.NoError(t, err)
 	assert.Equal(t, "Software Engineer (Agent Platform)", d.Title)
 	assert.NotEmpty(t, d.Description, "Description should be non-empty plain text")
 }
+
+// TestAshbySearchThenDetailOneBoardFetch checks that with the dump cache
+// enabled, Filters/Search/Detail for one board only hit upstream once.
+func TestAshbySearchThenDetailOneBoardFetch(t *testing.T) {
+	var hits atomic.Int32
+	srv := ashby.NewMockServer()
+	t.Cleanup(srv.Close)
+	// Wrap the mock with a counter via a reverse proxy style: use custom
+	// RoundTripper counting requests to the mock.
+	base := srv.Client().Transport
+	if base == nil {
+		base = http.DefaultTransport
+	}
+	hc := &http.Client{
+		Timeout: 5 * time.Second,
+		Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			hits.Add(1)
+			return base.RoundTrip(r)
+		}),
+	}
+	cache := NewDumpCache(DumpCacheConfig{TTL: time.Hour})
+	a, err := NewAshbyAdapter(srv.URL, hc, cache)
+	require.NoError(t, err)
+
+	_, err = a.Filters(t.Context(), ashby.MockBoardName)
+	require.NoError(t, err)
+	res, err := a.Search(t.Context(), ashby.MockBoardName, SearchParams{})
+	require.NoError(t, err)
+	require.NotEmpty(t, res.Jobs)
+	_, err = a.Detail(t.Context(), ashby.MockBoardName, res.Jobs[0].JobID)
+	require.NoError(t, err)
+	assert.Equal(t, int32(1), hits.Load(), "Filters+Search+Detail should share one board fetch")
+}
+
+type roundTripFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripFunc) RoundTrip(r *http.Request) (*http.Response, error) { return f(r) }
 
 func TestAshbyDetailNotFound(t *testing.T) {
 	a := testAshbyAdapter(t)

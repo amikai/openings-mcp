@@ -61,7 +61,7 @@ func TestServerListsJobTools(t *testing.T) {
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
 	cIndeed := indeed.NewClient("https://apis.indeed.com/graphql", http.DefaultClient)
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", http.DefaultClient)
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 	server := newServer(providerClients{
 		amazon:   cAmazon,
@@ -220,7 +220,7 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
 
 	ctx := t.Context()
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 	server := newServer(providerClients{}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
@@ -261,12 +261,12 @@ func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
 		Reader: io.NopCloser(strings.NewReader("")),
 		Writer: writeCloser{Writer: io.Discard},
 	}
-	err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil)), nil)
 	require.NoError(t, err)
 }
 
 func TestATSRegistryIncludesTeamtailor(t *testing.T) {
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 
 	resolution, err := registry.Resolve("Teamtailor")
@@ -285,7 +285,7 @@ func TestATSRegistryIncludesTeamtailor(t *testing.T) {
 }
 
 func TestATSRegistryIncludesOracle(t *testing.T) {
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 
 	resolution, err := registry.Resolve("Mayo Clinic")
@@ -312,7 +312,7 @@ func TestATSRegistryIncludesOracle(t *testing.T) {
 }
 
 func TestATSRegistryIncludesJoin(t *testing.T) {
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 
 	resolution, err := registry.Resolve("Routine Labs")
@@ -331,7 +331,7 @@ func TestATSRegistryIncludesJoin(t *testing.T) {
 }
 
 func TestATSRegistryIncludesBambooHR(t *testing.T) {
-	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient)
+	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 
 	resolution, err := registry.Resolve("Concept2")
@@ -363,7 +363,7 @@ func TestATSRegistryIncludesBambooHR(t *testing.T) {
 // regressing to ok=false and an unnamed new exemption fail this test rather
 // than being silently absorbed.
 func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
-	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
@@ -413,7 +413,7 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 // from the one the resolver actually uses, pinning a baseline that
 // describes collisions callers don't actually experience.
 func TestCompanyCollisionReport(t *testing.T) {
-	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient)
+	adapters, err := atsAdapters(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
