@@ -48,7 +48,7 @@ func testOracleAdapter(t *testing.T) (*OracleAdapter, *[]string) {
 	t.Cleanup(proxy.Close)
 
 	a := NewOracleAdapter(&http.Client{Timeout: 5 * time.Second})
-	a.apiBaseURL = func(oracle.Company) string { return proxy.URL }
+	a.baseURL = func(oracle.Company) string { return proxy.URL }
 	return a, &finders
 }
 
@@ -254,7 +254,7 @@ func TestOracleSearchDiscoversNonRosterURL(t *testing.T) {
 		)
 		return oracle.Site{
 			CareersURL: rawURL,
-			APIBaseURL: a.apiBaseURL(oracle.Company{}),
+			APIBaseURL: a.baseURL(oracle.Company{}),
 			Site:       "Acme",
 			SiteNumber: "CX_1",
 			Language:   "en",

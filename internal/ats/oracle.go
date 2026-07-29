@@ -37,14 +37,14 @@ var _ Adapter = (*OracleAdapter)(nil)
 // their internal site number from the public careers page before each call.
 type OracleAdapter struct {
 	hc           *http.Client
-	apiBaseURL   func(oracle.Company) string
+	baseURL      func(oracle.Company) string
 	discoverSite func(context.Context, string, *http.Client) (oracle.Site, error)
 }
 
 func NewOracleAdapter(hc *http.Client) *OracleAdapter {
 	return &OracleAdapter{
 		hc:           hc,
-		apiBaseURL:   oracle.Company.APIBaseURL,
+		baseURL:      oracle.Company.APIBaseURL,
 		discoverSite: oracle.DiscoverSite,
 	}
 }
@@ -258,7 +258,7 @@ func (a *OracleAdapter) resolveSite(
 func (a *OracleAdapter) siteForCompany(company oracle.Company) oracle.Site {
 	return oracle.Site{
 		CareersURL: company.CareersURL(),
-		APIBaseURL: a.apiBaseURL(company),
+		APIBaseURL: a.baseURL(company),
 		Site:       company.Site,
 		SiteNumber: company.SiteNumber,
 		Language:   "en",
