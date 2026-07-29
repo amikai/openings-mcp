@@ -21,6 +21,14 @@ type RosterCompany struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// baseURL is the origin for HRMOS API calls.
+const baseURL = "https://hrmos.co"
+
+// BaseURL returns the company's HRMOS API base URL, for [NewClient].
+func (c RosterCompany) BaseURL() string {
+	return baseURL
+}
+
 // careersURLTpl formats an HRMOS jobs page URL (e.g. "https://hrmos.co/pages/moneyforward/jobs").
 const careersURLTpl = "https://hrmos.co/pages/%s/jobs"
 

@@ -138,3 +138,9 @@ func mustOptURI(s string) OptURI {
 	}
 	return NewOptURI(*u)
 }
+
+func TestCompanyURLs(t *testing.T) {
+	c := Company{Name: "Pythian", BoardSlug: "pythian"}
+	assert.Equal(t, "https://api.rippling.com/platform/api/ats/v1", c.BaseURL())
+	assert.Equal(t, "https://ats.rippling.com/pythian/jobs", c.CareersURL())
+}

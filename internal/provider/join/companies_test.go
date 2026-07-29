@@ -42,7 +42,13 @@ func TestCompaniesLoaded(t *testing.T) {
 	}
 }
 
+func TestBaseURL(t *testing.T) {
+	c := RosterCompany{}
+	assert.Equal(t, "https://join.com", c.BaseURL())
+}
+
 func TestCareersURL(t *testing.T) {
 	c := RosterCompany{Name: "Routine Labs", Slug: "routinelabs"}
 	assert.Equal(t, "https://join.com/companies/routinelabs", c.CareersURL())
 }
+

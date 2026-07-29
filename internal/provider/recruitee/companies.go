@@ -23,6 +23,14 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// baseURLTpl formats a Recruitee API base URL (e.g. "https://mous.recruitee.com").
+const baseURLTpl = "https://%s.recruitee.com"
+
+// BaseURL returns the company's Recruitee API base URL, for [NewClient].
+func (c Company) BaseURL() string {
+	return fmt.Sprintf(baseURLTpl, c.Slug)
+}
+
 // careersURLTpl formats a Recruitee jobs page URL (e.g. "https://mous.recruitee.com").
 const careersURLTpl = "https://%s.recruitee.com"
 

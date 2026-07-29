@@ -23,6 +23,14 @@ type Company struct {
 	Host string `yaml:"host" json:"host"`
 }
 
+// baseURLTpl formats a Teamtailor portal base URL (e.g. "https://career.teamtailor.com").
+const baseURLTpl = "https://%s"
+
+// BaseURL returns the company's Teamtailor portal base URL, for [NewClient].
+func (c Company) BaseURL() string {
+	return fmt.Sprintf(baseURLTpl, c.Host)
+}
+
 // careersURLTpl formats a Teamtailor jobs page URL (e.g. "https://career.teamtailor.com/jobs").
 const careersURLTpl = "https://%s/jobs"
 

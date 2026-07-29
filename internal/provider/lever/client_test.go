@@ -149,3 +149,13 @@ func TestGetPostingNotFound(t *testing.T) {
 	}
 	assert.Equal(t, want, ue)
 }
+
+func TestCompanyBaseURL(t *testing.T) {
+	c := Company{
+		Name: "Lever Demo",
+		Site: "leverdemo",
+	}
+	assert.Equal(t, "https://api.lever.co", c.BaseURL())
+	assert.Equal(t, "https://jobs.lever.co/leverdemo", c.CareersURL())
+}
+

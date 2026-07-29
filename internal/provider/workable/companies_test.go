@@ -47,3 +47,13 @@ func TestNoDuplicateAccounts(t *testing.T) {
 		seen[slug] = c.Name
 	}
 }
+
+func TestBaseURL(t *testing.T) {
+	c := RosterCompany{Name: "Blueground", Account: "blueground"}
+	assert.Equal(t, "https://apply.workable.com", c.BaseURL())
+}
+
+func TestCareersURL(t *testing.T) {
+	c := RosterCompany{Name: "Blueground", Account: "blueground"}
+	assert.Equal(t, "https://apply.workable.com/blueground/", c.CareersURL())
+}

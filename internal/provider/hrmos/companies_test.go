@@ -42,6 +42,11 @@ func TestCompaniesLoaded(t *testing.T) {
 	}
 }
 
+func TestBaseURL(t *testing.T) {
+	c := RosterCompany{Name: "株式会社マネーフォワード", Slug: "moneyforward"}
+	assert.Equal(t, "https://hrmos.co", c.BaseURL())
+}
+
 func TestCareersURL(t *testing.T) {
 	c := RosterCompany{Name: "株式会社マネーフォワード", Slug: "moneyforward"}
 	assert.Equal(t, "https://hrmos.co/pages/moneyforward/jobs", c.CareersURL())

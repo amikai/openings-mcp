@@ -25,6 +25,14 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// baseURLTpl formats a BambooHR API base URL (e.g. "https://curtinmaritime.bamboohr.com").
+const baseURLTpl = "https://%s.bamboohr.com"
+
+// BaseURL returns the company's BambooHR API base URL, for [NewClient].
+func (c Company) BaseURL() string {
+	return fmt.Sprintf(baseURLTpl, c.Slug)
+}
+
 // careersURLTpl formats a BambooHR careers page URL (e.g. "https://curtinmaritime.bamboohr.com/careers").
 const careersURLTpl = "https://%s.bamboohr.com/careers"
 
