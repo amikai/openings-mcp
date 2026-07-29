@@ -24,11 +24,14 @@ type Company struct {
 	Board string `yaml:"board" json:"board"`
 }
 
+// careersURLTpl formats an Ashby job board page URL (e.g. "https://jobs.ashbyhq.com/openai").
+const careersURLTpl = "https://jobs.ashbyhq.com/%s"
+
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.ashbyhq.com/openai. API calls instead pass Board directly as
 // the jobBoardName parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://jobs.ashbyhq.com/%s", c.Board)
+	return fmt.Sprintf(careersURLTpl, c.Board)
 }
 
 // Companies holds every confirmed Ashby board, sorted by company name.

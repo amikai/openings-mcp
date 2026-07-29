@@ -28,10 +28,13 @@ type RosterCompany struct {
 	CompanyID int    `yaml:"company_id" json:"company_id"`
 }
 
+// careersURLTpl formats a Join career page URL (e.g. "https://join.com/companies/routinelabs").
+const careersURLTpl = "https://join.com/companies/%s"
+
 // CareersURL returns the company's human-facing career page, e.g.
 // https://join.com/companies/routinelabs.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf("https://join.com/companies/%s", c.Slug)
+	return fmt.Sprintf(careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed join.com company, sorted by company name.

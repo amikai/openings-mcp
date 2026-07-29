@@ -21,10 +21,13 @@ type RosterCompany struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// careersURLTpl formats an HRMOS jobs page URL (e.g. "https://hrmos.co/pages/moneyforward/jobs").
+const careersURLTpl = "https://hrmos.co/pages/%s/jobs"
+
 // CareersURL returns the company's human-facing jobs page, e.g.
 // https://hrmos.co/pages/moneyforward/jobs.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf("https://hrmos.co/pages/%s/jobs", c.Slug)
+	return fmt.Sprintf(careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed HRMOS company, sorted by company name.

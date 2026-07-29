@@ -25,9 +25,12 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// careersURLTpl formats a BambooHR careers page URL (e.g. "https://curtinmaritime.bamboohr.com/careers").
+const careersURLTpl = "https://%s.bamboohr.com/careers"
+
 // CareersURL returns the company's human-facing BambooHR careers page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s.bamboohr.com/careers", c.Slug)
+	return fmt.Sprintf(careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed BambooHR careers site, sorted by company

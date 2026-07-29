@@ -23,9 +23,12 @@ type Company struct {
 	Slug string `yaml:"slug" json:"slug"`
 }
 
+// careersURLTpl formats a Recruitee jobs page URL (e.g. "https://mous.recruitee.com").
+const careersURLTpl = "https://%s.recruitee.com"
+
 // CareersURL returns the company's human-facing Recruitee jobs page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf("https://%s.recruitee.com", c.Slug)
+	return fmt.Sprintf(careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed Recruitee career site, sorted by company
