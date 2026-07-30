@@ -17,6 +17,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/jaytaylor/html2text"
@@ -151,17 +152,13 @@ type searchResultJSON struct {
 
 // formatLocation joins the non-empty company location parts.
 func formatLocation(city, state, country string) string {
-	out := ""
+	cleaned := make([]string, 0, 3)
 	for _, part := range []string{city, state, country} {
-		if part == "" {
-			continue
+		if part != "" {
+			cleaned = append(cleaned, part)
 		}
-		if out != "" {
-			out += ", "
-		}
-		out += part
 	}
-	return out
+	return strings.Join(cleaned, ", ")
 }
 
 // formatSalary renders the salary fields as one line, e.g.

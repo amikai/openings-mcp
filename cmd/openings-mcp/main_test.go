@@ -63,7 +63,7 @@ func TestServerListsJobTools(t *testing.T) {
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", http.DefaultClient)
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
-	server := newServer(providerClients{
+	server := newServer(&providerClients{
 		amazon:   cAmazon,
 		job104:   c104,
 		apple:    cApple,
@@ -222,7 +222,7 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
-	server := newServer(providerClients{}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	server := newServer(&providerClients{}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
 	serverSession, err := server.Connect(ctx, serverTransport, nil)

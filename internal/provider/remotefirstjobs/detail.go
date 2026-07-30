@@ -37,7 +37,7 @@ func (c *Client) FindJob(ctx context.Context, id string, opts FindOptions) (*Job
 	if opts.Category != "" {
 		params.Category = NewOptString(opts.Category)
 	}
-	for page := 0; page <= maxPage; page++ {
+	for page := range maxPage + 1 {
 		params.Page = NewOptInt(page)
 		res, err := c.SearchJobs(ctx, params)
 		if err != nil {

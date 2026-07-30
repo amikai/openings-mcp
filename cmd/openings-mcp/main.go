@@ -198,7 +198,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 		return err
 	}
 
-	server := newServer(providerClients{
+	server := newServer(&providerClients{
 		amazon:   cAmazon,
 		job104:   c104,
 		apple:    cApple,
@@ -309,7 +309,7 @@ type providerClients struct {
 	meta     *meta.Client
 }
 
-func newServer(clients providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
+func newServer(clients *providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
 	server := mcp.NewServer(
 		&mcp.Implementation{Name: "openings-mcp", Version: version},
 		&mcp.ServerOptions{Instructions: serverInstructions, Logger: logger},
