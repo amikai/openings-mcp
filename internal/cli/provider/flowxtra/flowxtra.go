@@ -15,9 +15,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
 )
 
-// apiBaseURL is the single production server in the provider's openapi.yaml.
-const apiBaseURL = "https://app.flowxtra.com/api"
-
 type options struct {
 	baseURL string
 	timeout time.Duration
@@ -47,7 +44,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", apiBaseURL, "Flowxtra API base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", flowxtra.DefaultBaseURL, "Flowxtra API base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

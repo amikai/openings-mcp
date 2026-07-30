@@ -12,6 +12,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// DefaultBaseURL is the public base URL for Google Careers.
+const DefaultBaseURL = "https://www.google.com/about/careers/applications"
+
 const jobsPath = "/jobs/results"
 
 type Client struct {

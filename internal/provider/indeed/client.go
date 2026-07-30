@@ -27,6 +27,9 @@ type Client struct {
 	gql graphql.Client
 }
 
+// DefaultBaseURL is the GraphQL endpoint for Indeed's mobile API.
+const DefaultBaseURL = "https://apis.indeed.com/graphql"
+
 // NewClient builds a Client against apiURL (the GraphQL endpoint). When
 // httpClient is nil, http.DefaultClient is used. Every request carries the
 // static mobile-app headers; per-call indeed-co is taken from context set

@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public API base URL for Rippling.
+const DefaultBaseURL = "https://api.rippling.com/platform/api/ats/v1"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

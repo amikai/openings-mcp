@@ -13,9 +13,6 @@ import (
 	himalayas "github.com/amikai/openings-mcp/internal/provider/himalayas"
 )
 
-// apiBaseURL is Himalayas' public site origin — the single production
-// server in the provider's openapi.yaml (paths carry the /jobs/api prefix).
-const apiBaseURL = "https://himalayas.app"
 
 var sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
 
@@ -228,7 +225,7 @@ func runBrowse(ctx context.Context, f browseOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(apiBaseURL)
+	client, err := himalayas.NewClient(himalayas.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -271,7 +268,7 @@ func runSearch(ctx context.Context, f searchOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(apiBaseURL)
+	client, err := himalayas.NewClient(himalayas.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

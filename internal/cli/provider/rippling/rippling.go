@@ -16,9 +16,6 @@ import (
 	rippling "github.com/amikai/openings-mcp/internal/provider/rippling"
 )
 
-// apiBaseURL is Rippling's public Job Board API origin — the single
-// production server in the provider's openapi.yaml.
-const apiBaseURL = "https://api.rippling.com/platform/api/ats/v1"
 
 type rootOptions struct {
 	board   string
@@ -226,7 +223,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := rippling.NewClient(apiBaseURL)
+	client, err := rippling.NewClient(rippling.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -288,7 +285,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := rippling.NewClient(apiBaseURL)
+	client, err := rippling.NewClient(rippling.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

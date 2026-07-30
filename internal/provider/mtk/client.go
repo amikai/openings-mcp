@@ -14,6 +14,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// DefaultBaseURL is the public website base URL for MediaTek Careers.
+const DefaultBaseURL = "https://careers.mediatek.com"
+
 const (
 	defaultLimit = 6
 	maxLimit     = 100

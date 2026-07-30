@@ -14,7 +14,6 @@ import (
 	leverprovider "github.com/amikai/openings-mcp/internal/provider/lever"
 )
 
-const leverAPIBaseURL = "https://api.lever.co"
 
 type options struct {
 	site    string
@@ -170,7 +169,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := leverprovider.NewClient(leverAPIBaseURL)
+	client, err := leverprovider.NewClient(leverprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -233,7 +232,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := leverprovider.NewClient(leverAPIBaseURL)
+	client, err := leverprovider.NewClient(leverprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

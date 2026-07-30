@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public API base URL for Ashby.
+const DefaultBaseURL = "https://api.ashbyhq.com"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

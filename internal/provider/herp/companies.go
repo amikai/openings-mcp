@@ -11,6 +11,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public website base URL for HERP Career.
+const DefaultBaseURL = "https://herp.careers"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

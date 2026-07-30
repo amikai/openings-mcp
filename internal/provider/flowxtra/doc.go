@@ -2,3 +2,6 @@
 // jobs API — one board-wide feed covering every company hosted on the
 // Flowxtra ATS (see openapi.yaml for the surface notes and quirks).
 package flowxtra
+
+// DefaultBaseURL is the public API base URL for Flowxtra.
+const DefaultBaseURL = "https://app.flowxtra.com/api"

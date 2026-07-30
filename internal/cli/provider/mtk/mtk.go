@@ -13,8 +13,6 @@ import (
 	mtkprovider "github.com/amikai/openings-mcp/internal/provider/mtk"
 )
 
-const defaultBaseURL = "https://careers.mediatek.com"
-
 type options struct {
 	baseURL string
 	timeout time.Duration
@@ -31,7 +29,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "MediaTek Careers base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", mtkprovider.DefaultBaseURL, "MediaTek Careers base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

@@ -16,8 +16,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/remoteok"
 )
 
-const defaultBaseURL = "https://remoteok.com"
-
 type rootOptions struct {
 	baseURL string
 	timeout time.Duration
@@ -34,7 +32,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "Remote OK base URL")
+	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", remoteok.DefaultBaseURL, "Remote OK base URL")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

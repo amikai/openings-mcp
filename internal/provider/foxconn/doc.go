@@ -2,3 +2,6 @@
 // API. See openapi.yaml for the wire surface and its quirks, and codes.go
 // for the static workplaceCode/talentZoneCode reference data.
 package foxconn
+
+// DefaultBaseURL is the public API base URL for Foxconn Taiwan Careers.
+const DefaultBaseURL = "https://recruit.foxconn.com"

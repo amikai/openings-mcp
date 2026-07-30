@@ -13,7 +13,6 @@ import (
 	quantaprovider "github.com/amikai/openings-mcp/internal/provider/quanta"
 )
 
-const apiBaseURL = "https://hr.quantatw.com"
 
 type options struct {
 	timeout time.Duration
@@ -96,7 +95,7 @@ func fetchJobs(ctx context.Context, timeout time.Duration) ([]quantaprovider.Job
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := quantaprovider.NewClient(apiBaseURL)
+	client, err := quantaprovider.NewClient(quantaprovider.DefaultBaseURL)
 	if err != nil {
 		return nil, err
 	}

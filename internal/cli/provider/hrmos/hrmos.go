@@ -14,8 +14,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 )
 
-const defaultBaseURL = "https://hrmos.co"
-
 type options struct {
 	baseURL string
 	company string
@@ -42,7 +40,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "HRMOS 採用 base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", hrmos.DefaultBaseURL, "HRMOS 採用 base URL")
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "HRMOS tenant slug, e.g. moneyforward (see 'hrmos companies' for the curated list; any live tenant slug also works)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")

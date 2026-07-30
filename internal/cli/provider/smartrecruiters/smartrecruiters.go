@@ -16,10 +16,6 @@ import (
 	smartrecruiters "github.com/amikai/openings-mcp/internal/provider/smartrecruiters"
 )
 
-// apiBaseURL is SmartRecruiters' public Posting API origin — the single
-// production server in the provider's openapi.yaml (paths carry the /v1
-// prefix).
-const apiBaseURL = "https://api.smartrecruiters.com"
 
 type rootOptions struct {
 	company string
@@ -213,7 +209,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := smartrecruiters.NewClient(apiBaseURL)
+	client, err := smartrecruiters.NewClient(smartrecruiters.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -284,7 +280,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := smartrecruiters.NewClient(apiBaseURL)
+	client, err := smartrecruiters.NewClient(smartrecruiters.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

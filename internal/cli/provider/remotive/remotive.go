@@ -15,10 +15,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/remotive"
 )
 
-// apiBaseURL is the single production server in the provider's
-// openapi.yaml (paths carry the /remote-jobs prefix).
-const apiBaseURL = "https://remotive.com/api"
-
 type rootOptions struct {
 	baseURL string
 	timeout time.Duration
@@ -35,7 +31,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", apiBaseURL, "Remotive API base URL")
+	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", remotive.DefaultBaseURL, "Remotive API base URL")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

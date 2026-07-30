@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public API base URL for Greenhouse.
+const DefaultBaseURL = "https://boards-api.greenhouse.io/v1"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

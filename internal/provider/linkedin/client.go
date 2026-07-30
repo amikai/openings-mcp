@@ -13,6 +13,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// DefaultBaseURL is the public website base URL for LinkedIn.
+const DefaultBaseURL = "https://www.linkedin.com"
+
 const (
 	jobsPath      = "/jobs-guest/jobs/api/seeMoreJobPostings/search"
 	jobDetailPath = "/jobs/view"

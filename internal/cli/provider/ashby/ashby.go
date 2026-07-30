@@ -16,8 +16,6 @@ import (
 	ashby "github.com/amikai/openings-mcp/internal/provider/ashby"
 )
 
-const apiBaseURL = "https://api.ashbyhq.com"
-
 type options struct {
 	board   string
 	timeout time.Duration
@@ -126,7 +124,7 @@ func fetchBoard(ctx context.Context, board string, timeout time.Duration) (*ashb
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := ashby.NewClient(apiBaseURL)
+	client, err := ashby.NewClient(ashby.DefaultBaseURL)
 	if err != nil {
 		return nil, err
 	}

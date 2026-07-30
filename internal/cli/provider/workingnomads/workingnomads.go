@@ -14,7 +14,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/workingnomads"
 )
 
-const defaultBaseURL = "https://www.workingnomads.com"
 
 type rootOptions struct {
 	baseURL string
@@ -32,7 +31,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "Working Nomads base URL")
+	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", workingnomads.DefaultBaseURL, "Working Nomads base URL")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

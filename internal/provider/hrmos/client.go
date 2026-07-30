@@ -20,6 +20,9 @@ var ErrNotFound = errors.New("hrmos: not found")
 // pager (fact 14 says the pager is otherwise the reliable stop condition).
 const maxEmptyPageGuard = 1000
 
+// DefaultBaseURL is the public website base URL for HRMOS.
+const DefaultBaseURL = "https://hrmos.co"
+
 type Client struct {
 	httpClient *http.Client
 	baseURL    string

@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public API base URL for Lever.
+const DefaultBaseURL = "https://api.lever.co"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

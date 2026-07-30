@@ -14,7 +14,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/herp"
 )
 
-const baseURL = "https://herp.careers"
 
 type options struct {
 	company string
@@ -109,7 +108,7 @@ func fetchBoard(ctx context.Context, company string, timeout time.Duration) (*he
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := herp.NewClient(baseURL)
+	client, err := herp.NewClient(herp.DefaultBaseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -169,9 +168,9 @@ func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 
 func jobURL(board *herp.CompanyBoard, id string) string {
 	if board.CompanyIsApplicationEnabled.Or(true) {
-		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", baseURL, board.CompanySlug, id)
+		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", herp.DefaultBaseURL, board.CompanySlug, id)
 	}
-	return fmt.Sprintf("%s/v1/%s/%s", baseURL, board.CompanySlug, id)
+	return fmt.Sprintf("%s/v1/%s/%s", herp.DefaultBaseURL, board.CompanySlug, id)
 }
 
 type searchOptions struct {

@@ -85,7 +85,7 @@ func run(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := cake.NewClient("https://api.cake.me")
+	client, err := cake.NewClient(cake.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

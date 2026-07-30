@@ -30,6 +30,9 @@ var ErrJobNotFound = errors.New("engage: job not found")
 // sitemap — see doc.go), so this means selector drift, not an empty tenant.
 var ErrEmptyBoard = errors.New("engage: board parsed to zero jobs (selector drift suspected)")
 
+// DefaultBaseURL is the public website base URL for engage.
+const DefaultBaseURL = "https://en-gage.net"
+
 // Client talks to en-gage.net's public tenant boards, tenant detail pages,
 // and the cross-tenant aggregator search (roster tooling only — see
 // API.md).

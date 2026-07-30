@@ -14,6 +14,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// DefaultBaseURL is the public website base URL for TSMC Careers.
+const DefaultBaseURL = "https://careers.tsmc.com"
+
 const (
 	defaultPerPage = 10
 	jobsPath       = "/zh_TW/careers/SearchJobs/"

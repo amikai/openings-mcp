@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public API base URL for SmartRecruiters.
+const DefaultBaseURL = "https://api.smartrecruiters.com"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

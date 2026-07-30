@@ -11,6 +11,9 @@ import (
 	"strings"
 )
 
+// DefaultBaseURL is the public website base URL for Meta Careers.
+const DefaultBaseURL = "https://www.metacareers.com"
+
 const graphqlPath = "/graphql"
 
 // Persisted-query document IDs; see doc.go for how to re-derive them when

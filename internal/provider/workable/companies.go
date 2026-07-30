@@ -9,6 +9,9 @@ import (
 	"github.com/goccy/go-yaml"
 )
 
+// DefaultBaseURL is the public website base URL for Workable.
+const DefaultBaseURL = "https://apply.workable.com"
+
 //go:embed companies.yaml
 var companiesYAML []byte
 

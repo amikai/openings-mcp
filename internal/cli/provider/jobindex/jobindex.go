@@ -13,8 +13,6 @@ import (
 	jobindexprovider "github.com/amikai/openings-mcp/internal/provider/jobindex"
 )
 
-const defaultBaseURL = "https://www.jobindex.dk"
-
 type options struct {
 	baseURL string
 	timeout time.Duration
@@ -31,7 +29,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "Jobindex base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", jobindexprovider.DefaultBaseURL, "Jobindex base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

@@ -71,3 +71,6 @@
 //     need its own scraper. [FilterOptions.Keyword] covers this client-side
 //     over the dump instead.
 package weworkremotely
+
+// DefaultBaseURL is the public website base URL for We Work Remotely.
+const DefaultBaseURL = "https://weworkremotely.com"

@@ -16,7 +16,6 @@ import (
 	workable "github.com/amikai/openings-mcp/internal/provider/workable"
 )
 
-const apiBaseURL = "https://apply.workable.com"
 
 type rootOptions struct {
 	company string
@@ -263,7 +262,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(workable.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -344,7 +343,7 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(workable.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -408,7 +407,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(workable.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

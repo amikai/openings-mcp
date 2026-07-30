@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// DefaultBaseURL is the public base URL for Amazon Jobs.
+const DefaultBaseURL = "https://www.amazon.jobs"
+
 const (
 	defaultResultLimit = 10
 	maxResultLimit     = 100

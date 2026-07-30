@@ -22,6 +22,9 @@ const (
 	SortDate  = "date"
 )
 
+// DefaultBaseURL is the public website base URL for Jobindex.
+const DefaultBaseURL = "https://www.jobindex.dk"
+
 // Client talks to Jobindex.dk's public HTML search surface.
 type Client struct {
 	httpClient *http.Client

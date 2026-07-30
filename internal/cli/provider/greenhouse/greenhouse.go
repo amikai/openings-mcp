@@ -17,9 +17,6 @@ import (
 	greenhouse "github.com/amikai/openings-mcp/internal/provider/greenhouse"
 )
 
-// apiBaseURL is Greenhouse's public Job Board API origin — the single
-// production server in the provider's openapi.yaml.
-const apiBaseURL = "https://boards-api.greenhouse.io/v1"
 
 type options struct {
 	board   string
@@ -226,7 +223,7 @@ func runSearch(ctx context.Context, f searchOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := greenhouse.NewClient(apiBaseURL)
+	client, err := greenhouse.NewClient(greenhouse.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -288,7 +285,7 @@ func runGet(ctx context.Context, f getOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := greenhouse.NewClient(apiBaseURL)
+	client, err := greenhouse.NewClient(greenhouse.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

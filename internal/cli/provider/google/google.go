@@ -49,7 +49,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&flags.baseURL, "base-url", "https://www.google.com/about/careers/applications", "Google Careers site base URL")
+	cmd.Flags().StringVar(&flags.baseURL, "base-url", google.DefaultBaseURL, "Google Careers site base URL")
 	cmd.Flags().DurationVar(&flags.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.Flags().StringVar(&flags.query, "query", "", "free-text search query")
 	cmd.Flags().StringVar(&flags.location, "location", "", "location filter (city, region, or country)")

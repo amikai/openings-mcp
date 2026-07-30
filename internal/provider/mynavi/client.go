@@ -22,6 +22,9 @@ var minSalaries = []int{
 	800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
 }
 
+// DefaultBaseURL is the public website base URL for Mynavi Tenshoku.
+const DefaultBaseURL = "https://tenshoku.mynavi.jp"
+
 type Client struct {
 	httpClient *http.Client
 	baseURL    string

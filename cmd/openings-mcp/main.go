@@ -74,11 +74,19 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/job104"
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
+	"github.com/amikai/openings-mcp/internal/provider/ashby"
+	"github.com/amikai/openings-mcp/internal/provider/greenhouse"
+	"github.com/amikai/openings-mcp/internal/provider/hrmos"
+	"github.com/amikai/openings-mcp/internal/provider/join"
+	"github.com/amikai/openings-mcp/internal/provider/lever"
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
 	"github.com/amikai/openings-mcp/internal/provider/nvidia"
+	"github.com/amikai/openings-mcp/internal/provider/rippling"
+	"github.com/amikai/openings-mcp/internal/provider/smartrecruiters"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
+	"github.com/amikai/openings-mcp/internal/provider/workable"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
@@ -249,13 +257,13 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 	// instead of stalling the MCP session.
 	hc104 := &http.Client{Timeout: 30 * time.Second, Transport: job104.BrowserTransport{}}
 
-	c104, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(hc104))
+	c104, err := job104.NewClient(job104.DefaultBaseURL, job104.WithClient(hc104))
 	if err != nil {
 		return err
 	}
 
 	hc := &http.Client{Timeout: 30 * time.Second}
-	cAmazon, err := amazon.NewClient("https://www.amazon.jobs", amazon.WithClient(hc))
+	cAmazon, err := amazon.NewClient(amazon.DefaultBaseURL, amazon.WithClient(hc))
 	if err != nil {
 		return fmt.Errorf("create Amazon client: %w", err)
 	}
@@ -264,19 +272,19 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 	// JSON, so it gets its own client rather than sharing hc.
 	hcEightfold := &http.Client{Timeout: 30 * time.Second, Transport: eightfold.BrowserTransport{}}
 
-	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(hc))
+	cCake, err := cake.NewClient(cake.DefaultBaseURL, cake.WithClient(hc))
 	if err != nil {
 		return err
 	}
 
-	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(hc))
+	cNvidia, err := nvidia.NewClient(nvidia.DefaultBaseURL, nvidia.WithClient(hc))
 	if err != nil {
 		return err
 	}
 
-	cTsmc := tsmc.NewClient("https://careers.tsmc.com", hc)
+	cTsmc := tsmc.NewClient(tsmc.DefaultBaseURL, hc)
 
-	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", hc)
+	cGoogle := google.NewClient(google.DefaultBaseURL, hc)
 
 	cApple, err := apple.NewJobsClient(apple.DefaultBaseURL, hc)
 	if err != nil {
@@ -284,20 +292,20 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 	}
 
 	jarLinkedin, _ := cookiejar.New(nil)
-	cLinkedin := linkedin.NewClient("https://www.linkedin.com", &http.Client{Timeout: 30 * time.Second, Jar: jarLinkedin})
+	cLinkedin := linkedin.NewClient(linkedin.DefaultBaseURL, &http.Client{Timeout: 30 * time.Second, Jar: jarLinkedin})
 
-	cIndeed := indeed.NewClient("https://apis.indeed.com/graphql", hc)
+	cIndeed := indeed.NewClient(indeed.DefaultBaseURL, hc)
 
-	cFlowxtra, err := flowxtra.NewClient("https://app.flowxtra.com/api", flowxtra.WithClient(hc))
+	cFlowxtra, err := flowxtra.NewClient(flowxtra.DefaultBaseURL, flowxtra.WithClient(hc))
 	if err != nil {
 		return fmt.Errorf("create Flowxtra client: %w", err)
 	}
 
-	cJobindex := jobindex.NewClient("https://www.jobindex.dk", hc)
+	cJobindex := jobindex.NewClient(jobindex.DefaultBaseURL, hc)
 
-	cMynavi := mynavi.NewClient("https://tenshoku.mynavi.jp", hc)
+	cMynavi := mynavi.NewClient(mynavi.DefaultBaseURL, hc)
 
-	cMeta := meta.NewClient("https://www.metacareers.com", hc)
+	cMeta := meta.NewClient(meta.DefaultBaseURL, hc)
 
 	registry, err := newATSRegistry(hc, hcEightfold, dumpCache)
 	if err != nil {
@@ -343,27 +351,27 @@ func newATSRegistry(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) (*at
 // same list the server actually runs, rather than a redeclared copy that
 // could drift from it. dumpCache is injected into full-dump adapters (nil is fine).
 func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.Adapter, error) {
-	leverAdapter, err := ats.NewLeverAdapter("https://api.lever.co", hc, dumpCache)
+	leverAdapter, err := ats.NewLeverAdapter(lever.DefaultBaseURL, hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Lever ATS adapter: %w", err)
 	}
-	ashbyAdapter, err := ats.NewAshbyAdapter("https://api.ashbyhq.com", hc, dumpCache)
+	ashbyAdapter, err := ats.NewAshbyAdapter(ashby.DefaultBaseURL, hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Ashby ATS adapter: %w", err)
 	}
-	greenhouseAdapter, err := ats.NewGreenhouseAdapter("https://boards-api.greenhouse.io/v1", hc, dumpCache)
+	greenhouseAdapter, err := ats.NewGreenhouseAdapter(greenhouse.DefaultBaseURL, hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Greenhouse ATS adapter: %w", err)
 	}
-	smartrecruitersAdapter, err := ats.NewSmartRecruitersAdapter("https://api.smartrecruiters.com", hc)
+	smartrecruitersAdapter, err := ats.NewSmartRecruitersAdapter(smartrecruiters.DefaultBaseURL, hc)
 	if err != nil {
 		return nil, fmt.Errorf("create SmartRecruiters ATS adapter: %w", err)
 	}
-	workableAdapter, err := ats.NewWorkableAdapter("https://apply.workable.com", hc)
+	workableAdapter, err := ats.NewWorkableAdapter(workable.DefaultBaseURL, hc)
 	if err != nil {
 		return nil, fmt.Errorf("create Workable ATS adapter: %w", err)
 	}
-	ripplingAdapter, err := ats.NewRipplingAdapter("https://api.rippling.com/platform/api/ats/v1", hc, dumpCache)
+	ripplingAdapter, err := ats.NewRipplingAdapter(rippling.DefaultBaseURL, hc, dumpCache)
 	if err != nil {
 		return nil, fmt.Errorf("create Rippling ATS adapter: %w", err)
 	}
@@ -390,9 +398,9 @@ func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.
 		ats.NewICIMSAdapter(hc),
 		ats.NewAvatureAdapter(hc),
 		ats.NewOracleAdapter(hc),
-		ats.NewJoinAdapter("https://join.com", hc, dumpCache),
+		ats.NewJoinAdapter(join.DefaultBaseURL, hc, dumpCache),
 		ats.NewUltiProAdapter(hc),
-		ats.NewHrmosAdapter("https://hrmos.co", hc, dumpCache),
+		ats.NewHrmosAdapter(hrmos.DefaultBaseURL, hc, dumpCache),
 		mokahrAdapter,
 	}, nil
 }

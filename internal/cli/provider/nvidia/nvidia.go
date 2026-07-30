@@ -15,7 +15,6 @@ import (
 	nvidiaprovider "github.com/amikai/openings-mcp/internal/provider/nvidia"
 )
 
-const nvidiaSiteURL = "https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite"
 
 type options struct {
 	baseURL      string
@@ -122,7 +121,7 @@ func NewCommand() *cobra.Command {
 				detail, err := client.GetJobDetail(ctx, nvidiaprovider.GetJobDetailParams{Location: location, TitleSlug: titleSlug})
 				if err != nil {
 					fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.ExternalPath.Value, err)
-					fmt.Printf("URL: %s%s\n", nvidiaSiteURL, job.ExternalPath.Value)
+					fmt.Printf("URL: %s%s\n", nvidiaprovider.DefaultSiteURL, job.ExternalPath.Value)
 					if job.LocationsText.Set {
 						fmt.Printf("Location: %s\n", job.LocationsText.Value)
 					}

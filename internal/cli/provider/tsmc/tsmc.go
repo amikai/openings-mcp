@@ -39,7 +39,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opts.baseURL, "base-url", "https://careers.tsmc.com", "TSMC careers site base URL")
+	cmd.Flags().StringVar(&opts.baseURL, "base-url", tsmc.DefaultBaseURL, "TSMC careers site base URL")
 	cmd.Flags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.Flags().StringVar(&opts.keyword, "keyword", "", "free-text keyword search")
 	cmd.Flags().IntVar(&opts.page, "page", 1, "1-based page number")

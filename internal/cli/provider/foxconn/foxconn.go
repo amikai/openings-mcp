@@ -13,9 +13,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/foxconn"
 )
 
-// apiBaseURL is Foxconn's Taiwan careers origin — the single production
-// server in the provider's openapi.yaml.
-const apiBaseURL = "https://recruit.foxconn.com"
 
 type options struct {
 	timeout time.Duration
@@ -149,7 +146,7 @@ func runSearch(ctx context.Context, f searchOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := foxconn.NewClient(apiBaseURL)
+	client, err := foxconn.NewClient(foxconn.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -195,7 +192,7 @@ func runDetail(ctx context.Context, timeout time.Duration, id, format string) er
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := foxconn.NewClient(apiBaseURL)
+	client, err := foxconn.NewClient(foxconn.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

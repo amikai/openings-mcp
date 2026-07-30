@@ -65,7 +65,7 @@ func run(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(&http.Client{Transport: job104.BrowserTransport{}}))
+	client, err := job104.NewClient(job104.DefaultBaseURL, job104.WithClient(&http.Client{Transport: job104.BrowserTransport{}}))
 	if err != nil {
 		return err
 	}

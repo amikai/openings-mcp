@@ -15,8 +15,6 @@ import (
 	metaprovider "github.com/amikai/openings-mcp/internal/provider/meta"
 )
 
-const defaultBaseURL = "https://www.metacareers.com"
-
 type options struct {
 	baseURL string
 	timeout time.Duration
@@ -33,7 +31,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "Meta Careers base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", metaprovider.DefaultBaseURL, "Meta Careers base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 

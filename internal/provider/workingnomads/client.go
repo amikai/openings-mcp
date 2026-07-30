@@ -23,6 +23,9 @@ type Job struct {
 	URL         string // outbound apply link (redirects to the employer's site); NOT a WorkingNomads-hosted detail page
 }
 
+// DefaultBaseURL is the public website base URL for Working Nomads.
+const DefaultBaseURL = "https://www.workingnomads.com"
+
 // Client fetches Working Nomads' public exposed_jobs feed.
 type Client struct {
 	httpClient *http.Client

@@ -14,7 +14,6 @@ import (
 	realtekprovider "github.com/amikai/openings-mcp/internal/provider/realtek"
 )
 
-const apiBaseURL = "https://recruit.realtek.com"
 
 type options struct {
 	timeout time.Duration
@@ -168,7 +167,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := realtekprovider.NewClient(apiBaseURL)
+	client, err := realtekprovider.NewClient(realtekprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -220,7 +219,7 @@ func runDetail(ctx context.Context, timeout time.Duration, jobOppID, format stri
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtekprovider.NewClient(apiBaseURL)
+	client, err := realtekprovider.NewClient(realtekprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -261,7 +260,7 @@ func runTypes(ctx context.Context, timeout time.Duration, format string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtekprovider.NewClient(apiBaseURL)
+	client, err := realtekprovider.NewClient(realtekprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}
@@ -287,7 +286,7 @@ func runLocations(ctx context.Context, timeout time.Duration, format string) err
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtekprovider.NewClient(apiBaseURL)
+	client, err := realtekprovider.NewClient(realtekprovider.DefaultBaseURL)
 	if err != nil {
 		return err
 	}

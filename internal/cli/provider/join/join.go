@@ -14,7 +14,6 @@ import (
 	joinprovider "github.com/amikai/openings-mcp/internal/provider/join"
 )
 
-const apiBaseURL = "https://join.com"
 
 type options struct {
 	company string
@@ -197,7 +196,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := joinprovider.NewClient(apiBaseURL, nil)
+	client := joinprovider.NewClient(joinprovider.DefaultBaseURL, nil)
 	jobs, err := client.Jobs(ctx, c.CompanyID)
 	if err != nil {
 		return err
@@ -246,7 +245,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := joinprovider.NewClient(apiBaseURL, nil)
+	client := joinprovider.NewClient(joinprovider.DefaultBaseURL, nil)
 	d, err := client.JobDetail(ctx, c.Slug, f.idParam)
 	if err != nil {
 		if errors.Is(err, joinprovider.ErrNotFound) {
