@@ -1,0 +1,483 @@
+package workable
+
+import (
+	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"slices"
+	"strings"
+	"time"
+
+	"github.com/jaytaylor/html2text"
+	"github.com/spf13/cobra"
+
+	workable "github.com/amikai/openings-mcp/internal/provider/workable"
+)
+
+const apiBaseURL = "https://apply.workable.com"
+
+type rootOptions struct {
+	company string
+	timeout time.Duration
+	format  string
+}
+
+// NewCommand returns a cobra.Command for workable.
+func NewCommand() *cobra.Command {
+	opts := &rootOptions{}
+
+	cmd := &cobra.Command{
+		Use:          "workable",
+		Short:        "Search Workable jobs and view position details",
+		SilenceUsage: true,
+	}
+
+	cmd.PersistentFlags().StringVar(&opts.company, "company", "", `Workable account subdomain from the careers URL, e.g. "blueground" in apply.workable.com/blueground`)
+	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
+	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+
+	companiesCmd := &cobra.Command{
+		Use:          "companies",
+		Short:        "list curated Workable companies (company name and account subdomain)",
+		SilenceUsage: true,
+		Args:         cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.format != "text" && opts.format != "json" {
+				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
+			}
+			return runCompanies(opts.format)
+		},
+	}
+
+	var (
+		searchKeyword    string
+		searchCountry    string
+		searchRegion     string
+		searchCity       string
+		searchDepartment int
+		searchWorkplace  string
+		searchWorktype   string
+		searchRemote     string
+		searchToken      string
+	)
+	searchCmd := &cobra.Command{
+		Use:          "search",
+		Short:        "search jobs for a company (server-side filters, cursor pagination)",
+		SilenceUsage: true,
+		Args:         cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.format != "text" && opts.format != "json" {
+				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
+			}
+			return runSearch(cmd.Context(), searchFlags{
+				company:    opts.company,
+				timeout:    opts.timeout,
+				keyword:    searchKeyword,
+				country:    searchCountry,
+				region:     searchRegion,
+				city:       searchCity,
+				department: searchDepartment,
+				workplace:  searchWorkplace,
+				worktype:   searchWorktype,
+				remote:     searchRemote,
+				token:      searchToken,
+				format:     opts.format,
+			})
+		},
+	}
+	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "server-side keyword search over title and posting body text")
+	searchCmd.Flags().StringVar(&searchCountry, "country", "", `country name as the filters facets list it, e.g. "Greece"`)
+	searchCmd.Flags().StringVar(&searchRegion, "region", "", `state/region name, e.g. "Attica"`)
+	searchCmd.Flags().StringVar(&searchCity, "city", "", "city name")
+	searchCmd.Flags().IntVar(&searchDepartment, "department", 0, "numeric department id from 'workable filters' (not the display name)")
+	searchCmd.Flags().StringVar(&searchWorkplace, "workplace", "", "on_site, hybrid, or remote")
+	searchCmd.Flags().StringVar(&searchWorktype, "worktype", "", "full, part, contract, or temporary")
+	searchCmd.Flags().StringVar(&searchRemote, "remote", "", "true or false")
+	searchCmd.Flags().StringVar(&searchToken, "token", "", "nextPage cursor from the previous page (page size is a fixed 10)")
+
+	var getShortcode string
+	getCmd := &cobra.Command{
+		Use:          "get",
+		Short:        "print one job in full (description, requirements, benefits, public URL)",
+		SilenceUsage: true,
+		Args:         cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.format != "text" && opts.format != "json" {
+				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
+			}
+			return runGet(cmd.Context(), getFlags{
+				company:   opts.company,
+				timeout:   opts.timeout,
+				shortcode: getShortcode,
+				format:    opts.format,
+			})
+		},
+	}
+	getCmd.Flags().StringVar(&getShortcode, "shortcode", "", "job shortcode from a search result")
+
+	filtersCmd := &cobra.Command{
+		Use:          "filters",
+		Short:        "list a company's search facets (locations, department ids, worktypes, workplaces)",
+		SilenceUsage: true,
+		Args:         cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if opts.format != "text" && opts.format != "json" {
+				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
+			}
+			return runFilters(cmd.Context(), opts.company, opts.timeout, opts.format)
+		},
+	}
+
+	cmd.AddCommand(companiesCmd, searchCmd, getCmd, filtersCmd)
+	return cmd
+}
+
+func normalizeCompany(company string) (string, error) {
+	if company == "" {
+		return "", errors.New("--company is required")
+	}
+	c, ok := workable.CompaniesByAccount[strings.ToLower(company)]
+	if !ok {
+		return "", fmt.Errorf("company %q not found; run 'workable companies' to see supported companies", company)
+	}
+	return c.Account, nil
+}
+
+func runCompanies(format string) error {
+	cs := workable.Companies
+
+	if format == "json" {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(cs)
+	}
+
+	for _, c := range cs {
+		fmt.Printf("%s (%s)\n", c.Name, c.Account)
+	}
+	return nil
+}
+
+type jobSummaryJSON struct {
+	Shortcode  string `json:"shortcode"`
+	Title      string `json:"title"`
+	Location   string `json:"location,omitempty"`
+	Department string `json:"department,omitempty"`
+	Workplace  string `json:"workplace,omitempty"`
+	PostedAt   string `json:"postedAt,omitempty"`
+	URL        string `json:"url"`
+}
+
+type searchResultJSON struct {
+	Total     int              `json:"total"`
+	Jobs      []jobSummaryJSON `json:"jobs"`
+	NextToken string           `json:"nextToken,omitempty"`
+}
+
+func jobURL(account, shortcode string) string {
+	return fmt.Sprintf("https://apply.workable.com/%s/j/%s/", account, shortcode)
+}
+
+func summarize(account string, j workable.JobSummary) jobSummaryJSON {
+	s := jobSummaryJSON{
+		Shortcode: j.Shortcode,
+		Title:     j.Title,
+		Workplace: string(j.Workplace.Value),
+		URL:       jobURL(account, j.Shortcode),
+	}
+	if loc, ok := j.Location.Get(); ok {
+		if d, ok := loc.Display.Get(); ok && d != "" {
+			s.Location = d
+		} else {
+			parts := []string{}
+			for _, p := range []string{loc.City.Or(""), loc.Region.Or(""), loc.Country.Or("")} {
+				if p != "" {
+					parts = append(parts, p)
+				}
+			}
+			s.Location = strings.Join(parts, ", ")
+		}
+	}
+	if len(j.Department) > 0 {
+		s.Department = strings.Join(j.Department, ", ")
+	}
+	if v, ok := j.Published.Get(); ok {
+		if t, err := time.Parse(time.RFC3339, v); err == nil {
+			s.PostedAt = t.UTC().Format("2006-01-02")
+		} else {
+			s.PostedAt = v
+		}
+	}
+	return s
+}
+
+func printSummary(s jobSummaryJSON) {
+	if s.Location != "" {
+		fmt.Printf("Location: %s\n", s.Location)
+	}
+	if s.Workplace != "" {
+		fmt.Printf("Workplace: %s\n", s.Workplace)
+	}
+	if s.Department != "" {
+		fmt.Printf("Department: %s\n", s.Department)
+	}
+	if s.PostedAt != "" {
+		fmt.Printf("Posted: %s\n", s.PostedAt)
+	}
+	fmt.Printf("Shortcode: %s\n", s.Shortcode)
+	fmt.Printf("URL: %s\n", s.URL)
+}
+
+type searchFlags struct {
+	company    string
+	timeout    time.Duration
+	keyword    string
+	country    string
+	region     string
+	city       string
+	department int
+	workplace  string
+	worktype   string
+	remote     string
+	token      string
+	format     string
+}
+
+func runSearch(ctx context.Context, f searchFlags) error {
+	account, err := normalizeCompany(f.company)
+	if err != nil {
+		return err
+	}
+	if f.workplace != "" && !slices.Contains([]string{"on_site", "hybrid", "remote"}, f.workplace) {
+		return fmt.Errorf("--workplace must be on_site, hybrid, or remote, got %q", f.workplace)
+	}
+	if f.remote != "" && f.remote != "true" && f.remote != "false" {
+		return fmt.Errorf("--remote must be true or false, got %q", f.remote)
+	}
+	if f.department < 0 {
+		return fmt.Errorf("--department must be a positive facet id, got %d", f.department)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
+	defer cancel()
+
+	client, err := workable.NewClient(apiBaseURL)
+	if err != nil {
+		return err
+	}
+
+	req := workable.SearchRequest{}
+	if f.keyword != "" {
+		req.Query = workable.NewOptString(f.keyword)
+	}
+	if f.country != "" || f.region != "" || f.city != "" {
+		loc := workable.LocationFilter{}
+		if f.country != "" {
+			loc.Country = workable.NewOptString(f.country)
+		}
+		if f.region != "" {
+			loc.Region = workable.NewOptString(f.region)
+		}
+		if f.city != "" {
+			loc.City = workable.NewOptString(f.city)
+		}
+		req.Location = []workable.LocationFilter{loc}
+	}
+	if f.department > 0 {
+		req.Department = []int{f.department}
+	}
+	if f.workplace != "" {
+		req.Workplace = []workable.SearchRequestWorkplaceItem{workable.SearchRequestWorkplaceItem(f.workplace)}
+	}
+	if f.worktype != "" {
+		req.Worktype = []string{f.worktype}
+	}
+	if f.remote != "" {
+		req.Remote = []string{f.remote}
+	}
+	if f.token != "" {
+		req.Token = workable.NewOptString(f.token)
+	}
+
+	res, err := client.SearchJobs(ctx, &req, workable.SearchJobsParams{Account: account})
+	if err != nil {
+		return err
+	}
+
+	page, ok := res.(*workable.SearchResponse)
+	if !ok {
+		return fmt.Errorf("company %q not found on Workable (account removed?)", account)
+	}
+
+	jobs := make([]jobSummaryJSON, len(page.Results))
+	for i, j := range page.Results {
+		jobs[i] = summarize(account, j)
+	}
+
+	if f.format == "json" {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(searchResultJSON{Total: page.Total, Jobs: jobs, NextToken: page.NextPage.Value})
+	}
+
+	fmt.Printf("Workable Jobs Report (company: %s)\n", account)
+	fmt.Printf("Found %d jobs; showing %d\n\n", page.Total, len(jobs))
+	for i, s := range jobs {
+		fmt.Printf("%d. %s\n", i+1, s.Title)
+		printSummary(s)
+		fmt.Println()
+	}
+	if v, ok := page.NextPage.Get(); ok {
+		fmt.Printf("Next page: --token %s\n", v)
+	}
+	return nil
+}
+
+func runFilters(ctx context.Context, company string, timeout time.Duration, format string) error {
+	account, err := normalizeCompany(company)
+	if err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	client, err := workable.NewClient(apiBaseURL)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.ListJobFilters(ctx, workable.ListJobFiltersParams{Account: account})
+	if err != nil {
+		return err
+	}
+
+	facets, ok := res.(*workable.FiltersResponse)
+	if !ok {
+		return fmt.Errorf("company %q not found on Workable (account removed?)", account)
+	}
+
+	if format == "json" {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(facets)
+	}
+
+	fmt.Printf("Facets (company: %s)\n\n", account)
+	fmt.Println("Departments:")
+	for _, d := range facets.Departments {
+		fmt.Printf("  %d  %s (%d jobs)\n", d.ID, d.Name, d.Count.Value)
+	}
+	fmt.Println("Locations:")
+	for _, l := range facets.Locations {
+		label := l.Display.Or("")
+		if label == "" {
+			parts := []string{}
+			for _, p := range []string{l.Country.Or(""), l.Region.Or(""), l.City.Or("")} {
+				if p != "" {
+					parts = append(parts, p)
+				}
+			}
+			label = strings.Join(parts, ", ")
+		}
+		fmt.Printf("  %s\n", label)
+	}
+	fmt.Printf("Worktypes: %s\n", strings.Join(facets.Worktypes, ", "))
+	fmt.Printf("Workplaces: %s\n", strings.Join(facets.Workplaces, ", "))
+	return nil
+}
+
+type getFlags struct {
+	company   string
+	timeout   time.Duration
+	shortcode string
+	format    string
+}
+
+func runGet(ctx context.Context, f getFlags) error {
+	account, err := normalizeCompany(f.company)
+	if err != nil {
+		return err
+	}
+	if f.shortcode == "" {
+		return errors.New("--shortcode is required (take it from a search result's Shortcode)")
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, f.timeout)
+	defer cancel()
+
+	client, err := workable.NewClient(apiBaseURL)
+	if err != nil {
+		return err
+	}
+
+	res, err := client.GetJob(ctx, workable.GetJobParams{Account: account, Shortcode: f.shortcode})
+	if err != nil {
+		return err
+	}
+
+	switch d := res.(type) {
+	case *workable.JobDetail:
+		return printDetail(account, d, f.format)
+	case *workable.NotFound:
+		return fmt.Errorf("job %q not found for company %q", f.shortcode, account)
+	default:
+		return fmt.Errorf("unexpected response type %T", res)
+	}
+}
+
+func printDetail(account string, d *workable.JobDetail, format string) error {
+	if format == "json" {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(d)
+	}
+
+	fmt.Println(d.Title)
+	if c, ok := workable.CompaniesByAccount[account]; ok {
+		fmt.Printf("Company: %s\n", c.Name)
+	}
+	if loc, ok := d.Location.Get(); ok {
+		if label, ok := loc.Display.Get(); ok && label != "" {
+			fmt.Printf("Location: %s\n", label)
+		} else {
+			parts := []string{}
+			for _, p := range []string{loc.City.Or(""), loc.Region.Or(""), loc.Country.Or("")} {
+				if p != "" {
+					parts = append(parts, p)
+				}
+			}
+			if len(parts) > 0 {
+				fmt.Printf("Location: %s\n", strings.Join(parts, ", "))
+			}
+		}
+	}
+	if w, ok := d.Workplace.Get(); ok {
+		fmt.Printf("Workplace: %s\n", w)
+	}
+	if v, ok := d.Published.Get(); ok {
+		if t, err := time.Parse(time.RFC3339, v); err == nil {
+			fmt.Printf("Posted: %s\n", t.UTC().Format("2006-01-02"))
+		}
+	}
+	fmt.Printf("URL: %s\n", jobURL(account, d.Shortcode))
+
+	printSection("Description", d.Description)
+	printSection("Requirements", d.Requirements)
+	printSection("Benefits", d.Benefits)
+	return nil
+}
+
+func printSection(title string, opt workable.OptString) {
+	html, ok := opt.Get()
+	if !ok || html == "" {
+		return
+	}
+	rendered, err := html2text.FromString(html, html2text.Options{})
+	if err != nil {
+		rendered = html
+	}
+	fmt.Printf("\n%s:\n%s\n", title, rendered)
+}

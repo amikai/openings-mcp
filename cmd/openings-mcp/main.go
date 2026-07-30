@@ -5,17 +5,63 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"net/http/cookiejar"
 	"os"
 	"time"
 
-	"github.com/peterbourgon/ff/v4"
-	"github.com/peterbourgon/ff/v4/ffhelp"
+	"github.com/spf13/cobra"
 
 	"github.com/amikai/openings-mcp/internal/ats"
+	amazoncli "github.com/amikai/openings-mcp/internal/cli/provider/amazon"
+	applecli "github.com/amikai/openings-mcp/internal/cli/provider/apple"
+	ashbycli "github.com/amikai/openings-mcp/internal/cli/provider/ashby"
+	avaturecli "github.com/amikai/openings-mcp/internal/cli/provider/avature"
+	bamboohrcli "github.com/amikai/openings-mcp/internal/cli/provider/bamboohr"
+	cakecli "github.com/amikai/openings-mcp/internal/cli/provider/cake"
+	eightfoldcli "github.com/amikai/openings-mcp/internal/cli/provider/eightfold"
+	engagecli "github.com/amikai/openings-mcp/internal/cli/provider/engage"
+	flowxtracli "github.com/amikai/openings-mcp/internal/cli/provider/flowxtra"
+	foxconncli "github.com/amikai/openings-mcp/internal/cli/provider/foxconn"
+	googlecli "github.com/amikai/openings-mcp/internal/cli/provider/google"
+	greenhousecli "github.com/amikai/openings-mcp/internal/cli/provider/greenhouse"
+	herpcli "github.com/amikai/openings-mcp/internal/cli/provider/herp"
+	himalayascli "github.com/amikai/openings-mcp/internal/cli/provider/himalayas"
+	hrmoscli "github.com/amikai/openings-mcp/internal/cli/provider/hrmos"
+	icimscli "github.com/amikai/openings-mcp/internal/cli/provider/icims"
+	indeedcli "github.com/amikai/openings-mcp/internal/cli/provider/indeed"
+	job104cli "github.com/amikai/openings-mcp/internal/cli/provider/job104"
+	jobicycli "github.com/amikai/openings-mcp/internal/cli/provider/jobicy"
+	jobindexcli "github.com/amikai/openings-mcp/internal/cli/provider/jobindex"
+	joincli "github.com/amikai/openings-mcp/internal/cli/provider/join"
+	levercli "github.com/amikai/openings-mcp/internal/cli/provider/lever"
+	linkedincli "github.com/amikai/openings-mcp/internal/cli/provider/linkedin"
+	metacli "github.com/amikai/openings-mcp/internal/cli/provider/meta"
+	mokahrcli "github.com/amikai/openings-mcp/internal/cli/provider/mokahr"
+	mtkcli "github.com/amikai/openings-mcp/internal/cli/provider/mtk"
+	mynavicli "github.com/amikai/openings-mcp/internal/cli/provider/mynavi"
+	nodeskcli "github.com/amikai/openings-mcp/internal/cli/provider/nodesk"
+	nvidiacli "github.com/amikai/openings-mcp/internal/cli/provider/nvidia"
+	oraclecli "github.com/amikai/openings-mcp/internal/cli/provider/oracle"
+	quantacli "github.com/amikai/openings-mcp/internal/cli/provider/quanta"
+	realtekcli "github.com/amikai/openings-mcp/internal/cli/provider/realtek"
+	recruiteecli "github.com/amikai/openings-mcp/internal/cli/provider/recruitee"
+	remotefirstjobscli "github.com/amikai/openings-mcp/internal/cli/provider/remotefirstjobs"
+	remoteokcli "github.com/amikai/openings-mcp/internal/cli/provider/remoteok"
+	remotivecli "github.com/amikai/openings-mcp/internal/cli/provider/remotive"
+	ripplingcli "github.com/amikai/openings-mcp/internal/cli/provider/rippling"
+	smartrecruiterscli "github.com/amikai/openings-mcp/internal/cli/provider/smartrecruiters"
+	successfactorscli "github.com/amikai/openings-mcp/internal/cli/provider/successfactors"
+	synopsyscli "github.com/amikai/openings-mcp/internal/cli/provider/synopsys"
+	teamtailorcli "github.com/amikai/openings-mcp/internal/cli/provider/teamtailor"
+	tsmccli "github.com/amikai/openings-mcp/internal/cli/provider/tsmc"
+	ultiprocli "github.com/amikai/openings-mcp/internal/cli/provider/ultipro"
+	weworkremotelycli "github.com/amikai/openings-mcp/internal/cli/provider/weworkremotely"
+	workablecli "github.com/amikai/openings-mcp/internal/cli/provider/workable"
+	workdaycli "github.com/amikai/openings-mcp/internal/cli/provider/workday"
+	workingnomadscli "github.com/amikai/openings-mcp/internal/cli/provider/workingnomads"
+	"github.com/amikai/openings-mcp/internal/cli/verifycompanies"
 	"github.com/amikai/openings-mcp/internal/logging"
 	"github.com/amikai/openings-mcp/internal/openingsmcp"
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
@@ -63,50 +109,110 @@ Context management:
 - After filtering, fetch details when both hold: the user's criteria include something summaries can't answer (tech stack, remote policy, overtime culture, education requirements written in the posting body, etc.), and the filtered set is small enough to fetch economically (roughly 5-10 postings). If either condition fails, present summaries and let the user decide whether to go deeper.`
 
 func main() {
-	os.Exit(run())
+	if err := newRootCmd().Execute(); err != nil {
+		os.Exit(1)
+	}
 }
 
-// run carries main's body so the deferred log-file cleanup survives every
-// exit path; only main itself calls os.Exit.
-func run() int {
-	fs := ff.NewFlagSet("openings-mcp")
-	var (
-		logFile              = fs.StringLong("log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
-		logLevel             = fs.StringLong("log-level", "info", "minimum log level: debug, info, warn, or error")
-		enableCommandLogging = fs.BoolLong("enable-command-logging", "log raw JSON-RPC traffic to the log output")
-		versionFlag          = fs.BoolLong("version", "print version information and exit")
-		dumpCacheTTL         = fs.DurationLong("dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
-	)
-	cmd := &ff.Command{
-		Name:      "openings-mcp",
-		ShortHelp: "MCP server exposing job-search tools for job boards and company careers sites",
-		Flags:     fs,
-	}
-	if err := cmd.Parse(os.Args[1:]); err != nil {
-		fmt.Fprintln(os.Stderr, ffhelp.Command(cmd))
-		if errors.Is(err, ff.ErrHelp) {
-			return 0
-		}
-		fmt.Fprintln(os.Stderr, "err:", err)
-		return 1
+type serverConfig struct {
+	logFile              string
+	logLevel             string
+	enableCommandLogging bool
+	dumpCacheTTL         time.Duration
+}
+
+func newRootCmd() *cobra.Command {
+	cfg := &serverConfig{}
+
+	rootCmd := &cobra.Command{
+		Use:          "openings-mcp",
+		Short:        "MCP server exposing job-search tools for job boards and company careers sites",
+		SilenceUsage: true,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runServer(cfg)
+		},
 	}
 
-	if *versionFlag {
-		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\n", version, commit, date)
-		return 0
+	rootCmd.PersistentFlags().StringVar(&cfg.logFile, "log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
+	rootCmd.PersistentFlags().StringVar(&cfg.logLevel, "log-level", "info", "minimum log level: debug, info, warn, or error")
+	rootCmd.PersistentFlags().BoolVar(&cfg.enableCommandLogging, "enable-command-logging", false, "log raw JSON-RPC traffic to the log output")
+	rootCmd.PersistentFlags().DurationVar(&cfg.dumpCacheTTL, "dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
+
+	rootCmd.Version = fmt.Sprintf("%s\nCommit: %s\nBuild Date: %s", version, commit, date)
+	rootCmd.SetVersionTemplate("Version: {{.Version}}\n")
+
+	serverCmd := &cobra.Command{
+		Use:   "server",
+		Short: "Launch the openings-mcp stdio MCP server",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return runServer(cfg)
+		},
 	}
 
+	rootCmd.AddCommand(serverCmd)
+	rootCmd.AddCommand(verifycompanies.NewCommand())
+	rootCmd.AddCommand(job104cli.NewCommand())
+	rootCmd.AddCommand(amazoncli.NewCommand())
+	rootCmd.AddCommand(applecli.NewCommand())
+	rootCmd.AddCommand(ashbycli.NewCommand())
+	rootCmd.AddCommand(avaturecli.NewCommand())
+	rootCmd.AddCommand(bamboohrcli.NewCommand())
+	rootCmd.AddCommand(cakecli.NewCommand())
+	rootCmd.AddCommand(eightfoldcli.NewCommand())
+	rootCmd.AddCommand(engagecli.NewCommand())
+	rootCmd.AddCommand(flowxtracli.NewCommand())
+	rootCmd.AddCommand(foxconncli.NewCommand())
+	rootCmd.AddCommand(googlecli.NewCommand())
+	rootCmd.AddCommand(greenhousecli.NewCommand())
+	rootCmd.AddCommand(herpcli.NewCommand())
+	rootCmd.AddCommand(himalayascli.NewCommand())
+	rootCmd.AddCommand(hrmoscli.NewCommand())
+	rootCmd.AddCommand(icimscli.NewCommand())
+	rootCmd.AddCommand(indeedcli.NewCommand())
+	rootCmd.AddCommand(jobicycli.NewCommand())
+	rootCmd.AddCommand(jobindexcli.NewCommand())
+	rootCmd.AddCommand(joincli.NewCommand())
+	rootCmd.AddCommand(levercli.NewCommand())
+	rootCmd.AddCommand(linkedincli.NewCommand())
+	rootCmd.AddCommand(metacli.NewCommand())
+	rootCmd.AddCommand(mokahrcli.NewCommand())
+	rootCmd.AddCommand(mtkcli.NewCommand())
+	rootCmd.AddCommand(mynavicli.NewCommand())
+	rootCmd.AddCommand(nodeskcli.NewCommand())
+	rootCmd.AddCommand(nvidiacli.NewCommand())
+	rootCmd.AddCommand(oraclecli.NewCommand())
+	rootCmd.AddCommand(quantacli.NewCommand())
+	rootCmd.AddCommand(realtekcli.NewCommand())
+	rootCmd.AddCommand(recruiteecli.NewCommand())
+	rootCmd.AddCommand(remotefirstjobscli.NewCommand())
+	rootCmd.AddCommand(remoteokcli.NewCommand())
+	rootCmd.AddCommand(remotivecli.NewCommand())
+	rootCmd.AddCommand(ripplingcli.NewCommand())
+	rootCmd.AddCommand(smartrecruiterscli.NewCommand())
+	rootCmd.AddCommand(successfactorscli.NewCommand())
+	rootCmd.AddCommand(synopsyscli.NewCommand())
+	rootCmd.AddCommand(teamtailorcli.NewCommand())
+	rootCmd.AddCommand(tsmccli.NewCommand())
+	rootCmd.AddCommand(ultiprocli.NewCommand())
+	rootCmd.AddCommand(weworkremotelycli.NewCommand())
+	rootCmd.AddCommand(workablecli.NewCommand())
+	rootCmd.AddCommand(workdaycli.NewCommand())
+	rootCmd.AddCommand(workingnomadscli.NewCommand())
+
+	return rootCmd
+}
+
+func runServer(cfg *serverConfig) error {
 	var level slog.Level
-	if err := level.UnmarshalText([]byte(*logLevel)); err != nil {
-		log.Fatalf("invalid log-level %q: %v", *logLevel, err)
+	if err := level.UnmarshalText([]byte(cfg.logLevel)); err != nil {
+		return fmt.Errorf("invalid log-level %q: %w", cfg.logLevel, err)
 	}
 
 	logOutput := io.Writer(os.Stderr)
-	if *logFile != "" {
-		file, err := os.OpenFile(*logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600)
+	if cfg.logFile != "" {
+		file, err := os.OpenFile(cfg.logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to open log file: %v\n", err)
-			return 1
+			return fmt.Errorf("failed to open log file: %w", err)
 		}
 		defer file.Close()
 		logOutput = file
@@ -115,7 +221,7 @@ func run() int {
 
 	// Process-local dump cache for full-dump ATS adapters. Injected into
 	// adapters; nil when --dump-cache-ttl <= 0 (opt out by not constructing).
-	ttl := *dumpCacheTTL
+	ttl := cfg.dumpCacheTTL
 	var dumpCache *ats.DumpCache
 	if ttl > 0 {
 		dumpCache = ats.NewDumpCache(ats.DumpCacheConfig{TTL: ttl})
@@ -127,15 +233,15 @@ func run() int {
 	)
 
 	var transport mcp.Transport = &mcp.StdioTransport{}
-	if *enableCommandLogging {
+	if cfg.enableCommandLogging {
 		transport = &mcp.LoggingTransport{Transport: transport, Writer: logOutput}
 	}
 
 	if err := runWithTransport(transport, logger, dumpCache); err != nil {
 		logger.Error("server terminated", "error", err)
-		return 1
+		return err
 	}
-	return 0
+	return nil
 }
 
 func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpCache) error {

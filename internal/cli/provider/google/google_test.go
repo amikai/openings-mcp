@@ -1,0 +1,95 @@
+package google
+
+import (
+	"bytes"
+	"testing"
+
+	google "github.com/amikai/openings-mcp/internal/provider/google"
+	"github.com/stretchr/testify/assert"
+)
+
+func TestFormatReportIncludesEveryGoogleJobDetail(t *testing.T) {
+	search := &google.JobsResponse{
+		Jobs: []google.Job{
+			{ID: "104030745835512518", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA"},
+			{ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA", Remote: true},
+		},
+	}
+	details := map[string]*google.JobDetailResponse{
+		"104030745835512518": {ID: "104030745835512518", Title: "Model UX Designer", Company: "Google", Location: "Mountain View, CA, USA", About: "Design AI product UX.", Qualifications: "Bachelor's degree.", Responsibilities: "Create model UX flows."},
+		"126340255522398918": {ID: "126340255522398918", Title: "Senior Engineer, GDC", Company: "Google", Location: "Sunnyvale, CA, USA", About: "Build backend services."},
+	}
+
+	var buf bytes.Buffer
+	writeReport(&buf, reportData{
+		query:   "software engineer",
+		baseURL: "https://www.google.com/about/careers/applications",
+		search:  search,
+		jobs:    jobsForDetail(search.Jobs),
+		details: details,
+	})
+	got := buf.String()
+
+	for _, want := range []string{
+		"Google Jobs Report",
+		"Query: software engineer",
+		"Found 2 jobs; showing 2",
+		"[104030745835512518] Model UX Designer",
+		"URL: https://www.google.com/about/careers/applications/jobs/results/104030745835512518",
+		"Company: Google",
+		"Location: Mountain View, CA, USA",
+		"About: Design AI product UX.",
+		"Qualifications: Bachelor's degree.",
+		"Responsibilities: Create model UX flows.",
+		"[126340255522398918] Senior Engineer, GDC",
+		"Remote eligible",
+		"Build backend services.",
+	} {
+		assert.Contains(t, got, want)
+	}
+}
+
+func TestJobsForDetailLimitsGoogleJobsToTen(t *testing.T) {
+	jobs := make([]google.Job, 12)
+	got := jobsForDetail(jobs)
+	assert.Len(t, got, 10)
+}
+
+func TestBuildJobsRequest(t *testing.T) {
+	got := buildJobsRequest(searchFlags{
+		query:          "software engineer",
+		location:       "Taiwan",
+		hasRemote:      true,
+		targetLevel:    "MID",
+		skills:         "Python",
+		degree:         "MASTERS",
+		employmentType: "FULL_TIME",
+		company:        "Google",
+		sortBy:         "date",
+		page:           2,
+	})
+
+	want := &google.JobsRequest{
+		Query:          "software engineer",
+		Locations:      []string{"Taiwan"},
+		HasRemote:      true,
+		TargetLevels:   []string{"MID"},
+		Skills:         "Python",
+		Degrees:        []string{"MASTERS"},
+		EmploymentType: []string{"FULL_TIME"},
+		Companies:      []string{"Google"},
+		SortBy:         "date",
+		Page:           2,
+	}
+	assert.Equal(t, want, got)
+}
+
+func TestBuildJobsRequestLeavesUnsetFiltersOut(t *testing.T) {
+	got := buildJobsRequest(searchFlags{query: "software engineer", page: 1})
+
+	want := &google.JobsRequest{
+		Query: "software engineer",
+		Page:  1,
+	}
+	assert.Equal(t, want, got)
+}
