@@ -13,9 +13,9 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	rippling "github.com/amikai/openings-mcp/internal/provider/rippling"
 )
-
 
 type rootOptions struct {
 	board   string
@@ -35,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.board, "board", "", "confirmed Rippling board slug, e.g. pythian (see 'rippling companies' for the full list)")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -43,9 +43,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -60,9 +57,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				board:    opts.board,
 				timeout:  opts.timeout,
@@ -82,9 +76,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				board:   opts.board,
 				timeout: opts.timeout,
@@ -114,6 +105,9 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
+// summarizeDump merges the list's one-entry-per-(job, location) rows into
+// one summary per job, preserving the board's ordering and each job's
+// location order.
 func summarizeDump(entries []rippling.JobListEntry) []jobSummaryJSON {
 	byID := make(map[string]int)
 	jobs := make([]jobSummaryJSON, 0, len(entries))
@@ -140,6 +134,10 @@ func summarizeDump(entries []rippling.JobListEntry) []jobSummaryJSON {
 	return jobs
 }
 
+// matches applies the client-side search filters: case-insensitive
+// substring on title (keyword) and any location name (location), ANDed.
+// The Job Board API has no server-side filtering, so this is the whole
+// search.
 func matches(s jobSummaryJSON, keyword, location string) bool {
 	return containsFold(s.Title, keyword) && containsFold(strings.Join(s.Locations, "; "), location)
 }
@@ -151,6 +149,8 @@ func containsFold(s, sub string) bool {
 	return strings.Contains(strings.ToLower(s), strings.ToLower(sub))
 }
 
+// renderDescription converts the JD's HTML to plain text; on a conversion
+// failure fall back to the raw HTML rather than dropping it.
 func renderDescription(content string) string {
 	if text, err := html2text.FromString(content, html2text.Options{}); err == nil {
 		return text
@@ -158,6 +158,9 @@ func renderDescription(content string) string {
 	return content
 }
 
+// payRangeLine renders one payRangeDetails band as
+// "label: start – end CURRENCY/FREQUENCY". The label is the band's
+// location, work mode, or role level.
 func payRangeLine(r rippling.PayRangeDetail) string {
 	span := fmt.Sprintf("%.0f – %.0f %s/%s",
 		r.RangeStart.Value, r.RangeEnd.Value, r.Currency.Value, r.Frequency.Value)
@@ -167,6 +170,8 @@ func payRangeLine(r rippling.PayRangeDetail) string {
 	return span
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if len(s.Locations) > 0 {
 		fmt.Printf("Locations: %s\n", strings.Join(s.Locations, "; "))
@@ -180,6 +185,9 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("ID: %s\n", s.ID)
 }
 
+// runCompanies lists every confirmed Rippling board embedded in the CLI
+// (internal/provider/rippling/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := rippling.Companies
 
@@ -195,6 +203,8 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// normalizeBoard lowercases the --board value and requires it to be a
+// curated board — same policy as the greenhouse CLI's normalizeBoard.
 func normalizeBoard(board string) (string, error) {
 	if board == "" {
 		return "", errors.New("--board is required")
@@ -206,6 +216,7 @@ func normalizeBoard(board string) (string, error) {
 	return slug, nil
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	board    string
 	timeout  time.Duration
@@ -214,6 +225,9 @@ type searchFlags struct {
 	format   string
 }
 
+// runSearch fetches the board's whole job list (the API has no pagination
+// and no server-side filters), merges the per-location duplicate entries,
+// then filters client-side and prints summaries.
 func runSearch(ctx context.Context, f searchFlags) error {
 	slug, err := normalizeBoard(f.board)
 	if err != nil {
@@ -266,6 +280,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	board   string
 	timeout time.Duration
@@ -273,6 +288,7 @@ type getFlags struct {
 	format  string
 }
 
+// runGet fetches one job in full via Rippling's single-job endpoint.
 func runGet(ctx context.Context, f getFlags) error {
 	if f.jobUUID == "" {
 		return errors.New("--id is required (take it from a search result's ID)")
@@ -307,6 +323,8 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 }
 
+// printDetail renders one full job. JSON mode encodes the generated
+// JobDetail as-is — detail is for seeing the whole record.
 func printDetail(d *rippling.JobDetail, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

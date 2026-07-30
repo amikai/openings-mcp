@@ -1,3 +1,6 @@
+// Package linkedin implements the "openings-mcp linkedin" debug CLI, for
+// manual checks against the live surface that internal/provider/linkedin
+// documents.
 package linkedin
 
 import (
@@ -44,7 +47,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	cmd.Flags().StringVar(&opts.baseURL, "base-url", "https://www.linkedin.com", "LinkedIn base URL")
+	cmd.Flags().StringVar(&opts.baseURL, "base-url", linkedinprovider.DefaultBaseURL, "LinkedIn base URL")
 	cmd.Flags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.Flags().StringVar(&opts.keywords, "keywords", "", "free-text search query")
 	cmd.Flags().StringVar(&opts.location, "location", "", "location filter (LinkedIn searches globally)")
@@ -98,6 +101,7 @@ func run(ctx context.Context, opts *options) error {
 	return nil
 }
 
+// searchFlags carries the parsed flag values into buildJobsRequest.
 type searchFlags struct {
 	keywords      string
 	location      string
@@ -141,6 +145,7 @@ func jobsForDetail(jobs []linkedinprovider.Job, n int) []linkedinprovider.Job {
 	return jobs[:n]
 }
 
+// reportData carries the data writeReport renders.
 type reportData struct {
 	keywords string
 	baseURL  string
@@ -193,10 +198,17 @@ func writeDetail(w io.Writer, detail *linkedinprovider.JobDetailResponse) {
 	}
 }
 
+// labels returns the sorted keys of a lookup table, prefixed with "" so an
+// ff.StringEnumLong flag can default to unset (no filter) instead of
+// silently falling back to the first real value — ffval.Enum's zero Default
+// only survives initialize() if it's itself in the Valid list.
 func labels(table map[string]string) []string {
 	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
+// usageWithChoices appends a "one of: ..." list to base. ffhelp never
+// introspects an ff.StringEnumLong's valid values on its own, so small
+// enough choice sets are spelled out here to make -h self-documenting.
 func usageWithChoices(base string, table map[string]string) string {
 	choices := labels(table)[1:]
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))

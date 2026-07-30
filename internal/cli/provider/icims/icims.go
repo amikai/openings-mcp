@@ -1,3 +1,5 @@
+// Package icims implements the "openings-mcp icims" debug CLI, for manual
+// checks against the live surface that internal/provider/icims documents.
 package icims
 
 import (
@@ -12,6 +14,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	icimsprovider "github.com/amikai/openings-mcp/internal/provider/icims"
 )
 
@@ -33,7 +36,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", `curated company name or career-portal host, e.g. "Peraton" or "careers-peraton.icims.com"`)
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -42,9 +45,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("companies takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runCompanies(opts.format)
 		},
@@ -62,9 +62,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:  opts.company,
@@ -88,9 +85,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runDetail(cmd.Context(), detailFlags{
 				company: opts.company,

@@ -18,7 +18,7 @@ var companiesYAML []byte
 // site. Slug is the site's subdomain and the provider's tenant key. Every
 // curated entry was verified against /careers/list - HTTP 200 with a
 // non-empty result array - and its careers page's og:site_name checked
-// against the expected company name; cmd/verify-companies re-verifies the
+// against the expected company name; internal/cli/verifycompanies re-verifies the
 // roster.
 type Company struct {
 	Name string `yaml:"company" json:"company"`

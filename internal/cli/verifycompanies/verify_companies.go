@@ -23,6 +23,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/amikai/openings-mcp/internal/ats"
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/eightfold"
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 )
@@ -98,9 +99,6 @@ func NewCommand() *cobra.Command {
 		Short:        "Verify curated companies.yaml entries by running searches through ATS adapters",
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			errs, err := run(cmd.Context(), opts.providers, opts.timeout, opts.concurrency, opts.format)
 			if err != nil {
 				return err
@@ -115,7 +113,7 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringVar(&opts.providers, "provider", strings.Join(providerOrder, ","), "comma-separated subset of "+strings.Join(providerOrder, ","))
 	cmd.Flags().DurationVar(&opts.timeout, "timeout", 300*time.Second, "per-request timeout")
 	cmd.Flags().IntVar(&opts.concurrency, "concurrency", 8, "number of concurrent checks")
-	cmd.Flags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.Flags(), &opts.format)
 
 	return cmd
 }

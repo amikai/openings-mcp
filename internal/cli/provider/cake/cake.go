@@ -1,3 +1,5 @@
+// Package cake implements the "openings-mcp cake" debug CLI, for manual
+// checks against the live surface that internal/provider/cake documents.
 package cake
 
 import (
@@ -11,9 +13,11 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	cake "github.com/amikai/openings-mcp/internal/provider/cake"
 )
 
+// searchFlags carries the parsed flag values into buildSearchRequest.
 type searchFlags struct {
 	keyword        string
 	sort           string
@@ -53,25 +57,30 @@ func NewCommand() *cobra.Command {
 
 	cmd.Flags().DurationVar(&f.timeout, "timeout", 60*time.Second, "request timeout")
 	cmd.Flags().StringVar(&f.keyword, "keyword", "", "free-text keyword search (empty browses all jobs)")
-	cmd.Flags().StringVar(&f.sort, "sort", "", usageWithChoices("Sort order", choices(cake.JobSearchRequestSortBy("").AllValues())))
+	// sort_by is required by the API (see openapi.yaml), so it defaults to a
+	// real value rather than to unset — an empty sort_by is a 422.
+	clihelp.ChoiceVar(cmd.Flags(), &f.sort, "sort", string(cake.JobSearchRequestSortByPopularity),
+		choices(cake.JobSearchRequestSortBy("").AllValues()), "Sort order")
 	cmd.Flags().IntVar(&f.page, "page", 0, "1-based page number (0 = unset, server default)")
 	cmd.Flags().IntVar(&f.perPage, "per-page", 10, "jobs per page (0 = unset, server default 20)")
-	cmd.Flags().StringSliceVar(&f.locations, "location", nil, "Location name as shown on cake.me, e.g. Taiwan (repeatable)")
-	cmd.Flags().StringSliceVar(&f.professions, "profession", nil, "Profession slug, e.g. it_back-end-engineer (repeatable)")
-	cmd.Flags().StringSliceVar(&f.jobTypes, "job-type", nil, usageWithChoices("Employment type (repeatable)", choices(cake.JobSearchFiltersJobTypesItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.seniorities, "seniority", nil, usageWithChoices("Seniority level (repeatable)", choices(cake.JobSearchFiltersSeniorityLevelsItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.years, "years", nil, usageWithChoices("Years of experience bucket (repeatable)", choices(cake.JobSearchFiltersYearOfSeniorityItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.managements, "management", nil, usageWithChoices("Number of people managed (repeatable)", choices(cake.JobSearchFiltersNumberOfManagementItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.remotes, "remote", nil, usageWithChoices("Remote-work policy (repeatable)", choices(cake.JobSearchFiltersRemoteItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.inclusivities, "inclusivity", nil, usageWithChoices("Inclusive-hiring trait (repeatable)", choices(cake.JobSearchFiltersInclusivityTraitsItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.langs, "lang", nil, "Job description language, e.g. English, Chinese (repeatable)")
-	cmd.Flags().StringVar(&f.salaryType, "salary-type", "", usageWithChoices("Salary period", choices(cake.JobSearchFiltersSalaryType("").AllValues())))
-	cmd.Flags().StringVar(&f.salaryCurrency, "salary-currency", "", usageWithChoices("Salary currency", choices(cake.JobSearchFiltersSalaryCurrency("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.locations, "location", nil, "Location name as shown on cake.me, e.g. Taiwan (repeatable)")
+	cmd.Flags().StringArrayVar(&f.professions, "profession", nil, "Profession slug, e.g. it_back-end-engineer (repeatable)")
+	cmd.Flags().StringArrayVar(&f.jobTypes, "job-type", nil, usageWithChoices("Employment type (repeatable)", choices(cake.JobSearchFiltersJobTypesItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.seniorities, "seniority", nil, usageWithChoices("Seniority level (repeatable)", choices(cake.JobSearchFiltersSeniorityLevelsItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.years, "years", nil, usageWithChoices("Years of experience bucket (repeatable)", choices(cake.JobSearchFiltersYearOfSeniorityItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.managements, "management", nil, usageWithChoices("Number of people managed (repeatable)", choices(cake.JobSearchFiltersNumberOfManagementItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.remotes, "remote", nil, usageWithChoices("Remote-work policy (repeatable)", choices(cake.JobSearchFiltersRemoteItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.inclusivities, "inclusivity", nil, usageWithChoices("Inclusive-hiring trait (repeatable)", choices(cake.JobSearchFiltersInclusivityTraitsItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.langs, "lang", nil, "Job description language, e.g. English, Chinese (repeatable)")
+	clihelp.ChoiceVar(cmd.Flags(), &f.salaryType, "salary-type", "",
+		clihelp.WithUnset(choices(cake.JobSearchFiltersSalaryType("").AllValues())), "Salary period")
+	clihelp.ChoiceVar(cmd.Flags(), &f.salaryCurrency, "salary-currency", "",
+		clihelp.WithUnset(choices(cake.JobSearchFiltersSalaryCurrency("").AllValues())), "Salary currency")
 	cmd.Flags().IntVar(&f.salaryMin, "salary-min", 0, "minimum salary (0 = unset)")
 	cmd.Flags().IntVar(&f.salaryMax, "salary-max", 0, "maximum salary (0 = unset)")
-	cmd.Flags().StringSliceVar(&f.companySizes, "company-size", nil, usageWithChoices("Company size bucket (repeatable)", choices(cake.JobSearchFiltersPageNumberOfEmployeesItem("").AllValues())))
-	cmd.Flags().StringSliceVar(&f.sectors, "sector", nil, "Company sector slug, e.g. tech_software (repeatable)")
-	cmd.Flags().StringSliceVar(&f.techLabels, "tech-label", nil, "Technology the company uses, e.g. go (repeatable)")
+	cmd.Flags().StringArrayVar(&f.companySizes, "company-size", nil, usageWithChoices("Company size bucket (repeatable)", choices(cake.JobSearchFiltersPageNumberOfEmployeesItem("").AllValues())))
+	cmd.Flags().StringArrayVar(&f.sectors, "sector", nil, "Company sector slug, e.g. tech_software (repeatable)")
+	cmd.Flags().StringArrayVar(&f.techLabels, "tech-label", nil, "Technology the company uses, e.g. go (repeatable)")
 
 	return cmd
 }
@@ -108,6 +117,9 @@ func run(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// buildSearchRequest converts flag values into the API request. Enum flags
+// are validated against the generated enum types; empty or zero values leave
+// the corresponding field unset (unfiltered).
 func buildSearchRequest(f searchFlags) (cake.JobSearchRequest, error) {
 	req := cake.JobSearchRequest{
 		Query:  f.keyword,
@@ -172,6 +184,8 @@ func buildSearchRequest(f searchFlags) (cake.JobSearchRequest, error) {
 	return req, nil
 }
 
+// toEnums validates each value against T's enum and converts it. A nil or
+// empty input returns nil, leaving the filter unset.
 func toEnums[T interface {
 	~string
 	AllValues() []T
@@ -195,6 +209,7 @@ func toEnums[T interface {
 	return out, nil
 }
 
+// choices converts a generated enum's AllValues into flag choice strings.
 func choices[T ~string](values []T) []string {
 	out := make([]string, 0, len(values))
 	for _, v := range values {
@@ -203,6 +218,7 @@ func choices[T ~string](values []T) []string {
 	return out
 }
 
+// usageWithChoices appends a comma-separated "one of: ..." list to base.
 func usageWithChoices(base string, choices []string) string {
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))
 }

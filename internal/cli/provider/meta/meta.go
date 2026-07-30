@@ -1,3 +1,5 @@
+// Package meta implements the "openings-mcp meta" debug CLI, for manual
+// checks against the live surface that internal/provider/meta documents.
 package meta
 
 import (
@@ -12,6 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	metaprovider "github.com/amikai/openings-mcp/internal/provider/meta"
 )
 
@@ -33,7 +36,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", metaprovider.DefaultBaseURL, "Meta Careers base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchQ                string
@@ -54,9 +57,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runSearch(cmd.Context(), searchFlags{
 				baseURL: opts.baseURL,
@@ -97,9 +97,6 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				return fmt.Errorf("detail takes no positional arguments, got %v", args)
 			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runDetail(cmd.Context(), detailFlags{
 				baseURL: opts.baseURL,
 				timeout: opts.timeout,
@@ -117,9 +114,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("filters takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runFilters(cmd.Context(), filtersFlags{
 				baseURL: opts.baseURL,

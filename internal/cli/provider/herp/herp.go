@@ -1,3 +1,5 @@
+// Package herp implements the "openings-mcp herp" debug CLI, for manual
+// checks against the live surface that internal/provider/herp documents.
 package herp
 
 import (
@@ -11,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/herp"
 )
-
 
 type options struct {
 	company string
@@ -21,10 +23,12 @@ type options struct {
 	format  string
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	keyword string
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	jobID string
 }
@@ -41,7 +45,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "HERP Career company slug, e.g. notainc (see 'herp companies' for the curated list)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -142,6 +146,9 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
+// summarize takes the board rather than the caller's --company string: the
+// slug the caller typed may differ in case, and herp.careers 404s on a
+// mixed-case path, so every rendered URL uses board.CompanySlug.
 func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 	roles := make([]string, 0, len(j.JobRoles))
 	for _, r := range j.JobRoles {
@@ -166,6 +173,9 @@ func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 	}
 }
 
+// jobURL mirrors the ATS adapter: a company that opted out of HERP Career
+// applications renders a media page with no apply action, so its postings are
+// linked to the HERP Hire career page instead.
 func jobURL(board *herp.CompanyBoard, id string) string {
 	if board.CompanyIsApplicationEnabled.Or(true) {
 		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", herp.DefaultBaseURL, board.CompanySlug, id)

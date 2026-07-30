@@ -29,7 +29,7 @@ const (
 
 // APIError is an unsuccessful MokaHR response. Msg is upstream's own wording
 // and is written in Chinese. It carries no package prefix: callers in
-// internal/ats and cmd/mokahr add their own, and two would read as one
+// internal/ats and internal/cli/provider/mokahr add their own, and two would read as one
 // doubled.
 type APIError struct {
 	Code int

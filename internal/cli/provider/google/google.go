@@ -1,3 +1,5 @@
+// Package google implements the "openings-mcp google" debug CLI, for manual
+// checks against the live surface that internal/provider/google documents.
 package google
 
 import (
@@ -13,6 +15,8 @@ import (
 	google "github.com/amikai/openings-mcp/internal/provider/google"
 )
 
+// Enum values mirror openapi.yaml's searchJobs parameters. The site silently
+// ignores unrecognized values, so the flags reject them up front.
 var (
 	targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
 	degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
@@ -21,6 +25,7 @@ var (
 	sortOrders      = []string{"relevance", "date"}
 )
 
+// searchFlags carries the parsed flag values into buildJobsRequest.
 type searchFlags struct {
 	baseURL        string
 	timeout        time.Duration
@@ -124,6 +129,9 @@ func buildJobsRequest(f searchFlags) *google.JobsRequest {
 	return req
 }
 
+// usageWithChoices appends a "one of: ..." list to base. ffhelp never
+// introspects an ff.StringEnumLong's valid values on its own, so small
+// enough choice sets are spelled out here to make -h self-documenting.
 func usageWithChoices(base string, choices []string) string {
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))
 }
@@ -135,6 +143,7 @@ func jobsForDetail(jobs []google.Job) []google.Job {
 	return jobs
 }
 
+// reportData carries the data writeReport renders.
 type reportData struct {
 	query   string
 	baseURL string

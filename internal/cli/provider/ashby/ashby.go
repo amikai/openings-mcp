@@ -1,3 +1,5 @@
+// Package ashby implements the "openings-mcp ashby" debug CLI, for manual
+// checks against the live surface that internal/provider/ashby documents.
 package ashby
 
 import (
@@ -13,6 +15,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	ashby "github.com/amikai/openings-mcp/internal/provider/ashby"
 )
 
@@ -22,6 +25,7 @@ type options struct {
 	format  string
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	board   string
 	timeout time.Duration
@@ -29,6 +33,7 @@ type searchFlags struct {
 	format  string
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	board   string
 	timeout time.Duration
@@ -48,7 +53,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.board, "board", "", "confirmed Ashby board slug, e.g. openai")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -97,6 +102,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// runCompanies lists every confirmed Ashby board embedded in the CLI
+// (internal/provider/ashby/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := ashby.Companies
 
@@ -112,6 +120,10 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// fetchBoard validates the board slug against the embedded roster, then
+// fetches the board's entire job list with compensation included — the
+// shared front half of search and get. The API's typed 404 is theoretically
+// unreachable for roster boards but reported rather than swallowed.
 func fetchBoard(ctx context.Context, board string, timeout time.Duration) (*ashby.JobBoardResponse, error) {
 	if board == "" {
 		return nil, errors.New("--board is required")
@@ -146,6 +158,9 @@ func fetchBoard(ctx context.Context, board string, timeout time.Duration) (*ashb
 	}
 }
 
+// jobSummaryJSON is the --format json shape for one search result and the
+// summary header of a get result: the compact fields a listing needs, no
+// description.
 type jobSummaryJSON struct {
 	ID                 string   `json:"id,omitempty"`
 	Title              string   `json:"title"`
@@ -197,6 +212,9 @@ func summarize(j *ashby.JobPosting) jobSummaryJSON {
 	return s
 }
 
+// runSearch fetches the whole board and prints summaries, optionally
+// filtered by a case-insensitive substring match on the title. There is no
+// pagination — the API returns everything in one response.
 func runSearch(ctx context.Context, f searchFlags) error {
 	resp, err := fetchBoard(ctx, f.board, f.timeout)
 	if err != nil {
@@ -227,6 +245,10 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// printSummary prints one job's compact text block (everything but the
+// description). The locations block mirrors the workday CLI's singular/plural
+// treatment: a bare "Location:" line when there's one, an itemized
+// "Locations:" list when secondaries exist.
 func printSummary(s jobSummaryJSON) {
 	switch {
 	case s.Department != "" && s.Team != "" && s.Team != s.Department:
@@ -265,6 +287,8 @@ func printSummary(s jobSummaryJSON) {
 	}
 }
 
+// runGet fetches the whole board (Ashby has no per-job endpoint) and prints
+// the one job whose id matches, in full.
 func runGet(ctx context.Context, f getFlags) error {
 	if f.jobID == "" {
 		return errors.New("--id is required")
@@ -310,6 +334,9 @@ func printJob(j *ashby.JobPosting, format string) error {
 	return nil
 }
 
+// printCompensation itemizes the tier/component detail beneath the one-line
+// summary printSummary already showed. Jobs that publish no ranges send an
+// empty tier list — print nothing rather than an empty header.
 func printCompensation(c ashby.Compensation) {
 	if len(c.CompensationTiers) == 0 {
 		return
@@ -327,6 +354,10 @@ func printCompensation(c ashby.Compensation) {
 	}
 }
 
+// componentLine renders one compensation component. The API's summary
+// already carries the human-readable range and currency ("Estimated base
+// salary $132K – $330K"), so it leads; compensationType and a non-NONE
+// interval qualify it.
 func componentLine(c ashby.CompensationComponent) string {
 	line := cmp.Or(c.Summary.Value, c.CompensationType.Value)
 	var quals []string

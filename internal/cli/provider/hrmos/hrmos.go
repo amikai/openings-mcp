@@ -1,3 +1,5 @@
+// Package hrmos implements the "openings-mcp hrmos" debug CLI, for manual
+// checks against the live surface that internal/provider/hrmos documents.
 package hrmos
 
 import (
@@ -11,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 )
 
@@ -43,7 +46,7 @@ func NewCommand() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", hrmos.DefaultBaseURL, "HRMOS 採用 base URL")
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "HRMOS tenant slug, e.g. moneyforward (see 'hrmos companies' for the curated list; any live tenant slug also works)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -100,6 +103,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// resolveSlug accepts either a curated roster slug or an arbitrary live
+// HRMOS tenant slug — unlike join.com, a HRMOS slug needs no roster lookup
+// to resolve (see internal/ats.HrmosAdapter.ParseCareersURL).
 func resolveSlug(company string) (string, error) {
 	if company == "" {
 		return "", errors.New("--company is required")
@@ -110,6 +116,8 @@ func resolveSlug(company string) (string, error) {
 	return company, nil
 }
 
+// runCompanies lists every curated HRMOS company embedded in the CLI
+// (internal/provider/hrmos/companies.yaml). It makes no network call.
 func runCompanies(format string) error {
 	cs := hrmos.Companies
 
@@ -132,6 +140,8 @@ type searchOptions struct {
 	format            string
 }
 
+// runSearch fetches the tenant's whole job dump (Client.AllJobs already
+// loops every page) then filters client-side and prints summaries.
 func runSearch(ctx context.Context, f searchOptions) error {
 	slug, err := resolveSlug(f.company)
 	if err != nil {

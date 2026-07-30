@@ -1,3 +1,5 @@
+// Package amazon implements the "openings-mcp amazon" debug CLI, for manual
+// checks against the live surface that internal/provider/amazon documents.
 package amazon
 
 import (
@@ -11,9 +13,9 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 )
-
 
 type options struct {
 	baseURL string
@@ -65,7 +67,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", amazon.DefaultBaseURL, "Amazon Jobs base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	sOpts := &searchOptions{options: *opts}
 	searchCmd := &cobra.Command{
@@ -80,12 +82,12 @@ func NewCommand() *cobra.Command {
 	}
 
 	searchCmd.Flags().StringVar(&sOpts.keyword, "keyword", "", "free-text query (empty browses all jobs)")
-	searchCmd.Flags().StringSliceVar(&sOpts.countries, "country", nil, "ISO-3 country code, e.g. TWN (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sOpts.cities, "city", nil, "normalized city name, e.g. Taipei City (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sOpts.jobCategories, "job-category", nil, "job category display name, e.g. Software Development (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sOpts.businessCategories, "business-category", nil, "Amazon business-category slug, e.g. aws (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sOpts.scheduleTypes, "schedule-type", nil, "schedule type, e.g. Full-Time (repeatable)")
-	searchCmd.Flags().StringVar(&sOpts.sort, "sort", "relevant", "result order (relevant|recent)")
+	searchCmd.Flags().StringArrayVar(&sOpts.countries, "country", nil, "ISO-3 country code, e.g. TWN (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sOpts.cities, "city", nil, "normalized city name, e.g. Taipei City (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sOpts.jobCategories, "job-category", nil, "job category display name, e.g. Software Development (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sOpts.businessCategories, "business-category", nil, "Amazon business-category slug, e.g. aws (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sOpts.scheduleTypes, "schedule-type", nil, "schedule type, e.g. Full-Time (repeatable)")
+	clihelp.ChoiceVar(searchCmd.Flags(), &sOpts.sort, "sort", "relevant", []string{"relevant", "recent"}, "result order")
 	searchCmd.Flags().IntVar(&sOpts.offset, "offset", 0, "zero-based result offset")
 	searchCmd.Flags().IntVar(&sOpts.limit, "limit", 10, "page size (1-100)")
 

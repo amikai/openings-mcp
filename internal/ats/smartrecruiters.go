@@ -520,7 +520,7 @@ func smartRecruitersDescription(jobAd smartrecruiters.OptJobAdSections) string {
 		text, err := html2text.FromString(sec.Text.Value, html2text.Options{})
 		if err != nil {
 			// Keep the section as raw HTML rather than dropping it
-			// (mirrors cmd/smartrecruiters's printSection).
+			// (mirrors internal/cli/provider/smartrecruiters's printSection).
 			text = sec.Text.Value
 		}
 		parts = append(parts, cmp.Or(sec.Title.Value, s.fallbackTitle)+":\n"+text)

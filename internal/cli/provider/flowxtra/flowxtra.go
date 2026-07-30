@@ -1,3 +1,6 @@
+// Package flowxtra implements the "openings-mcp flowxtra" debug CLI, for
+// manual checks against the live surface that internal/provider/flowxtra
+// documents.
 package flowxtra
 
 import (
@@ -12,6 +15,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
 )
 
@@ -46,7 +50,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", flowxtra.DefaultBaseURL, "Flowxtra API base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	sFlags := &searchFlags{}
 	searchCmd := &cobra.Command{
@@ -112,6 +116,7 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// jobSummaryJSON is the --format json shape for one search result.
 type jobSummaryJSON struct {
 	HasID     string `json:"has_id"`
 	Title     string `json:"title"`
@@ -130,6 +135,7 @@ type searchResultJSON struct {
 	Jobs     []jobSummaryJSON `json:"jobs"`
 }
 
+// formatLocation joins the non-empty company location parts.
 func formatLocation(city, state, country string) string {
 	cleaned := make([]string, 0, 3)
 	for _, part := range []string{city, state, country} {
@@ -140,6 +146,8 @@ func formatLocation(city, state, country string) string {
 	return strings.Join(cleaned, ", ")
 }
 
+// formatSalary renders the salary fields as one line, e.g.
+// "EUR 21000/year" or "EUR 1000-2000/month"; empty when unset.
 func formatSalary(currency string, minSalary, maxSalary, salary flowxtra.NilFloat64, rate string) string {
 	amount := ""
 	switch {

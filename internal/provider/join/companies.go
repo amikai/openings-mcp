@@ -21,7 +21,7 @@ var companiesYAML []byte
 // live: the GraphQL search endpoint returns HTTP 200 with at least one
 // job for Slug/CompanyID, or — for a company that happens to have zero
 // open jobs right now — the /companies/{slug} page resolves to the same
-// CompanyID independently (see cmd/verify-companies).
+// CompanyID independently (see internal/cli/verifycompanies).
 // CompanyID is the numeric id the GraphQL API takes as
 // PublicJobsQueryInput.companyId; there is no way to derive it from Slug
 // at request time (see API.md), so it's resolved once here.

@@ -16,7 +16,7 @@ var companiesYAML []byte
 // (internal/provider/mokahr/companies.yaml). Every entry was verified against
 // the live job API — a successful envelope with at least one open posting —
 // and its careers-page title checked against the expected company;
-// cmd/verify-companies re-verifies the roster.
+// internal/cli/verifycompanies re-verifies the roster.
 //
 // A tenant can own several careers sites with different job sets, and the one
 // a bare /social-recruitment/<org> URL redirects to is not always the largest,

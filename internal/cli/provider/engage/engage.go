@@ -1,3 +1,5 @@
+// Package engage implements the "openings-mcp engage" debug CLI, for manual
+// checks against the live surface that internal/provider/engage documents.
 package engage
 
 import (
@@ -11,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/engage"
 )
-
 
 type options struct {
 	timeout time.Duration
@@ -31,7 +33,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -70,6 +72,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// normalizeSlug requires slug to be a curated company — same policy as the
+// greenhouse CLI's --board and the lever CLI's --site — and returns the
+// roster's canonical slug rather than whatever casing the caller typed.
 func normalizeSlug(slug string) (string, error) {
 	if slug == "" {
 		return "", errors.New("a company slug is required")
@@ -81,6 +86,9 @@ func normalizeSlug(slug string) (string, error) {
 	return c.Slug, nil
 }
 
+// runCompanies lists every curated engage company embedded in the CLI
+// (internal/provider/engage/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := engage.Companies
 
@@ -96,12 +104,15 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// searchFlags carries the parsed "search" subcommand arguments into
+// runSearch.
 type searchFlags struct {
 	slug    string
 	timeout time.Duration
 	format  string
 }
 
+// jobSummaryJSON is the --format json shape for one board listing.
 type jobSummaryJSON struct {
 	WorkID         string `json:"workId"`
 	Title          string `json:"title"`
@@ -125,6 +136,11 @@ func summarize(j engage.Job) jobSummaryJSON {
 	}
 }
 
+// runSearch fetches one tenant board and prints its jobs. When any
+// employment-type category came back at [engage.CategoryCap], the board is
+// a lower bound on the tenant's true job count, so this is one of the two
+// places (the other is doc.go) that surfaces the cap explicitly rather than
+// presenting the listing as exhaustive.
 func runSearch(ctx context.Context, f searchFlags) error {
 	slug, err := normalizeSlug(f.slug)
 	if err != nil {
@@ -175,6 +191,8 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// detailFlags carries the parsed "detail" subcommand arguments into
+// runDetail.
 type detailFlags struct {
 	slug    string
 	workID  string
@@ -182,6 +200,7 @@ type detailFlags struct {
 	format  string
 }
 
+// runDetail fetches one posting in full.
 func runDetail(ctx context.Context, f detailFlags) error {
 	slug, err := normalizeSlug(f.slug)
 	if err != nil {
@@ -203,6 +222,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	return printDetail(detail, f.format)
 }
 
+// printDetail renders one full posting.
 func printDetail(d *engage.JobDetail, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
@@ -251,6 +271,8 @@ func unitSuffix(unit string) string {
 	return " (" + unit + ")"
 }
 
+// formatLocation joins the JobDetail's address fields into one display
+// line, skipping empty parts.
 func formatLocation(l engage.Location) string {
 	parts := make([]string, 0, 4)
 	for _, p := range []string{l.Region, l.Locality, l.Street} {

@@ -1,3 +1,6 @@
+// Package teamtailor implements the "openings-mcp teamtailor" debug CLI, for
+// manual checks against the live surface that internal/provider/teamtailor
+// documents.
 package teamtailor
 
 import (
@@ -12,6 +15,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/teamtailor"
 )
 
@@ -35,7 +39,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.host, "host", "", "curated Teamtailor career-site host, e.g. career.teamtailor.com")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -43,9 +47,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -57,9 +58,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{host: opts.host, timeout: opts.timeout, keyword: searchKeyword, format: opts.format})
 		},
 	}
@@ -72,9 +70,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{host: opts.host, timeout: opts.timeout, jobID: getJobID, format: opts.format})
 		},
 	}

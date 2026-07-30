@@ -1,3 +1,5 @@
+// Package mynavi implements the "openings-mcp mynavi" debug CLI, for manual
+// checks against the live surface that internal/provider/mynavi documents.
 package mynavi
 
 import (
@@ -10,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	mynaviprovider "github.com/amikai/openings-mcp/internal/provider/mynavi"
 )
 
@@ -31,7 +34,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", mynaviprovider.DefaultBaseURL, "Mynavi Tenshoku base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchKeywords  string
@@ -44,9 +47,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if searchPage < 1 {
 				return fmt.Errorf("--page must be >= 1, got %d", searchPage)
 			}
@@ -72,9 +72,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if detailJobID == "" {
 				return errors.New("--job-id is required")
 			}

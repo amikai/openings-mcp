@@ -1,3 +1,5 @@
+// Package job104 implements the "openings-mcp 104" debug CLI, for manual
+// checks against the live surface that internal/provider/job104 documents.
 package job104
 
 import (
@@ -16,6 +18,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/job104"
 )
 
+// searchFlags carries the parsed flag values into buildSearchParams.
 type searchFlags struct {
 	keyword    string
 	area       string
@@ -48,10 +51,10 @@ func NewCommand() *cobra.Command {
 	cmd.Flags().StringVar(&flags.ro, "ro", "", usageWithChoices("Job type", labels(job104.RoIDs)))
 	cmd.Flags().StringVar(&flags.order, "order", "", usageWithChoices("Sort order", labels(job104.OrderIDs)))
 	cmd.Flags().IntVar(&flags.page, "page", 0, "1-based page number (0 = unset, server default)")
-	cmd.Flags().StringSliceVar(&flags.edu, "edu", nil, usageWithChoices("Education (repeatable)", labels(job104.EduIDs)))
+	cmd.Flags().StringArrayVar(&flags.edu, "edu", nil, usageWithChoices("Education (repeatable)", labels(job104.EduIDs)))
 	cmd.Flags().StringVar(&flags.remoteWork, "remote-work", "", usageWithChoices("Remote work", labels(job104.RemoteWorkIDs)))
-	cmd.Flags().StringSliceVar(&flags.s9, "s9", nil, usageWithChoices("Shift type (repeatable)", labels(job104.S9IDs)))
-	cmd.Flags().StringSliceVar(&flags.jobexp, "jobexp", nil, usageWithChoices("Years of experience (repeatable)", labels(job104.JobExpIDs)))
+	cmd.Flags().StringArrayVar(&flags.s9, "s9", nil, usageWithChoices("Shift type (repeatable)", labels(job104.S9IDs)))
+	cmd.Flags().StringArrayVar(&flags.jobexp, "jobexp", nil, usageWithChoices("Years of experience (repeatable)", labels(job104.JobExpIDs)))
 
 	return cmd
 }
@@ -103,6 +106,10 @@ func run(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// buildSearchParams resolves each flag's human label to its job104 request
+// value via the lookup tables above. Labels are already validated against
+// the flag's enum at parse time. An empty label (flag not set) leaves that
+// field unset (unfiltered); page 0 leaves Page unset.
 func buildSearchParams(f searchFlags) (job104.SearchJobsParams, error) {
 	params := job104.SearchJobsParams{}
 	if f.keyword != "" {
@@ -163,6 +170,8 @@ func buildSearchParams(f searchFlags) (job104.SearchJobsParams, error) {
 	return params, nil
 }
 
+// lookupList resolves each value against table, mirroring the single-value
+// lookups above but for the repeatable flags (--edu, --s9).
 func lookupList[T any](table map[string]T, values []string, flag string) ([]T, error) {
 	out := make([]T, 0, len(values))
 	for _, v := range values {
@@ -189,10 +198,12 @@ func writeDetail(w io.Writer, detail *job104.JobDetailResponse) {
 	}
 }
 
+// labels returns the sorted keys of a generic lookup table.
 func labels[T any](table map[string]T) []string {
 	return slices.Sorted(maps.Keys(table))
 }
 
+// usageWithChoices appends a comma-separated "one of: ..." list to base.
 func usageWithChoices(base string, choices []string) string {
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))
 }

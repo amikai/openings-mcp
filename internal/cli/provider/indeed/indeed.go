@@ -1,3 +1,5 @@
+// Package indeed implements the "openings-mcp indeed" debug CLI, for manual
+// checks against the live surface that internal/provider/indeed documents.
 package indeed
 
 import (
@@ -214,10 +216,17 @@ func writeDetail(w io.Writer, detail *indeedprovider.JobDetail) {
 	}
 }
 
+// labels returns the sorted keys of a lookup table, prefixed with "" so an
+// ff.StringEnumLong flag can default to unset (no filter) instead of
+// silently falling back to the first real value — ffval.Enum's zero Default
+// only survives initialize() if it's itself in the Valid list.
 func labels(table map[string]string) []string {
 	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
+// usageWithChoices appends a "one of: ..." list to base. ffhelp never
+// introspects an ff.StringEnumLong's valid values on its own, so small
+// enough choice sets are spelled out here to make -h self-documenting.
 func usageWithChoices(base string, table map[string]string) string {
 	choices := labels(table)[1:]
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))

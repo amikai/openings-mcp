@@ -31,7 +31,7 @@ release. Build once (`go build -o <scratchpad>/openings-mcp
 the integrate-new-provider skill's MCP-surface step.
 
 - **ATS adapters** (the unified-search set: `providerOrder` in
-  `cmd/verify-companies/main.go`): per provider, sample 3–5 companies
+  `internal/cli/verifycompanies`): per provider, sample 3–5 companies
   from `internal/provider/<name>/companies.yaml`;
   `search_jobs_by_company` must return live listings for each, and
   `get_job_detail_by_company` must succeed on at least one returned

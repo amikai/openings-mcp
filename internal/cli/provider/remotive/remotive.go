@@ -12,6 +12,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/remotive"
 )
 
@@ -33,7 +34,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", remotive.DefaultBaseURL, "Remotive API base URL")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	var (
 		keyword  string
@@ -49,9 +50,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if limit < 1 {
 				return fmt.Errorf("--limit must be >= 1, got %d", limit)
 			}
@@ -84,9 +82,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if jobID == 0 {
 				return errors.New("--id is required (take it from a search result's ID)")
 			}
@@ -106,9 +101,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCategories(cmd.Context(), opts.baseURL, opts.timeout, opts.format)
 		},
 	}
@@ -117,6 +109,7 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// fetchJobs pulls the full dump — the only read the API supports.
 func fetchJobs(ctx context.Context, baseURL string, timeout time.Duration) (*remotive.JobList, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -128,6 +121,8 @@ func fetchJobs(ctx context.Context, baseURL string, timeout time.Duration) (*rem
 	return client.ListJobs(ctx)
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no HTML description.
 type jobSummaryJSON struct {
 	ID       int    `json:"id"`
 	Title    string `json:"title"`
@@ -159,6 +154,7 @@ func summarize(j remotive.Job) jobSummaryJSON {
 	}
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	baseURL string
 	timeout time.Duration
@@ -211,6 +207,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// detailFlags carries the parsed "detail" subcommand flags into runDetail.
 type detailFlags struct {
 	baseURL string
 	timeout time.Duration
@@ -218,6 +215,9 @@ type detailFlags struct {
 	jobID   int
 }
 
+// runDetail resolves one job from the dump by id — the API has no detail
+// endpoint, so an id that has left the dump (or never existed) is simply
+// not found.
 func runDetail(ctx context.Context, f detailFlags) error {
 	res, err := fetchJobs(ctx, f.baseURL, f.timeout)
 	if err != nil {
@@ -232,6 +232,8 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	return fmt.Errorf("job %d not found in the current dump (%d jobs); it may have expired", f.jobID, res.JobCount)
 }
 
+// printDetail renders one full job. JSON mode encodes the generated Job
+// as-is — detail is for seeing the whole record.
 func printDetail(j remotive.Job, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

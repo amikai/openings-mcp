@@ -236,7 +236,7 @@ func TestGetJob(t *testing.T) {
 		IncludeAiDisclaimer: OptNilBool{Set: true, Null: true},
 		AiDisclaimer:        OptNilString{Set: true, Null: true},
 		AiOptOutRequestURL:  OptNilURI{Set: true, Null: true},
-		Metadata: NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{{}}),
+		Metadata:            NewOptNilJobDetailMetadataItemArray([]JobDetailMetadataItem{{}}),
 		DataCompliance: []DataCompliance{
 			{Type: NewOptString("gdpr"), RequiresConsent: NewOptBool(false), RequiresProcessingConsent: NewOptBool(false), RequiresRetentionConsent: NewOptBool(false), RetentionPeriod: OptNilInt{Set: true, Null: true}, DemographicDataConsentApplies: NewOptBool(false)},
 		},

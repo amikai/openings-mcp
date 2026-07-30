@@ -1,3 +1,6 @@
+// Package jobindex implements the "openings-mcp jobindex" debug CLI, for
+// manual checks against the live surface that internal/provider/jobindex
+// documents.
 package jobindex
 
 import (
@@ -10,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	jobindexprovider "github.com/amikai/openings-mcp/internal/provider/jobindex"
 )
 
@@ -31,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", jobindexprovider.DefaultBaseURL, "Jobindex base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchKeyword string
@@ -47,9 +51,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			if searchKeyword == "" {
 				return errors.New("--keyword is required")
@@ -72,7 +73,7 @@ func NewCommand() *cobra.Command {
 	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "Jobindex q= free-text (required for useful results)")
 	searchCmd.Flags().StringVar(&searchArea, "area", "", "area path slug, e.g. storkoebenhavn")
 	searchCmd.Flags().IntVar(&searchJobAge, "jobage", 0, "Jobindex jobage= days (1, 7, 14, 30); 0 = all")
-	searchCmd.Flags().StringVar(&searchSort, "sort", "score", "Jobindex sort= (score|date)")
+	clihelp.ChoiceVar(searchCmd.Flags(), &searchSort, "sort", "score", []string{"score", "date"}, "Jobindex sort=")
 	searchCmd.Flags().IntVar(&searchPage, "page", 1, "Jobindex page= (1-based)")
 
 	var detailTID string
@@ -83,9 +84,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("detail takes no positional arguments, got %v (did you mean --tid %q?)", args, args[0])
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			if detailTID == "" {
 				return errors.New("--tid is required")

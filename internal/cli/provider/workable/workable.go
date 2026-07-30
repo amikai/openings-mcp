@@ -1,3 +1,6 @@
+// Package workable implements the "openings-mcp workable" debug CLI, for
+// manual checks against the live surface that internal/provider/workable
+// documents.
 package workable
 
 import (
@@ -13,9 +16,9 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	workable "github.com/amikai/openings-mcp/internal/provider/workable"
 )
-
 
 type rootOptions struct {
 	company string
@@ -35,7 +38,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.company, "company", "", `Workable account subdomain from the careers URL, e.g. "blueground" in apply.workable.com/blueground`)
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -43,9 +46,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -67,9 +67,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:    opts.company,
 				timeout:    opts.timeout,
@@ -103,9 +100,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				company:   opts.company,
 				timeout:   opts.timeout,
@@ -122,9 +116,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFilters(cmd.Context(), opts.company, opts.timeout, opts.format)
 		},
 	}
@@ -133,6 +124,8 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// normalizeCompany requires --company to be a curated company — same policy
+// as the smartrecruiters CLI — and returns the roster's account subdomain.
 func normalizeCompany(company string) (string, error) {
 	if company == "" {
 		return "", errors.New("--company is required")
@@ -144,6 +137,9 @@ func normalizeCompany(company string) (string, error) {
 	return c.Account, nil
 }
 
+// runCompanies lists every curated Workable company embedded in the CLI
+// (internal/provider/workable/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := workable.Companies
 
@@ -159,6 +155,8 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no posting body.
 type jobSummaryJSON struct {
 	Shortcode  string `json:"shortcode"`
 	Title      string `json:"title"`
@@ -175,6 +173,8 @@ type searchResultJSON struct {
 	NextToken string           `json:"nextToken,omitempty"`
 }
 
+// jobURL builds the human-clickable posting page; no API response field
+// carries it.
 func jobURL(account, shortcode string) string {
 	return fmt.Sprintf("https://apply.workable.com/%s/j/%s/", account, shortcode)
 }
@@ -212,6 +212,8 @@ func summarize(account string, j workable.JobSummary) jobSummaryJSON {
 	return s
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -229,6 +231,7 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("URL: %s\n", s.URL)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company    string
 	timeout    time.Duration
@@ -244,6 +247,9 @@ type searchFlags struct {
 	format     string
 }
 
+// runSearch maps every flag onto the job board API's real server-side
+// filters. Pagination is cursor-only: rerun with --token set to the
+// previous output's next-page cursor.
 func runSearch(ctx context.Context, f searchFlags) error {
 	account, err := normalizeCompany(f.company)
 	if err != nil {
@@ -334,6 +340,8 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// runFilters dumps the account's facets — most usefully the numeric
+// department ids that search's --department flag requires.
 func runFilters(ctx context.Context, company string, timeout time.Duration, format string) error {
 	account, err := normalizeCompany(company)
 	if err != nil {
@@ -388,6 +396,7 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	company   string
 	timeout   time.Duration
@@ -395,6 +404,8 @@ type getFlags struct {
 	format    string
 }
 
+// runGet fetches one job in full via the v2 detail endpoint, which — unlike
+// search — 404s for an unknown shortcode.
 func runGet(ctx context.Context, f getFlags) error {
 	account, err := normalizeCompany(f.company)
 	if err != nil {
@@ -427,6 +438,8 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 }
 
+// printDetail renders one full job. JSON mode encodes the generated
+// JobDetail as-is — detail is for seeing the whole record.
 func printDetail(account string, d *workable.JobDetail, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
@@ -469,6 +482,9 @@ func printDetail(account string, d *workable.JobDetail, format string) error {
 	return nil
 }
 
+// printSection renders one of the three HTML body fields as plain text,
+// skipping fields the posting leaves empty. Falls back to the raw HTML on a
+// conversion failure rather than dropping the section.
 func printSection(title string, opt workable.OptString) {
 	html, ok := opt.Get()
 	if !ok || html == "" {

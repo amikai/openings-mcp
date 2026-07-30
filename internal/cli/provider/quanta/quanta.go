@@ -1,3 +1,5 @@
+// Package quanta implements the "openings-mcp quanta" debug CLI, for manual
+// checks against the live surface that internal/provider/quanta documents.
 package quanta
 
 import (
@@ -10,9 +12,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	quantaprovider "github.com/amikai/openings-mcp/internal/provider/quanta"
 )
-
 
 type options struct {
 	timeout time.Duration
@@ -30,7 +32,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchKeyword     string
@@ -44,9 +46,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if searchLimit < 1 {
 				return fmt.Errorf("--limit must be >= 1, got %d", searchLimit)
 			}
@@ -64,8 +63,8 @@ func NewCommand() *cobra.Command {
 	}
 
 	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "case-insensitive substring over category, title, location, requirements, and keywords")
-	searchCmd.Flags().StringSliceVar(&searchLocationIDs, "location-id", nil, "locati value from a search result; repeatable, matches any")
-	searchCmd.Flags().StringSliceVar(&searchCategoryIDs, "category-id", nil, "capoid value from a search result; repeatable, matches any")
+	searchCmd.Flags().StringArrayVar(&searchLocationIDs, "location-id", nil, "locati value from a search result; repeatable, matches any")
+	searchCmd.Flags().StringArrayVar(&searchCategoryIDs, "category-id", nil, "capoid value from a search result; repeatable, matches any")
 	searchCmd.Flags().IntVar(&searchLimit, "limit", 20, "max results to print (filtering is client-side; the site has no paging)")
 
 	var detailSerial string
@@ -75,9 +74,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if detailSerial == "" {
 				return errors.New("--serial is required (take it from a search result's serial)")
 			}
@@ -91,6 +87,7 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// fetchJobs pulls the full dump — the only read the site supports.
 func fetchJobs(ctx context.Context, timeout time.Duration) ([]quantaprovider.Job, error) {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -106,6 +103,8 @@ func fetchJobs(ctx context.Context, timeout time.Duration) ([]quantaprovider.Job
 	return res.GetJobResult(), nil
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no description or requirements.
 type jobSummaryJSON struct {
 	Serial   string `json:"serial"`
 	JobCode  string `json:"jobCode"`
@@ -131,6 +130,7 @@ func summarize(j quantaprovider.Job) jobSummaryJSON {
 	}
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	timeout time.Duration
 	format  string
@@ -179,12 +179,16 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// detailFlags carries the parsed "detail" subcommand flags into runDetail.
 type detailFlags struct {
 	timeout time.Duration
 	format  string
 	serial  string
 }
 
+// runDetail resolves one job from the dump by serial — the site has no
+// detail endpoint, so a serial that has left the dump (or never existed)
+// is simply not found.
 func runDetail(ctx context.Context, f detailFlags) error {
 	jobs, err := fetchJobs(ctx, f.timeout)
 	if err != nil {
@@ -198,6 +202,8 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	return printDetail(j, f.format)
 }
 
+// printDetail renders one full job. JSON mode encodes the generated Job
+// as-is — detail is for seeing the whole record.
 func printDetail(j quantaprovider.Job, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

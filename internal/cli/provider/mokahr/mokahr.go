@@ -1,3 +1,5 @@
+// Package mokahr implements the "openings-mcp mokahr" debug CLI, for manual
+// checks against the live surface that internal/provider/mokahr documents.
 package mokahr
 
 import (
@@ -14,6 +16,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	mokahrprovider "github.com/amikai/openings-mcp/internal/provider/mokahr"
 )
 
@@ -37,7 +40,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", `curated roster company name or "<org>/<site>" slug from the careers URL, e.g. "high-flyer/140576"`)
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -46,9 +49,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("companies takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runCompanies(opts.format)
 		},
@@ -68,9 +68,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:     opts.company,
@@ -99,9 +96,6 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				company: opts.company,
 				timeout: opts.timeout,
@@ -120,9 +114,6 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				return fmt.Errorf("filters takes no positional arguments, got %v", args)
 			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFilters(cmd.Context(), filtersFlags{
 				company: opts.company,
 				timeout: opts.timeout,
@@ -135,6 +126,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// resolveCompany accepts a roster company name (case-insensitive) or an
+// "<org>/<site>" slug — including one not in the roster, since MokaHR needs
+// no credentials and any tenant's slug is guessable from its careers URL.
 func resolveCompany(company string) (mokahrprovider.Company, error) {
 	if company == "" {
 		return mokahrprovider.Company{}, errors.New("--company is required")
@@ -154,6 +148,9 @@ func resolveCompany(company string) (mokahrprovider.Company, error) {
 	return mokahrprovider.Company{}, fmt.Errorf("company %q not found; run 'mokahr companies' to see supported companies, or pass an \"<org>/<site>\" slug", company)
 }
 
+// runCompanies lists every curated MokaHR company embedded in the CLI
+// (internal/provider/mokahr/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	if format == formatJSON {
 		return writeJSON(mokahrprovider.Companies)
@@ -168,6 +165,7 @@ func newClient(timeout time.Duration) (*mokahrprovider.JobsClient, error) {
 	return mokahrprovider.NewJobsClient(mokahrprovider.DefaultBaseURL, &http.Client{Timeout: timeout})
 }
 
+// jobSummaryJSON is the --format json shape for one search result.
 type jobSummaryJSON struct {
 	ID       string `json:"id"`
 	Title    string `json:"title"`
@@ -196,6 +194,8 @@ func summarize(j mokahrprovider.Job, org, site string) jobSummaryJSON {
 	return s
 }
 
+// locations joins every workplace as "city, province, country", skipping
+// empty parts, and joins multiple workplaces with "; ".
 func locations(ls []mokahrprovider.Location) string {
 	parts := make([]string, 0, len(ls))
 	for _, l := range ls {
@@ -227,6 +227,7 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("URL: %s\n", s.URL)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company     string
 	timeout     time.Duration
@@ -296,6 +297,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	company string
 	timeout time.Duration
@@ -332,6 +334,8 @@ func runGet(ctx context.Context, f getFlags) error {
 	return printDetail(d, c, f.format)
 }
 
+// printDetail renders one full posting. JSON mode encodes the generated
+// JobDetail as-is — detail is for seeing the whole record.
 func printDetail(d *mokahrprovider.JobDetail, c mokahrprovider.Company, format string) error {
 	if format == formatJSON {
 		return writeJSON(d)
@@ -360,6 +364,9 @@ func printDetail(d *mokahrprovider.JobDetail, c mokahrprovider.Company, format s
 	return nil
 }
 
+// printSection renders the job description, converting its HTML to plain
+// text and falling back to the raw HTML on a conversion failure rather than
+// dropping the section.
 func printSection(opt mokahrprovider.OptString) {
 	html, ok := opt.Get()
 	if !ok || html == "" {
@@ -372,6 +379,7 @@ func printSection(opt mokahrprovider.OptString) {
 	fmt.Printf("\nDescription:\n%s\n", rendered)
 }
 
+// filtersFlags carries the parsed "filters" subcommand flags into runFilters.
 type filtersFlags struct {
 	company string
 	timeout time.Duration
@@ -432,6 +440,8 @@ func runFilters(ctx context.Context, f filtersFlags) error {
 	return nil
 }
 
+// printZhineng renders one 职能 facet and its children, indented by depth,
+// so the id a caller passes to --zhineng-id is visible next to its label.
 func printZhineng(f mokahrprovider.ZhinengFacet, depth int) {
 	fmt.Printf("%s%s (id=%d, jobs=%d)\n", strings.Repeat("  ", depth), f.Label.Or(""), f.ID.Or(0), f.JobCount.Or(0))
 	for _, child := range f.Children {

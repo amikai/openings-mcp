@@ -1,3 +1,6 @@
+// Package ultipro implements the "openings-mcp ultipro" debug CLI, for
+// manual checks against the live surface that internal/provider/ultipro
+// documents.
 package ultipro
 
 import (
@@ -13,6 +16,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/ultipro"
 )
 
@@ -36,7 +40,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.company, "company", "", `curated company name, company code, or career-board URL, e.g. "TechnoServe", "TEC1006TESER", or a recruiting.ultipro.com/.../JobBoard/... URL`)
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -44,9 +48,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -64,9 +65,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:      opts.company,
 				timeout:      opts.timeout,
@@ -82,7 +80,8 @@ func NewCommand() *cobra.Command {
 	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "free-text keyword search")
 	searchCmd.Flags().StringVar(&searchLocation, "location", "", "physical-location catalog id or display label")
 	searchCmd.Flags().StringVar(&searchCategory, "category", "", "job-category catalog id or display label")
-	searchCmd.Flags().StringVar(&searchLocationType, "location-type", "", "job location type (hybrid|onsite|remote)")
+	clihelp.ChoiceVar(searchCmd.Flags(), &searchLocationType, "location-type", "",
+		clihelp.WithUnset(clihelp.SortedKeys(locationTypeCodes)), "job location type")
 	searchCmd.Flags().IntVar(&searchPage, "page", 1, "one-based page number")
 
 	var detailJobID string
@@ -92,9 +91,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runDetail(cmd.Context(), detailFlags{
 				company:       opts.company,
 				timeout:       opts.timeout,
@@ -109,6 +105,9 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// resolveCompany accepts a curated display name, a curated company code, or
+// any recognized career-board URL (for live debugging beyond the seed
+// roster — mirrors internal/cli/provider/icims's any-host allowance).
 func resolveCompany(company string) (name string, site ultipro.CareersSite, err error) {
 	if company == "" {
 		return "", ultipro.CareersSite{}, errors.New("--company is required")
@@ -160,6 +159,8 @@ type searchFlags struct {
 	format       string
 }
 
+// locationTypeCodes maps the CLI's enum flag to the LoadSearchResults
+// fieldName-37 values (see openapi.yaml: 0=Hybrid, 1=On-site, 2=Remote).
 var locationTypeCodes = map[string]string{"hybrid": "0", "onsite": "1", "remote": "2"}
 
 func runSearch(ctx context.Context, f searchFlags) error {
@@ -244,6 +245,9 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// resolveCatalogValue accepts either a raw catalog id (passed through
+// unchanged) or a display label (resolved via one catalog call, exact
+// case-insensitive match).
 func resolveCatalogValue(ctx context.Context, fetch func(context.Context) ([]ultipro.FilterCatalog, error), input, kind string) (string, error) {
 	catalog, err := fetch(ctx)
 	if err != nil {

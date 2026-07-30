@@ -14,6 +14,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/bamboohr"
 )
 
@@ -23,6 +24,7 @@ type options struct {
 	format  string
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company string
 	timeout time.Duration
@@ -30,6 +32,7 @@ type searchFlags struct {
 	format  string
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	company string
 	timeout time.Duration
@@ -49,7 +52,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "curated BambooHR subdomain slug, e.g. concept2")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -98,6 +101,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// runCompanies lists every curated BambooHR careers site embedded in the
+// CLI (internal/provider/bamboohr/companies.yaml), sorted by company name.
+// It makes no network call.
 func runCompanies(format string) error {
 	cs := bamboohr.Companies
 
@@ -113,6 +119,10 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// newTenantClient validates the slug against the embedded roster and
+// returns a client bound to the tenant's origin. Redirect-following is
+// disabled so an unknown tenant surfaces as the API's 302 instead of a
+// decode error on the marketing site's HTML.
 func newTenantClient(company string) (*bamboohr.Client, string, error) {
 	if company == "" {
 		return nil, "", errors.New("--company is required")
@@ -133,6 +143,9 @@ func newTenantClient(company string) (*bamboohr.Client, string, error) {
 	return client, slug, nil
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs. The list feed carries no posting date -
+// that lives on the detail endpoint only.
 type jobSummaryJSON struct {
 	ID               string `json:"id"`
 	Title            string `json:"title"`
@@ -160,10 +173,15 @@ func summarize(slug string, j *bamboohr.ListJob) jobSummaryJSON {
 	}
 }
 
+// postingURL builds the human-clickable posting page, the same URL the
+// detail endpoint reports as jobOpeningShareUrl.
 func postingURL(slug, id string) string {
 	return fmt.Sprintf("https://%s.bamboohr.com/careers/%s", slug, id)
 }
 
+// listLocation renders a list row's location, preferring the structured
+// `location` and falling back to `atsLocation` (which alone carries the
+// country) when the former is all-null.
 func listLocation(j *bamboohr.ListJob) string {
 	if s := joinParts(j.Location.City.Or(""), j.Location.State.Or("")); s != "" {
 		return s
@@ -181,6 +199,9 @@ func joinParts(parts ...string) string {
 	return strings.Join(kept, ", ")
 }
 
+// runSearch fetches the whole board and prints summaries, optionally
+// filtered by a case-insensitive substring match on the title. There is no
+// pagination - the API returns everything in one response.
 func runSearch(ctx context.Context, f searchFlags) error {
 	client, slug, err := newTenantClient(f.company)
 	if err != nil {
@@ -233,6 +254,7 @@ func unwrapList(res bamboohr.ListJobsRes, slug string) (*bamboohr.ListResponse, 
 	}
 }
 
+// printSummary prints one job's compact text block.
 func printSummary(s jobSummaryJSON) {
 	if s.Department != "" {
 		fmt.Printf("Department: %s\n", s.Department)
@@ -250,6 +272,8 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("ID: %s\n", s.ID)
 }
 
+// runGet fetches one posting from the per-job detail endpoint and prints it
+// in full.
 func runGet(ctx context.Context, f getFlags) error {
 	if f.jobID == "" {
 		return errors.New("--id is required")

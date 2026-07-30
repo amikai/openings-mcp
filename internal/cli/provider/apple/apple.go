@@ -13,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 )
 
@@ -67,7 +68,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", apple.DefaultBaseURL, "Apple Jobs API base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	sFlags := &searchFlags{}
 	searchCmd := &cobra.Command{
@@ -85,14 +86,15 @@ func NewCommand() *cobra.Command {
 
 	searchCmd.Flags().StringVar(&sFlags.keyword, "keyword", "", "keyword query (required)")
 	searchCmd.Flags().StringVar(&sFlags.country, "country", "", "ISO 3166-1 alpha-3 country code, e.g. TWN or USA")
-	searchCmd.Flags().StringSliceVar(&sFlags.locations, "location", nil, "location code (repeatable)")
-	searchCmd.Flags().StringVar(&sFlags.sort, "sort", "relevance", "result order")
+	searchCmd.Flags().StringArrayVar(&sFlags.locations, "location", nil, "location code (repeatable)")
+	clihelp.ChoiceVar(searchCmd.Flags(), &sFlags.sort, "sort", "relevance",
+		[]string{"relevance", "newest", "teamAsc", "teamDesc", "locationAsc", "locationDesc"}, "result order")
 	searchCmd.Flags().IntVar(&sFlags.page, "page", 1, "1-based page of 20 results")
 	searchCmd.Flags().BoolVar(&sFlags.homeOffice, "home-office", false, "only remote-eligible postings")
-	searchCmd.Flags().StringSliceVar(&sFlags.filterKeywords, "filter-keyword", nil, "extra keyword filter chip (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sFlags.teams, "team", nil, "team filter as TEAM/SUBTEAM codes (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sFlags.products, "product", nil, "product code (repeatable)")
-	searchCmd.Flags().StringSliceVar(&sFlags.languages, "language", nil, "language code (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sFlags.filterKeywords, "filter-keyword", nil, "extra keyword filter chip (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sFlags.teams, "team", nil, "team filter as TEAM/SUBTEAM codes (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sFlags.products, "product", nil, "product code (repeatable)")
+	searchCmd.Flags().StringArrayVar(&sFlags.languages, "language", nil, "language code (repeatable)")
 
 	dFlags := &detailFlags{}
 	detailCmd := &cobra.Command{

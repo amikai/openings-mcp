@@ -1,3 +1,5 @@
+// Package nodesk implements the "openings-mcp nodesk" debug CLI, for manual
+// checks against the live surface that internal/provider/nodesk documents.
 package nodesk
 
 import (
@@ -13,6 +15,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	nodeskprovider "github.com/amikai/openings-mcp/internal/provider/nodesk"
 )
 
@@ -40,7 +43,7 @@ func NewCommand() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&opts.algoliaBaseURL, "algolia-base-url", nodeskprovider.DefaultAlgoliaBaseURL, "Algolia DSN base URL")
 	rootCmd.PersistentFlags().StringVar(&opts.siteBaseURL, "site-base-url", nodeskprovider.DefaultSiteBaseURL, "NoDesk site base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchQuery       string
@@ -55,9 +58,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if searchPage < 0 {
 				return fmt.Errorf("--page must be >= 0, got %d", searchPage)
 			}
@@ -90,9 +90,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if detailJobID == "" {
 				return errors.New("--id is required (take it from a search result's ID)")
 			}
@@ -108,9 +105,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFacets(cmd.Context(), *opts)
 		},
 	}
@@ -236,6 +230,8 @@ func runFacets(ctx context.Context, f options) error {
 	return nil
 }
 
+// printCounts lists a facet's values by descending job count, ties
+// alphabetically.
 func printCounts(counts map[string]int) {
 	keys := make([]string, 0, len(counts))
 	for k := range counts {

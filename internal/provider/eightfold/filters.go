@@ -4,7 +4,7 @@ import "encoding/json"
 
 // MergedFacets concatenates FilterDef.SmartFilters and FilterDef.AllFilters
 // into one facet list, so every caller (the unified adapter in internal/ats
-// and the debug CLI in cmd/eightfold) discovers the same facets the same
+// and the debug CLI in internal/cli/provider/eightfold) discovers the same facets the same
 // way. AllFilters is a second, usually-disjoint facet list some tenants
 // (observed: Eaton, Infineon, Qualcomm) populate instead of smartFilters —
 // normalized here to the SmartFilter shape.

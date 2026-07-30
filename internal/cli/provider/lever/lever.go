@@ -1,3 +1,5 @@
+// Package lever implements the "openings-mcp lever" debug CLI, for manual
+// checks against the live surface that internal/provider/lever documents.
 package lever
 
 import (
@@ -11,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	leverprovider "github.com/amikai/openings-mcp/internal/provider/lever"
 )
-
 
 type options struct {
 	site    string
@@ -33,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.site, "site", "", "curated Lever site slug, e.g. leverdemo, palantir (see 'lever companies' for the full list)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -42,9 +44,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("companies takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runCompanies(opts.format)
 		},
@@ -66,9 +65,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runSearch(cmd.Context(), searchFlags{
 				site:        opts.site,
@@ -101,9 +97,6 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				id = args[0]
 			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				site:      opts.site,
 				timeout:   opts.timeout,
@@ -117,6 +110,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// normalizeSite lowercases the --site value and requires it to be a
+// curated site — same policy as the workday CLI's --tenant, even though
+// Lever's URL shape wouldn't technically need the allowlist.
 func normalizeSite(site string) (string, error) {
 	if site == "" {
 		return "", errors.New("--site is required")
@@ -128,6 +124,9 @@ func normalizeSite(site string) (string, error) {
 	return s, nil
 }
 
+// runCompanies lists every curated Lever site embedded in the CLI
+// (internal/provider/lever/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := leverprovider.Companies
 
@@ -143,10 +142,13 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// searchResultJSON wraps the postings array so future side-channel fields
+// (e.g. a total count, if Lever ever exposes one) don't break consumers.
 type searchResultJSON struct {
 	Postings []postingJSON `json:"postings"`
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	site        string
 	timeout     time.Duration
@@ -160,6 +162,9 @@ type searchFlags struct {
 	format      string
 }
 
+// runSearch fetches one page of postings with the given filters. The list
+// response already carries full posting content, so there are no
+// per-result detail fetches — one API call per invocation.
 func runSearch(ctx context.Context, f searchFlags) error {
 	s, err := normalizeSite(f.site)
 	if err != nil {
@@ -213,6 +218,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	site      string
 	timeout   time.Duration
@@ -220,6 +226,7 @@ type getFlags struct {
 	format    string
 }
 
+// runGet fetches one posting by id and renders it unnumbered.
 func runGet(ctx context.Context, f getFlags) error {
 	s, err := normalizeSite(f.site)
 	if err != nil {
@@ -254,6 +261,10 @@ func runGet(ctx context.Context, f getFlags) error {
 	return nil
 }
 
+// postingJSON is the --format json shape for one posting, and the input
+// to text rendering: a flat, stable projection of the generated
+// lever.Posting so the CLI's output doesn't change shape when the spec's
+// generated types do.
 type postingJSON struct {
 	ID          string   `json:"id"`
 	Title       string   `json:"title"`
@@ -283,6 +294,9 @@ func toPostingJSON(p *leverprovider.Posting) postingJSON {
 	return r
 }
 
+// postingLocations prefers the full allLocations list; the primary
+// location is its first entry when present, so the fallback only matters
+// for postings that carry a single location field.
 func postingLocations(p *leverprovider.Posting) []string {
 	cats := p.Categories.Value
 	if len(cats.AllLocations) > 0 {
@@ -294,6 +308,10 @@ func postingLocations(p *leverprovider.Posting) []string {
 	return nil
 }
 
+// setLocations fills both the singular Location (first entry, for quick
+// access) and the full Locations array (only when there's more than one,
+// to avoid a redundant one-element array alongside the singular field) —
+// mirrors internal/cli/provider/workday's setLocations.
 func setLocations(r *postingJSON, locations ...string) {
 	if len(locations) == 0 {
 		return
@@ -304,6 +322,8 @@ func setLocations(r *postingJSON, locations ...string) {
 	}
 }
 
+// printPosting renders one posting as text. index > 0 numbers the entry
+// (search results); index 0 prints it unnumbered (get).
 func printPosting(index int, p postingJSON) {
 	if index > 0 {
 		fmt.Printf("%d. %s\n", index, p.Title)

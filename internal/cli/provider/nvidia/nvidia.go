@@ -1,3 +1,5 @@
+// Package nvidia implements the "openings-mcp nvidia" debug CLI, for manual
+// checks against the live surface that internal/provider/nvidia documents.
 package nvidia
 
 import (
@@ -14,7 +16,6 @@ import (
 
 	nvidiaprovider "github.com/amikai/openings-mcp/internal/provider/nvidia"
 )
-
 
 type options struct {
 	baseURL      string
@@ -145,7 +146,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 
-	rootCmd.Flags().StringVar(&opts.baseURL, "base-url", "https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", "NVIDIA Workday CXS base URL")
+	rootCmd.Flags().StringVar(&opts.baseURL, "base-url", nvidiaprovider.DefaultBaseURL, "NVIDIA Workday CXS base URL")
 	rootCmd.Flags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.Flags().StringVar(&opts.searchText, "search-text", "", "free-text keyword search")
 	rootCmd.Flags().IntVar(&opts.limit, "limit", 20, "page size (server caps this at 20)")
@@ -160,6 +161,7 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// facetFlags carries the parsed flag values into buildAppliedFacets.
 type facetFlags struct {
 	jobCategory  string
 	jobType      string
@@ -169,6 +171,10 @@ type facetFlags struct {
 	site         string
 }
 
+// buildAppliedFacets resolves each flag's human label to a Workday facet id
+// via the facets.go lookup tables. Labels are already validated against the
+// flag's enum at parse time, so a lookup miss here can't happen for a
+// non-empty label. An empty label (flag not set) leaves that facet field nil.
 func buildAppliedFacets(f facetFlags) nvidiaprovider.AppliedFacets {
 	var af nvidiaprovider.AppliedFacets
 	if f.jobCategory != "" {
@@ -192,15 +198,26 @@ func buildAppliedFacets(f facetFlags) nvidiaprovider.AppliedFacets {
 	return af
 }
 
+// labels returns the sorted keys of a facets.go lookup table, prefixed with
+// "" so an ff.StringEnumLong flag can default to unset (no filter) instead
+// of silently falling back to the first real label — ffval.Enum's zero
+// Default only survives initialize() if it's itself in the Valid list.
 func labels[V any](table map[string]V) []string {
 	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
+// usageWithChoices appends a comma-separated "one of: ..." list to base.
+// ffhelp never introspects an ff.StringEnumLong's valid values on its own, so
+// small enough choice sets are spelled out here to make -h self-documenting.
 func usageWithChoices[V any](base string, table map[string]V) string {
 	choices := labels(table)[1:]
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))
 }
 
+// printLocations prints the itemized location(s) from a job detail response.
+// Unlike JobSummary.LocationsText (which collapses multi-site postings into
+// an aggregate string like "2 Locations"), JobPostingInfo carries the actual
+// primary Location plus every AdditionalLocations entry.
 func printLocations(info nvidiaprovider.JobPostingInfo) {
 	locations := make([]string, 0, 1+len(info.AdditionalLocations))
 	if info.Location.Set {

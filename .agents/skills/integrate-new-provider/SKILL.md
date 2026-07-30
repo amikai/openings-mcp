@@ -20,7 +20,7 @@ done when the provider is reachable through the MCP server, not when the
 debug CLI works — if a session stops before the surface stage, hand off the
 remaining stages explicitly.
 
-SmartRecruiters (`internal/provider/smartrecruiters`, `cmd/smartrecruiters`)
+SmartRecruiters (`internal/provider/smartrecruiters`, `internal/cli/provider/smartrecruiters`)
 is the most recent ogen/JSON worked example. Spec-less hand-written clients
 in-tree: LinkedIn, jobindex, join, iCIMS, SuccessFactors, UltiPro (HTML /
 GraphQL / `__NEXT_DATA__`).
@@ -138,18 +138,24 @@ has a stable, roster-able feed URL and multi-company routing is worth it.
    (the smartrecruiters roster documents this bar). Bulk expansion comes
    later in step 7; the seed roster just has to prove the pipeline
    end-to-end.
-5. **Debug CLI** — `cmd/<name>/main.go` using ff/v4 with `search`,
-   `detail`, and `companies` subcommands for live manual checks. Validate
-   pagination flags and reject stray positional args (mirror
-   `cmd/smartrecruiters`). Do not add `cmd/<name>/doc.go`; package-level
-   documentation belongs only in `internal/provider/<name>/doc.go`.
+5. **Debug CLI** — `internal/cli/provider/<name>/<name>.go` exporting
+   `NewCommand() *cobra.Command` with `search`, `detail`, and `companies`
+   subcommands for live manual checks, registered on the root command in
+   `cmd/openings-mcp/main.go` so it runs as `openings-mcp <name> search`.
+   There is no `cmd/<name>` binary — every debug CLI is a subcommand of the
+   one `openings-mcp` binary. Validate pagination flags, set
+   `Args: cobra.NoArgs` on every leaf subcommand, and declare fixed-choice
+   flags with `clihelp.ChoiceVar` / `clihelp.FormatVar` so an invalid value
+   fails the parse instead of reaching the API (mirror
+   `internal/cli/provider/smartrecruiters`). The package gets a doc comment
+   like any other library package.
 6. **MCP surface**
    - ATS adapter: `internal/ats/<name>.go` implementing `Adapter`
      (Name, Roster, ParseCareersURL, Search, Filters, Detail) + tests.
      Register it in `newATSRegistry` (`cmd/openings-mcp/main.go`), add its
      careers-URL host pattern to `careersHostPatternsByAdapter`
      (`internal/ats/registry.go`), and add it to `providerOrder`
-     (`cmd/verify-companies/main.go`).
+     (`internal/cli/verifycompanies/verify_companies.go`).
    - Dedicated tools: `internal/openingsmcp/<name>.go` with
      `Register<Name>` + tests; wire the client in `newServer`.
 
@@ -173,7 +179,7 @@ has a stable, roster-able feed URL and multi-company routing is worth it.
    against the new `<name>_search_jobs` / `<name>_get_job_detail`
    tools with a few real queries instead.
 7. **Roster curation** — bulk-discovered candidates go in
-   `unverified/<name>.yaml`; verify entries with `cmd/verify-companies`
+   `unverified/<name>.yaml`; verify entries with `openings-mcp verify-companies`
    (runs the real adapter path) before promoting them into the curated
    `companies.yaml`. Follow the roster commit convention in CLAUDE.md.
 8. **Docs** — update the README provider list and, if tool-selection

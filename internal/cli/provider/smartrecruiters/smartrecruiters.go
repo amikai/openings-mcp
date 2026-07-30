@@ -13,9 +13,9 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	smartrecruiters "github.com/amikai/openings-mcp/internal/provider/smartrecruiters"
 )
-
 
 type rootOptions struct {
 	company string
@@ -35,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.company, "company", "", `SmartRecruiters companyIdentifier from the career site URL, e.g. "Equinox" in jobs.smartrecruiters.com/Equinox`)
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -43,9 +43,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -65,9 +62,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:    opts.company,
 				timeout:    opts.timeout,
@@ -97,9 +91,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				company:   opts.company,
 				timeout:   opts.timeout,
@@ -114,6 +105,12 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// normalizeCompany requires --company to be a curated company — same
+// policy as the greenhouse CLI's --board and the lever CLI's --site — and
+// returns the roster's canonically-cased companyIdentifier rather than whatever
+// casing the caller typed, since the roster (and this CLI's own report
+// output) isn't consistently lowercase like Greenhouse's board tokens are
+// (e.g. "Equinox", "AECOM2").
 func normalizeCompany(company string) (string, error) {
 	if company == "" {
 		return "", errors.New("--company is required")
@@ -125,6 +122,9 @@ func normalizeCompany(company string) (string, error) {
 	return c.CompanyIdentifier, nil
 }
 
+// runCompanies lists every curated SmartRecruiters company embedded in the
+// CLI (internal/provider/smartrecruiters/companies.yaml), sorted by company
+// name. It makes no network call.
 func runCompanies(format string) error {
 	cs := smartrecruiters.Companies
 
@@ -140,6 +140,10 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// postingSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no description. No public URL — the
+// list endpoint only carries `ref` (the Posting API's own detail link);
+// the human-clickable postingUrl only appears on 'get'.
 type postingSummaryJSON struct {
 	ID         string `json:"id"`
 	Title      string `json:"title"`
@@ -168,6 +172,8 @@ func summarize(p smartrecruiters.PostingItem) postingSummaryJSON {
 	return s
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s postingSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -181,6 +187,7 @@ func printSummary(s postingSummaryJSON) {
 	fmt.Printf("ID: %s\n", s.ID)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company    string
 	timeout    time.Duration
@@ -194,6 +201,9 @@ type searchFlags struct {
 	format     string
 }
 
+// runSearch maps every flag directly onto the Posting API's real
+// server-side filters — unlike Greenhouse's client-side dump-and-filter,
+// SmartRecruiters does the narrowing upstream.
 func runSearch(ctx context.Context, f searchFlags) error {
 	company, err := normalizeCompany(f.company)
 	if err != nil {
@@ -261,6 +271,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	company   string
 	timeout   time.Duration
@@ -268,6 +279,9 @@ type getFlags struct {
 	format    string
 }
 
+// runGet fetches one posting in full via the Posting API's detail
+// endpoint, which — unlike the list endpoint — 404s for an unknown id
+// rather than returning an empty result.
 func runGet(ctx context.Context, f getFlags) error {
 	company, err := normalizeCompany(f.company)
 	if err != nil {
@@ -303,6 +317,8 @@ func runGet(ctx context.Context, f getFlags) error {
 	}
 }
 
+// printDetail renders one full posting. JSON mode encodes the generated
+// Posting as-is — detail is for seeing the whole record.
 func printDetail(d *smartrecruiters.Posting, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
@@ -333,6 +349,10 @@ func printDetail(d *smartrecruiters.Posting, format string) error {
 	return nil
 }
 
+// printSection renders one jobAd.sections entry, converting its HTML text
+// to plain text. Falls back to the fallbackTitle when the section omits
+// its own title, and to the raw HTML on a conversion failure rather than
+// dropping the section.
 func printSection(fallbackTitle string, opt smartrecruiters.OptJobAdSection) {
 	sec, ok := opt.Get()
 	if !ok || sec.Text.Value == "" {

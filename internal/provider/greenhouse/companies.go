@@ -18,7 +18,7 @@ var companiesYAML []byte
 // Company is a confirmed organization hosting a public Greenhouse job
 // board, drawn from a curated list (internal/provider/greenhouse/companies.yaml).
 // Every entry was verified against the live Job Board API — HTTP 200 with
-// a non-empty jobs array; cmd/verify-companies re-verifies the roster.
+// a non-empty jobs array; internal/cli/verifycompanies re-verifies the roster.
 // BoardToken is the identifier the API takes as its board_token
 // path parameter, e.g. "anthropic" for boards-api.greenhouse.io/v1/boards/anthropic/jobs.
 type Company struct {

@@ -13,6 +13,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/remoteok"
 )
 
@@ -34,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", remoteok.DefaultBaseURL, "Remote OK base URL")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchTags []string
@@ -47,9 +48,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if limit < 1 {
 				return fmt.Errorf("--limit must be >= 1, got %d", limit)
 			}
@@ -63,7 +61,7 @@ func NewCommand() *cobra.Command {
 			})
 		},
 	}
-	searchCmd.Flags().StringSliceVar(&searchTags, "tag", nil, "server-side tag filter; repeatable, tags are AND-ed")
+	searchCmd.Flags().StringArrayVar(&searchTags, "tag", nil, "server-side tag filter; repeatable, tags are AND-ed")
 	searchCmd.Flags().StringVar(&keyword, "keyword", "", "client-side substring filter on position, company, and tags")
 	searchCmd.Flags().IntVar(&limit, "limit", 20, "max jobs to print")
 
@@ -77,9 +75,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if id == "" {
 				return errors.New("--id is required")
 			}
@@ -93,7 +88,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	detailCmd.Flags().StringVar(&id, "id", "", "job id from search, e.g. 1134996")
-	detailCmd.Flags().StringSliceVar(&detailTags, "tag", nil, "tag filter used when the job was found; scopes the feed re-fetch")
+	detailCmd.Flags().StringArrayVar(&detailTags, "tag", nil, "tag filter used when the job was found; scopes the feed re-fetch")
 
 	cmd.AddCommand(searchCmd, detailCmd)
 	return cmd

@@ -66,19 +66,19 @@ import (
 	"github.com/amikai/openings-mcp/internal/openingsmcp"
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 	"github.com/amikai/openings-mcp/internal/provider/apple"
+	"github.com/amikai/openings-mcp/internal/provider/ashby"
 	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/amikai/openings-mcp/internal/provider/eightfold"
 	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
 	"github.com/amikai/openings-mcp/internal/provider/google"
+	"github.com/amikai/openings-mcp/internal/provider/greenhouse"
+	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 	"github.com/amikai/openings-mcp/internal/provider/indeed"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
-	"github.com/amikai/openings-mcp/internal/provider/linkedin"
-	"github.com/amikai/openings-mcp/internal/provider/ashby"
-	"github.com/amikai/openings-mcp/internal/provider/greenhouse"
-	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 	"github.com/amikai/openings-mcp/internal/provider/join"
 	"github.com/amikai/openings-mcp/internal/provider/lever"
+	"github.com/amikai/openings-mcp/internal/provider/linkedin"
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
@@ -141,11 +141,6 @@ func newRootCmd() *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVar(&cfg.logFile, "log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
-	rootCmd.PersistentFlags().StringVar(&cfg.logLevel, "log-level", "info", "minimum log level: debug, info, warn, or error")
-	rootCmd.PersistentFlags().BoolVar(&cfg.enableCommandLogging, "enable-command-logging", false, "log raw JSON-RPC traffic to the log output")
-	rootCmd.PersistentFlags().DurationVar(&cfg.dumpCacheTTL, "dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
-
 	rootCmd.Version = fmt.Sprintf("%s\nCommit: %s\nBuild Date: %s", version, commit, date)
 	rootCmd.SetVersionTemplate("Version: {{.Version}}\n")
 
@@ -155,6 +150,14 @@ func newRootCmd() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return runServer(cfg)
 		},
+	}
+
+	// Local, not persistent: these configure the MCP server only, and the
+	// provider debug subcommands would otherwise advertise them under
+	// "Global Flags" while ignoring them. Registered on both commands that
+	// can start the server — bare `openings-mcp` and `openings-mcp server`.
+	for _, cmd := range []*cobra.Command{rootCmd, serverCmd} {
+		bindServerFlags(cmd, cfg)
 	}
 
 	rootCmd.AddCommand(serverCmd)
@@ -208,6 +211,14 @@ func newRootCmd() *cobra.Command {
 	rootCmd.AddCommand(workingnomadscli.NewCommand())
 
 	return rootCmd
+}
+
+// bindServerFlags registers the MCP server's flags on cmd, writing into cfg.
+func bindServerFlags(cmd *cobra.Command, cfg *serverConfig) {
+	cmd.Flags().StringVar(&cfg.logFile, "log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
+	cmd.Flags().StringVar(&cfg.logLevel, "log-level", "info", "minimum log level: debug, info, warn, or error")
+	cmd.Flags().BoolVar(&cfg.enableCommandLogging, "enable-command-logging", false, "log raw JSON-RPC traffic to the log output")
+	cmd.Flags().DurationVar(&cfg.dumpCacheTTL, "dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
 }
 
 func runServer(cfg *serverConfig) error {

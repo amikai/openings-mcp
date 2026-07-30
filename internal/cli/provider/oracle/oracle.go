@@ -1,3 +1,5 @@
+// Package oracle implements the "openings-mcp oracle" debug CLI, for manual
+// checks against the live surface that internal/provider/oracle documents.
 package oracle
 
 import (
@@ -14,6 +16,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	oracleprovider "github.com/amikai/openings-mcp/internal/provider/oracle"
 )
 
@@ -35,7 +38,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "curated company name or Oracle Candidate Experience careers URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "combined discovery and API request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	env := commandEnv{httpClient: http.DefaultClient, out: os.Stdout}
 
@@ -45,9 +48,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format, env)
 		},
 	}
@@ -64,9 +64,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				commonFlags: commonFlags{
 					company: opts.company,
@@ -83,7 +80,7 @@ func NewCommand() *cobra.Command {
 	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "free-text keyword search")
 	searchCmd.Flags().IntVar(&searchLimit, "limit", 20, "page size (1-100)")
 	searchCmd.Flags().IntVar(&searchOffset, "offset", 0, "zero-based result offset")
-	searchCmd.Flags().StringSliceVar(&searchFilters, "filter", nil, "facet filter as name=id (repeatable)")
+	searchCmd.Flags().StringArrayVar(&searchFilters, "filter", nil, "facet filter as name=id (repeatable)")
 
 	var (
 		facetsKeyword string
@@ -95,9 +92,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFacets(cmd.Context(), facetsFlags{
 				commonFlags: commonFlags{
 					company: opts.company,
@@ -110,7 +104,7 @@ func NewCommand() *cobra.Command {
 		},
 	}
 	facetsCmd.Flags().StringVar(&facetsKeyword, "keyword", "", "narrow facet counts with a keyword")
-	facetsCmd.Flags().StringSliceVar(&facetsFilters, "filter", nil, "facet filter as name=id (repeatable)")
+	facetsCmd.Flags().StringArrayVar(&facetsFilters, "filter", nil, "facet filter as name=id (repeatable)")
 
 	var detailJobID string
 	detailCmd := &cobra.Command{
@@ -119,9 +113,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runDetail(cmd.Context(), detailFlags{
 				commonFlags: commonFlags{
 					company: opts.company,

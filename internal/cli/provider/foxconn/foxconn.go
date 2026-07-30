@@ -1,3 +1,6 @@
+// Package foxconn implements the "openings-mcp foxconn" debug CLI, for
+// manual checks against the live surface that internal/provider/foxconn
+// documents.
 package foxconn
 
 import (
@@ -10,15 +13,16 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/foxconn"
 )
-
 
 type options struct {
 	timeout time.Duration
 	format  string
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	workplace  string
 	talentZone string
@@ -40,7 +44,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	sFlags := &searchFlags{}
 	searchCmd := &cobra.Command{
@@ -94,6 +98,7 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// jobSummaryJSON is the --format json shape for one search result.
 type jobSummaryJSON struct {
 	ID       string `json:"id"`
 	JobNo    string `json:"jobNo"`
@@ -123,6 +128,8 @@ func summarize(j foxconn.JobVacancy) jobSummaryJSON {
 	return s
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -142,6 +149,9 @@ type searchOptions struct {
 	format     string
 }
 
+// runSearch maps every flag onto the API's real server-side filters. The
+// list endpoint has no pagination — it returns the full matching set in one
+// response — so an unfiltered call returns the entire ~953-job board.
 func runSearch(ctx context.Context, f searchOptions) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
@@ -188,6 +198,9 @@ func runSearch(ctx context.Context, f searchOptions) error {
 	return nil
 }
 
+// runDetail fetches one vacancy in full. Unlike the list endpoint, the
+// detail endpoint 404s for an unknown id (an RFC 7807 problem+json body,
+// decoded here as *foxconn.ProblemDetails).
 func runDetail(ctx context.Context, timeout time.Duration, id, format string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
@@ -212,6 +225,8 @@ func runDetail(ctx context.Context, timeout time.Duration, id, format string) er
 	}
 }
 
+// printDetail renders one full vacancy. JSON mode encodes the generated
+// JobVacancy as-is — detail is for seeing the whole record.
 func printDetail(d *foxconn.JobVacancy, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
@@ -247,6 +262,8 @@ func printDetail(d *foxconn.JobVacancy, format string) error {
 	return nil
 }
 
+// printSection prints one desc_* free-text block when it is present and
+// non-empty.
 func printSection(label string, opt foxconn.OptNilString) {
 	v, ok := opt.Get()
 	if !ok || v == "" {
@@ -255,11 +272,15 @@ func printSection(label string, opt foxconn.OptNilString) {
 	fmt.Printf("\n%s:\n%s\n", label, v)
 }
 
+// codesJSON is the --format json shape for the codes subcommand.
 type codesJSON struct {
 	WorkplaceCodes  []foxconn.Code `json:"workplaceCodes"`
 	TalentZoneCodes []foxconn.Code `json:"talentZoneCodes"`
 }
 
+// runCodes prints the static workplace and talent-zone filter enums
+// embedded in the CLI (internal/provider/foxconn/codes.go). It makes no
+// network call.
 func runCodes(format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

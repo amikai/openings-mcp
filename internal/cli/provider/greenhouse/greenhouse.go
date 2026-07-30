@@ -1,3 +1,6 @@
+// Package greenhouse implements the "openings-mcp greenhouse" debug CLI, for
+// manual checks against the live surface that internal/provider/greenhouse
+// documents.
 package greenhouse
 
 import (
@@ -14,9 +17,9 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	greenhouse "github.com/amikai/openings-mcp/internal/provider/greenhouse"
 )
-
 
 type options struct {
 	board   string
@@ -24,11 +27,13 @@ type options struct {
 	format  string
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	keyword  string
 	location string
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	jobID int
 }
@@ -45,7 +50,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.board, "board", "", "confirmed Greenhouse board token, e.g. stripe (see 'greenhouse companies' for the full list)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -100,6 +105,10 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no description. It's a flat, stable
+// projection of the generated greenhouse.JobSummary so the CLI's output
+// doesn't change shape when the spec's generated types do.
 type jobSummaryJSON struct {
 	ID        int    `json:"id"`
 	Title     string `json:"title"`
@@ -132,6 +141,9 @@ func summarize(j greenhouse.JobSummary) jobSummaryJSON {
 	return s
 }
 
+// matches applies the client-side search filters: case-insensitive
+// substring on title (keyword) and location name (location), ANDed. The
+// Job Board API has no server-side filtering, so this is the whole search.
 func matches(s jobSummaryJSON, keyword, location string) bool {
 	return containsFold(s.Title, keyword) && containsFold(s.Location, location)
 }
@@ -143,6 +155,8 @@ func containsFold(s, sub string) bool {
 	return strings.Contains(strings.ToLower(s), strings.ToLower(sub))
 }
 
+// formatCents renders a pay_input_ranges amount: whole currency units when
+// the cents divide evenly (the common case), two decimals otherwise.
 func formatCents(cents int) string {
 	if cents%100 == 0 {
 		return strconv.Itoa(cents / 100)
@@ -150,6 +164,9 @@ func formatCents(cents int) string {
 	return strconv.FormatFloat(float64(cents)/100, 'f', 2, 64)
 }
 
+// payRangeLine renders one pay range as "title: min – max CURRENCY". The
+// currency comes from currency_type verbatim — no hard-coded "$", the
+// roster has EUR boards.
 func payRangeLine(r greenhouse.PayInputRange) string {
 	span := fmt.Sprintf("%s – %s %s",
 		formatCents(r.MinCents.Value), formatCents(r.MaxCents.Value), r.CurrencyType.Value)
@@ -159,6 +176,9 @@ func payRangeLine(r greenhouse.PayInputRange) string {
 	return span
 }
 
+// renderDescription converts a job's content field to plain text. Greenhouse
+// sends it HTML entity-encoded, so decode first, then strip tags; on a
+// conversion failure fall back to the decoded HTML rather than dropping it.
 func renderDescription(content string) string {
 	decoded := html.UnescapeString(content)
 	if text, err := html2text.FromString(decoded, html2text.Options{}); err == nil {
@@ -167,6 +187,8 @@ func renderDescription(content string) string {
 	return decoded
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -180,6 +202,9 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("ID: %d\n", s.ID)
 }
 
+// runCompanies lists every confirmed Greenhouse board embedded in the CLI
+// (internal/provider/greenhouse/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := greenhouse.Companies
 
@@ -195,6 +220,8 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// normalizeBoard lowercases the --board value and requires it to be a
+// curated board — same policy as the ashby CLI's fetchBoard front half.
 func normalizeBoard(board string) (string, error) {
 	if board == "" {
 		return "", errors.New("--board is required")
@@ -214,6 +241,9 @@ type searchOptions struct {
 	format   string
 }
 
+// runSearch fetches the board's whole job list (the API has no pagination
+// and no server-side filters) WITHOUT content=true — summaries stay small —
+// then filters client-side and prints summaries.
 func runSearch(ctx context.Context, f searchOptions) error {
 	slug, err := normalizeBoard(f.board)
 	if err != nil {
@@ -273,6 +303,9 @@ type getOptions struct {
 	format  string
 }
 
+// runGet fetches one job in full via Greenhouse's single-job endpoint —
+// unlike Ashby there's no need to re-fetch the whole board — with
+// pay_transparency=true so pay_input_ranges come back.
 func runGet(ctx context.Context, f getOptions) error {
 	if f.jobID == 0 {
 		return errors.New("--id is required (take it from a search result's ID)")
@@ -308,6 +341,8 @@ func runGet(ctx context.Context, f getOptions) error {
 	}
 }
 
+// printDetail renders one full job. JSON mode encodes the generated
+// JobDetail as-is — detail is for seeing the whole record.
 func printDetail(d *greenhouse.JobDetail, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

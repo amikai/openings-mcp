@@ -1,3 +1,6 @@
+// Package realtek implements the "openings-mcp realtek" debug CLI, for
+// manual checks against the live surface that internal/provider/realtek
+// documents.
 package realtek
 
 import (
@@ -11,9 +14,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	realtekprovider "github.com/amikai/openings-mcp/internal/provider/realtek"
 )
-
 
 type options struct {
 	timeout time.Duration
@@ -31,7 +34,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchKeyword  string
@@ -45,9 +48,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				timeout:  opts.timeout,
 				keyword:  searchKeyword,
@@ -71,9 +71,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if detailJobOppID == "" {
 				return errors.New("--job-opp-id is required (take it from a search result's JobOppId)")
 			}
@@ -89,9 +86,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runTypes(cmd.Context(), opts.timeout, opts.format)
 		},
 	}
@@ -102,9 +96,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runLocations(cmd.Context(), opts.timeout, opts.format)
 		},
 	}
@@ -113,6 +104,7 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// jobSummaryJSON is the --format json shape for one search result.
 type jobSummaryJSON struct {
 	JobOppId string `json:"jobOppId"`
 	Title    string `json:"title"`
@@ -138,6 +130,8 @@ func summarize(j realtekprovider.JobSummary) jobSummaryJSON {
 	}
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -154,6 +148,7 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("JobOppId: %s\n", s.JobOppId)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	timeout  time.Duration
 	keyword  string
@@ -163,6 +158,11 @@ type searchFlags struct {
 	format   string
 }
 
+// runSearch calls GetFilterList when any filter is set, or the unfiltered
+// GetAllJobList dump otherwise (GetFilterList's own defaults, keyword
+// omitted and xp -1, make it equivalent to the dump, but the dump avoids
+// an unnecessary form-encoded POST). Both unfiltered paths are capped at
+// 200 rows by the server; see openapi.yaml.
 func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()

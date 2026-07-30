@@ -1,6 +1,9 @@
 # goreleaser output
 dist/
 
+# local `go build` output
+/openings-mcp
+
 # Local case studies and Serena metadata
 /case-study/
 /.serena/

@@ -13,6 +13,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/successfactors"
 )
 
@@ -34,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.company, "company", "", `curated company name or career-site host, e.g. "SAP" or "jobs.sap.com"`)
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -42,9 +43,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -64,9 +62,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:      opts.company,
 				timeout:      opts.timeout,
@@ -86,7 +81,7 @@ func NewCommand() *cobra.Command {
 	searchCmd.Flags().StringVar(&department, "department", "", "department facet raw value from 'facets' (not the translated label)")
 	searchCmd.Flags().StringVar(&careerStatus, "career-status", "", "career-status facet raw value from 'facets'")
 	searchCmd.Flags().StringVar(&country, "country", "", "ISO 3166-1 alpha-2 country code, e.g. DE")
-	searchCmd.Flags().StringSliceVar(&filters, "filter", nil, "tenant facet as name=value (repeatable; run 'facets' for valid names and values)")
+	searchCmd.Flags().StringArrayVar(&filters, "filter", nil, "tenant facet as name=value (repeatable; run 'facets' for valid names and values)")
 	searchCmd.Flags().IntVar(&startRow, "start-row", 0, "zero-based result offset")
 
 	var facetsKeyword string
@@ -96,9 +91,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFacets(cmd.Context(), facetsFlags{
 				company: opts.company,
 				timeout: opts.timeout,
@@ -116,9 +108,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runDetail(cmd.Context(), detailFlags{
 				company: opts.company,
 				timeout: opts.timeout,
@@ -133,6 +122,9 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// resolveCompany accepts a curated company name or its career-site host
+// directly, and returns the Company record — the CLI's --company mirrors
+// what a caller could otherwise only get by reading companies.yaml.
 func resolveCompany(company string) (successfactors.Company, error) {
 	if company == "" {
 		return successfactors.Company{}, errors.New("--company is required")
@@ -174,6 +166,7 @@ type searchResultJSON struct {
 	Jobs  []jobSummaryJSON `json:"jobs"`
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company      string
 	timeout      time.Duration
@@ -273,6 +266,7 @@ func buildSearchFilters(f searchFlags) (map[string]string, error) {
 	return filters, nil
 }
 
+// facetsFlags carries the parsed "facets" subcommand flags into runFacets.
 type facetsFlags struct {
 	company string
 	timeout time.Duration
@@ -318,6 +312,7 @@ func runFacets(ctx context.Context, f facetsFlags) error {
 	return nil
 }
 
+// detailFlags carries the parsed "detail" subcommand flags into runDetail.
 type detailFlags struct {
 	company string
 	timeout time.Duration

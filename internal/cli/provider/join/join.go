@@ -1,3 +1,5 @@
+// Package join implements the "openings-mcp join" debug CLI, for manual
+// checks against the live surface that internal/provider/join documents.
 package join
 
 import (
@@ -11,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	joinprovider "github.com/amikai/openings-mcp/internal/provider/join"
 )
-
 
 type options struct {
 	company string
@@ -33,7 +35,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", "confirmed join.com company slug, e.g. routinelabs (see 'join companies' for the full list)")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -42,9 +44,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("companies takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runCompanies(opts.format)
 		},
@@ -61,9 +60,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v (did you forget a flag name?)", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			return runSearch(cmd.Context(), searchFlags{
 				company:  opts.company,
@@ -86,9 +82,6 @@ func NewCommand() *cobra.Command {
 			if len(args) > 0 {
 				return fmt.Errorf("get takes no positional arguments, got %v (did you mean --id %q?)", args, args[0])
 			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runGet(cmd.Context(), getFlags{
 				company: opts.company,
 				timeout: opts.timeout,
@@ -103,6 +96,8 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// normalizeCompany requires --company to be a curated company and returns
+// the roster's canonical slug — same policy as the greenhouse CLI's --board.
 func normalizeCompany(company string) (joinprovider.RosterCompany, error) {
 	if company == "" {
 		return joinprovider.RosterCompany{}, errors.New("--company is required")
@@ -114,6 +109,9 @@ func normalizeCompany(company string) (joinprovider.RosterCompany, error) {
 	return c, nil
 }
 
+// runCompanies lists every confirmed join.com company embedded in the CLI
+// (internal/provider/join/companies.yaml), sorted by company name. It makes
+// no network call.
 func runCompanies(format string) error {
 	cs := joinprovider.Companies
 
@@ -129,6 +127,9 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// jobSummaryJSON is the --format json shape for one search result: the
+// compact fields a listing needs, no description (join.com's search
+// endpoint never populates one — see API.md).
 type jobSummaryJSON struct {
 	IdParam  string `json:"idParam"`
 	Title    string `json:"title"`
@@ -155,6 +156,10 @@ func summarize(j joinprovider.Job) jobSummaryJSON {
 	return s
 }
 
+// matches applies the client-side search filters: case-insensitive
+// substring on title (keyword) and city (location), ANDed. join.com's
+// public API has no server-side keyword search, so this is the whole
+// search — see API.md's "Why dump-style, not server-side search".
 func matches(s jobSummaryJSON, keyword, location string) bool {
 	return containsFold(s.Title, keyword) && containsFold(s.Location, location)
 }
@@ -166,6 +171,8 @@ func containsFold(s, sub string) bool {
 	return strings.Contains(strings.ToLower(s), strings.ToLower(sub))
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	if s.Location != "" {
 		fmt.Printf("Location: %s\n", s.Location)
@@ -179,6 +186,7 @@ func printSummary(s jobSummaryJSON) {
 	fmt.Printf("ID: %s\n", s.IdParam)
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	company  string
 	timeout  time.Duration
@@ -187,6 +195,9 @@ type searchFlags struct {
 	format   string
 }
 
+// runSearch fetches the company's whole job dump (join.com has no
+// server-side keyword search; Client.Jobs already loops every page) then
+// filters client-side and prints summaries.
 func runSearch(ctx context.Context, f searchFlags) error {
 	c, err := normalizeCompany(f.company)
 	if err != nil {
@@ -226,6 +237,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	return nil
 }
 
+// getFlags carries the parsed "get" subcommand flags into runGet.
 type getFlags struct {
 	company string
 	timeout time.Duration
@@ -233,6 +245,9 @@ type getFlags struct {
 	format  string
 }
 
+// runGet fetches one job's full posting by scraping its SSR detail page —
+// join.com's public GraphQL API never populates a description (see
+// API.md), so there is no API-based detail call to make instead.
 func runGet(ctx context.Context, f getFlags) error {
 	if f.idParam == "" {
 		return errors.New("--id is required (take it from a search result's ID)")
@@ -256,6 +271,8 @@ func runGet(ctx context.Context, f getFlags) error {
 	return printDetail(d, c, f.format)
 }
 
+// printDetail renders one full job. JSON mode encodes the parsed JobDetail
+// as-is — detail is for seeing the whole record.
 func printDetail(d *joinprovider.JobDetail, c joinprovider.RosterCompany, format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

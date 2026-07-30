@@ -29,7 +29,7 @@ REST API this can't be modeled as an OpenAPI spec turned into an `ogen`
 client (`ogen` models distinct paths per operation). The Go client is built
 with Khan/genqlient against a reverse-engineered `schema.graphql` (Indeed
 has no public SDL). Live-validated type names (via GraphQL validation
-errors and the `cmd/indeed` CLI): `JobSearchSortOrder`,
+errors and the `internal/cli/provider/indeed` CLI): `JobSearchSortOrder`,
 `filters: [JobSearchFilterInput!]!`, `JobSearchLocationInput`,
 `jobData(jobKeys: [ID!])`, `Salary.range` → `RangeType` (`Range` | `AtLeast` | `AtMost` | `Exactly`).
 

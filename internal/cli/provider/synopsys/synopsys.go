@@ -1,3 +1,6 @@
+// Package synopsys implements the "openings-mcp synopsys" debug CLI, for
+// manual checks against the live surface that internal/provider/synopsys
+// documents.
 package synopsys
 
 import (

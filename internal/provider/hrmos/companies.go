@@ -15,7 +15,7 @@ var companiesYAML []byte
 // RosterCompany is a confirmed organization hosting a public HRMOS 採用
 // tenant, drawn from a curated list (internal/provider/hrmos/companies.yaml).
 // Every entry was verified live: /pages/{slug}/jobs returns HTTP 200 with
-// jobs present and a matching company name (see cmd/verify-companies).
+// jobs present and a matching company name (see internal/cli/verifycompanies).
 type RosterCompany struct {
 	Name string `yaml:"company" json:"company"`
 	Slug string `yaml:"slug" json:"slug"`

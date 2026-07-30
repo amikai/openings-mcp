@@ -1,3 +1,5 @@
+// Package jobicy implements the "openings-mcp jobicy" debug CLI, for manual
+// checks against the live surface that internal/provider/jobicy documents.
 package jobicy
 
 import (
@@ -10,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	jobicyprovider "github.com/amikai/openings-mcp/internal/provider/jobicy"
 )
 
@@ -31,7 +34,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", jobicyprovider.DefaultBaseURL, "Jobicy base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchCount    int
@@ -46,9 +49,6 @@ func NewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
-			}
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 			}
 			if searchCount < 1 || searchCount > 100 {
 				return fmt.Errorf("--count must be in 1..100, got %d", searchCount)
@@ -87,9 +87,6 @@ func NewCommand() *cobra.Command {
 			RunE: func(cmd *cobra.Command, args []string) error {
 				if len(args) > 0 {
 					return fmt.Errorf("%s takes no positional arguments, got %v", taxName, args)
-				}
-				if opts.format != "text" && opts.format != "json" {
-					return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
 				}
 				return runTaxonomy(cmd.Context(), opts.baseURL, opts.timeout, opts.format, taxGet)
 			},

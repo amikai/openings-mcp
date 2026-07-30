@@ -7,7 +7,7 @@ description: Use when auditing the curated ATS rosters for stale entries, prunin
 
 ## Overview
 
-`cmd/verify-companies` sweeps every curated `companies.yaml` entry
+`openings-mcp verify-companies` sweeps every curated `companies.yaml` entry
 through the real `internal/ats` adapter path — the same code the MCP server serves —
 and reports each entry as OK with its total job count, or ERROR with the
 error message. Each successful search is followed by one Detail probe on
@@ -18,7 +18,7 @@ candidates into the curated roster).
 ## The sweep
 
 ```
-go run ./cmd/verify-companies [--provider ashby,greenhouse,lever,workday] \
+go run ./cmd/openings-mcp verify-companies [--provider ashby,greenhouse,lever,workday] \
     [--format text|json] [--concurrency N] [--timeout D]
 ```
 
@@ -75,7 +75,7 @@ go:embed'd, so it never affects the built binary.
    that's the whole reason the entry is quarantined.
 2. Move the entries into the provider's `companies.yaml` (same YAML
    shape) and delete them from `unverified/<provider>.yaml`.
-3. `go run ./cmd/verify-companies --provider <name>` — rosters are
+3. `go run ./cmd/openings-mcp verify-companies --provider <name>` — rosters are
    go:embed'd, so `go run` picks the additions up. Drop entries that
    ERROR (re-check stale vs transient as in the audit).
 4. `go test ./...` — `ats.NewRegistry` requires every display name and

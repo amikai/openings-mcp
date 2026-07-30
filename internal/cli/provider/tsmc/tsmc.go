@@ -1,3 +1,5 @@
+// Package tsmc implements the "openings-mcp tsmc" debug CLI, for manual
+// checks against the live surface that internal/provider/tsmc documents.
 package tsmc
 
 import (
@@ -122,6 +124,10 @@ type searchFlags struct {
 	perPage        int
 }
 
+// buildJobsRequest resolves each flag's human label to a form-field id via
+// the ids.go lookup tables. Labels are already validated against the flag's
+// enum at parse time, so a lookup miss here can't happen for a non-empty
+// label. An empty label (flag not set) leaves that filter unset.
 func buildJobsRequest(f searchFlags) *tsmc.JobsRequest {
 	req := &tsmc.JobsRequest{
 		Keyword: f.keyword,
@@ -143,10 +149,17 @@ func buildJobsRequest(f searchFlags) *tsmc.JobsRequest {
 	return req
 }
 
+// labels returns the sorted keys of an ids.go lookup table, prefixed with
+// "" so an ff.StringEnumLong flag can default to unset (no filter) instead
+// of silently falling back to the first real label — ffval.Enum's zero
+// Default only survives initialize() if it's itself in the Valid list.
 func labels[V any](table map[string]V) []string {
 	return append([]string{""}, slices.Sorted(maps.Keys(table))...)
 }
 
+// usageWithChoices appends a "one of: ..." list to base. ffhelp never
+// introspects an ff.StringEnumLong's valid values on its own, so small
+// enough choice sets are spelled out here to make -h self-documenting.
 func usageWithChoices[V any](base string, table map[string]V) string {
 	choices := labels(table)[1:]
 	return fmt.Sprintf("%s, one of: %s", base, strings.Join(choices, " | "))

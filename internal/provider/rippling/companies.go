@@ -19,7 +19,7 @@ var companiesYAML []byte
 // drawn from a curated list (internal/provider/rippling/companies.yaml).
 // Every entry was verified against the live Job Board API — HTTP 200 with a
 // non-empty jobs array and a matching companyName on a sampled job detail;
-// cmd/verify-companies re-verifies the roster.
+// internal/cli/verifycompanies re-verifies the roster.
 // BoardSlug is the identifier the API takes as its board_slug path
 // parameter, e.g. "pythian" for
 // api.rippling.com/platform/api/ats/v1/board/pythian/jobs.

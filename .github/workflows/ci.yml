@@ -34,6 +34,28 @@ jobs:
           RACE: ${{ (runner.os != 'Windows' || runner.arch != 'ARM64') && '-race' || '' }}
         run: go test $RACE -vet=all ./...
 
+  format-and-tidy:
+    # The test job runs -vet=all, which checks neither formatting nor module
+    # hygiene, so both drifted unnoticed until they were caught in review.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+
+      - name: gofmt
+        run: |
+          unformatted=$(gofmt -l ./cmd ./internal)
+          if [ -n "$unformatted" ]; then
+            echo "::error::gofmt needed on:"; echo "$unformatted"
+            exit 1
+          fi
+
+      - name: go.mod / go.sum are tidy
+        run: go mod tidy -diff
+
   validate-openapi:
     # Separate job: the validator runs in docker, which macOS runners lack.
     runs-on: ubuntu-latest

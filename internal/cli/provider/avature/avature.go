@@ -13,6 +13,7 @@ import (
 	"github.com/jaytaylor/html2text"
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	"github.com/amikai/openings-mcp/internal/provider/avature"
 )
 
@@ -43,7 +44,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.company, "company", "", `curated company name or portal slug (e.g. "Bloomberg" or "koch.avature.net/careers")`)
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -90,6 +91,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// resolvePortal accepts a curated company name or portal slug, or an
+// uncurated "<host>/<portal>" (with or without the https:// prefix) so
+// roster candidates can be probed before curation.
 func resolvePortal(company string) (baseURL string, err error) {
 	company = strings.TrimSpace(company)
 	if company == "" {
@@ -107,6 +111,9 @@ func resolvePortal(company string) (baseURL string, err error) {
 	return "", fmt.Errorf("company %q not found; run 'avature companies', or pass a portal slug like koch.avature.net/careers", company)
 }
 
+// runCompanies lists every curated Avature portal embedded in the CLI
+// (internal/provider/avature/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)

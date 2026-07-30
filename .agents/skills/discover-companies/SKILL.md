@@ -15,9 +15,9 @@ verify-companies skill, and the roster commit convention is in
 CLAUDE.md. Scope a session to one provider — rosters land one per PR.
 
 The providers in scope are the `--provider` values of
-`cmd/verify-companies` (`providerOrder`). SmartRecruiters keeps a
+`internal/cli/verifycompanies` (`providerOrder`). SmartRecruiters keeps a
 roster too but has no adapter yet; spot-check its candidates with
-`go run ./cmd/smartrecruiters --company <id> search` instead.
+`go run ./cmd/openings-mcp smartrecruiters --company <id> search` instead.
 
 ## Sourcing channels
 
@@ -69,7 +69,7 @@ rosters in one session.
 ## Verify the batch
 
 1. Append the batch to `companies.yaml`, then
-   `go run ./cmd/verify-companies --provider <name>` — rosters are
+   `go run ./cmd/openings-mcp verify-companies --provider <name>` — rosters are
    go:embed'd, so `go run` picks the additions up. Keep the default
    timeout; big full-dump boards need it.
 2. Drop confirmed-stale ERRORs; retry transients first (the

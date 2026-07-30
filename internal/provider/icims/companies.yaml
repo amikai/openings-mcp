@@ -1,6 +1,6 @@
 # Curated iCIMS career portals. Each host was verified live against
 # /jobs/search?ss=1&pr=0&in_iframe=1 (HTTP 200 + portal markup) and
-# against cmd/verify-companies --provider icims.
+# against openings-mcp verify-companies --provider icims.
 # Slugs and display names may collide with other ATS rosters; Resolve
 # disambiguates that at runtime instead of NewRegistry failing at startup.
 # Two rules stay fatal at startup: no two entries in this file may share a

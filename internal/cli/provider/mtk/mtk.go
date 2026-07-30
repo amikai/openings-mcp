@@ -1,3 +1,5 @@
+// Package mtk implements the "openings-mcp mtk" debug CLI, for manual checks
+// against the live surface that internal/provider/mtk documents.
 package mtk
 
 import (
@@ -10,6 +12,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	mtkprovider "github.com/amikai/openings-mcp/internal/provider/mtk"
 )
 
@@ -31,7 +34,7 @@ func NewCommand() *cobra.Command {
 
 	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", mtkprovider.DefaultBaseURL, "MediaTek Careers base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	var (
 		searchKeyword     string
@@ -48,9 +51,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if searchPage < 1 {
 				return fmt.Errorf("--page must be >= 1, got %d", searchPage)
 			}
@@ -66,10 +66,10 @@ func NewCommand() *cobra.Command {
 	}
 
 	searchCmd.Flags().StringVar(&searchKeyword, "keyword", "", "free-text keyword query; AND/OR joins are supported")
-	searchCmd.Flags().StringSliceVar(&searchCategories, "category", nil, "category label (repeatable)")
-	searchCmd.Flags().StringSliceVar(&searchExperiences, "experience", nil, "work-experience label (repeatable)")
-	searchCmd.Flags().StringSliceVar(&searchLocations, "location", nil, "location label (repeatable)")
-	searchCmd.Flags().StringSliceVar(&searchPrograms, "program", nil, "program label (repeatable)")
+	searchCmd.Flags().StringArrayVar(&searchCategories, "category", nil, "category label (repeatable)")
+	searchCmd.Flags().StringArrayVar(&searchExperiences, "experience", nil, "work-experience label (repeatable)")
+	searchCmd.Flags().StringArrayVar(&searchLocations, "location", nil, "location label (repeatable)")
+	searchCmd.Flags().StringArrayVar(&searchPrograms, "program", nil, "program label (repeatable)")
 	searchCmd.Flags().IntVar(&searchPage, "page", 1, "1-based page number")
 	searchCmd.Flags().IntVar(&searchLimit, "limit", 6, "page size (1-100)")
 
@@ -80,9 +80,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			if detailJobID == "" {
 				return errors.New("--job-id is required")
 			}

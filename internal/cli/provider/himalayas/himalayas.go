@@ -1,3 +1,6 @@
+// Package himalayas implements the "openings-mcp himalayas" debug CLI, for
+// manual checks against the live surface that internal/provider/himalayas
+// documents.
 package himalayas
 
 import (
@@ -10,9 +13,9 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	himalayas "github.com/amikai/openings-mcp/internal/provider/himalayas"
 )
-
 
 var sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
 
@@ -21,11 +24,13 @@ type options struct {
 	format  string
 }
 
+// browseFlags carries the parsed "browse" subcommand flags into runBrowse.
 type browseFlags struct {
 	limit  int
 	offset int
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	keyword          string
 	country          string
@@ -50,7 +55,7 @@ func NewCommand() *cobra.Command {
 	}
 
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(rootCmd.PersistentFlags(), &opts.format)
 
 	bFlags := &browseFlags{}
 	browseCmd := &cobra.Command{
@@ -101,7 +106,7 @@ func NewCommand() *cobra.Command {
 	searchCmd.Flags().StringVar(&sFlags.employmentType, "employment-type", "", "comma-separated employment type filters: Full Time, Part Time, Contractor, Temporary, Intern, Volunteer, Other")
 	searchCmd.Flags().StringVar(&sFlags.company, "company", "", "canonical Himalayas company slug (himalayas.app/companies/<slug>); comma-separated values allowed")
 	searchCmd.Flags().StringVar(&sFlags.timezone, "timezone", "", "timezone filter, e.g. UTC-5 or UTC+05:30")
-	searchCmd.Flags().StringVar(&sFlags.sort, "sort", "relevant", "sort order: "+strings.Join(sortValues, ", "))
+	clihelp.ChoiceVar(searchCmd.Flags(), &sFlags.sort, "sort", "relevant", sortValues, "sort order")
 	searchCmd.Flags().IntVar(&sFlags.page, "page", 1, "1-based results page (fixed 20 jobs per page)")
 
 	rootCmd.AddCommand(browseCmd)
@@ -110,6 +115,9 @@ func NewCommand() *cobra.Command {
 	return rootCmd
 }
 
+// jobSummaryJSON is the --format json shape for one job: the compact
+// fields a listing needs, no description. The guid doubles as the job's
+// public himalayas.app posting URL.
 type jobSummaryJSON struct {
 	GUID           string   `json:"guid"`
 	Title          string   `json:"title"`
@@ -144,6 +152,9 @@ func summarize(j himalayas.Job) jobSummaryJSON {
 	return s
 }
 
+// formatSalary renders the disclosed salary range, e.g. "USD 120000-180000
+// annual". A null currency means no salary line at all, since the currency
+// is required to render either bound meaningfully.
 func formatSalary(j himalayas.Job) string {
 	if j.Currency.Null {
 		return ""
@@ -171,6 +182,8 @@ func salaryValue(v himalayas.OptNilFloat64) (float64, bool) {
 	return v.Value, true
 }
 
+// printSummary prints one job's compact text block (everything below the
+// title line).
 func printSummary(s jobSummaryJSON) {
 	fmt.Printf("Company: %s (%s)\n", s.Company, s.CompanySlug)
 	fmt.Printf("Type: %s", s.EmploymentType)
@@ -260,6 +273,10 @@ type searchOptions struct {
 	format           string
 }
 
+// runSearch maps every flag directly onto the search endpoint's real
+// server-side filters. Note the API rejects unrecognized --country,
+// --timezone, and --company values as 400 errors rather than returning
+// empty results.
 func runSearch(ctx context.Context, f searchOptions) error {
 	if f.page < 1 {
 		return fmt.Errorf("--page must be >= 1, got %d", f.page)

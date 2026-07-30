@@ -1,3 +1,6 @@
+// Package workday implements the "openings-mcp workday" debug CLI, for
+// manual checks against the live surface that internal/provider/workday
+// documents.
 package workday
 
 import (
@@ -13,9 +16,14 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/amikai/openings-mcp/internal/cli/clihelp"
 	workday "github.com/amikai/openings-mcp/internal/provider/workday"
 )
 
+// maxConcurrentDetailFetches caps how many job-detail requests runSearch
+// fires at once — fetchJobResult never returns an error, so the only reason
+// to bound it is being a considerate caller of someone else's career site
+// rather than firing --limit-many requests in a single burst.
 const maxConcurrentDetailFetches = 5
 
 type rootOptions struct {
@@ -36,7 +44,7 @@ func NewCommand() *cobra.Command {
 
 	cmd.PersistentFlags().StringVar(&opts.tenant, "tenant", "", "confirmed Workday tenant slug, e.g. 3m, att (see 'workday companies' for the full list)")
 	cmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
-	cmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
+	clihelp.FormatVar(cmd.PersistentFlags(), &opts.format)
 
 	companiesCmd := &cobra.Command{
 		Use:          "companies",
@@ -44,9 +52,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runCompanies(opts.format)
 		},
 	}
@@ -61,9 +66,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runFacets(cmd.Context(), facetsFlags{
 				tenant:     opts.tenant,
 				timeout:    opts.timeout,
@@ -88,9 +90,6 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 		Args:         cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if opts.format != "text" && opts.format != "json" {
-				return fmt.Errorf("invalid format %q (must be text or json)", opts.format)
-			}
 			return runSearch(cmd.Context(), searchFlags{
 				tenant:     opts.tenant,
 				timeout:    opts.timeout,
@@ -111,6 +110,10 @@ func NewCommand() *cobra.Command {
 	return cmd
 }
 
+// parseFacets turns repeated "--facet name=id" flag values into an
+// AppliedFacets map. Repeating the same name appends to that facet's id
+// list (OR'd within a facet); different names key different facets (AND'd
+// together) — matches AppliedFacets's map[string][]string shape 1:1.
 func parseFacets(raw []string) (workday.AppliedFacets, error) {
 	af := workday.AppliedFacets{}
 	for _, f := range raw {
@@ -123,6 +126,9 @@ func parseFacets(raw []string) (workday.AppliedFacets, error) {
 	return af, nil
 }
 
+// runCompanies lists every confirmed Workday tenant embedded in the CLI
+// (internal/provider/workday/companies.yaml), sorted by company name. It
+// makes no network call.
 func runCompanies(format string) error {
 	cs := workday.Companies
 
@@ -138,6 +144,7 @@ func runCompanies(format string) error {
 	return nil
 }
 
+// facetsFlags carries the parsed "facets" subcommand flags into runFacets.
 type facetsFlags struct {
 	tenant     string
 	timeout    time.Duration
@@ -146,6 +153,10 @@ type facetsFlags struct {
 	format     string
 }
 
+// runFacets discovers a tenant's current facet tree via a search whose only
+// job is to read back JobsResponse.Facets — Limit is 1 because the actual
+// jobPostings aren't used here (see openapi.yaml's note that every /jobs
+// response, filtered or not, carries the full current facet tree).
 func runFacets(ctx context.Context, f facetsFlags) error {
 	if f.tenant == "" {
 		return errors.New("--tenant is required")
@@ -192,6 +203,13 @@ func runFacets(ctx context.Context, f facetsFlags) error {
 	return nil
 }
 
+// printFacetNode recursively prints one facet tree node. A node with a
+// facetParameter is a group (printed as "facetParameter (descriptor)",
+// descriptor omitted when unset — some top-level groups like
+// locationMainGroup have none); a node without one is a leaf, printed as
+// "descriptor  id=...  count=...". Grouping keys on facetParameter rather
+// than len(Values) so a group whose Values are momentarily empty isn't
+// mis-rendered as a leaf.
 func printFacetNode(node workday.FacetNode, depth int) {
 	indent := strings.Repeat("  ", depth)
 	if param, ok := node.FacetParameter.Get(); ok {
@@ -210,6 +228,9 @@ func printFacetNode(node workday.FacetNode, depth int) {
 	fmt.Printf("%s%s  id=%s  count=%d\n", indent, descriptor, node.ID.Value, count)
 }
 
+// jobResultJSON is the --format json shape for one search result: the
+// search summary merged with its fetched detail (or, if the detail fetch
+// failed, a fallback link plus Error instead of Description).
 type jobResultJSON struct {
 	Title       string   `json:"title"`
 	URL         string   `json:"url"`
@@ -226,6 +247,7 @@ type searchResultJSON struct {
 	Jobs  []jobResultJSON `json:"jobs"`
 }
 
+// searchFlags carries the parsed "search" subcommand flags into runSearch.
 type searchFlags struct {
 	tenant     string
 	timeout    time.Duration
@@ -236,6 +258,11 @@ type searchFlags struct {
 	format     string
 }
 
+// runSearch searches jobs, then fetches full detail for every result
+// (mirrors the nvidia CLI's report behavior: a posting with no ExternalPath is
+// listed with a "no detail available" note rather than silently dropped, so
+// "showing N" always matches the page's posting count) — one page per
+// invocation, no auto-pagination.
 func runSearch(ctx context.Context, f searchFlags) error {
 	if f.tenant == "" {
 		return errors.New("--tenant is required")
@@ -321,6 +348,13 @@ func printResultLocations(r jobResultJSON) {
 	}
 }
 
+// fetchJobResult fetches full detail for one job summary. A detail-fetch
+// failure is non-fatal: it falls back to a derived public site URL and the
+// summary's aggregate LocationsText, and records the error instead of a
+// description, so one bad job doesn't abort the whole search — mirrors the
+// nvidia CLI's existing per-job fallback behavior. A summary with no
+// ExternalPath (an incomplete/transient Workday posting) can't be fetched at
+// all, so it's returned with a "no detail available" note rather than dropped.
 func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, baseURL string, job workday.JobSummary) jobResultJSON {
 	r := jobResultJSON{Title: job.Title.Value, PostedOn: job.PostedOn.Value}
 
@@ -375,6 +409,10 @@ func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, b
 	return r
 }
 
+// setLocations fills both the singular Location (first entry, for quick
+// access) and the full Locations array (only when there's more than one, to
+// avoid a redundant one-element array alongside the singular field) —
+// mirrors the nvidia CLI's printLocations singular/plural distinction.
 func setLocations(r *jobResultJSON, locations ...string) {
 	if len(locations) == 0 {
 		return
@@ -385,6 +423,10 @@ func setLocations(r *jobResultJSON, locations ...string) {
 	}
 }
 
+// fallbackURL builds a best-effort public job link when the detail fetch
+// (which carries the authoritative externalUrl) fails. Falls back to
+// externalPath alone if the base URL can't be resolved to a public site
+// origin either.
 func fallbackURL(baseURL, externalPath string) string {
 	site, err := workday.PublicSiteURL(baseURL)
 	if err != nil {
