@@ -292,15 +292,15 @@ func printJob(board *herp.CompanyBoard, j *herp.Job, format string) error {
 		label string
 		body  string
 	}{
-		{"仕事概要", j.Summary},
-		{"必須スキル", j.RequiredSkills.Or("")},
-		{"歓迎スキル", j.PreferredSkills.Or("")},
-		{"求める人物像", j.Personality.Or("")},
-		{"給与", salaryText(j)},
-		{"勤務地", j.Location},
-		{"勤務体系", j.WorkingConditions.Or("")},
-		{"試用期間", j.Trial.Or("")},
-		{"福利厚生", j.Welfare.Or("")},
+		{label: "仕事概要", body: j.Summary},
+		{label: "必須スキル", body: j.RequiredSkills.Or("")},
+		{label: "歓迎スキル", body: j.PreferredSkills.Or("")},
+		{label: "求める人物像", body: j.Personality.Or("")},
+		{label: "給与", body: salaryText(j)},
+		{label: "勤務地", body: j.Location},
+		{label: "勤務体系", body: j.WorkingConditions.Or("")},
+		{label: "試用期間", body: j.Trial.Or("")},
+		{label: "福利厚生", body: j.Welfare.Or("")},
 	} {
 		if sec.body == "" {
 			continue

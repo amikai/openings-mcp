@@ -69,8 +69,9 @@ func (a *ICIMSAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	if !icimsCareersHostRE.MatchString(host) {
 		return "", false
 	}
-	if strings.HasPrefix(host, "login") || strings.HasPrefix(host, "cdn") ||
-		strings.HasPrefix(host, "api.") || host == "www.icims.com" {
+	isReservedHost := strings.HasPrefix(host, "login") || strings.HasPrefix(host, "cdn") ||
+		strings.HasPrefix(host, "api.") || host == "www.icims.com"
+	if isReservedHost {
 		return "", false
 	}
 	return host, true

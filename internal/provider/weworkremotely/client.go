@@ -241,7 +241,7 @@ type rssMedia struct {
 	URL string `xml:"url,attr"`
 }
 
-func (it rssItem) toJob() Job {
+func (it *rssItem) toJob() Job {
 	company, title := splitTitle(it.Title)
 	return Job{
 		ID:          jobID(it.Link, it.GUID),

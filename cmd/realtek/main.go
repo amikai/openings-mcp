@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/peterbourgon/ff/v4"
@@ -201,7 +202,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		res, err = client.ListJobs(ctx)
 	} else {
 		req := &realtek.FilterJobsReq{
-			Xp: realtek.NewOptString(fmt.Sprintf("%d", f.xp)),
+			Xp: realtek.NewOptString(strconv.Itoa(f.xp)),
 		}
 		if f.keyword != "" {
 			req.Keyword = realtek.NewOptString(f.keyword)

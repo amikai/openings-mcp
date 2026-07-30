@@ -242,10 +242,12 @@ func (a *AvatureAdapter) resolvePortal(slug string) (base, name string, err erro
 	// Careers-URL path: accept an uncurated <host>/<portal> slug, but only
 	// on Avature's own domain — a custom-domain portal cannot be verified
 	// as Avature from its slug alone.
-	if host, portal, ok := strings.Cut(key, "/"); ok &&
-		strings.HasSuffix(host, ".avature.net") && host != ".avature.net" &&
-		portal != "" && !strings.Contains(portal, "/") {
-		return a.baseURL(key), "", nil
+	if host, portal, ok := strings.Cut(key, "/"); ok {
+		isAvatureHost := strings.HasSuffix(host, ".avature.net") && host != ".avature.net"
+		isValidPortal := portal != "" && !strings.Contains(portal, "/")
+		if isAvatureHost && isValidPortal {
+			return a.baseURL(key), "", nil
+		}
 	}
 	return "", "", fmt.Errorf("avature: unknown company %q; pass a roster company or an Avature careers URL", slug)
 }

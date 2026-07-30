@@ -268,7 +268,10 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 
 	g, gCtx := errgroup.WithContext(ctx)
 	g.SetLimit(mokaHRDumpConcurrency)
-	for i := 1; i < len(pages); i++ {
+	for i := range len(pages) {
+		if i == 0 {
+			continue
+		}
 		g.Go(func() error {
 			pageReq := req
 			pageReq.Offset = mokahr.NewOptInt(i * pageSize)

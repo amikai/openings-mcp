@@ -3,6 +3,7 @@ package openingsmcp
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
 	"github.com/jaytaylor/html2text"
@@ -91,17 +92,13 @@ type flowxtraDetailOutput struct {
 
 // flowxtraLocation joins the non-empty location parts.
 func flowxtraLocation(parts ...string) string {
-	out := ""
+	cleaned := make([]string, 0, len(parts))
 	for _, part := range parts {
-		if part == "" {
-			continue
+		if part != "" {
+			cleaned = append(cleaned, part)
 		}
-		if out != "" {
-			out += ", "
-		}
-		out += part
 	}
-	return out
+	return strings.Join(cleaned, ", ")
 }
 
 // flowxtraSalary renders the salary fields as one line, e.g.

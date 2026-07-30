@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -447,7 +448,7 @@ func runFilters(ctx context.Context, f filtersFlags) error {
 			ids := make([]string, 0, len(facet.LocationRows))
 			for _, row := range facet.LocationRows {
 				if id, ok := row.ID.Get(); ok {
-					ids = append(ids, fmt.Sprintf("%d", id))
+					ids = append(ids, strconv.Itoa(id))
 				}
 			}
 			fmt.Printf("  %s: %s\n", facet.Label.Or(""), strings.Join(ids, ", "))

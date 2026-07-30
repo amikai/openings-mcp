@@ -90,7 +90,7 @@ func (f *falsibleString) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
-func (h hit) toJob(siteBaseURL string) Job {
+func (h *hit) toJob(siteBaseURL string) Job {
 	return Job{
 		ID:          permalinkSlug(h.Permalink),
 		ObjectID:    h.ObjectID,

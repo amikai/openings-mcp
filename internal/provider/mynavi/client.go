@@ -13,11 +13,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// MinSalaries are the first-year annual-salary floors (初年度年収) the
+// minSalaries are the first-year annual-salary floors (初年度年収) the
 // search accepts, in units of 10,000 JPY (万円) — the fixed steps of the
 // site's own salary pulldown. Any other value is HTTP 404 upstream, so
 // [Client.Jobs] rejects it client-side.
-var MinSalaries = []int{
+var minSalaries = []int{
 	150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700,
 	800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
 }
@@ -121,8 +121,8 @@ func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	// site's canonical list URLs end with "/".
 	segs := []string{"list"}
 	if r.MinSalary != 0 {
-		if !slices.Contains(MinSalaries, r.MinSalary) {
-			return "", fmt.Errorf("min salary %d万円 is not a value the site accepts; valid steps: %v", r.MinSalary, MinSalaries)
+		if !slices.Contains(minSalaries, r.MinSalary) {
+			return "", fmt.Errorf("min salary %d万円 is not a value the site accepts; valid steps: %v", r.MinSalary, minSalaries)
 		}
 		segs = append(segs, fmt.Sprintf("min%04d", r.MinSalary))
 	}
