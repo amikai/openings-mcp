@@ -278,7 +278,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", hc)
 
-	cApple, err := apple.NewJobsClient("https://jobs.apple.com", hc)
+	cApple, err := apple.NewJobsClient(apple.DefaultBaseURL, hc)
 	if err != nil {
 		return fmt.Errorf("create Apple client: %w", err)
 	}

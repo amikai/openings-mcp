@@ -11,6 +11,9 @@ import (
 	"sync"
 )
 
+// DefaultBaseURL is the public base URL for Apple Careers.
+const DefaultBaseURL = "https://jobs.apple.com"
+
 const (
 	defaultLocale    = SearchJobsRequestLocaleEnUs
 	longDateFormat   = DateFormatLongDateMMMMDYYYY

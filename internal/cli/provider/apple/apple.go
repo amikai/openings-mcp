@@ -17,8 +17,7 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://jobs.apple.com"
-	jsonFormat     = "json"
+	jsonFormat = "json"
 )
 
 type options struct {
@@ -66,7 +65,7 @@ func NewCommand() *cobra.Command {
 		SilenceUsage: true,
 	}
 
-	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", defaultBaseURL, "Apple Jobs API base URL")
+	rootCmd.PersistentFlags().StringVar(&opts.baseURL, "base-url", apple.DefaultBaseURL, "Apple Jobs API base URL")
 	rootCmd.PersistentFlags().DurationVar(&opts.timeout, "timeout", 60*time.Second, "request timeout")
 	rootCmd.PersistentFlags().StringVar(&opts.format, "format", "text", "output format (text|json)")
 
