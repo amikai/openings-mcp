@@ -8,6 +8,7 @@ OPENAPI_SPECS := \
 	internal/provider/cake/openapi.yaml \
 	internal/provider/eightfold/openapi.yaml \
 	internal/provider/flowxtra/openapi.yaml \
+	internal/provider/fourdayweek/openapi.yaml \
 	internal/provider/foxconn/openapi.yaml \
 	internal/provider/google/openapi.yaml \
 	internal/provider/greenhouse/openapi.yaml \
