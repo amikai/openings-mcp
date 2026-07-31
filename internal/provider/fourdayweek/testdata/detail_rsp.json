@@ -1,0 +1,208 @@
+{
+    "id": "019fb058-46be-7dca-95c4-41cc572cc20b",
+    "slug": "senior-infrastructure-engineer-at-buffer-38679a55",
+    "title": "Senior Infrastructure Engineer",
+    "description": "### About Buffer\n\nWe create social media and brand-building software for small businesses, creators, and individuals. Our mission is to provide essential tools to help small businesses get off the ground and grow. Through exceptional customer service and uplifting content, we help our customers believe they can succeed and do good along the way.\n\nBuffer is a fully distributed team, and we've always aimed to do things a little differently at Buffer. Since the early days, we've focused on building one of the most unique and fulfilling workplaces by rethinking a lot of traditional practices. We also default to transparency, so you can read all about our metrics, and our successes and failures along the way on our [Transparency Dashboard](https://buffer.com/open).\n\nWe're united by Buffer's [values](https://buffer.com/about#values), and we hire and work from all over the world. We strive to create a diverse and inclusive work environment, and we are building a culture where underrepresented groups are welcome and can flourish. Please note that we do travel to work together in person once or twice per year, and those events are highly encouraged to build deeper connections among our small team.\n\nAs you get to know Buffer and consider joining the journey, you can learn more about Buffer on our [Journey](https://buffer.com/journey) page. Still curious to learn more about the experience on the Buffer team? Feel free to read more from [Kirsti](https://buffer.com/resources/first-30-days-buffer/) and [Sabreen](https://buffer.com/resources/joined-3-days-before-the-retreat/) as they share their first experiences with Buffer, as well as from [Hailley](https://buffer.com/resources/8-years-at-buffer/), who captured why she still calls Buffer home after 8+ years.\n\n### About the role\n\nAs Buffer's next Senior Infrastructure Engineer, you'll join two seasoned Infrastructure Engineers on a small, deliberate, high-leverage team. Together, you'll run the platform that lets every Buffer engineer ship, and that indirectly lets millions of creators publish, grow, and earn a living on the social web. When our infrastructure is fast and reliable, creators get features sooner and outages less often.\n\nYou'll own a meaningful slice of three shifts the team is making.\n\n- **Keeping the lights on at a higher bar.** You'll make our CI/CD pipelines faster and even more anti-fragile, ship boring deploys, and turn each incident into a new lesson rather than a repeat.\n\n- **Modernizing the foundation.** Buffer is not new, but our Infra is in continuous improvement. From deploying KEDA and Argo Rollouts to improving our signal-to-noise ratio in monitoring, there is plenty to do. One cannot talk about modernization without mentioning AI. We're already leaning on it for investigations and boilerplate, and want to bring it deeper into our day-to-day.\n\n- **Treating engineers across Buffer as customers.** You'll evolve the developer tooling that makes the inner loop fast, with documentation that holds up at 2am or when consumed by an agent.\n\n\nWe're remote-first with a preference for at least 4 hours of overlap with EMEA time zones, but we're open to strong candidates anywhere in the world.\n\nIt's an exciting time to join. Buffer is a profitable, 15-year-old company innovating at the edge of AI-assisted development, and there's lots of impactful work to do.\n\n### Who you'll work with\n\nIn this role, you'll report to [Miguel](https://www.linkedin.com/in/migueldavid/), the Infrastructure Engineering Manager.\n\nDay-to-day you'll work closely with [Peter](https://www.linkedin.com/in/peter-emil/) and [Steven](https://www.linkedin.com/in/stevenc81/), who have helped build the infrastructure we run on since the beginning of Buffer. We're looking to round out the team with someone who sits between infra and developer experience: deep infra expertise paired with an infra-as-a-product mindset.\n\nYou'll also work daily with all of EPD (Buffer's unified Engineering, Product, and Design team). EPD are the internal customers of the platform you maintain, and they contribute to it too.\n\n### What you'll be working on\n\n- **Own** the day-to-day reliability of our production platform. Keep EKS, ArgoCD, and the AWS surface area boring, tune autoscaling so the system adjusts well under load, and approach incident response in a way that each incident teaches us something new instead of repeating itself. (On-call is distributed across all engineers at Buffer, a week-long shift roughly once a quarter.)\n\n- **Build** progressive delivery into something the rest of engineering trusts. Implement Argo Rollouts with clean rollback paths, so the time between \"this deploy is bad\" and \"this deploy is reverted\" measures in seconds to minutes.\n\n- **Build** developer tools as products, instead of loose scripts. Evolve our in-house local development environment, [BIBEs](https://peteremil.com/buffers-bibes/) (Buffer Isolated Build Environments, per-PR full-stack staging deployments), and our CLI tooling so the inner loop is fast, frictionless, and parallel-friendly for AI agents. Measure adoption, talk to your users, iterate.\n\n- **Reduce** operational toil with AI. Automate low-risk workflows end-to-end so the team spends its time on the hard problems, not the repeat ones. AI doesn't touch infrastructure directly, it speeds up the humans who do.\n\n- **Keep** the stack current. Drive lifecycle upgrades: application runtimes (Node.js, Python), Kubernetes, EKS, Helm versions, and the Terraform-managed surface area. Own infra-side security vulnerabilities.\n\n- **Improve** the economics of our platform. Lead visibility work on Datadog, AWS rightsizing, and log filters so observability and cloud spend grow slower than the company does.\n\n- **Partner** with EPD on the platform they build on. Raise the documentation bar with the team, carry your share of weekly security work (dependency and vulnerability management is everyone's job), and help the infra team grow toward shared ownership and fewer single-person dependencies.\n\n\n### Helpful skills and experience\n\n- You've worked as an Infrastructure Engineer, SRE, \"DevOps\" engineer, or adjacent role for long enough to be considered senior.\n\n- You have hands-on experience operating production Kubernetes at scale on a managed offering (GKE, EKS, AKS), including authoring and maintaining Helm charts, and you're fluent with autoscaling primitives driving KEDA and the cluster auto scaler.\n\n- You have AWS depth across IAM, EC2, S3, SQS, ECR, and ALBs. You may have also used Cloudflare (WAF, Workers, etc.) and GCP (BigQuery).\n\n- You have strong Terraform skills. You default to modules for structure, and keep the code adaptable, readable, and self-contained. Bonus points if you contributed an OSS module.\n\n- You've operated production CI/CD with GitHub Actions (or equivalent) and GitOps via ArgoCD (or similar). You've authored ArgoCD pipelines and Helm configuration yourself, including canary or progressive delivery systems you'd trust to roll back safely.\n\n- You've built internal developer tools (CLIs, dev environments, per-PR environments) and you think about them as products with users, not scripts.\n\n- You have a track record of pragmatic build-vs-buy decisions on infrastructure tooling. You can defend a choice and revisit it when conditions change.\n\n- You've worked with DataDog, Sentry, or similar observability stacks, and you design logs and metrics with cost in mind. You know observability and cloud spend can grow faster than the company if no one is watching.\n\n- You're comfortable with the Cloudflare across Workers, Zero Trust, DNS, and the rest of their platform.\n\n- You read and modify TypeScript or Node services well enough to upgrade runtimes and unblock teams (legacy PHP and Python show up too).\n\n- You're fluent with modern AI tools. You use them to debug, document, and reduce toil, not just to generate code, and you bring those patterns into how infra runs.\n\n- You're proactive and you follow through. You spot what needs doing before you're asked, and you close the loop without being chased.\n\n- You turn ambiguity into proofs of concept. You take fuzzy asks, ship something rough teammates can react to, and iterate with them until it lands.\n\n- You thrive in remote, asynchronous environments. You're clear in your thinking, generous with context.\n\n- You don't wait for perfect information to start, and you don't wait for perfect to ship.\n\n- You see infra as a force multiplier for engineering, not a gatekeeper.\n\n- You care about Buffer's customers. When things are slow for them it's painful for you to see. When errors are flaky you find the root cause and try to eliminate the entire class of problem, because you see the system, not the bug.\n\n- You care about performance. If it's too slow to use, it shouldn't exist. You'd rather make it fast than work around it.\n\n- You're a generalist engineer with strong spikes: T-shaped folks with depth in infrastructure and the flexibility to pivot as priorities shift.\n\n- You create, not just consume. Open source contributions, a technical blog, conference talks, side projects, or active accounts on the platforms Buffer serves, your pick. We're a Team of Creators ourselves, and the closer infra is to the creator's experience, the better the platform becomes.\n\n- You think about infrastructure as a platform with users. APIs, SDKs, CLIs, MCP servers, or developer-facing tooling you've shipped where adoption, not just deployment, was the success metric. You've felt the difference between code that ships and code that gets used.\n\n- You play the long game. You'd rather invest in compounding fundamentals than chase the platform-of-the-month.\n\n- Bonus points if you're already a Buffer user or familiar with social media management tools.\n\n\n### Our tech stack\n\n- **Cloud and IaC.** AWS, GCP, Cloudflare. Products you'll find in use here: EC2, EKS, S3, SQS, SNS, ECR, IAM, ALB, BigQuery, mostly managed in Terraform.\n\n- **Container orchestration and delivery.** Kubernetes on EKS, Helm for charting, KEDA for SQS-driven autoscaling. ArgoCD for deploys from git. An in-house canary system that we want to augment with Argo Rollouts. BIBEs and frontend branch deployments for per-PR previews.\n\n- **CI/CD.** GitHub Actions, with self-hosted AWS runners (including KVM-capable instances for Android UI tests). Our monorepo is the consolidation target, and we're moving more services into it over time.\n\n- **Observability and incidents.** Datadog for logs, metrics, APM, and spans. Sentry for errors. [Incident.io](https://incident.io) (and a bit of PagerDuty) for the incident lifecycle and postmortems.\n\n- **Networking and DNS.** Cloudflare across Workers, Zero Trust, DNS, and more. CloudFront for AWS-side distribution. VPC peering for cross-account connectivity. OctoDNS for DNS-as-code.\n\n- **Data stores.** MongoDB fronted by GraphQL, Elasticsearch, Redis.\n\n- **Local development.** Hermes (our in-house environment that mirrors production) running in OrbStack, pre-built production containers from ECR.\n\n- **Languages and runtimes.** Node.js and TypeScript across most services, Python in selected services and tooling, and PHP for legacy services that are still load-bearing and being gradually replaced.\n\n\n### Interview process\n\nDo you believe you're a fit for this role and want to join the Buffer team? We'd love to hear about you!\n\nHere's what the hiring process will look like:\n\n1. **Application.** Apply to join the team through the form below.\n\n   - When submitting your application and resume, take your time. This is your chance to make a strong first impression.\n\n   - While we have a couple of engineering roles open, we recommend applying to only one role. If during our review or interviews we think you'd be great for a different position, we'll re-route your application internally.\n\n   - Response times can take a few days to weeks. We're a small team reviewing every application carefully.\n2. **Hiring manager interview.** Chat with the hiring manager for your role ([Miguel, Engineering Manager](https://www.linkedin.com/in/migueldavid/)) and another Engineering Leader to understand what it takes to work at Buffer. This is an opportunity for both sides to get to know each other and determine whether our expectations align.\n\n3. **Take-home exercise.** We'll send you a two-page max asynchronous assignment to review a system or scenario to help us understand how you think about systems, assumptions and communication of technical ideas.\n\n4. **Technical interview.** Interview with two Infrastructure Engineers from Buffer ([Peter](https://www.linkedin.com/in/peter-emil/) and [Steven](https://www.linkedin.com/in/stevenc81/)) focusing on your technical experience and approach.\n\n5. **Leadership interview.** A conversation with one or two Engineering Leaders to discuss your approach to leadership, how we drive value and impact in a cross-functional company, and to really get into how you think about approaching work and collaboration.\n\n6. **Final interview.** You will have the opportunity to meet with our Executive Leadership team. This is a great chance for you to gain a deeper understanding of Buffer's strategy, values, and work processes.\n\n7. **Collaboration period.** This is a stage where you would work with us on a real project over two days (fully paid). The goal is to see how it feels to work in the team, both for us and for you. You'll meet a few Bufferoos, we'll kick off the project, invite you to a Slack channel, and you'll collaborate with the team on it.\n\n8. **Offer.** We wrap it up with an offer and discuss the final details. We would align on the last bits before we make you part of the Buffer team \ud83d\udc9b\n\n\n_At Buffer, we value diversity of experience, and we understand that comes in many forms. We're dedicated to adding new perspectives to the team. So, if your experience is close to what we're looking for, please consider applying._\n\n_By submitting the application, you consent to Buffer collecting and processing your personal data for recruiting purposes, find more details in our_ [_Privacy Policy_](https://buffer.notion.site/Privacy-Policy-for-Applicants-230a7f5a00fd80e48478f09171d18a24?pvs=143) _._",
+    "url": "https://4dayweek.io/job/senior-infrastructure-engineer-at-buffer-38679a55",
+    "category": "devops",
+    "role": "Infrastructure Engineer",
+    "level": "senior",
+    "contract_type": "permanent",
+    "schedule_type": "4_day_week",
+    "hours_per_week_min": 32,
+    "hours_per_week_max": 32,
+    "work_arrangement": "remote",
+    "timezones": [
+        "UTC+0"
+    ],
+    "salary_min": 16459500,
+    "salary_max": 21274400,
+    "salary_currency": "USD",
+    "salary_period": "year",
+    "skills": [
+        {
+            "name": "Asynchronous Communication",
+            "slug": "asynchronous-communication"
+        },
+        {
+            "name": "CI/CD",
+            "slug": "ci-cd"
+        },
+        {
+            "name": "Cloud Architecture",
+            "slug": "cloud-architecture"
+        },
+        {
+            "name": "DevOps",
+            "slug": "devops"
+        },
+        {
+            "name": "Developer Experience",
+            "slug": "developer-experience"
+        },
+        {
+            "name": "Incident Response",
+            "slug": "incident-response"
+        },
+        {
+            "name": "Infrastructure as Code",
+            "slug": "infrastructure-as-code"
+        },
+        {
+            "name": "Kubernetes",
+            "slug": "kubernetes"
+        },
+        {
+            "name": "Observability",
+            "slug": "observability"
+        },
+        {
+            "name": "Performance Optimization",
+            "slug": "performance-optimization"
+        },
+        {
+            "name": "Progressive delivery",
+            "slug": "progressive-delivery"
+        },
+        {
+            "name": "Security",
+            "slug": "security"
+        },
+        {
+            "name": "System Design",
+            "slug": "system-design"
+        }
+    ],
+    "stack": [
+        {
+            "name": "Elasticsearch",
+            "slug": "elasticsearch"
+        },
+        {
+            "name": "GraphQL",
+            "slug": "graphql"
+        },
+        {
+            "name": "Kubernetes",
+            "slug": "kubernetes"
+        },
+        {
+            "name": "MongoDB",
+            "slug": "mongodb"
+        },
+        {
+            "name": "Node.js",
+            "slug": "nodejs"
+        },
+        {
+            "name": "PHP",
+            "slug": "php"
+        },
+        {
+            "name": "Python",
+            "slug": "python"
+        },
+        {
+            "name": "Redis",
+            "slug": "redis"
+        },
+        {
+            "name": "TypeScript",
+            "slug": "typescript"
+        }
+    ],
+    "tools": [
+        {
+            "name": "ALB",
+            "slug": "alb"
+        },
+        {
+            "name": "AWS",
+            "slug": "aws"
+        },
+        {
+            "name": "ArgoCD",
+            "slug": "argocd"
+        },
+        {
+            "name": "BigQuery",
+            "slug": "bigquery"
+        },
+        {
+            "name": "Cloudflare",
+            "slug": "cloudflare"
+        },
+        {
+            "name": "Datadog",
+            "slug": "datadog"
+        },
+        {
+            "name": "ECR",
+            "slug": "ecr"
+        },
+        {
+            "name": "EKS",
+            "slug": "eks"
+        },
+        {
+            "name": "GCP",
+            "slug": "gcp"
+        },
+        {
+            "name": "GitHub Actions",
+            "slug": "github-actions"
+        },
+        {
+            "name": "Helm",
+            "slug": "helm"
+        },
+        {
+            "name": "KEDA",
+            "slug": "keda"
+        },
+        {
+            "name": "OctoDNS",
+            "slug": "octodns"
+        },
+        {
+            "name": "Orbstack",
+            "slug": "orbstack"
+        },
+        {
+            "name": "S3",
+            "slug": "s3"
+        },
+        {
+            "name": "SNS",
+            "slug": "sns"
+        },
+        {
+            "name": "SQS",
+            "slug": "sqs"
+        },
+        {
+            "name": "Sentry",
+            "slug": "sentry"
+        },
+        {
+            "name": "Terraform",
+            "slug": "terraform"
+        }
+    ],
+    "posted_at": "2026-07-30T00:06:43Z",
+    "company": {
+        "id": "019b776b-3d19-7efc-9aaf-01f7c5a47fc9",
+        "slug": "buffer",
+        "name": "Buffer",
+        "url": "https://4dayweek.io/company/buffer",
+        "website": "https://buffer.com/",
+        "logo_url": "https://media.4dayweek.io/files/1767277998734_3b9d1ad18de28680.jpg",
+        "short_description": "A fully remote social media management platform championing a more human way to work with 4-day workweeks and a global team across 15 countries.",
+        "country": "United States",
+        "employees": 73,
+        "schedule_type": "4_day_week",
+        "hours_full_time": 32,
+        "remote_level": "fully-remote",
+        "hires_worldwide": true
+    }
+}
