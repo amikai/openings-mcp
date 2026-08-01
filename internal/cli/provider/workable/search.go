@@ -15,7 +15,7 @@ func searchCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "search",
 		Usage:     "search jobs for a company",
-		UsageText: "workable search --company COMPANY [--keyword TEXT] [--country C] [--region R] [--city CITY] [--department-id ID] [--workplace W] [--worktype W] [--remote] [--page-token CURSOR]",
+		UsageText: "openings-cli workable search --company COMPANY [--keyword TEXT] [--country C] [--region R] [--city CITY] [--department-id ID] [--workplace W] [--worktype W] [--remote] [--page-token CURSOR]",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "company",
@@ -39,7 +39,7 @@ func searchCmd() *cli.Command {
 			},
 			&cli.IntFlag{
 				Name:  "department-id",
-				Usage: "numeric department id from 'workable filters' (not the display name)",
+				Usage: "numeric department id from 'openings-cli workable filters' (not the display name)",
 			},
 			&cli.StringFlag{
 				Name:  "workplace",

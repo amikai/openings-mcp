@@ -14,7 +14,7 @@ func detailCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "detail",
 		Usage:     "print full description of a job",
-		UsageText: "workable detail --company COMPANY --shortcode SHORTCODE",
+		UsageText: "openings-cli workable detail --company COMPANY --shortcode SHORTCODE",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "company",

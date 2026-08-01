@@ -10,6 +10,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/urfave/cli/v3"
 
 	provider "github.com/amikai/openings-mcp/internal/provider/workable"
 )
@@ -20,7 +21,7 @@ func TestNormalizeCompany(t *testing.T) {
 	t.Run("unknown company", func(t *testing.T) {
 		_, err := normalizeCompany(provider.MockUnknownCompany)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "not found; run 'workable companies' to see supported companies")
+		assert.Contains(t, err.Error(), "not found; run 'openings-cli workable companies' to see supported companies")
 	})
 
 	t.Run("mixed-case input resolves to roster casing", func(t *testing.T) {
@@ -106,6 +107,47 @@ func TestEndToEnd(t *testing.T) {
 	})
 }
 
+// TestMounted runs NewCmd() the way cmd/openings-cli does — as a subcommand of
+// a parent — because that changes what cmd.Root() resolves to and which help
+// the "a subcommand is required" path prints. The other tests drive NewCmd()
+// standalone, so without this the mounted arrangement would go untested.
+func TestMounted(t *testing.T) {
+	srv := provider.NewMockServer()
+	defer srv.Close()
+
+	run := func(args ...string) (string, string, error) {
+		var out, errOut bytes.Buffer
+		root := &cli.Command{
+			Name:      "openings-cli",
+			Writer:    &out,
+			ErrWriter: &errOut,
+			Commands:  []*cli.Command{NewCmd()},
+		}
+		err := root.Run(context.Background(), append([]string{"openings-cli"}, args...))
+		return out.String(), errOut.String(), err
+	}
+
+	t.Run("leaf runs and writes to the root's writer", func(t *testing.T) {
+		out, _, err := run("workable", "--base-url", srv.URL, "search", "--company", "blueground")
+		require.NoError(t, err)
+		assert.JSONEq(t, upstreamFixture(t, "jobs_rsp.json"), out)
+	})
+
+	t.Run("provider flags reach the leaf from either side of it", func(t *testing.T) {
+		out, _, err := run("workable", "search", "--base-url", srv.URL, "--company", "blueground")
+		require.NoError(t, err)
+		assert.JSONEq(t, upstreamFixture(t, "jobs_rsp.json"), out)
+	})
+
+	t.Run("provider without a subcommand errors and prints its own help", func(t *testing.T) {
+		out, _, err := run("workable")
+		require.Error(t, err)
+		assert.EqualError(t, err, "a subcommand (companies, search, detail, or filters) is required")
+		assert.Contains(t, out, "openings-cli workable", "should print workable's help, not the root's")
+		assert.Contains(t, out, "companies")
+	})
+}
+
 func TestErrorCases(t *testing.T) {
 	srv := provider.NewMockServer()
 	defer srv.Close()
@@ -119,7 +161,7 @@ func TestErrorCases(t *testing.T) {
 	t.Run("company not in roster is rejected before any HTTP call", func(t *testing.T) {
 		_, _, err := runCLI(t, srv.URL, "search", "--company", provider.MockUnknownCompany)
 		require.Error(t, err)
-		assert.Contains(t, err.Error(), "not found; run 'workable companies' to see supported companies")
+		assert.Contains(t, err.Error(), "not found; run 'openings-cli workable companies' to see supported companies")
 	})
 
 	t.Run("--workplace bogus", func(t *testing.T) {

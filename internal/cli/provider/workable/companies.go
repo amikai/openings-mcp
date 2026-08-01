@@ -13,7 +13,7 @@ func companiesCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "companies",
 		Usage:     "list every curated Workable company's account slug, one per line",
-		UsageText: "workable companies",
+		UsageText: "openings-cli workable companies",
 		Action: func(ctx context.Context, cmd *cli.Command) error {
 			if err := rejectArgs(cmd); err != nil {
 				return err

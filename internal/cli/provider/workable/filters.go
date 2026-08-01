@@ -14,7 +14,7 @@ func filtersCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "filters",
 		Usage:     "list a company's search facets",
-		UsageText: "workable filters --company COMPANY",
+		UsageText: "openings-cli workable filters --company COMPANY",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:  "company",

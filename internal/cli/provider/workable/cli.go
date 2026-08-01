@@ -10,15 +10,19 @@ import (
 	provider "github.com/amikai/openings-mcp/internal/provider/workable"
 )
 
-// NewCmd builds the "workable" root command and its four subcommands
-// companies/search/detail/filters. --timeout and --base-url sit here because
-// every subcommand that talks to the API needs them; --company is declared
-// per subcommand instead, so "companies" does not advertise a flag it ignores.
+// NewCmd builds the "workable" command and its four subcommands
+// companies/search/detail/filters, for cmd/openings-cli to mount. Being
+// mounted rather than standalone is why the Action calls ShowSubcommandHelp
+// and not ShowAppHelp, which would print the parent's help instead.
+//
+// --timeout and --base-url sit here because every subcommand that talks to the
+// API needs them; --company is declared per subcommand instead, so "companies"
+// does not advertise a flag it ignores.
 func NewCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "workable",
 		Usage:     "debug CLI for the Workable job board API",
-		UsageText: "workable [FLAGS] <companies|search|detail|filters> [FLAGS]",
+		UsageText: "openings-cli workable [FLAGS] <companies|search|detail|filters> [FLAGS]",
 		Flags: []cli.Flag{
 			&cli.DurationFlag{
 				Name:  "timeout",
@@ -33,7 +37,7 @@ func NewCmd() *cli.Command {
 			},
 		},
 		Action: func(ctx context.Context, cmd *cli.Command) error {
-			cli.ShowAppHelp(cmd)
+			cli.ShowSubcommandHelp(cmd)
 			return errors.New("a subcommand (companies, search, detail, or filters) is required")
 		},
 		Commands: []*cli.Command{

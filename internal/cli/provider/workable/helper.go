@@ -27,7 +27,7 @@ func normalizeCompany(company string) (string, error) {
 	}
 	c, ok := provider.CompaniesByAccount[strings.ToLower(company)]
 	if !ok {
-		return "", fmt.Errorf("company %q not found; run 'workable companies' to see supported companies", company)
+		return "", fmt.Errorf("company %q not found; run 'openings-cli workable companies' to see supported companies", company)
 	}
 	return c.Account, nil
 }
