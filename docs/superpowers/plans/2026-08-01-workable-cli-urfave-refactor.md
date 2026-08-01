@@ -295,3 +295,42 @@ so the sections above are not read as the current state.
   were lost. Usage lines now live in `UsageText` and the descriptions are back
   in `Usage`. `--remote`'s help text, still reading `true or false` from when it
   was a string flag, was rewritten for the bool tri-state.
+- **The CLI stopped reshaping what it prints.** `summarize()` is gone: it picked
+  seven fields out of each search result, joined department, reformatted the
+  date, and synthesized a `url` the API never returns — while `detail` and
+  `filters` passed their responses straight through, so the list view carried a
+  URL the single view did not. That inconsistency was the tell that the shaping
+  was product work, which belongs in the MCP layer, not in a tool whose job is
+  showing what upstream sent. `search` now emits `SearchResponse` as-is.
+
+  Deliberately *not* done: dumping the raw HTTP body. It was measured — the
+  ogen-generated decoder silently drops any field `openapi.yaml` does not
+  declare, so going through the client is lossy — but bypassing the client would
+  show fields the provider package can never return, breaking the correspondence
+  between what this CLI prints and what the MCP server can serve. Spec drift is
+  the hurl fixtures' job.
+- **Output is compact, not indented.** `SetIndent` is gone on the same grounds:
+  pretty-printing is a presentation choice, and `jq` makes it better. With that,
+  `encodeJSON` wrapped a single line and was inlined into its three call sites.
+- **The golden files are gone.** Once `search` stopped reshaping, all five were
+  byte-for-byte copies of the hurl fixtures in
+  `internal/provider/workable/testdata` that `NewMockServer` already replays —
+  verified by asserting equality before deleting them. The tests read those
+  fixtures directly, so the expectation is bytes recorded from Workable rather
+  than bytes produced by the code under test, and the assertion is now the
+  property the CLI is built around: output equals the API response.
+- **`cmd/workable` became `cmd/openings-cli workable`.** One binary with a
+  subcommand per provider, rather than a binary and a `main.go` per provider;
+  the next provider is one line. `cmd/workable` was removed rather than kept as
+  a second way to run the same code.
+
+  Mounting the command under a parent broke three things, each found by running
+  it: `cli.ShowAppHelp` prints the *outermost* command's help, so
+  `openings-cli workable` described the wrong command (now
+  `ShowSubcommandHelp`); `UsageText` is printed verbatim, with urfave prefixing
+  the parent chain onto the NAME line but not onto USAGE; and two user-facing
+  strings still told the reader to run `workable companies` /
+  `workable filters`. `--timeout` and `--base-url` needed nothing — on the
+  intermediate command they still reach the leaf, from either side of it.
+  `TestMounted` covers the arrangement, since every other test drives `NewCmd()`
+  standalone and the two differ in what `cmd.Root()` resolves to.
