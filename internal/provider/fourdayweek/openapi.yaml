@@ -1,0 +1,507 @@
+openapi: 3.1.0
+info:
+  title: 4dayweek.io Public API (v2 subset)
+  version: "1.0.0"
+  description: >
+    Free, no-auth JSON API for every live job on 4dayweek.io. Trimmed from the
+    official spec at https://4dayweek.io/openapi.yaml to the v2 endpoints this
+    client uses, and corrected against live responses captured on 2026-07-31.
+
+
+    The official spec also documents a legacy `/api/v1` endpoint. It is omitted
+    here: v2 returns a superset of the same jobs in a richer shape, and v1
+    honors only `page`/`limit` (every other filter is ignored by design).
+
+
+    Deviations from the official spec, each confirmed absent across 700 live
+    jobs (400 unfiltered + 300 `work_arrangement=remote`):
+
+    * `is_remote` is declared required on `V2Job` but is never returned. Derive
+      remoteness from `work_arrangement` instead.
+
+    * `office_locations` and `remote_allowed` are never returned. A single
+      `locations` array carries both, tagged per entry with its own
+      `work_arrangement` plus `is_primary`, `latitude` and `longitude` — none
+      of which the official spec mentions. Its documented `region` field is
+      never returned.
+
+    * `expires_at` (job) and `work_life_score` (company) are never returned.
+
+    * `V2Job.description` is documented as plain text. It is Markdown: headings,
+      bold and bullet lists appear in 662 of 700 sampled descriptions. It is
+      reliably not HTML — zero sampled descriptions contained tags.
+
+
+    Response conventions confirmed over the same sample: absent data is
+    *omitted*, never `null`, and array fields are omitted rather than sent
+    empty. Scalars are still marked nullable per this repo's convention so an
+    upstream `null` cannot crash decoding; identifier fields are exempt.
+
+
+    Rate limit is 60 requests per minute per IP, answered with HTTP 429 and a
+    `Retry-After` header. Responses carry `Cache-Control: public, max-age=60`.
+
+servers:
+  - url: https://4dayweek.io
+    description: Production
+
+paths:
+  /api/v2/jobs:
+    get:
+      operationId: searchJobs
+      summary: List live jobs
+      description: >
+        Paginated, filterable job listings. Every filter below is applied
+        server-side — verified on 2026-07-31, where the unfiltered board
+        reported 22207 jobs, `work_arrangement=remote` narrowed it to 6177,
+        and adding `country=Germany` plus `schedule=4_day_week` narrowed it
+        to 3.
+      parameters:
+        - name: page
+          in: query
+          description: 1-based page number.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: >
+            Jobs per page. Values above the maximum are silently clamped to
+            100 rather than rejected.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 25
+        - name: category
+          in: query
+          description: >
+            Comma-separated category slugs. Observed domain: content,
+            customer-success, data, design, devops, engineering, finance, hr,
+            legal, marketing, operations, other, product, sales, security.
+          schema:
+            type: string
+        - name: level
+          in: query
+          description: >
+            Comma-separated seniority slugs. Observed domain: entry, mid,
+            senior, lead, executive.
+          schema:
+            type: string
+        - name: schedule
+          in: query
+          description: >
+            Comma-separated schedule types. See `Job.schedule_type` for the
+            observed domain and what each value actually promises.
+          schema:
+            type: string
+        - name: work_arrangement
+          in: query
+          description: Comma-separated work arrangements (onsite, hybrid, remote).
+          schema:
+            type: string
+        - name: skills
+          in: query
+          description: Comma-separated skill slugs (e.g. python,go).
+          schema:
+            type: string
+        - name: country
+          in: query
+          description: >
+            Country name, matched against *any* of the job's locations
+            regardless of that location's own `work_arrangement`. Takes the
+            `locations[].country` display form (e.g. "Germany", "United
+            States"), not an ISO code.
+
+
+            Combining this with `work_arrangement=remote` does not mean
+            "remote-workable from this country" — the two filters are applied
+            independently. A captured example: `work_arrangement=remote` plus
+            `country=Germany` returns a job whose only German location is an
+            onsite Berlin office, its remote-allowed location being France.
+            Callers that need the joint meaning have to re-check
+            `locations[]` themselves.
+          schema:
+            type: string
+        - name: salary_min
+          in: query
+          description: >
+            Minimum salary in USD *whole dollars* (e.g. 120000). Note the unit
+            mismatch with the response: `V2Job.salary_min` is in cents.
+          schema:
+            type: integer
+            minimum: 0
+        - name: salary_max
+          in: query
+          description: Maximum salary in USD whole dollars. Same unit mismatch as salary_min.
+          schema:
+            type: integer
+            minimum: 0
+        - name: posted_after
+          in: query
+          description: Posted within the last N days. Capped at 365.
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 365
+        - name: q
+          in: query
+          description: Full-text search across the listing.
+          schema:
+            type: string
+        - name: sort
+          in: query
+          description: >
+            Sort order. An unrecognized value is a hard 400, not a fallback to
+            the default.
+          schema:
+            type: string
+            enum: [date, salary]
+            default: date
+      responses:
+        "200":
+          description: Matching jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobList"
+        "400":
+          description: Invalid query parameter.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /api/v2/jobs/{slug}:
+    get:
+      operationId: getJob
+      summary: Get a single job by slug
+      description: >
+        Looks a job up by the `slug` a listing returned. The payload is exactly
+        the same `Job` shape a listing carries — this endpoint refreshes a
+        single job, it does not enrich one, so there is no reason to follow up
+        a search with a detail call for extra fields.
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          description: Job slug from `Job.slug`.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: The job.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "404":
+          description: No live job with that slug.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+components:
+  responses:
+    RateLimited:
+      description: Rate limit exceeded (60 requests per minute per IP).
+      headers:
+        Retry-After:
+          schema:
+            type: integer
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+
+  schemas:
+    ErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          $ref: "#/components/schemas/ErrorBody"
+
+    ErrorBody:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: integer
+          description: Repeats the HTTP status code.
+          example: 404
+        message:
+          type: string
+          example: Job not found
+        field:
+          type: string
+          nullable: true
+          description: Offending query parameter, when the error is attributable to one.
+
+    JobList:
+      type: object
+      required: [data, page, limit, total, has_more]
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        page:
+          type: integer
+        limit:
+          type: integer
+          description: Effective page size after clamping, not the requested one.
+        total:
+          type: integer
+          description: Total jobs matching the filters, across all pages.
+        has_more:
+          type: boolean
+
+    Job:
+      type: object
+      description: >
+        A live job listing. Only the fields the upstream marks required are
+        required here; everything else was observed missing on at least one of
+        700 sampled jobs. Notably `locations` is absent on fully-remote jobs
+        with no office, and `company` was absent on 4 of 300 remote jobs.
+      required: [id, slug, title, url, work_arrangement, posted_at]
+      properties:
+        id:
+          type: string
+          description: UUID string. Stable identifier.
+        slug:
+          type: string
+          description: Lookup key for GET /api/v2/jobs/{slug}.
+        title:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+          description: Markdown, never HTML. See the deviations note in `info`.
+        url:
+          type: string
+          format: uri
+          description: Canonical job page on 4dayweek.io.
+        category:
+          type: string
+          nullable: true
+          description: Category slug. Same domain as the `category` query parameter.
+        role:
+          type: string
+          nullable: true
+          description: Normalized role slug, finer-grained than `category`.
+        level:
+          type: string
+          nullable: true
+          description: Seniority slug. Same domain as the `level` query parameter.
+        contract_type:
+          type: string
+          nullable: true
+          enum: [permanent, contract, freelance]
+          description: The official spec enumerates this set exhaustively.
+        schedule_type:
+          type: string
+          nullable: true
+          description: >
+            What the schedule actually promises. Deliberately not an enum: the
+            upstream documents the domain in prose but leaves the field open,
+            so new values are expected. Observed: 4_day_week (36h or less at
+            100% salary — the only value that means reduced hours at full pay),
+            4_day_week_pro_rata, part_time (reduced hours, pro-rata pay),
+            9_day_fortnight, half_day_fridays, rotating_4_day, summer_fridays
+            (other reduced-hours patterns), compressed_week (a 4x10 — the same
+            40 hours in four days, and never a 4-day week), plus the
+            full-week-with-a-policy values flexible_hours, flex_fridays,
+            unlimited_pto, generous_pto, no_meeting_days,
+            generous_parental_leave and best_place_to_work.
+        hours_per_week_min:
+          type: integer
+          nullable: true
+        hours_per_week_max:
+          type: integer
+          nullable: true
+        work_arrangement:
+          type: string
+          enum: [onsite, hybrid, remote]
+          description: >
+            Office-presence policy for this job. The official spec enumerates
+            this set exhaustively. This is the only remoteness signal the API
+            returns — its documented `is_remote` companion never appears.
+        locations:
+          type: array
+          description: >
+            Office and remote-allowed locations, undocumented upstream. Absent
+            entirely for fully-remote jobs with no office; never sent empty.
+          items:
+            $ref: "#/components/schemas/Location"
+        timezones:
+          type: array
+          description: >
+            Timezones a remote job may be worked from. Sparse — present on 68
+            of 300 sampled remote jobs — so absence is not evidence that a job
+            is timezone-unrestricted.
+          items:
+            type: string
+        salary_min:
+          type: integer
+          format: int64
+          nullable: true
+          description: >
+            In the smallest unit of `salary_currency`, i.e. cents for USD:
+            8000000 means $80,000. The salary_min/salary_max *query* parameters
+            take whole dollars instead.
+        salary_max:
+          type: integer
+          format: int64
+          nullable: true
+          description: Same unit as salary_min.
+        salary_currency:
+          type: string
+          nullable: true
+          description: >
+            ISO 4217 code. Observed: USD, GBP, CAD, EUR, AUD.
+          example: USD
+        salary_period:
+          type: string
+          nullable: true
+          enum: [year, month, hour]
+          description: The official spec enumerates this set exhaustively.
+        skills:
+          type: array
+          description: Skills required. Never sent empty.
+          items:
+            $ref: "#/components/schemas/Tag"
+        stack:
+          type: array
+          description: Technologies used. Never sent empty.
+          items:
+            $ref: "#/components/schemas/Tag"
+        tools:
+          type: array
+          description: Tools used. Never sent empty.
+          items:
+            $ref: "#/components/schemas/Tag"
+        posted_at:
+          type: string
+          format: date-time
+          description: RFC3339 UTC timestamp.
+        company:
+          $ref: "#/components/schemas/Company"
+
+    Tag:
+      type: object
+      required: [name, slug]
+      properties:
+        name:
+          type: string
+          example: Python
+        slug:
+          type: string
+          description: Feedable to the `skills` query parameter.
+          example: python
+
+    Location:
+      type: object
+      description: >
+        Undocumented upstream; shape derived from 479 sampled entries. Every
+        field is optional — `city` was missing on 104 of them and `state` on
+        378.
+      properties:
+        city:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+          description: Inconsistently a full name or an abbreviation ("California" and "CA" both occur).
+        country:
+          type: string
+          nullable: true
+          description: Display name, matching the `country` query parameter.
+        continent:
+          type: string
+          nullable: true
+        latitude:
+          type: number
+          nullable: true
+        longitude:
+          type: number
+          nullable: true
+        work_arrangement:
+          type: string
+          nullable: true
+          description: >
+            Arrangement for this location specifically, which is how a job
+            distinguishes an office from a remote-allowed region. Observed
+            domain matches the job-level field (onsite, hybrid, remote), but
+            left unconstrained because the upstream documents neither.
+        is_primary:
+          type: boolean
+          nullable: true
+
+    Company:
+      type: object
+      required: [id, slug, name, url]
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+          description: Company page on 4dayweek.io.
+        website:
+          type: string
+          nullable: true
+          description: The company's own site.
+        logo_url:
+          type: string
+          nullable: true
+        short_description:
+          type: string
+          nullable: true
+          description: >
+            One-liner that usually states how the schedule policy was verified.
+        country:
+          type: string
+          nullable: true
+        employees:
+          type: integer
+          format: int64
+          nullable: true
+        schedule_type:
+          type: string
+          nullable: true
+          description: >
+            Company-wide policy. Same open domain as `Job.schedule_type`, and
+            not necessarily equal to it for a given job.
+        hours_full_time:
+          type: integer
+          format: int64
+          nullable: true
+          description: Hours the company counts as full time.
+        remote_level:
+          type: string
+          nullable: true
+          description: >
+            Office-presence policy company-wide. Observed: fully-remote,
+            hybrid, onsite. Left unconstrained because the upstream documents
+            the values in prose without enumerating them, and note the values
+            differ from `Job.work_arrangement` ("fully-remote", not "remote").
+        hires_worldwide:
+          type: boolean
+          nullable: true
+          description: >
+            Whether the company accepts applicants from any country. Orthogonal
+            to remote_level — a fully-remote company can still be
+            country-restricted.
