@@ -56,22 +56,6 @@ fetches full job details, so consider a cheaper model.
 > endpoints; please respect their terms of service and use it at a reasonable,
 > low frequency. The project ships no scraped job data.
 
-### Dump cache (company search)
-
-For ATS platforms that must download a whole job board before filtering
-(Greenhouse, Lever, Ashby, and similar), openings-mcp keeps a **short-lived
-in-process cache** (backed by [otter](https://github.com/maypok86/otter)) of
-that board so an agent that calls filters, then search, then detail for the
-same company does not re-fetch the board every time. The cache dies with the
-MCP process (one agent session), defaults to a **10-minute** TTL, and keeps
-at most **100** company boards.
-
-| Flag | Effect |
-|---|---|
-| `--dump-cache-ttl=10m` | TTL for the dump cache (default `10m`). Set `<=0` (e.g. `0`) to disable |
-
-Server-side search platforms (Workday and similar) are not cached this way.
-
 ## Install
 
 With Homebrew:

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"sort"
 	"strings"
@@ -256,13 +257,41 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 	}
 }
 
-func TestRunWithTransportTreatsStdinEOFAsCleanExit(t *testing.T) {
+func TestRunStdioTreatsStdinEOFAsCleanExit(t *testing.T) {
 	transport := &mcp.IOTransport{
 		Reader: io.NopCloser(strings.NewReader("")),
 		Writer: writeCloser{Writer: io.Discard},
 	}
-	err := runWithTransport(transport, slog.New(slog.NewTextHandler(io.Discard, nil)), nil)
+	err := runStdio(transport, slog.New(slog.NewTextHandler(io.Discard, nil)), nil)
 	require.NoError(t, err)
+}
+
+// TestStreamableHTTPServesTools covers the --http path end to end: the same
+// server reachable over streamable HTTP, listing tools through a real client.
+func TestStreamableHTTPServesTools(t *testing.T) {
+	ctx := t.Context()
+	server, err := newProviderServer(slog.New(slog.NewTextHandler(io.Discard, nil)), nil)
+	require.NoError(t, err)
+
+	httpServer := httptest.NewServer(mcp.NewStreamableHTTPHandler(
+		func(*http.Request) *mcp.Server { return server },
+		&mcp.StreamableHTTPOptions{Stateless: true},
+	))
+	defer httpServer.Close()
+
+	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
+	session, err := client.Connect(ctx, &mcp.StreamableClientTransport{Endpoint: httpServer.URL}, nil)
+	require.NoError(t, err)
+	defer session.Close()
+
+	res, err := session.ListTools(ctx, nil)
+	require.NoError(t, err)
+	names := make([]string, 0, len(res.Tools))
+	for _, tool := range res.Tools {
+		names = append(names, tool.Name)
+	}
+	assert.Contains(t, names, "search_jobs_by_company")
+	assert.Contains(t, names, "linkedin_search_jobs")
 }
 
 func TestATSRegistryIncludesTeamtailor(t *testing.T) {
