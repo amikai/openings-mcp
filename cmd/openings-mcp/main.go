@@ -1,3 +1,22 @@
+// Command openings-mcp serves job-search providers as MCP tools.
+//
+// With no transport flag the server speaks MCP over stdio:
+//
+//	openings-mcp
+//
+// The --http flag switches to streamable HTTP instead. It works bare, on
+// :8080, and takes an optional address that must be attached with '='
+// rather than passed as a separate argument:
+//
+//	openings-mcp --http
+//	openings-mcp --http=localhost:9000
+//
+// The HTTP transport exists to give one person a second way to reach the
+// same tools, not to serve several: it keeps no sessions and has no
+// authentication, so bind it to a loopback address. Its endpoint is the bare
+// URL, and GET returns 405.
+//
+// Run openings-mcp --help for the logging and cache flags.
 package main
 
 import (
@@ -10,8 +29,12 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"os"
+	"strconv"
+	"syscall"
 	"time"
 
+	// Aliased because this file's own run() would shadow the package name.
+	oklogrun "github.com/oklog/run"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 
@@ -73,10 +96,21 @@ func run() int {
 	var (
 		logFile              = fs.StringLong("log-file", "", "path to the log file (defaults to empty, outputs to stderr)")
 		logLevel             = fs.StringLong("log-level", "info", "minimum log level: debug, info, warn, or error")
-		enableCommandLogging = fs.BoolLong("enable-command-logging", "log raw JSON-RPC traffic to the log output")
+		enableCommandLogging = fs.BoolLong("enable-command-logging", "log raw JSON-RPC traffic to the log output (stdio only)")
 		versionFlag          = fs.BoolLong("version", "print version information and exit")
 		dumpCacheTTL         = fs.DurationLong("dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
 	)
+	serveHTTP := &httpFlag{addr: defaultHTTPAddr}
+	if _, err := fs.AddFlag(ff.FlagConfig{
+		LongName:      "http",
+		Value:         serveHTTP,
+		Usage:         "serve streamable HTTP instead of stdio, on " + defaultHTTPAddr + "; --http=ADDR picks another address",
+		NoPlaceholder: true,
+	}); err != nil {
+		fmt.Fprintln(os.Stderr, "err:", err)
+		return 1
+	}
+
 	cmd := &ff.Command{
 		Name:      "openings-mcp",
 		ShortHelp: "MCP server exposing job-search tools for job boards and company careers sites",
@@ -94,6 +128,14 @@ func run() int {
 	if *versionFlag {
 		fmt.Printf("Version: %s\nCommit: %s\nBuild Date: %s\n", version, commit, date)
 		return 0
+	}
+
+	// LoggingTransport wraps a Transport, which the HTTP handler never
+	// exposes. Reject the combination rather than silently dropping it;
+	// LoggingMiddleware still logs every JSON-RPC message either way.
+	if serveHTTP.enabled && *enableCommandLogging {
+		fmt.Fprintln(os.Stderr, "err: --enable-command-logging applies to the stdio transport only")
+		return 1
 	}
 
 	var level slog.Level
@@ -126,32 +168,132 @@ func run() int {
 		"max_entries", ats.DefaultDumpCacheMaxEntries,
 	)
 
-	var transport mcp.Transport = &mcp.StdioTransport{}
-	if *enableCommandLogging {
-		transport = &mcp.LoggingTransport{Transport: transport, Writer: logOutput}
+	var runErr error
+	if serveHTTP.enabled {
+		runErr = runHTTP(serveHTTP.addr, logger, dumpCache)
+	} else {
+		var transport mcp.Transport = &mcp.StdioTransport{}
+		if *enableCommandLogging {
+			transport = &mcp.LoggingTransport{Transport: transport, Writer: logOutput}
+		}
+		runErr = runStdio(transport, logger, dumpCache)
 	}
-
-	if err := runWithTransport(transport, logger, dumpCache); err != nil {
-		logger.Error("server terminated", "error", err)
+	if runErr != nil {
+		logger.Error("server terminated", "error", runErr)
 		return 1
 	}
 	return 0
 }
 
-func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpCache) error {
+// runStdio serves the MCP server until the client closes stdin. The transport
+// is a parameter rather than built here so callers can wrap it for command
+// logging, and so tests can drive it with an in-memory reader and writer.
+func runStdio(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpCache) error {
+	server, err := newProviderServer(logger, dumpCache)
+	if err != nil {
+		return err
+	}
+	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
+		return err
+	}
+	return nil
+}
+
+// defaultHTTPAddr is where --http listens when given no address of its own.
+const defaultHTTPAddr = ":8080"
+
+// httpFlag backs --http, which reads as a bool that carries an optional
+// address: plain --http listens on defaultHTTPAddr, --http=:9000 on :9000,
+// and no flag at all leaves the server on stdio. ff accepts the valueless
+// form only from a flag value that reports IsBoolFlag, which is why this is
+// a custom value rather than a plain string flag.
+//
+// The address cannot be passed as a separate argument (--http :9000); ff
+// reserves that form for non-bool flags.
+type httpFlag struct {
+	enabled bool
+	addr    string
+}
+
+func (f *httpFlag) IsBoolFlag() bool { return true }
+
+// String reports "false" while the flag is off, which is also how ff learns
+// to leave a default out of the help text: omitting --http means stdio, not
+// an address.
+func (f *httpFlag) String() string {
+	if !f.enabled {
+		return "false"
+	}
+	return f.addr
+}
+
+// Set takes "true"/"false" from the valueless form and anything else as the
+// address to listen on.
+func (f *httpFlag) Set(value string) error {
+	if enabled, err := strconv.ParseBool(value); err == nil {
+		f.enabled, f.addr = enabled, defaultHTTPAddr
+		return nil
+	}
+	f.enabled, f.addr = true, value
+	return nil
+}
+
+// runHTTP serves the same server over streamable HTTP until the process is
+// interrupted or terminated. Sessions are stateless: no tool carries
+// per-session state, and the server never initiates requests back to the
+// client, so there is nothing for a session ID to keep track of.
+func runHTTP(addr string, logger *slog.Logger, dumpCache *ats.DumpCache) error {
+	server, err := newProviderServer(logger, dumpCache)
+	if err != nil {
+		return err
+	}
+
+	httpServer := &http.Server{
+		Addr: addr,
+		Handler: mcp.NewStreamableHTTPHandler(
+			func(*http.Request) *mcp.Server { return server },
+			&mcp.StreamableHTTPOptions{Stateless: true, Logger: logger},
+		),
+		ReadHeaderTimeout: 10 * time.Second,
+	}
+
+	g := &oklogrun.Group{}
+	g.Add(oklogrun.SignalHandler(context.Background(), syscall.SIGINT, syscall.SIGTERM))
+	g.Add(func() error {
+		logger.Info("serving MCP over streamable HTTP", "addr", addr)
+		return httpServer.ListenAndServe()
+	}, func(error) {
+		logger.Info("shutting down HTTP server")
+		if err := httpServer.Shutdown(context.Background()); err != nil {
+			logger.Warn("HTTP shutdown failed", "error", err)
+		}
+	})
+
+	// A signal is how this server is meant to stop, and Serve always ends in
+	// ErrServerClosed once Shutdown runs; neither is a failure.
+	err = g.Run()
+	if errors.Is(err, oklogrun.ErrSignal) || errors.Is(err, http.ErrServerClosed) {
+		return nil
+	}
+	return err
+}
+
+// newProviderServer wires every provider client and the ATS registry into one
+// MCP server; both transports serve the same value.
+func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Server, error) {
 	// One connection pool, with a ceiling so a hung upstream fails that call
 	// instead of stalling the MCP session.
 	hc104 := &http.Client{Timeout: 30 * time.Second, Transport: job104.BrowserTransport{}}
 
 	c104, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(hc104))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	hc := &http.Client{Timeout: 30 * time.Second}
 	cAmazon, err := amazon.NewClient("https://www.amazon.jobs", amazon.WithClient(hc))
 	if err != nil {
-		return fmt.Errorf("create Amazon client: %w", err)
+		return nil, fmt.Errorf("create Amazon client: %w", err)
 	}
 
 	// Eightfold's edge 403s Go's default User-Agent instead of returning
@@ -160,12 +302,12 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(hc))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(hc))
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", hc)
@@ -174,7 +316,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 
 	cApple, err := apple.NewJobsClient("https://jobs.apple.com", hc)
 	if err != nil {
-		return fmt.Errorf("create Apple client: %w", err)
+		return nil, fmt.Errorf("create Apple client: %w", err)
 	}
 
 	jarLinkedin, _ := cookiejar.New(nil)
@@ -184,7 +326,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 
 	cFlowxtra, err := flowxtra.NewClient("https://app.flowxtra.com/api", flowxtra.WithClient(hc))
 	if err != nil {
-		return fmt.Errorf("create Flowxtra client: %w", err)
+		return nil, fmt.Errorf("create Flowxtra client: %w", err)
 	}
 
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", hc)
@@ -195,10 +337,10 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 
 	registry, err := newATSRegistry(hc, hcEightfold, dumpCache)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	server := newServer(&providerClients{
+	return newServer(&providerClients{
 		amazon:   cAmazon,
 		job104:   c104,
 		apple:    cApple,
@@ -212,12 +354,7 @@ func runWithTransport(transport mcp.Transport, logger *slog.Logger, dumpCache *a
 		jobindex: cJobindex,
 		mynavi:   cMynavi,
 		meta:     cMeta,
-	}, registry, logger)
-
-	if err := server.Run(context.Background(), transport); err != nil && !errors.Is(err, io.EOF) {
-		return err
-	}
-	return nil
+	}, registry, logger), nil
 }
 
 // newATSRegistry wires all unified company adapters over one shared
