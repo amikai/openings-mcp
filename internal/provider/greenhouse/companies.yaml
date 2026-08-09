@@ -4852,6 +4852,8 @@
   board_token: uasi
 - company: Uber Freight
   board_token: uberfreight
+- company: Ubiquiti
+  board_token: ubiquiti
 - company: Udemy
   board_token: udemy
 - company: Ultragenyx Pharmaceutical
