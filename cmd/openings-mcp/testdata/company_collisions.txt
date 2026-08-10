@@ -27,6 +27,7 @@ Acuity	herp|アキュイティー株式会社|https://herp.careers/careers/compa
 AdGlobe	herp|株式会社アドグローブ|https://herp.careers/careers/companies/adglobe	smartrecruiters|AdGlobe|https://jobs.smartrecruiters.com/AdGlobe	hrmos|株式会社アドグローブ|https://hrmos.co/pages/adglobe/jobs
 Adi Development Group	lever|Adi Development Group|https://jobs.lever.co/adidevelopments	bamboohr|ADI Development Group|https://adidevelopments.bamboohr.com/careers
 Adverum	lever|Adverum Biotechnologies, Inc.|https://jobs.lever.co/adverum	bamboohr|Adverum|https://adverum.bamboohr.com/careers
+AfterShip	greenhouse|AfterShip|https://job-boards.greenhouse.io/aftership	mokahr|AfterShip|https://app.mokahr.com/social-recruitment/aftership/43117
 Airtrunk	greenhouse|Airtrunk|https://job-boards.greenhouse.io/airtrunk	bamboohr|AirTrunk (airtrunk)|https://airtrunk.bamboohr.com/careers
 Ajax Careers	workday|Ajax Careers|https://ajax.wd10.myworkdayjobs.com/en-US/Ajax	oracle|Ajax Careers|https://fa-exrr-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/ajax/jobs
 Ajinomoto	hrmos|味の素株式会社|https://hrmos.co/pages/ajinomoto/jobs	successfactors|Ajinomoto|https://jobs.ajinomoto-be.com/search/
@@ -667,6 +668,7 @@ adrim-recruit	herp|株式会社ADrim|https://herp.careers/careers/companies/adri
 advantech	workday|Advantech Careers|https://advantech.wd3.myworkdayjobs.com/en-US/External	herp|アドバンテック株式会社|https://herp.careers/careers/companies/advantech
 adverum	lever|Adverum Biotechnologies, Inc.|https://jobs.lever.co/adverum	bamboohr|Adverum|https://adverum.bamboohr.com/careers
 aesper	herp|株式会社AESPER|https://herp.careers/careers/companies/aesper	hrmos|株式会社AESPER|https://hrmos.co/pages/aesper/jobs
+aftership	greenhouse|AfterShip|https://job-boards.greenhouse.io/aftership	mokahr|AfterShip|https://app.mokahr.com/social-recruitment/aftership/43117
 agatha	herp|アガサ株式会社|https://herp.careers/careers/companies/agatha	hrmos|アガサ株式会社|https://hrmos.co/pages/agatha/jobs
 agrex	herp|株式会社アグレックス|https://herp.careers/careers/companies/agrex	hrmos|株式会社アグレックス|https://hrmos.co/pages/agrex/jobs
 aidma-hd	herp|株式会社アイドマ・ホールディングス|https://herp.careers/careers/companies/aidma-hd	hrmos|株式会社アイドマ・ホールディングス|https://hrmos.co/pages/aidma-hd/jobs
