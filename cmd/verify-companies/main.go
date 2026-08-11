@@ -31,6 +31,7 @@ import (
 
 // providerOrder fixes the --provider default and the report's grouping order.
 var providerOrder = []string{
+	"adp_myjobs",
 	"ashby",
 	"avature",
 	"bamboohr",
@@ -182,6 +183,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			err error
 		)
 		switch name {
+		case "adp_myjobs":
+			a = ats.NewADPMyJobsAdapter(hc, nil)
 		case "ashby":
 			a, err = ats.NewAshbyAdapter("https://api.ashbyhq.com", hc, nil)
 		case "avature":
