@@ -41,53 +41,91 @@ func TestListSearchServerSide(t *testing.T) {
 	assert.Contains(t, page.JobRequisitions[0].Title(), "Teacher")
 }
 
-func TestGeoBoxFilterMatchesUpstreamShape(t *testing.T) {
-	box := NewGeoBox(-118.36, 34.13, -118.28, 34.07)
-	// west/south first, then east/north, with the "undefined" tokens upstream's
-	// parser requires. Diverging from this string is answered with HTTP 500.
+func TestCustomFilterExprShape(t *testing.T) {
+	// The slot code is the field name and clauses AND with "&&"; upstream
+	// answers any other shape with the whole board.
 	assert.Equal(t,
-		"geo.intersects(workLocations.geoLocation, geography'POLYGON((undefined, "+
-			"-118.36 34.07, undefined, -118.28 34.13))')",
-		box.Filter(),
+		"FIELD1 eq 'Pennsylvania' && FIELD2 eq 'Full-time'",
+		filterExpr([]CustomFilter{
+			{Field: "FIELD1", Value: "Pennsylvania"},
+			{Field: "FIELD2", Value: "Full-time"},
+		}),
 	)
 }
 
-func TestGeoBoxNormalizesCornersAndPads(t *testing.T) {
-	box := NewGeoBox(10, 20, -10, -20)
-	assert.Equal(t, GeoBox{West: -10, South: -20, East: 10, North: 20}, box)
-
-	// A box around one point has zero area, which upstream rejects; Pad is how
-	// callers make it sendable, and must not switch to exponent notation.
-	point := NewGeoBox(-74.890955, 40.177719, -74.890955, 40.177719).Pad(0.0001)
-	assert.Contains(t, point.Filter(), "-74.891055 40.177619")
-	assert.NotContains(t, point.Filter(), "e-")
-}
-
-func TestListSearchAndGeoBoxServerSide(t *testing.T) {
+func TestGetCustomFilters(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
 	c := NewClient(Config{CareerSiteBase: srv.URL, ListingBase: srv.URL})
 
-	orem := NewGeoBox(MockOremLon, MockOremLat, MockOremLon, MockOremLat).Pad(0.01)
-	page, err := c.ListJobRequisitions(context.Background(), MockSlug, ListParams{
-		GeoBox: &orem,
-		Top:    10,
+	catalog, err := c.GetCustomFilters(context.Background(), MockSlug)
+	require.NoError(t, err)
+	require.Len(t, catalog.FilterList, 3)
+	assert.Equal(t, "FIELD1", catalog.FilterList[0].Category)
+	assert.Equal(t, "State", catalog.FilterList[0].CategoryLabel)
+	assert.Equal(t, "Pennsylvania", catalog.FilterList[0].FilterList[0].Value)
+}
+
+func TestListWithCustomFilters(t *testing.T) {
+	srv := NewMockServer()
+	t.Cleanup(srv.Close)
+	c := NewClient(Config{CareerSiteBase: srv.URL, ListingBase: srv.URL})
+	ctx := context.Background()
+
+	page, err := c.ListJobRequisitions(ctx, MockSlug, ListParams{
+		CustomFilters: []CustomFilter{{Field: "FIELD1", Value: "Utah"}},
+		Top:           10,
 	})
 	require.NoError(t, err)
 	require.Equal(t, 1, page.Count)
 	assert.Contains(t, page.JobRequisitions[0].Title(), "Teacher")
 
-	// $search and the box are both applied upstream, in the same request.
-	page, err = c.ListJobRequisitions(context.Background(), MockSlug, ListParams{
-		Search: "engineer",
-		GeoBox: &orem,
-		Top:    10,
+	// Clauses AND, so a combination no job satisfies is empty.
+	page, err = c.ListJobRequisitions(ctx, MockSlug, ListParams{
+		CustomFilters: []CustomFilter{
+			{Field: "FIELD1", Value: "Utah"},
+			{Field: "FIELD2", Value: "Full-time"},
+		},
+		Top: 10,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 0, page.Count)
+
+	// $search and a filter are applied together, in one request.
+	page, err = c.ListJobRequisitions(ctx, MockSlug, ListParams{
+		Search:        "teacher",
+		CustomFilters: []CustomFilter{{Field: "FIELD1", Value: "Utah"}},
+		Top:           10,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 1, page.Count)
+
+	// A value whose case is off matches nothing rather than erroring, which is
+	// why the adapter canonicalizes before sending.
+	page, err = c.ListJobRequisitions(ctx, MockSlug, ListParams{
+		CustomFilters: []CustomFilter{{Field: "FIELD1", Value: "utah"}},
+		Top:           10,
 	})
 	require.NoError(t, err)
 	assert.Equal(t, 0, page.Count)
 }
 
-func TestListSearchAndGeoBoxEncodeBothQueryOptions(t *testing.T) {
+func TestListUnconfiguredFieldReturnsWholeBoard(t *testing.T) {
+	srv := NewMockServer()
+	t.Cleanup(srv.Close)
+	c := NewClient(Config{CareerSiteBase: srv.URL, ListingBase: srv.URL})
+
+	// The trap this provider is built around: upstream does not reject a slot
+	// code the board never configured, it ignores the filter entirely.
+	page, err := c.ListJobRequisitions(context.Background(), MockSlug, ListParams{
+		CustomFilters: []CustomFilter{{Field: "FIELD9", Value: "anything"}},
+		Top:           10,
+	})
+	require.NoError(t, err)
+	assert.Equal(t, 3, page.Count)
+}
+
+func TestListEncodesSpacesAsPercent20(t *testing.T) {
 	srv := NewMockServer()
 	t.Cleanup(srv.Close)
 	recorder := &recordingRoundTripper{}
@@ -97,31 +135,24 @@ func TestListSearchAndGeoBoxEncodeBothQueryOptions(t *testing.T) {
 		ListingBase:    srv.URL,
 	})
 
-	box := NewGeoBox(-118.36, 34.07, -118.28, 34.13)
 	_, err := c.ListJobRequisitions(context.Background(), MockSlug, ListParams{
-		Search: "teacher",
-		GeoBox: &box,
-		Top:    10,
+		Search:        "teacher",
+		CustomFilters: []CustomFilter{{Field: "FIELD1", Value: "Pennsylvania"}},
+		Top:           10,
 	})
 	require.NoError(t, err)
 	require.Len(t, recorder.requests, 2)
+
+	// Upstream reads a "+" in $filter as part of the value, not as a space, and
+	// answers the whole unfiltered board. Every facet value with a space would
+	// silently stop filtering, so the raw query must carry %20.
+	raw := recorder.requests[1].URL.RawQuery
+	assert.Contains(t, raw, "%24filter=FIELD1%20eq%20%27Pennsylvania%27")
+	assert.NotContains(t, raw, "+eq+")
+
 	query := recorder.requests[1].URL.Query()
 	assert.Equal(t, "teacher", query.Get("$search"))
-	assert.Equal(t, box.Filter(), query.Get("$filter"))
-}
-
-func TestListZeroAreaGeoBoxRejectedUpstream(t *testing.T) {
-	srv := NewMockServer()
-	t.Cleanup(srv.Close)
-	c := NewClient(Config{CareerSiteBase: srv.URL, ListingBase: srv.URL})
-
-	unpadded := NewGeoBox(MockOremLon, MockOremLat, MockOremLon, MockOremLat)
-	_, err := c.ListJobRequisitions(context.Background(), MockSlug, ListParams{
-		GeoBox: &unpadded,
-		Top:    10,
-	})
-	require.Error(t, err)
-	assert.Contains(t, err.Error(), "HTTP 500")
+	assert.Equal(t, "FIELD1 eq 'Pennsylvania'", query.Get("$filter"))
 }
 
 func TestGetJobRequisition(t *testing.T) {

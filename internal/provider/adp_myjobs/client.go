@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -23,6 +22,7 @@ const (
 	DefaultPageSize      = 100
 	DefaultPageSpacing   = 250 * time.Millisecond
 	listingPath          = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters"
+	customFiltersPath    = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters"
 	searchMetaPathPrefix = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-meta/"
 	careerSitePathPrefix = "/public/staffing/v1/career-site/"
 	defaultSelect        = "reqId,jobTitle,publishedJobTitle,type,jobDescription,jobQualifications,workLevelCode,clientRequisitionID,postingDate,requisitionLocations"
@@ -44,83 +44,41 @@ type ListParams struct {
 	// Search is sent as OData $search (server-side free-text over the posting).
 	// Empty means no $search.
 	Search string
-	// GeoBox restricts results to postings located inside the box, sent as the
-	// endpoint's one supported $filter form. nil means no $filter.
-	GeoBox *GeoBox
-	Skip   int
-	Top    int
+	// CustomFilters narrows the board by the tenant's own filter dimensions,
+	// ANDed together. Empty means no $filter.
+	CustomFilters []CustomFilter
+	Skip          int
+	Top           int
 }
 
-// GeoBox is a longitude/latitude bounding box, the only location constraint the
-// public listing endpoint honors. It matches against workLocations.geoLocation,
-// which is indexed per posting location at street precision even on boards
-// whose listing payload returns workLocations empty.
+// CustomFilter is one clause over a tenant-defined filter dimension, the only
+// $filter form the public listing endpoint honors.
 //
-// Everything else callers might reach for is a trap: the endpoint answers a
-// $filter over any other field — requisitionLocations/itemID, workLocations.city,
-// or a misspelled field name — with HTTP 200 and the unfiltered board, so a
-// wrong expression reads as "this company has no location filter" rather than
-// as an error. Only one box per request is possible; ORing two boxes is either
-// rejected (HTTP 500) or silently ignored, and a polygon with more than the two
-// corners below is rejected.
-type GeoBox struct {
-	West, South, East, North float64
+// Field is the dimension's opaque slot code ([FilterCategory.Category], e.g.
+// "FIELD1"), never its label: a $filter naming the label, or any other field,
+// is answered with HTTP 200 and the complete unfiltered board rather than an
+// error. Value must equal the published [FilterValue.Value] exactly, including
+// case, since a near-miss yields zero results that read as "this company has no
+// such jobs". Both therefore have to come from [Client.GetCustomFilters] for
+// the same slug; the slot codes are positional and mean different things on
+// different tenants.
+type CustomFilter struct {
+	Field string
+	Value string
 }
 
-// NewGeoBox returns the box spanning the two corners, ordered as the endpoint
-// requires. Callers pass corners in any order; a box needs west < east and
-// south < north, since inverted longitudes quietly select a different region
-// and a zero-area box is answered with HTTP 500.
-func NewGeoBox(lon1, lat1, lon2, lat2 float64) GeoBox {
-	return GeoBox{
-		West:  min(lon1, lon2),
-		South: min(lat1, lat2),
-		East:  max(lon1, lon2),
-		North: max(lat1, lat2),
+// filterExpr renders the clauses as one $filter value.
+//
+// Clauses are joined with "&&", which ANDs across dimensions. There is no OR:
+// "a || b" returns nothing and "(a or b)" is ignored in favour of the whole
+// board, so callers wanting several values for one dimension must issue
+// separate requests.
+func filterExpr(filters []CustomFilter) string {
+	clauses := make([]string, 0, len(filters))
+	for _, f := range filters {
+		clauses = append(clauses, f.Field+" eq '"+f.Value+"'")
 	}
-}
-
-// Pad grows the box by delta degrees on all four sides. A box built from a
-// single posting location has zero area, which upstream rejects, so callers
-// resolving a location to coordinates must pad before sending.
-//
-// Corners are rounded to coordDecimals places, so the float noise of adding
-// delta does not reach the query string.
-func (b GeoBox) Pad(delta float64) GeoBox {
-	return GeoBox{
-		West:  roundCoord(b.West - delta),
-		South: roundCoord(b.South - delta),
-		East:  roundCoord(b.East + delta),
-		North: roundCoord(b.North + delta),
-	}
-}
-
-// coordDecimals is the precision kept for box corners: 7 decimal places is
-// ~1 cm, far finer than the per-location coordinates upstream publishes.
-const coordDecimals = 7
-
-func roundCoord(v float64) float64 {
-	scale := math.Pow(10, coordDecimals)
-	return math.Round(v*scale) / scale
-}
-
-// Filter renders b as an OData $filter value.
-//
-// The literal "undefined" tokens are required, not a bug being copied for its
-// own sake: they come from a broken template in ADP's own career SPA, and the
-// endpoint's parser now only accepts that shape. A well-formed
-// POLYGON((lon lat, lon lat)) with the same corners is answered with HTTP 500.
-func (b GeoBox) Filter() string {
-	return "geo.intersects(workLocations.geoLocation, geography'POLYGON((undefined, " +
-		formatCoord(b.West) + " " + formatCoord(b.South) + ", undefined, " +
-		formatCoord(b.East) + " " + formatCoord(b.North) + "))')"
-}
-
-// formatCoord renders a coordinate in plain decimal notation, never the
-// exponent form Go's default float formatting would pick near zero, which is
-// not valid inside a WKT literal.
-func formatCoord(v float64) string {
-	return strconv.FormatFloat(v, 'f', -1, 64)
+	return strings.Join(clauses, " && ")
 }
 
 // Client talks to public MyJobs career-site and listing endpoints.
@@ -206,6 +164,38 @@ func (c *Client) GetCareerSite(ctx context.Context, slug string) (*CareerSite, e
 	c.tokens[slug] = session{token: cs.MyJobsToken, orgOID: cs.OrgOID}
 	c.mu.Unlock()
 	return &cs, nil
+}
+
+// GetCustomFilters fetches the tenant's filter dimensions and their values in
+// one request. It is the only way to learn which slot code carries which
+// dimension for a slug, so it must be consulted before any [CustomFilter] is
+// built.
+func (c *Client) GetCustomFilters(ctx context.Context, slug string) (*CustomFilterCatalog, error) {
+	slug = strings.ToLower(strings.TrimSpace(slug))
+	sess, err := c.ensureSession(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	q := url.Values{}
+	q.Set("tz", defaultTZ)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.listingBase+customFiltersPath+"?"+encodeQuery(q), nil)
+	if err != nil {
+		return nil, err
+	}
+	c.setListingHeaders(req, sess)
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("adp_myjobs: custom filters %q: %w", slug, err)
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("adp_myjobs: custom filters %q: HTTP %d", slug, res.StatusCode)
+	}
+	var out CustomFilterCatalog
+	if err := json.NewDecoder(res.Body).Decode(&out); err != nil {
+		return nil, fmt.Errorf("adp_myjobs: custom filters %q decode: %w", slug, err)
+	}
+	return &out, nil
 }
 
 // ListJobRequisitions fetches one page of requisitions.
@@ -342,8 +332,8 @@ func (c *Client) listOnce(ctx context.Context, slug string, sess session, p List
 	if s := strings.TrimSpace(p.Search); s != "" {
 		q.Set("$search", s)
 	}
-	if p.GeoBox != nil {
-		q.Set("$filter", p.GeoBox.Filter())
+	if len(p.CustomFilters) > 0 {
+		q.Set("$filter", filterExpr(p.CustomFilters))
 	}
 	u := c.listingBase + listingPath + "?" + encodeQuery(q)
 

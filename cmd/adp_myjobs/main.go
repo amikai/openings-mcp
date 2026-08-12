@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/jaytaylor/html2text"
@@ -25,7 +24,7 @@ func main() {
 	)
 	rootCmd := &ff.Command{
 		Name:  "adp_myjobs",
-		Usage: "adp_myjobs --company SLUG [FLAGS] <companies|search|get> [FLAGS]",
+		Usage: "adp_myjobs --company SLUG [FLAGS] <companies|filters|search|get> [FLAGS]",
 		Flags: rootFlags,
 	}
 
@@ -46,21 +45,36 @@ func main() {
 
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	keyword := searchFS.StringLong("keyword", "", "server-side $search over the posting")
-	bbox := searchFS.StringLong("bbox", "", "location box as WEST,SOUTH,EAST,NORTH in degrees, e.g. -118.4,34.0,-118.3,34.2")
+	field := searchFS.StringLong("field", "", "custom filter as FIELDn=VALUE; run the filters subcommand for the codes and values")
 	limit := searchFS.IntLong("limit", 20, "max jobs to print after filtering")
 	searchCmd := &ff.Command{
 		Name:      "search",
-		Usage:     "adp_myjobs --company SLUG search [--keyword TEXT] [--bbox W,S,E,N] [--limit N]",
-		ShortHelp: "list jobs from a MyJobs board (server-side keyword and location)",
+		Usage:     "adp_myjobs --company SLUG search [--keyword TEXT] [--field FIELDn=VALUE] [--limit N]",
+		ShortHelp: "list jobs from a MyJobs board (server-side keyword and custom filters)",
 		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
 			}
-			return runSearch(ctx, *company, *keyword, *bbox, *limit, *format)
+			return runSearch(ctx, *company, *keyword, *field, *limit, *format)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
+
+	filtersFS := ff.NewFlagSet("filters").SetParent(rootFlags)
+	filtersCmd := &ff.Command{
+		Name:      "filters",
+		Usage:     "adp_myjobs --company SLUG filters",
+		ShortHelp: "print the board's custom filter dimensions and values",
+		Flags:     filtersFS,
+		Exec: func(ctx context.Context, args []string) error {
+			if len(args) > 0 {
+				return fmt.Errorf("filters takes no positional arguments, got %v", args)
+			}
+			return runFilters(ctx, *company, *format)
+		},
+	}
+	rootCmd.Subcommands = append(rootCmd.Subcommands, filtersCmd)
 
 	getFS := ff.NewFlagSet("get").SetParent(rootFlags)
 	jobID := getFS.StringLong("id", "", "job reqId from search results")
@@ -88,7 +102,7 @@ func main() {
 	}
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
-		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or get) is required")
+		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, filters, search, or get) is required")
 		os.Exit(1)
 	}
 	if err := rootCmd.Run(context.Background()); err != nil {
@@ -115,7 +129,30 @@ func newClient() *adp_myjobs.Client {
 	})
 }
 
-func runSearch(ctx context.Context, company, keyword, bbox string, limit int, format string) error {
+func runFilters(ctx context.Context, company, format string) error {
+	slug, err := requireSlug(company)
+	if err != nil {
+		return err
+	}
+	catalog, err := newClient().GetCustomFilters(ctx, slug)
+	if err != nil {
+		return err
+	}
+	if format == "json" {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(catalog)
+	}
+	for _, c := range catalog.FilterList {
+		fmt.Printf("%s\t%s\t(%d values)\n", c.Category, c.CategoryLabel, len(c.FilterList))
+		for _, v := range c.FilterList {
+			fmt.Printf("\t%s\n", v.Value)
+		}
+	}
+	return nil
+}
+
+func runSearch(ctx context.Context, company, keyword, field string, limit int, format string) error {
 	slug, err := requireSlug(company)
 	if err != nil {
 		return err
@@ -123,14 +160,14 @@ func runSearch(ctx context.Context, company, keyword, bbox string, limit int, fo
 	if limit <= 0 {
 		limit = 20
 	}
-	box, err := parseBBox(bbox)
+	filters, err := parseFields(field)
 	if err != nil {
 		return err
 	}
 	page, err := newClient().ListJobRequisitions(ctx, slug, adp_myjobs.ListParams{
-		Search: strings.TrimSpace(keyword),
-		GeoBox: box,
-		Top:    limit,
+		Search:        strings.TrimSpace(keyword),
+		CustomFilters: filters,
+		Top:           limit,
 	})
 	if err != nil {
 		return err
@@ -176,31 +213,20 @@ func runGet(ctx context.Context, company, jobID, format string) error {
 	return nil
 }
 
-// parseBBox turns a "WEST,SOUTH,EAST,NORTH" flag into a box, or nil when the
-// flag is empty. It pads a box the caller gave zero area, since upstream answers
-// that with HTTP 500.
-func parseBBox(raw string) (*adp_myjobs.GeoBox, error) {
+// parseFields turns a "FIELDn=VALUE" flag into one upstream clause. The slot
+// code is passed through as given: it is positional per tenant, so this debug
+// CLI cannot validate it, and an unconfigured code is answered with the whole
+// board rather than an error.
+func parseFields(raw string) ([]adp_myjobs.CustomFilter, error) {
 	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return nil, nil
 	}
-	parts := strings.Split(raw, ",")
-	if len(parts) != 4 {
-		return nil, fmt.Errorf("--bbox needs 4 comma-separated degrees WEST,SOUTH,EAST,NORTH, got %q", raw)
+	code, value, ok := strings.Cut(raw, "=")
+	if !ok || strings.TrimSpace(code) == "" || strings.TrimSpace(value) == "" {
+		return nil, fmt.Errorf("--field wants FIELDn=VALUE, got %q", raw)
 	}
-	nums := make([]float64, 4)
-	for i, p := range parts {
-		v, err := strconv.ParseFloat(strings.TrimSpace(p), 64)
-		if err != nil {
-			return nil, fmt.Errorf("--bbox value %q is not a number", p)
-		}
-		nums[i] = v
-	}
-	box := adp_myjobs.NewGeoBox(nums[0], nums[1], nums[2], nums[3])
-	if box.West == box.East || box.South == box.North {
-		box = box.Pad(0.0001)
-	}
-	return &box, nil
+	return []adp_myjobs.CustomFilter{{Field: strings.TrimSpace(code), Value: strings.TrimSpace(value)}}, nil
 }
 
 func requireSlug(company string) (string, error) {

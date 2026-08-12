@@ -28,18 +28,7 @@ var mockCareerSiteCM []byte
 //go:embed testdata/career_site_unknown_rsp.json
 var mockCareerSiteUnknown []byte
 
-// Coordinates of the mock board's geocoded locations, exported so tests can
-// build boxes around them without restating literals.
-const (
-	MockLanghorneLat = 40.177719
-	MockLanghorneLon = -74.890955
-	MockOremLat      = 40.2968979
-	MockOremLon      = -111.6946475
-)
-
-// mockBoard is the tiny board the mock server filters over. The third job's
-// location carries the 0/0 placeholder MyJobs stores for locations it never
-// geocoded, which no box can match.
+// mockBoard is the tiny board the mock server filters over.
 func mockBoard() []JobRequisition {
 	return []JobRequisition{
 		{
@@ -56,7 +45,7 @@ func mockBoard() []JobRequisition {
 					CityName:                 "Langhorne",
 					CountrySubdivisionLevel1: &CodeVal{CodeValue: "PA"},
 					Country:                  &CodeVal{CodeValue: "USA"},
-					GeoCoordinate:            &GeoCoordinate{Latitude: MockLanghorneLat, Longitude: MockLanghorneLon},
+					GeoCoordinate:            &GeoCoordinate{Latitude: 40.177719, Longitude: -74.890955},
 				},
 				NameCode: &NameCode{CodeValue: "1", LongName: "GC - Langhorne-1"},
 			}},
@@ -75,7 +64,7 @@ func mockBoard() []JobRequisition {
 					CityName:                 "Orem",
 					CountrySubdivisionLevel1: &CodeVal{CodeValue: "UT"},
 					Country:                  &CodeVal{CodeValue: "USA"},
-					GeoCoordinate:            &GeoCoordinate{Latitude: MockOremLat, Longitude: MockOremLon},
+					GeoCoordinate:            &GeoCoordinate{Latitude: 40.2968979, Longitude: -111.6946475},
 				},
 				NameCode: &NameCode{CodeValue: "2", LongName: "GC - Orem-2"},
 			}},
@@ -91,30 +80,57 @@ func mockBoard() []JobRequisition {
 				ItemID:           "loc-3",
 				PrimaryIndicator: true,
 				Address: &LocationAddress{
-					CityName:                 "Ungeocoded City",
+					CityName:                 "Merrill",
 					CountrySubdivisionLevel1: &CodeVal{CodeValue: "NE"},
 					Country:                  &CodeVal{CodeValue: "USA"},
-					GeoCoordinate:            &GeoCoordinate{Latitude: 0, Longitude: 0},
+					GeoCoordinate:            &GeoCoordinate{Latitude: 45.180, Longitude: -89.683},
 				},
-				NameCode: &NameCode{CodeValue: "3", LongName: "GC - Ungeocoded-3"},
+				NameCode: &NameCode{CodeValue: "3", LongName: "GC - Merrill-3"},
 			}},
 		},
 	}
 }
 
-// mockGeoBoxRE extracts the corners of the one $filter shape upstream honors.
-// The literal "undefined" tokens are part of that shape; see [GeoBox.Filter].
-var mockGeoBoxRE = regexp.MustCompile(
-	`geo\.intersects\(workLocations\.geoLocation, geography'POLYGON\(\(undefined, ` +
-		`(-?[0-9.]+) (-?[0-9.]+), undefined, (-?[0-9.]+) (-?[0-9.]+)\)\)'\)`,
-)
+// mockCustomFilterRE matches one "FIELDn eq 'value'" clause, the only $filter
+// shape upstream honors. Clauses are ANDed with "&&"; see [CustomFilter].
+var mockCustomFilterRE = regexp.MustCompile(`^(FIELD[0-9]+) eq '(.*)'$`)
 
-// NewMockServer serves career-site, list ($search + geo $filter), and search-meta.
+// mockFacets is the catalog the mock board files its jobs under. FIELD1 is
+// deliberately not "location": the slot codes are positional, so nothing may
+// assume a fixed meaning for them.
+func mockFacets() CustomFilterCatalog {
+	return CustomFilterCatalog{FilterList: []FilterCategory{
+		{Category: "FIELD1", CategoryLabel: "State", FilterList: []FilterValue{
+			{Value: "Pennsylvania", Label: "Pennsylvania"},
+			{Value: "Utah", Label: "Utah"},
+		}},
+		{Category: "FIELD2", CategoryLabel: "Position Type", FilterList: []FilterValue{
+			{Value: "Full-time", Label: "Full-time"},
+			{Value: "Part-time", Label: "Part-time"},
+		}},
+		// A second dimension sharing a label, as Guitar Center configures.
+		{Category: "FIELD3", CategoryLabel: "State", FilterList: []FilterValue{
+			{Value: "Nebraska", Label: "Nebraska"},
+		}},
+	}}
+}
+
+// mockJobFacets maps each mock job to its facet values, keyed by slot code.
+func mockJobFacets() map[string]map[string]string {
+	return map[string]map[string]string{
+		"1001": {"FIELD1": "Pennsylvania", "FIELD2": "Full-time"},
+		"1002": {"FIELD1": "Utah", "FIELD2": "Part-time"},
+		"1003": {"FIELD3": "Nebraska", "FIELD2": "Full-time"},
+	}
+}
+
+// NewMockServer serves career-site, the custom-filter catalog, list ($search +
+// custom-filter $filter), and search-meta.
 //
-// The list handler reproduces the two upstream behaviours that make a wrong
-// location filter hard to notice: a $filter it does not recognize as a geo box
-// is answered with HTTP 200 and the whole board, and a zero-area box is
-// answered with HTTP 500.
+// The list handler reproduces the upstream behaviour that makes a wrong filter
+// hard to notice: a $filter naming a slot code the board has not configured is
+// answered with HTTP 200 and the whole board, not an error. A value whose case
+// is wrong simply matches nothing, exactly as upstream answers it.
 func NewMockServer() *httptest.Server {
 	const detail = `{"jobRequisitions":[{
 		"itemID":"1002",
@@ -150,16 +166,7 @@ func NewMockServer() *httptest.Server {
 			jobs = filterMockBySearch(jobs, search)
 		}
 		if filter := q.Get("$filter"); filter != "" {
-			box, ok := parseMockGeoBox(filter)
-			switch {
-			case !ok:
-				// Upstream ignores any other $filter without complaining.
-			case box.West >= box.East || box.South >= box.North:
-				http.Error(w, "invalid polygon", http.StatusInternalServerError)
-				return
-			default:
-				jobs = filterMockByBox(jobs, box)
-			}
+			jobs = filterMockByCustomFilters(jobs, filter)
 		}
 
 		total := len(jobs)
@@ -167,6 +174,13 @@ func NewMockServer() *httptest.Server {
 			Count:           total,
 			JobRequisitions: pageMockJobs(jobs, q.Get("$skip"), q.Get("$top")),
 		}))
+	})
+	mux.HandleFunc("/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("myjobstoken") == "" || r.Header.Get("rolecode") == "" {
+			http.Error(w, "bad headers", http.StatusBadRequest)
+			return
+		}
+		serveJSON(w, http.StatusOK, mustJSON(mockFacets()))
 	})
 	mux.HandleFunc("/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-meta/", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("myjobstoken") == "" {
@@ -191,40 +205,30 @@ func filterMockBySearch(jobs []JobRequisition, needle string) []JobRequisition {
 	return out
 }
 
-func filterMockByBox(jobs []JobRequisition, box GeoBox) []JobRequisition {
-	out := make([]JobRequisition, 0, len(jobs))
-	for _, j := range jobs {
-		for _, loc := range j.RequisitionLocations {
-			if loc.Address == nil {
-				continue
-			}
-			lat, lon, ok := loc.Address.GeoCoordinate.Point()
-			if !ok {
-				continue
-			}
-			if lon >= box.West && lon <= box.East && lat >= box.South && lat <= box.North {
-				out = append(out, j)
-				break
-			}
-		}
+// filterMockByCustomFilters applies every clause it recognizes. A clause naming
+// an unconfigured slot code is ignored, which is what upstream does.
+func filterMockByCustomFilters(jobs []JobRequisition, filter string) []JobRequisition {
+	configured := map[string]bool{}
+	for _, c := range mockFacets().FilterList {
+		configured[c.Category] = true
 	}
-	return out
-}
+	byJob := mockJobFacets()
 
-func parseMockGeoBox(filter string) (GeoBox, bool) {
-	m := mockGeoBoxRE.FindStringSubmatch(filter)
-	if m == nil {
-		return GeoBox{}, false
-	}
-	nums := make([]float64, 4)
-	for i := range nums {
-		v, err := strconv.ParseFloat(m[i+1], 64)
-		if err != nil {
-			return GeoBox{}, false
+	for _, clause := range strings.Split(filter, " && ") {
+		m := mockCustomFilterRE.FindStringSubmatch(strings.TrimSpace(clause))
+		if m == nil || !configured[m[1]] {
+			continue
 		}
-		nums[i] = v
+		field, value := m[1], m[2]
+		kept := make([]JobRequisition, 0, len(jobs))
+		for _, j := range jobs {
+			if byJob[j.ReqIDString()][field] == value {
+				kept = append(kept, j)
+			}
+		}
+		jobs = kept
 	}
-	return GeoBox{West: nums[0], South: nums[1], East: nums[2], North: nums[3]}, true
+	return jobs
 }
 
 func pageMockJobs(jobs []JobRequisition, skipRaw, topRaw string) []JobRequisition {

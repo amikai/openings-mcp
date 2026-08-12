@@ -52,10 +52,27 @@ jsonpath "$.count" > 0
 jsonpath "$.count" < {{baseline_count}}
 jsonpath "$.jobRequisitions" count > 0
 
-# Location via $filter: a bounding box over workLocations.geoLocation, boxed
-# around the Hollywood store (34.1147313 / -118.3637264). The literal
-# "undefined" tokens are required — a well-formed POLYGON is answered with 500.
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$orderby=postingDate%20desc&$select=reqId,jobTitle,requisitionLocations&$top=20&$skip=0&tz=America/New_York&$filter=geo.intersects(workLocations.geoLocation,%20geography%27POLYGON((undefined,%20-118.4%2034.09,%20undefined,%20-118.33%2034.14))%27)
+# The tenant's own filter dimensions, in one request. Slot codes are positional
+# per tenant, so the codes below are Guitar Center's and mean other things
+# elsewhere: FIELD2 "Area of Interest", FIELD3 "Full-Time/Part-Time",
+# FIELD4 "Brand". A failure here means the tenant reconfigured its fields.
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters?tz=America/New_York
+Accept: application/json
+Origin: https://myjobs.adp.com
+Referer: https://myjobs.adp.com/
+myjobstoken: {{myjobs_token}}
+rolecode: manager
+orgoid: {{orgoid}}
+
+HTTP 200
+[Asserts]
+jsonpath "$.filterList" count > 0
+jsonpath "$.filterList[0].category" matches /^FIELD[0-9]+$/
+jsonpath "$.filterList[0].categoryLabel" exists
+jsonpath "$.filterList[0].filterList[0].value" exists
+
+# Applying one narrows the board.
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=FIELD3%20eq%20%27Full-time%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -68,13 +85,9 @@ HTTP 200
 jsonpath "$.count" isInteger
 jsonpath "$.count" > 0
 jsonpath "$.count" < {{baseline_count}}
-jsonpath "$.jobRequisitions[0].requisitionLocations[0].address.countrySubdivisionLevel1.codeValue" == "CA"
-# The address field is "country", not "countryCode".
-jsonpath "$.jobRequisitions[0].requisitionLocations[0].address.country.codeValue" == "USA"
-jsonpath "$.jobRequisitions[0].requisitionLocations[0].address.geoCoordinate.latitude" exists
 
-# Box AND keyword are both applied server-side in one request.
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$orderby=postingDate%20desc&$select=reqId,jobTitle&$top=20&$skip=0&tz=America/New_York&$search=teacher&$filter=geo.intersects(workLocations.geoLocation,%20geography%27POLYGON((undefined,%20-118.98%2033.45,%20undefined,%20-117.84%2034.6))%27)
+# A value containing spaces filters too, once the spaces are %20.
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=FIELD2%20eq%20%27Customer%20Service%20and%20Sales%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -84,13 +97,13 @@ orgoid: {{orgoid}}
 
 HTTP 200
 [Captures]
-la_teacher_count: jsonpath "$.count"
+aoi_count: jsonpath "$.count"
 [Asserts]
 jsonpath "$.count" > 0
 jsonpath "$.count" < {{baseline_count}}
 
-# A zero-area box is rejected, which is why resolved boxes are padded.
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=geo.intersects(workLocations.geoLocation,%20geography%27POLYGON((undefined,%20-118.3637264%2034.1147313,%20undefined,%20-118.3637264%2034.1147313))%27)
+# Clauses AND with && , and compose with $search, in one request.
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$search=teacher&$filter=FIELD2%20eq%20%27Customer%20Service%20and%20Sales%27%20%26%26%20FIELD3%20eq%20%27Full-time%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -98,13 +111,17 @@ myjobstoken: {{myjobs_token}}
 rolecode: manager
 orgoid: {{orgoid}}
 
-HTTP 500
+HTTP 200
+[Asserts]
+jsonpath "$.count" isInteger
+jsonpath "$.count" < {{aoi_count}}
 
-# Regression guard for the trap that makes a wrong location filter invisible:
-# a $filter on any non-geo field returns HTTP 200 and the UNFILTERED board.
-# If either assert ever fails, the endpoint gained real field filtering and the
-# adapter can stop going through coordinates.
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=requisitionLocations/itemID%20eq%205000010689906
+# Regression guards for the three ways a wrong filter goes unnoticed: each
+# returns the FULL board with HTTP 200 rather than an error, which is why the
+# adapter never forwards an unvalidated field, a label, or a "+" for a space.
+
+# (1) a slot code the board has not configured
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=FIELD9%20eq%20%27x%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -116,7 +133,8 @@ HTTP 200
 [Asserts]
 jsonpath "$.count" == {{baseline_count}}
 
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=totallyBogusField%20eq%20%27zzz%27
+# (2) the display label instead of the slot code
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=Brand%20eq%20%27AVDG%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -128,10 +146,8 @@ HTTP 200
 [Asserts]
 jsonpath "$.count" == {{baseline_count}}
 
-# The facet catalog behind the board's "All Filters" dialog: one request,
-# tenant-defined categories. Labels carry no coordinates, so the adapter builds
-# its location catalog from the board dump instead.
-GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters?tz=America/New_York
+# (3) spaces encoded as "+" rather than %20 — same filter as the AoI one above
+GET https://my.adp.com/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters?$select=reqId&$top=1&tz=America/New_York&$filter=FIELD2+eq+%27Customer+Service+and+Sales%27
 Accept: application/json
 Origin: https://myjobs.adp.com
 Referer: https://myjobs.adp.com/
@@ -141,5 +157,4 @@ orgoid: {{orgoid}}
 
 HTTP 200
 [Asserts]
-jsonpath "$.filterList" count > 0
-jsonpath "$.filterList[0].categoryLabel" exists
+jsonpath "$.count" == {{baseline_count}}

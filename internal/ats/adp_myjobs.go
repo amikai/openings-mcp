@@ -4,11 +4,11 @@ import (
 	"cmp"
 	"context"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"regexp"
 	"slices"
-	"sort"
 	"strings"
 	"unicode"
 
@@ -29,24 +29,15 @@ var adpMyJobsCareersURLRE = regexp.MustCompile(
 	`(?i)^myjobs\.adp\.com/(?P<slug>[^/]+)`,
 )
 
-const adpLocationFilterKey = "location"
-
-// adpGeoPad widens a resolved bounding box on every side. A box drawn around a
-// single posting location has zero area, which upstream answers with HTTP 500.
-// 0.0001 degree is roughly 11 m, small enough to keep one store distinct from
-// its neighbours.
-const adpGeoPad = 0.0001
-
 // ADPMyJobsAdapter serves public ADP MyJobs career boards (myjobs.adp.com).
 // Keyword search uses the upstream OData $search parameter with server-side
-// pagination. Location labels come from a cached board listing and are resolved
-// to the coordinates of the matching posting locations, sent upstream as the
-// geographic bounding box that is the endpoint's only usable $filter.
+// pagination, and filters use the tenant's own dimensions, both applied in the
+// same request. Nothing is matched locally and no board dump is needed.
 //
-// A label matching several locations widens the box to enclose all of them, so
-// results are a superset: postings that merely sit inside the box are returned
-// rather than dropped, the same way the board's own radius search returns
-// neighbouring towns.
+// The dimensions are whatever the tenant configured — State and City on one
+// board, Store or Brand or Compensation Range on another — so [Adapter.Filters]
+// reports them per company and [SearchParams.Location] is not supported: a
+// board that files its jobs by store cannot answer a free-text place.
 // Workforce Now (workforcenow.adp.com) is out of scope (future adp_wfn).
 type ADPMyJobsAdapter struct {
 	hc          *http.Client
@@ -107,56 +98,39 @@ func (a *ADPMyJobsAdapter) Search(ctx context.Context, slug string, p SearchPara
 	pageIndex := page - 1
 	skip := pageIndex * pageSize
 
-	locationValues := append([]string(nil), p.Filters[adpLocationFilterKey]...)
-	for key := range p.Filters {
-		if key != adpLocationFilterKey {
-			return nil, fmt.Errorf(
-				"adp_myjobs: unsupported filter key %q; available: %s",
-				key,
-				adpLocationFilterKey,
-			)
-		}
-	}
+	// Every board files its jobs by its own dimensions, and several file them
+	// by store rather than by place, so there is nothing a free-text location
+	// could be matched against without reading the whole board.
 	if location := strings.TrimSpace(p.Location); location != "" {
-		if len(locationValues) > 0 {
-			return nil, fmt.Errorf("adp_myjobs: location is already set in filters; pass it only once")
-		}
-		locationValues = []string{location}
+		return nil, fmt.Errorf(
+			"adp_myjobs: location is not supported; call get_filters_by_company and pass one of "+
+				"its dimensions through filters instead (location %q)",
+			location,
+		)
 	}
 
-	var geoBox *adp_myjobs.GeoBox
-	if len(locationValues) > 0 {
-		// Upstream takes one bounding box per request and cannot OR two, so
-		// several distinct locations would have to collapse into the box
-		// enclosing them all -- for far-apart values that is a corridor of
-		// unrelated postings. Ask for one location instead of answering with it.
-		if len(locationValues) > 1 {
-			return nil, fmt.Errorf(
-				"adp_myjobs: upstream filters one location per search, got %d (%s); search each separately",
-				len(locationValues), strings.Join(locationValues, ", "),
-			)
-		}
-		options, err := a.locationOptions(ctx, slug)
+	var customFilters []adp_myjobs.CustomFilter
+	if len(p.Filters) > 0 {
+		facets, err := a.facets(ctx, slug)
 		if err != nil {
 			return nil, err
 		}
-		box, err := resolveADPGeoBox(options, locationValues[0])
+		customFilters, err = facets.resolve(p.Filters)
 		if err != nil {
 			return nil, err
 		}
-		geoBox = &box
 	}
 
-	// Keyword search uses upstream $search, location the geographic $filter, so
-	// both constraints are applied server-side in the same request.
+	// Keyword search uses upstream $search and filters the tenant's dimensions,
+	// so both constraints are applied server-side in the same request.
 	search := strings.TrimSpace(p.Query)
 
 	client := a.client()
 	res, err := client.ListJobRequisitions(ctx, slug, adp_myjobs.ListParams{
-		Search: search,
-		GeoBox: geoBox,
-		Skip:   skip,
-		Top:    pageSize,
+		Search:        search,
+		CustomFilters: customFilters,
+		Skip:          skip,
+		Top:           pageSize,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("adp_myjobs: search %q: %w", slug, err)
@@ -195,275 +169,150 @@ func (a *ADPMyJobsAdapter) Search(ctx context.Context, slug string, p SearchPara
 }
 
 func (a *ADPMyJobsAdapter) Filters(ctx context.Context, slug string) (FilterSet, error) {
-	options, err := a.locationOptions(ctx, slug)
+	facets, err := a.facets(ctx, slug)
 	if err != nil {
 		return nil, err
 	}
-	// Only locations with coordinates are listed: upstream filters location by
-	// coordinates alone, so a label the board never geocoded is not a value
-	// Search could honor. A board that geocoded nothing reports no location
-	// dimension at all rather than values that always fail.
-	labels := make([]string, 0, len(options))
-	for _, option := range options {
-		if len(option.points) > 0 {
-			labels = append(labels, option.label)
+	return facets.filterSet(), nil
+}
+
+// adpFacets is one board's filter dimensions, in both directions: the labels
+// and values published to callers, and the slot code plus canonical spelling
+// each of them has to be translated back into before it can be sent upstream.
+type adpFacets struct {
+	keys   []string                     // published keys, in the tenant's own order
+	fields map[string]string            // key -> slot code ("FIELD1")
+	labels map[string][]string          // key -> published values
+	values map[string]map[string]string // key -> lowercased value -> canonical value
+}
+
+func (f *adpFacets) filterSet() FilterSet {
+	fs := make(FilterSet, len(f.keys))
+	for _, key := range f.keys {
+		fs[key] = f.labels[key]
+	}
+	return fs
+}
+
+// resolve turns caller-supplied filters into upstream clauses, rejecting
+// anything it cannot translate. Both rejections matter: an unknown slot code is
+// answered with the whole unfiltered board, and a value whose case is off is
+// answered with no jobs at all, so neither may be forwarded unchecked.
+func (f *adpFacets) resolve(filters FilterSet) ([]adp_myjobs.CustomFilter, error) {
+	valid := make(map[string]bool, len(f.keys))
+	for _, key := range f.keys {
+		valid[key] = true
+	}
+
+	out := make([]adp_myjobs.CustomFilter, 0, len(filters))
+	for _, key := range slices.Sorted(maps.Keys(filters)) {
+		if !valid[key] {
+			return nil, errUnknownFilterKey(key, valid)
 		}
+		values := filters[key]
+		// Upstream has no OR: "a || b" matches nothing and "(a or b)" is
+		// dropped in favour of the whole board, so a second value cannot be
+		// expressed and must not be silently ignored either.
+		if len(values) > 1 {
+			return nil, fmt.Errorf(
+				"adp_myjobs: filter %q takes one value per search, got %d (%s); search each separately",
+				key, len(values), strings.Join(values, ", "),
+			)
+		}
+		canonical, ok := f.values[key][strings.ToLower(strings.TrimSpace(values[0]))]
+		if !ok {
+			return nil, fmt.Errorf(
+				"adp_myjobs: filter value %q not found for %q; available: %s",
+				values[0], key, strings.Join(f.labels[key], ", "),
+			)
+		}
+		out = append(out, adp_myjobs.CustomFilter{Field: f.fields[key], Value: canonical})
 	}
-	if len(labels) == 0 {
-		return FilterSet{}, nil
-	}
-	return FilterSet{adpLocationFilterKey: labels}, nil
+	return out, nil
 }
 
-// adpLocationOption is one posting location from a board dump: the labels a
-// caller can name it by, plus the coordinates that make it filterable upstream.
-// points is empty for locations the board never geocoded.
-type adpLocationOption struct {
-	id      string
-	label   string
-	aliases []string
-	points  []adpGeoPoint
-}
-
-type adpGeoPoint struct {
-	lat, lon float64
-}
-
-func (a *ADPMyJobsAdapter) locationOptions(ctx context.Context, slug string) ([]adpLocationOption, error) {
+func (a *ADPMyJobsAdapter) facets(ctx context.Context, slug string) (*adpFacets, error) {
 	_, side, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
-		reqs, err := a.client().ListAllJobRequisitions(ctx, slug)
+		catalog, err := a.client().GetCustomFilters(ctx, slug)
 		if err != nil {
-			return nil, nil, fmt.Errorf("adp_myjobs: load location filters for %q: %w", slug, err)
+			return nil, nil, err
 		}
-		return nil, buildADPLocationOptions(reqs), nil
+		return nil, buildADPFacets(catalog), nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	options, ok := side.([]adpLocationOption)
+	facets, ok := side.(*adpFacets)
 	if !ok {
-		return nil, fmt.Errorf("adp_myjobs: location filter cache for %q has an invalid value", slug)
+		return nil, fmt.Errorf("adp_myjobs: filter cache for %q has an invalid value", slug)
 	}
-	return options, nil
+	return facets, nil
 }
 
-func buildADPLocationOptions(reqs []adp_myjobs.JobRequisition) []adpLocationOption {
-	byID := make(map[string]adpLocationOption)
-	for _, req := range reqs {
-		for _, loc := range req.RequisitionLocations {
-			id := strings.TrimSpace(loc.ItemID)
-			if id == "" {
-				continue
-			}
-			labels := adpLocationLabels(loc)
-			if len(labels) == 0 {
-				continue
-			}
-			option := byID[id]
-			if option.id == "" {
-				option = adpLocationOption{id: id, label: labels[0]}
-			}
-			for _, label := range labels {
-				if !containsFold(option.aliases, label) {
-					option.aliases = append(option.aliases, label)
-				}
-			}
-			if loc.Address != nil {
-				if lat, lon, ok := loc.Address.GeoCoordinate.Point(); ok && !containsPoint(option.points, lat, lon) {
-					option.points = append(option.points, adpGeoPoint{lat: lat, lon: lon})
-				}
-			}
-			byID[id] = option
-		}
+func buildADPFacets(catalog *adp_myjobs.CustomFilterCatalog) *adpFacets {
+	f := &adpFacets{
+		fields: map[string]string{},
+		labels: map[string][]string{},
+		values: map[string]map[string]string{},
 	}
-
-	options := make([]adpLocationOption, 0, len(byID))
-	for _, option := range byID {
-		options = append(options, option)
-	}
-	sort.Slice(options, func(i, j int) bool {
-		return strings.ToLower(options[i].label) < strings.ToLower(options[j].label)
-	})
-	return options
-}
-
-func adpLocationLabels(loc adp_myjobs.RequisitionLocation) []string {
-	labels := make([]string, 0, 4)
-	if loc.NameCode != nil {
-		for _, label := range []string{
-			loc.NameCode.LongName,
-			loc.NameCode.ShortName,
-			loc.NameCode.CodeValue,
-		} {
-			if strings.TrimSpace(label) != "" && !containsFold(labels, label) {
-				labels = append(labels, strings.TrimSpace(label))
-			}
-		}
-	}
-	if loc.Address != nil {
-		// Two spellings of the same address, because a caller naming a region
-		// may use either: boards label states and countries by code
-		// ("Peterborough, ON, CAN"), so without the long form "Ontario" and
-		// "Canada" match nothing while "ON" and "CAN" work.
-		for _, name := range []func(*adp_myjobs.CodeVal) string{adpCodeString, adpLongName} {
-			parts := make([]string, 0, 3)
-			if loc.Address.CityName != "" {
-				parts = append(parts, loc.Address.CityName)
-			}
-			if s := name(loc.Address.CountrySubdivisionLevel1); s != "" {
-				parts = append(parts, s)
-			}
-			if s := name(loc.Address.Country); s != "" {
-				parts = append(parts, s)
-			}
-			if label := strings.Join(parts, ", "); label != "" && !containsFold(labels, label) {
-				labels = append(labels, label)
-			}
-		}
-	}
-	return labels
-}
-
-// adpLongName prefers a code's spelled-out name, the opposite of adpCodeString.
-func adpLongName(c *adp_myjobs.CodeVal) string {
-	if c == nil {
-		return ""
-	}
-	if c.LongName != "" {
-		return c.LongName
-	}
-	if c.ShortName != "" {
-		return c.ShortName
-	}
-	return c.CodeValue
-}
-
-func adpCodeString(c *adp_myjobs.CodeVal) string {
-	if c == nil {
-		return ""
-	}
-	if c.CodeValue != "" {
-		return c.CodeValue
-	}
-	if c.ShortName != "" {
-		return c.ShortName
-	}
-	return c.LongName
-}
-
-// adpLocationMatch ranks how well one catalog alias answers a caller's location
-// value; only the best rank any option reaches is used.
-//
-// A plain substring test alone is too loose once matches decide a bounding box:
-// on a nationwide board "OH" also hits "CO - Johnstown" and "Johnson City, TN",
-// which would stretch the box from Colorado to Tennessee. Requiring the value to
-// be a whole label token keeps "OH" to Ohio, while substring stays available for
-// partial words like "Colum".
-type adpLocationMatch int
-
-const (
-	adpNoMatch adpLocationMatch = iota
-	adpSubstringMatch
-	adpTokenMatch
-	adpExactMatch
-)
-
-// resolveADPGeoBox matches value against the catalog's location labels and
-// returns the padded bounding box enclosing every coordinate they carry.
-//
-// A value that legitimately names many locations ("California", "TX") widens the
-// box to cover them all, which is how a region search is expressed here.
-func resolveADPGeoBox(options []adpLocationOption, value string) (adp_myjobs.GeoBox, error) {
-	needle := strings.ToLower(strings.TrimSpace(value))
-	if needle == "" {
-		return adp_myjobs.GeoBox{}, fmt.Errorf("adp_myjobs: empty location")
-	}
-
-	ranks := make([]adpLocationMatch, len(options))
-	best := adpNoMatch
-	for i, option := range options {
-		for _, alias := range option.aliases {
-			ranks[i] = max(ranks[i], adpMatchAlias(alias, needle))
-		}
-		best = max(best, ranks[i])
-	}
-
-	var (
-		matched []string
-		points  []adpGeoPoint
-	)
-	for i, option := range options {
-		if ranks[i] != best || best == adpNoMatch {
+	for _, category := range catalog.FilterList {
+		if strings.TrimSpace(category.Category) == "" || len(category.FilterList) == 0 {
 			continue
 		}
-		matched = append(matched, option.label)
-		points = append(points, option.points...)
-	}
-
-	switch {
-	case len(matched) == 0:
-		return adp_myjobs.GeoBox{}, fmt.Errorf(
-			"adp_myjobs: no location matching %q; call get_filters_by_company first", value,
-		)
-	case len(points) == 0:
-		// The board names these locations but never geocoded them, and
-		// coordinates are the only location value upstream can filter on.
-		sort.Strings(matched)
-		return adp_myjobs.GeoBox{}, fmt.Errorf(
-			"adp_myjobs: location %q matches %s, which this board publishes without coordinates; "+
-				"upstream can only filter by location coordinates, so drop the location and use a keyword instead",
-			value, strings.Join(matched, ", "),
-		)
-	}
-
-	box := adp_myjobs.NewGeoBox(points[0].lon, points[0].lat, points[0].lon, points[0].lat)
-	for _, p := range points[1:] {
-		box.West = min(box.West, p.lon)
-		box.East = max(box.East, p.lon)
-		box.South = min(box.South, p.lat)
-		box.North = max(box.North, p.lat)
-	}
-	return box.Pad(adpGeoPad), nil
-}
-
-// adpMatchAlias ranks alias against an already-lowercased needle.
-func adpMatchAlias(alias, needle string) adpLocationMatch {
-	alias = strings.ToLower(alias)
-	switch {
-	case alias == needle:
-		return adpExactMatch
-	case slices.Contains(adpAliasTokens(alias), needle):
-		return adpTokenMatch
-	case strings.Contains(alias, needle):
-		return adpSubstringMatch
-	}
-	return adpNoMatch
-}
-
-// adpAliasTokens splits a label into its alphanumeric words, so "OH - Grove
-// City" and "Grove City, OH, USA" both yield the token "oh".
-func adpAliasTokens(alias string) []string {
-	return strings.FieldsFunc(alias, func(r rune) bool {
-		return !unicode.IsLetter(r) && !unicode.IsDigit(r)
-	})
-}
-
-func containsFold(values []string, needle string) bool {
-	for _, value := range values {
-		if strings.EqualFold(value, needle) {
-			return true
+		key := adpFilterKey(category.CategoryLabel, category.Category)
+		// A board may configure two dimensions under one label, and they are
+		// not interchangeable -- Guitar Center's second "Location" carries 188
+		// stores the first one never lists -- so the later one is suffixed
+		// rather than dropped.
+		for n := 2; f.fields[key] != ""; n++ {
+			key = fmt.Sprintf("%s_%d", adpFilterKey(category.CategoryLabel, category.Category), n)
 		}
+
+		labels := make([]string, 0, len(category.FilterList))
+		canonical := make(map[string]string, len(category.FilterList))
+		for _, v := range category.FilterList {
+			value := strings.TrimSpace(v.Value)
+			if value == "" {
+				continue
+			}
+			label := strings.TrimSpace(v.Label)
+			if label == "" {
+				label = value
+			}
+			labels = append(labels, label)
+			canonical[strings.ToLower(value)] = value
+			canonical[strings.ToLower(label)] = value
+		}
+		if len(labels) == 0 {
+			continue
+		}
+		f.keys = append(f.keys, key)
+		f.fields[key] = category.Category
+		f.labels[key] = labels
+		f.values[key] = canonical
 	}
-	return false
+	return f
 }
 
-func containsPoint(points []adpGeoPoint, lat, lon float64) bool {
-	for _, p := range points {
-		if p.lat == lat && p.lon == lon {
-			return true
+// adpFilterKey normalizes a tenant's display label into a filter key, falling
+// back to the slot code for a label that normalizes to nothing.
+func adpFilterKey(label, category string) string {
+	key := strings.Map(func(r rune) rune {
+		switch {
+		case unicode.IsLetter(r) || unicode.IsDigit(r):
+			return unicode.ToLower(r)
+		default:
+			return '_'
 		}
+	}, strings.TrimSpace(label))
+	for strings.Contains(key, "__") {
+		key = strings.ReplaceAll(key, "__", "_")
 	}
-	return false
+	key = strings.Trim(key, "_")
+	if key == "" {
+		return strings.ToLower(category)
+	}
+	return key
 }
 
 func (a *ADPMyJobsAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDetail, error) {

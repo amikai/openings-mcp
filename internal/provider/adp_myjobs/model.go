@@ -51,29 +51,38 @@ type LocationAddress struct {
 	GeoCoordinate            *GeoCoordinate `json:"geoCoordinate"`
 }
 
-// GeoCoordinate is a posting location's WGS84 point, the only location value
-// the listing endpoint can filter on (see [GeoBox]).
+// GeoCoordinate is a posting location's WGS84 point. Boards that never
+// geocoded a location report 0/0 rather than omitting it.
 type GeoCoordinate struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
-// Point reports the coordinate only when it is usable in a geo query. It
-// rejects the 0/0 placeholder MyJobs stores for locations it never geocoded —
-// some boards carry those for every location — and out-of-range values, both
-// of which would silently match the wrong postings.
-func (g *GeoCoordinate) Point() (lat, lon float64, ok bool) {
-	switch {
-	case g == nil:
-		return 0, 0, false
-	case g.Latitude == 0 && g.Longitude == 0:
-		return 0, 0, false
-	case g.Latitude < -90 || g.Latitude > 90:
-		return 0, 0, false
-	case g.Longitude < -180 || g.Longitude > 180:
-		return 0, 0, false
-	}
-	return g.Latitude, g.Longitude, true
+// CustomFilterCatalog is the tenant's own filter dimensions, as returned by
+// [Client.GetCustomFilters].
+type CustomFilterCatalog struct {
+	FilterList []FilterCategory `json:"filterList"`
+}
+
+// FilterCategory is one filter dimension a tenant has configured.
+//
+// Category is an opaque slot code ("FIELD1".."FIELD5") that is positional, not
+// semantic: FIELD3 is "Full-Time/Part-Time" on one board, "Area of Interest" on
+// another and "Compensation Range" on a third, so it can only be interpreted
+// through the catalog of the same slug. CategoryLabel is the tenant's display
+// name and is not unique — a board may configure two dimensions that are both
+// labelled "Location".
+type FilterCategory struct {
+	Category      string        `json:"category"`
+	CategoryLabel string        `json:"categoryLabel"`
+	FilterList    []FilterValue `json:"filterList"`
+}
+
+// FilterValue is one selectable value. Value is what a $filter must compare
+// against, exactly and case-sensitively.
+type FilterValue struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
 }
 
 // CodeVal is a short code/name pair.
