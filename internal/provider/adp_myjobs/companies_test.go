@@ -9,8 +9,7 @@ import (
 )
 
 func TestCompaniesSeed(t *testing.T) {
-	require.GreaterOrEqual(t, len(Companies), 3)
-	require.LessOrEqual(t, len(Companies), 5)
+	require.GreaterOrEqual(t, len(Companies), 5)
 	seen := map[string]bool{}
 	for _, c := range Companies {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug)

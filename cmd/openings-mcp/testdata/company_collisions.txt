@@ -26,6 +26,7 @@ Acommerce	greenhouse|Acommerce|https://job-boards.greenhouse.io/acommerce	bamboo
 Acuity	herp|アキュイティー株式会社|https://herp.careers/careers/companies/acuity	smartrecruiters|Acuity|https://jobs.smartrecruiters.com/Acuity1
 AdGlobe	herp|株式会社アドグローブ|https://herp.careers/careers/companies/adglobe	smartrecruiters|AdGlobe|https://jobs.smartrecruiters.com/AdGlobe	hrmos|株式会社アドグローブ|https://hrmos.co/pages/adglobe/jobs
 Adi Development Group	lever|Adi Development Group|https://jobs.lever.co/adidevelopments	bamboohr|ADI Development Group|https://adidevelopments.bamboohr.com/careers
+Advantest	hrmos|株式会社アドバンテスト|https://hrmos.co/pages/advantest/jobs	adp_myjobs|Advantest|https://myjobs.adp.com/advantestcareers/cx
 Adverum	lever|Adverum Biotechnologies, Inc.|https://jobs.lever.co/adverum	bamboohr|Adverum|https://adverum.bamboohr.com/careers
 AfterShip	greenhouse|AfterShip|https://job-boards.greenhouse.io/aftership	mokahr|AfterShip|https://app.mokahr.com/social-recruitment/aftership/43117
 Airtrunk	greenhouse|Airtrunk|https://job-boards.greenhouse.io/airtrunk	bamboohr|AirTrunk (airtrunk)|https://airtrunk.bamboohr.com/careers
@@ -138,6 +139,7 @@ ClipLine株式会社	herp|ClipLine株式会社|https://herp.careers/careers/comp
 CloudWalk	lever|CloudWalk|https://jobs.lever.co/cloudwalk	mokahr|CloudWalk|https://app.mokahr.com/social-recruitment/cloudwalk/4871
 Clutch	greenhouse|Clutch Technologies Inc.|https://job-boards.greenhouse.io/clutch	ashby|Clutch|https://jobs.ashbyhq.com/withclutch
 Cmind Group	herp|Cmind Group|https://herp.careers/careers/companies/cmindgroup	hrmos|Cmind Group|https://hrmos.co/pages/cmindgroup/jobs
+CoStar Group	adp_myjobs|CoStar Group|https://myjobs.adp.com/costargroup/cx	workday|CoStar Group|https://costar.wd1.myworkdayjobs.com/en-US/CoStarCareers
 Coast	greenhouse|Coast|https://job-boards.greenhouse.io/coast	bamboohr|Coast (coast)|https://coast.bamboohr.com/careers
 Commvault	workday|Commvault Careers|https://commvault.wd1.myworkdayjobs.com/en-US/commvault	greenhouse|Commvault|https://job-boards.greenhouse.io/commvault
 Connections Health Solutions	greenhouse|Connectionshealthsolutions|https://job-boards.greenhouse.io/connectionshealthsolutions	icims|Connections Health Solutions|https://careers-connectionshs.icims.com/jobs/search?ss=1
@@ -354,7 +356,7 @@ Mochihealth	greenhouse|Mochihealth|https://job-boards.greenhouse.io/mochihealth	
 Moneytree	lever|Moneytree|https://jobs.lever.co/moneytree	hrmos|マネーツリー株式会社|https://hrmos.co/pages/moneytree/jobs
 Moniepoint	greenhouse|Moniepoint|https://job-boards.greenhouse.io/moniepoint	bamboohr|Moniepoint (moniepoint)|https://moniepoint.bamboohr.com/careers
 Morgan Stanley	eightfold|Morgan Stanley Inc.|https://morganstanley.eightfold.ai/careers	workday|Morgan Stanley|https://ms.wd5.myworkdayjobs.com/en-US/External
-Mosaic	workday|Mosaic Company (The)|https://mosaic.wd5.myworkdayjobs.com/en-US/mosaic	ashby|Mosaic|https://jobs.ashbyhq.com/mosaic
+Mosaic	workday|Mosaic Company (The)|https://mosaic.wd5.myworkdayjobs.com/en-US/mosaic	ashby|Mosaic|https://jobs.ashbyhq.com/mosaic	adp_myjobs|Mosaic|https://myjobs.adp.com/externalmosaic/cx
 Motivo	workable|Motivo Engineering|https://apply.workable.com/motivo/	rippling|Motivo|https://ats.rippling.com/motivo/jobs
 Muck Rack	greenhouse|Muckrack|https://job-boards.greenhouse.io/muckrack	bamboohr|Muck Rack|https://muckrack.bamboohr.com/careers
 Muckrack	greenhouse|Muckrack|https://job-boards.greenhouse.io/muckrack	bamboohr|Muck Rack|https://muckrack.bamboohr.com/careers
@@ -550,6 +552,7 @@ SupportYourApp	bamboohr|SupportYourApp|https://supportyourapp.bamboohr.com/caree
 Swap	workable|Swap|https://apply.workable.com/swap/	teamtailor|Swap|https://swap.teamtailor.com/jobs
 Sweatcoin	workable|Sweatcoin|https://apply.workable.com/sweatcoin/	teamtailor|Sweatcoin|https://sweatcoin.teamtailor.com/jobs
 Swissblock	lever|Swissblock|https://jobs.lever.co/swissblock	bamboohr|Swissblock Technologies AG|https://swissblock.bamboohr.com/careers
+Symetra	eightfold|Symetra|https://symetra.eightfold.ai/careers	adp_myjobs|Symetra|https://myjobs.adp.com/symetraexternal/cx
 Synthego	lever|Synthego|https://jobs.lever.co/synthego	bamboohr|Synthego|https://synthego.bamboohr.com/careers
 Syntronic	lever|Syntronic|https://jobs.lever.co/syntronic	bamboohr|Syntronic|https://syntronic.bamboohr.com/careers
 TAWANTECH	workable|TAWANTECH|https://apply.workable.com/tawantech/	teamtailor|TawanTech|https://tawantech.teamtailor.com/jobs
@@ -666,6 +669,7 @@ adglobe	herp|株式会社アドグローブ|https://herp.careers/careers/compani
 adidevelopments	lever|Adi Development Group|https://jobs.lever.co/adidevelopments	bamboohr|ADI Development Group|https://adidevelopments.bamboohr.com/careers
 adrim-recruit	herp|株式会社ADrim|https://herp.careers/careers/companies/adrim-recruit	hrmos|株式会社ADrim|https://hrmos.co/pages/adrim-recruit/jobs
 advantech	workday|Advantech Careers|https://advantech.wd3.myworkdayjobs.com/en-US/External	herp|アドバンテック株式会社|https://herp.careers/careers/companies/advantech
+advantest	hrmos|株式会社アドバンテスト|https://hrmos.co/pages/advantest/jobs	adp_myjobs|Advantest|https://myjobs.adp.com/advantestcareers/cx
 adverum	lever|Adverum Biotechnologies, Inc.|https://jobs.lever.co/adverum	bamboohr|Adverum|https://adverum.bamboohr.com/careers
 aesper	herp|株式会社AESPER|https://herp.careers/careers/companies/aesper	hrmos|株式会社AESPER|https://hrmos.co/pages/aesper/jobs
 aftership	greenhouse|AfterShip|https://job-boards.greenhouse.io/aftership	mokahr|AfterShip|https://app.mokahr.com/social-recruitment/aftership/43117
@@ -771,6 +775,7 @@ bolster	lever|Bolster Inc.|https://jobs.lever.co/bolster	recruitee|Bolster Digit
 branch	greenhouse|Branch|https://job-boards.greenhouse.io/branch	bamboohr|Branch (branch)|https://branch.bamboohr.com/careers
 branu	herp|BRANU株式会社|https://herp.careers/careers/companies/branu	hrmos|BRANU株式会社|https://hrmos.co/pages/branu/jobs
 bravegroup	herp|株式会社Brave group|https://herp.careers/careers/companies/bravegroup	hrmos|株式会社Brave group|https://hrmos.co/pages/bravegroup/jobs
+brc	adp_myjobs|Bowery Residents Committee|https://myjobs.adp.com/brc/cx	workable|brc|https://apply.workable.com/brc/
 brevanhoward	workday|Brevanhoward|https://brevanhoward.wd3.myworkdayjobs.com/en-US/BH_ExternalCareers	icims|Brevanhoward|https://careers-brevanhoward.icims.com/jobs/search?ss=1
 bridge	herp|ブリッジインターナショナルグループ株式会社|https://herp.careers/careers/companies/bridge	hrmos|ブリッジインターナショナルグループ株式会社|https://hrmos.co/pages/bridge/jobs
 brightai	greenhouse|Brightai|https://job-boards.greenhouse.io/brightai	bamboohr|Bright Ai|https://brightai.bamboohr.com/careers
@@ -822,6 +827,7 @@ coretech	herp|株式会社コアテック|https://herp.careers/careers/companies
 corsair	bamboohr|Corsair Components Limited|https://corsair.bamboohr.com/careers	oracle|CORSAIR|https://edix.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 corteva	workday|Corteva|https://corteva.wd5.myworkdayjobs.com/en-US/Corteva	eightfold|Corteva Agriscience|https://corteva.eightfold.ai/careers
 cos	workable|ConnectOS|https://apply.workable.com/cos/	rippling|Cos|https://ats.rippling.com/cos-careers/jobs
+costargroup	adp_myjobs|CoStar Group|https://myjobs.adp.com/costargroup/cx	workday|CoStar Group|https://costar.wd1.myworkdayjobs.com/en-US/CoStarCareers
 cre	herp|株式会社シーアールイー|https://herp.careers/careers/companies/cre	hrmos|株式会社シーアールイー|https://hrmos.co/pages/cre/jobs
 cresco	herp|株式会社クレスコ|https://herp.careers/careers/companies/cresco	hrmos|株式会社クレスコ|https://hrmos.co/pages/cresco/jobs
 crexi	greenhouse|Crexi|https://job-boards.greenhouse.io/crexi	bamboohr|CREXi (crexi)|https://crexi.bamboohr.com/careers
@@ -1110,7 +1116,7 @@ moniepoint	greenhouse|Moniepoint|https://job-boards.greenhouse.io/moniepoint	bam
 monstar-lab-recruit	herp|株式会社モンスターラボ|https://herp.careers/careers/companies/monstar-lab-recruit	hrmos|株式会社モンスターラボ|https://hrmos.co/pages/monstar-lab-recruit/jobs
 morganstanley	eightfold|Morgan Stanley Inc.|https://morganstanley.eightfold.ai/careers	workday|Morgan Stanley|https://ms.wd5.myworkdayjobs.com/en-US/External
 mori	hrmos|森ビル株式会社|https://hrmos.co/pages/mori/jobs	workable|MORI|https://apply.workable.com/babymori/
-mosaic	workday|Mosaic Company (The)|https://mosaic.wd5.myworkdayjobs.com/en-US/mosaic	ashby|Mosaic|https://jobs.ashbyhq.com/mosaic
+mosaic	workday|Mosaic Company (The)|https://mosaic.wd5.myworkdayjobs.com/en-US/mosaic	ashby|Mosaic|https://jobs.ashbyhq.com/mosaic	adp_myjobs|Mosaic|https://myjobs.adp.com/externalmosaic/cx
 mota	herp|株式会社MOTA|https://herp.careers/careers/companies/mota	smartrecruiters|MOTA|https://jobs.smartrecruiters.com/MOTA
 motivo	workable|Motivo Engineering|https://apply.workable.com/motivo/	rippling|Motivo|https://ats.rippling.com/motivo/jobs
 msd	workday|Merck & Co.|https://msd.wd5.myworkdayjobs.com/en-US/SearchJobs	successfactors|MSD|https://jobs.msd.govt.nz/search/
@@ -1368,6 +1374,7 @@ swap	workable|Swap|https://apply.workable.com/swap/	teamtailor|Swap|https://swap
 sweatcoin	workable|Sweatcoin|https://apply.workable.com/sweatcoin/	teamtailor|Sweatcoin|https://sweatcoin.teamtailor.com/jobs
 swingdev	lever|SwingDev—a hippo company|https://jobs.lever.co/swingdev	workable|Swing Development (SwingDev)|https://apply.workable.com/swingdev/
 swissblock	lever|Swissblock|https://jobs.lever.co/swissblock	bamboohr|Swissblock Technologies AG|https://swissblock.bamboohr.com/careers
+symetra	eightfold|Symetra|https://symetra.eightfold.ai/careers	adp_myjobs|Symetra|https://myjobs.adp.com/symetraexternal/cx
 syncreon	join|DP World Company|https://join.com/companies/syncreon	successfactors|syncreon|https://careers.syncreon.com/search/
 synthego	lever|Synthego|https://jobs.lever.co/synthego	bamboohr|Synthego|https://synthego.bamboohr.com/careers
 syntronic	lever|Syntronic|https://jobs.lever.co/syntronic	bamboohr|Syntronic|https://syntronic.bamboohr.com/careers
