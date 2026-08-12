@@ -43,11 +43,13 @@ type ADPMyJobsAdapter struct {
 	hc          *http.Client
 	careerBase  string
 	listingBase string
-	dumpCache   *DumpCache
+	// dumpCache holds no dump for this adapter; see facets for what it stores.
+	dumpCache *DumpCache
 }
 
 // NewADPMyJobsAdapter builds an adapter using the shared HTTP client.
-// dumpCache caches the location index used by Filters and location searches.
+// dumpCache is reused to hold each board's filter catalog rather than any board
+// dump (see facets); nil disables that caching without changing behaviour.
 func NewADPMyJobsAdapter(hc *http.Client, dumpCache *DumpCache) *ADPMyJobsAdapter {
 	if hc == nil {
 		hc = http.DefaultClient
@@ -231,6 +233,17 @@ func (f *adpFacets) resolve(filters FilterSet) ([]adp_myjobs.CustomFilter, error
 	return out, nil
 }
 
+// facets returns the board's cached filter catalog, fetching it once per slug.
+//
+// Despite the call below, this adapter does not dump anything: it borrows
+// [DumpCache] only for the per-slug keying, TTL and size bound, and stores the
+// catalog in the side channel with nil jobs. Reading `getOrLoadDump` here does
+// not mean the board is being paginated — a whole-board read is exactly what
+// filtering through the tenant's own dimensions replaced. Two consequences are
+// worth knowing: the entry occupies one of the cache's slots even though it is
+// far smaller than a real dump, and --dump-cache-ttl therefore also governs how
+// often this catalog is refetched. Nothing here depends on the cache for
+// correctness; a miss or eviction just refetches, and a nil cache is fine.
 func (a *ADPMyJobsAdapter) facets(ctx context.Context, slug string) (*adpFacets, error) {
 	_, side, err := a.dumpCache.getOrLoadDump(ctx, a.Name(), slug, func(ctx context.Context) ([]dumpJob, any, error) {
 		catalog, err := a.client().GetCustomFilters(ctx, slug)
