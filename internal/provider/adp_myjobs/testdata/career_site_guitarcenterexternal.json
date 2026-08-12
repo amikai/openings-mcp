@@ -1,0 +1,115 @@
+{
+  "id": "8c466343-1339-4b84-951e-93ded8f500c6",
+  "name": "GuitarCenterExternal ",
+  "domain": "guitarcenterexternal",
+  "isMyJobsEnabled": true,
+  "isSignOutEnabled": true,
+  "isReferAfriendEnabled": true,
+  "isTalentCommunityEnabled": false,
+  "isOtpLoginEnabled": false,
+  "directToAppGrid": false,
+  "isiClientId": "Guitar",
+  "clientName": "Guitar Center",
+  "orgoid": "234A0DA4F04007FD",
+  "settings": {
+    "themeId": "",
+    "externalId": "1238651",
+    "externalDomain": "ExternalCareerSite",
+    "bbqVersion": "",
+    "customJobDetailsFields": [],
+    "enabledFeatures": {
+      "AckPrivacyStatement": true,
+      "addStateSearchFilter": true,
+      "allowImageTypes": true,
+      "booleanAsCheckbox": true,
+      "candidateProfileMyJobs": true,
+      "chooseVerificationMethod": true,
+      "customJobDetails": true,
+      "customJobFilters": true,
+      "cxFeatureGuards": true,
+      "cxSettings": true,
+      "deleteCareerSite": true,
+      "enableCxDocuments": true,
+      "enableCxGoogleTagManager": true,
+      "enableCxToken": true,
+      "evergreenMultilocationsEnabled": true,
+      "hideJobDetailsMultiLoc": true,
+      "honorEGRMPostingFlag": true,
+      "honorRMPostingFlag": true,
+      "isFooterV2Enabled": true,
+      "multiLingualSearch": true,
+      "notifyMe": true,
+      "referAFriend": true,
+      "resultsFieldsRedesign": true,
+      "rightToBeForgotten": true,
+      "showAITransparencyLink": true,
+      "showVirtualFields": true,
+      "similarJobs": true,
+      "skillsCuration": true
+    },
+    "careerSiteType": "External"
+  },
+  "active": true,
+  "hideDaysPosted": true,
+  "links": [
+    {
+      "rel": "self",
+      "href": "/public/staffing/v1/career-site/guitarcenterexternal"
+    },
+    {
+      "rel": "themeURL",
+      "href": "https://my.adp.com/myadp_prefix/redboxapi/public/core/v1/branding/themes/?alias=f6cd1606-b313-4d23-8275-04f2b7315e22"
+    },
+    {
+      "rel": "cxSettingsUrl",
+      "href": "https://my.adp.com/myadp_prefix/mycareer/public/api/rm/staffing/v1/client-configuration/careersite/setting-categories/CX/settings?rmapp=cxsa"
+    },
+    {
+      "rel": "bbqUrl",
+      "href": "https://static.adp.com/static/redbox/barbecue/myadp-barbecue-loader.js"
+    },
+    {
+      "rel": "spsFacebook",
+      "href": "https://sps.adp.com/affwebservices/public/oauthtokenconsumer/fbpilot?AuthzServerID=Facebook&RelayState="
+    },
+    {
+      "rel": "spsGoogle",
+      "href": "https://sps.adp.com/affwebservices/public/oauthtokenconsumer/googlepilot?AuthzServerID=Google&RelayState="
+    },
+    {
+      "rel": "spsLinkedin",
+      "href": "https://sps.adp.com/affwebservices/public/oauthtokenconsumer/lnpilot?AuthzServerID=LinkedIn&RelayState="
+    },
+    {
+      "rel": "spsIndeed",
+      "href": "https://sps.adp.com/affwebservices/public/oauthtokenconsumer/indeedpilot?AuthzServerID=Indeed&RelayState="
+    }
+  ],
+  "properties": {
+    "googleMapsKey": "AIzaSyA_EGkaKdCg3HbFzFf-r62H5l0xVctXdLE",
+    "myadpUrl": "https://my.adp.com",
+    "ei9Host": "ei9.adp.com",
+    "dropbox": {
+      "apiKey": "7or8z5c071bs3nq"
+    },
+    "googleDrive": {
+      "apiKey": "AIzaSyDs7CTLLA0zhXgsfa-NprVwCrOBLTf0lIg",
+      "clientId": "231832210702-2gesiai1ndvhlthudk69gqnr9h2q8vkp.apps.googleusercontent.com",
+      "appId": "231832210702"
+    },
+    "oneDrive": {
+      "clientId": "f72edc60-de2e-4c61-981b-3a5a4ca6ada8"
+    },
+    "iCloud": {
+      "containerIdentifier": "cont_id",
+      "apiToken": "api_token"
+    },
+    "pendo": {
+      "apiKey": "04639564-0b9c-48de-4e99-8b925d9a1251"
+    },
+    "similarSkills": {
+      "apiKey": "oQTKfxSrGp7qeQYb5k7MH6593cgNL4gq5YM45Cmz"
+    }
+  },
+  "myJobsToken": "TEST_MYJOBS_TOKEN"
+}

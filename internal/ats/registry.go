@@ -47,6 +47,7 @@ type Registry struct {
 // error only advertises hosts the registry actually has an adapter for.
 var careersHostPatternsByAdapter = map[string]string{
 	"workday":         "<tenant>.<wd*>.myworkdayjobs.com/<site>",
+	"adp_myjobs":      "myjobs.adp.com/<slug>",
 	"avature":         "<tenant>.avature.net/<portal> (custom-domain portals via roster only)",
 	"bamboohr":        "<company>.bamboohr.com/careers",
 	"greenhouse":      "job-boards.greenhouse.io/<board>",

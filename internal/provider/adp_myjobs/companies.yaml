@@ -1,0 +1,12 @@
+# Seed roster: each slug was live-verified against public career-site config
+# (HTTP 200, myJobsToken present) during provider integration.
+- company: Church Mutual Insurance, S.I.
+  slug: churchmutual
+- company: Follett Corporation
+  slug: retailexternalfollett
+- company: Guitar Center
+  slug: guitarcenterexternal
+- company: Kimball Midwest
+  slug: kmwcareers
+- company: Signature Performance, Inc
+  slug: signatureperformancecareers
