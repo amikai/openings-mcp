@@ -1,12 +1,74 @@
 # Seed roster: each slug was live-verified against public career-site config
 # (HTTP 200, myJobsToken present) during provider integration.
+- company: Advantest
+  slug: advantestcareers
+- company: ATI Restoration
+  slug: atiexternal
+- company: BankUnited
+  slug: bankunitedexternal
+- company: Bowery Residents Committee
+  slug: brc
+- company: Brady Corporation
+  slug: bradycorp
+- company: Carlisle Companies
+  slug: carlislecompanies
+- company: Casey's
+  slug: caseysstore
+- company: Central Bancompany
+  slug: centralbancompany
+- company: Century Casinos
+  slug: centurycasinos
 - company: Church Mutual Insurance, S.I.
   slug: churchmutual
+- company: Citi Trends
+  slug: cititrendscorp
+- company: Comerica
+  slug: comericajobs
+- company: CoStar Group
+  slug: costargroup
+- company: CVR Energy, Inc.
+  slug: externalcvrenergy
+- company: Del Monte Foods, Inc
+  slug: delmonte
+- company: Designer Brands Inc.
+  slug: designerbrands
+- company: Dhanani Group
+  slug: wendys
+- company: FedEx Supply Chain
+  slug: fedex
 - company: Follett Corporation
   slug: retailexternalfollett
+- company: GECU Federal Credit Union
+  slug: gecucareers
 - company: Guitar Center
   slug: guitarcenterexternal
+- company: Herb Chambers
+  slug: herbchambers
+- company: Icahn Automotive Group LLC
+  slug: pepboyscareers
+- company: Kaiser Aluminum
+  slug: kaisercareers
 - company: Kimball Midwest
   slug: kmwcareers
+- company: Lyric HCM
+  slug: roomstogo
+- company: Mosaic
+  slug: externalmosaic
+- company: New Season
+  slug: newseasoncareer
+- company: Parkdale US Cotton
+  slug: uscjobs
+- company: Peachtree Restaurant Partners LLC
+  slug: ihopcareers
+- company: Pinnacle Bank, a Tennessee bank, d/b/a Synovus Bank
+  slug: synovuscareers
 - company: Signature Performance, Inc
   slug: signatureperformancecareers
+- company: Student Conservation Association, Inc
+  slug: scacareers
+- company: Symetra
+  slug: symetraexternal
+
+
+
+
