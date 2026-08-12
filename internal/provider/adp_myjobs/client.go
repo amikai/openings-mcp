@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -39,13 +40,87 @@ type Config struct {
 }
 
 // ListParams is one page of public job requisitions.
-// Search is sent as OData $search (server-side free-text). Empty means no $search.
-// Filter is sent as OData $filter. Empty means no $filter.
 type ListParams struct {
+	// Search is sent as OData $search (server-side free-text over the posting).
+	// Empty means no $search.
 	Search string
-	Filter string
+	// GeoBox restricts results to postings located inside the box, sent as the
+	// endpoint's one supported $filter form. nil means no $filter.
+	GeoBox *GeoBox
 	Skip   int
 	Top    int
+}
+
+// GeoBox is a longitude/latitude bounding box, the only location constraint the
+// public listing endpoint honors. It matches against workLocations.geoLocation,
+// which is indexed per posting location at street precision even on boards
+// whose listing payload returns workLocations empty.
+//
+// Everything else callers might reach for is a trap: the endpoint answers a
+// $filter over any other field — requisitionLocations/itemID, workLocations.city,
+// or a misspelled field name — with HTTP 200 and the unfiltered board, so a
+// wrong expression reads as "this company has no location filter" rather than
+// as an error. Only one box per request is possible; ORing two boxes is either
+// rejected (HTTP 500) or silently ignored, and a polygon with more than the two
+// corners below is rejected.
+type GeoBox struct {
+	West, South, East, North float64
+}
+
+// NewGeoBox returns the box spanning the two corners, ordered as the endpoint
+// requires. Callers pass corners in any order; a box needs west < east and
+// south < north, since inverted longitudes quietly select a different region
+// and a zero-area box is answered with HTTP 500.
+func NewGeoBox(lon1, lat1, lon2, lat2 float64) GeoBox {
+	return GeoBox{
+		West:  min(lon1, lon2),
+		South: min(lat1, lat2),
+		East:  max(lon1, lon2),
+		North: max(lat1, lat2),
+	}
+}
+
+// Pad grows the box by delta degrees on all four sides. A box built from a
+// single posting location has zero area, which upstream rejects, so callers
+// resolving a location to coordinates must pad before sending.
+//
+// Corners are rounded to coordDecimals places, so the float noise of adding
+// delta does not reach the query string.
+func (b GeoBox) Pad(delta float64) GeoBox {
+	return GeoBox{
+		West:  roundCoord(b.West - delta),
+		South: roundCoord(b.South - delta),
+		East:  roundCoord(b.East + delta),
+		North: roundCoord(b.North + delta),
+	}
+}
+
+// coordDecimals is the precision kept for box corners: 7 decimal places is
+// ~1 cm, far finer than the per-location coordinates upstream publishes.
+const coordDecimals = 7
+
+func roundCoord(v float64) float64 {
+	scale := math.Pow(10, coordDecimals)
+	return math.Round(v*scale) / scale
+}
+
+// Filter renders b as an OData $filter value.
+//
+// The literal "undefined" tokens are required, not a bug being copied for its
+// own sake: they come from a broken template in ADP's own career SPA, and the
+// endpoint's parser now only accepts that shape. A well-formed
+// POLYGON((lon lat, lon lat)) with the same corners is answered with HTTP 500.
+func (b GeoBox) Filter() string {
+	return "geo.intersects(workLocations.geoLocation, geography'POLYGON((undefined, " +
+		formatCoord(b.West) + " " + formatCoord(b.South) + ", undefined, " +
+		formatCoord(b.East) + " " + formatCoord(b.North) + "))')"
+}
+
+// formatCoord renders a coordinate in plain decimal notation, never the
+// exponent form Go's default float formatting would pick near zero, which is
+// not valid inside a WKT literal.
+func formatCoord(v float64) string {
+	return strconv.FormatFloat(v, 'f', -1, 64)
 }
 
 // Client talks to public MyJobs career-site and listing endpoints.
@@ -247,6 +322,16 @@ func (c *Client) setListingHeaders(req *http.Request, sess session) {
 	}
 }
 
+// encodeQuery encodes q with spaces as %20 rather than "+".
+//
+// The two are interchangeable to this endpoint everywhere except inside a geo
+// $filter, where a "+" makes it answer HTTP 500 — url.Values.Encode alone is
+// enough to break every location search. Replacing "+" afterwards is safe
+// because Encode has already escaped any literal plus as %2B.
+func encodeQuery(q url.Values) string {
+	return strings.ReplaceAll(q.Encode(), "+", "%20")
+}
+
 func (c *Client) listOnce(ctx context.Context, slug string, sess session, p ListParams) (*ListResult, error) {
 	q := url.Values{}
 	q.Set("$orderby", defaultOrderBy)
@@ -257,10 +342,10 @@ func (c *Client) listOnce(ctx context.Context, slug string, sess session, p List
 	if s := strings.TrimSpace(p.Search); s != "" {
 		q.Set("$search", s)
 	}
-	if f := strings.TrimSpace(p.Filter); f != "" {
-		q.Set("$filter", f)
+	if p.GeoBox != nil {
+		q.Set("$filter", p.GeoBox.Filter())
 	}
-	u := c.listingBase + listingPath + "?" + q.Encode()
+	u := c.listingBase + listingPath + "?" + encodeQuery(q)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {

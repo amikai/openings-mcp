@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/jaytaylor/html2text"
@@ -44,18 +45,19 @@ func main() {
 	rootCmd.Subcommands = append(rootCmd.Subcommands, companiesCmd)
 
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
-	keyword := searchFS.StringLong("keyword", "", "case-insensitive substring filter on job titles")
+	keyword := searchFS.StringLong("keyword", "", "server-side $search over the posting")
+	bbox := searchFS.StringLong("bbox", "", "location box as WEST,SOUTH,EAST,NORTH in degrees, e.g. -118.4,34.0,-118.3,34.2")
 	limit := searchFS.IntLong("limit", 20, "max jobs to print after filtering")
 	searchCmd := &ff.Command{
 		Name:      "search",
-		Usage:     "adp_myjobs --company SLUG search [--keyword TEXT] [--limit N]",
-		ShortHelp: "list jobs from a MyJobs board (full dump + local filter)",
+		Usage:     "adp_myjobs --company SLUG search [--keyword TEXT] [--bbox W,S,E,N] [--limit N]",
+		ShortHelp: "list jobs from a MyJobs board (server-side keyword and location)",
 		Flags:     searchFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("search takes no positional arguments, got %v", args)
 			}
-			return runSearch(ctx, *company, *keyword, *limit, *format)
+			return runSearch(ctx, *company, *keyword, *bbox, *limit, *format)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, searchCmd)
@@ -113,7 +115,7 @@ func newClient() *adp_myjobs.Client {
 	})
 }
 
-func runSearch(ctx context.Context, company, keyword string, limit int, format string) error {
+func runSearch(ctx context.Context, company, keyword, bbox string, limit int, format string) error {
 	slug, err := requireSlug(company)
 	if err != nil {
 		return err
@@ -121,8 +123,13 @@ func runSearch(ctx context.Context, company, keyword string, limit int, format s
 	if limit <= 0 {
 		limit = 20
 	}
+	box, err := parseBBox(bbox)
+	if err != nil {
+		return err
+	}
 	page, err := newClient().ListJobRequisitions(ctx, slug, adp_myjobs.ListParams{
 		Search: strings.TrimSpace(keyword),
+		GeoBox: box,
 		Top:    limit,
 	})
 	if err != nil {
@@ -167,6 +174,33 @@ func runGet(ctx context.Context, company, jobID, format string) error {
 	}
 	fmt.Printf("%s\n%s\n%s\n\n%s\n", j.Title(), j.PrimaryLocation(), adp_myjobs.ApplyURL(slug, j.ReqIDString()), desc)
 	return nil
+}
+
+// parseBBox turns a "WEST,SOUTH,EAST,NORTH" flag into a box, or nil when the
+// flag is empty. It pads a box the caller gave zero area, since upstream answers
+// that with HTTP 500.
+func parseBBox(raw string) (*adp_myjobs.GeoBox, error) {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		return nil, nil
+	}
+	parts := strings.Split(raw, ",")
+	if len(parts) != 4 {
+		return nil, fmt.Errorf("--bbox needs 4 comma-separated degrees WEST,SOUTH,EAST,NORTH, got %q", raw)
+	}
+	nums := make([]float64, 4)
+	for i, p := range parts {
+		v, err := strconv.ParseFloat(strings.TrimSpace(p), 64)
+		if err != nil {
+			return nil, fmt.Errorf("--bbox value %q is not a number", p)
+		}
+		nums[i] = v
+	}
+	box := adp_myjobs.NewGeoBox(nums[0], nums[1], nums[2], nums[3])
+	if box.West == box.East || box.South == box.North {
+		box = box.Pad(0.0001)
+	}
+	return &box, nil
 }
 
 func requireSlug(company string) (string, error) {

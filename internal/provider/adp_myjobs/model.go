@@ -43,11 +43,37 @@ type RequisitionLocation struct {
 
 // LocationAddress holds geo fields from a requisition location.
 type LocationAddress struct {
-	CityName                 string   `json:"cityName"`
-	CountrySubdivisionLevel1 *CodeVal `json:"countrySubdivisionLevel1"`
-	CountryCode              *CodeVal `json:"countryCode"`
-	PostalCode               string   `json:"postalCode"`
-	LineOne                  string   `json:"lineOne"`
+	CityName                 string         `json:"cityName"`
+	CountrySubdivisionLevel1 *CodeVal       `json:"countrySubdivisionLevel1"`
+	Country                  *CodeVal       `json:"country"`
+	PostalCode               string         `json:"postalCode"`
+	LineOne                  string         `json:"lineOne"`
+	GeoCoordinate            *GeoCoordinate `json:"geoCoordinate"`
+}
+
+// GeoCoordinate is a posting location's WGS84 point, the only location value
+// the listing endpoint can filter on (see [GeoBox]).
+type GeoCoordinate struct {
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+// Point reports the coordinate only when it is usable in a geo query. It
+// rejects the 0/0 placeholder MyJobs stores for locations it never geocoded —
+// some boards carry those for every location — and out-of-range values, both
+// of which would silently match the wrong postings.
+func (g *GeoCoordinate) Point() (lat, lon float64, ok bool) {
+	switch {
+	case g == nil:
+		return 0, 0, false
+	case g.Latitude == 0 && g.Longitude == 0:
+		return 0, 0, false
+	case g.Latitude < -90 || g.Latitude > 90:
+		return 0, 0, false
+	case g.Longitude < -180 || g.Longitude > 180:
+		return 0, 0, false
+	}
+	return g.Latitude, g.Longitude, true
 }
 
 // CodeVal is a short code/name pair.
@@ -178,7 +204,7 @@ func (j JobRequisition) PrimaryLocation() string {
 		if s := codeString(loc.Address.CountrySubdivisionLevel1); s != "" {
 			parts = append(parts, s)
 		}
-		if s := codeString(loc.Address.CountryCode); s != "" {
+		if s := codeString(loc.Address.Country); s != "" {
 			parts = append(parts, s)
 		}
 		if len(parts) > 0 {
