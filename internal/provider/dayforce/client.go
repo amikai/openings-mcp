@@ -43,11 +43,13 @@ type BoardClient struct {
 // transport are attached, so other providers can safely share its base
 // transport and timeout without sharing Dayforce session state.
 func NewBoardClient(baseURL string, httpClient *http.Client) (*BoardClient, error) {
-	if httpClient == nil {
-		httpClient = &http.Client{}
+	// Shallow-copy the client so replacing Transport and Jar below does not
+	// mutate the caller's client; the underlying transport remains shared.
+	var sessionHTTPClient http.Client
+	if httpClient != nil {
+		sessionHTTPClient = *httpClient
 	}
 
-	sessionHTTPClient := *httpClient
 	base := sessionHTTPClient.Transport
 	if base == nil {
 		base = http.DefaultTransport
