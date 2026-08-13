@@ -1,6 +1,7 @@
 package dayforce
 
 import (
+	"cmp"
 	_ "embed"
 	"errors"
 	"fmt"
@@ -37,16 +38,14 @@ type Company struct {
 
 // Culture returns c.CultureCode, defaulting to en-US when unset.
 func (c Company) Culture() string {
-	if c.CultureCode == "" {
-		return defaultCultureCode
-	}
-	return c.CultureCode
+	return cmp.Or(c.CultureCode, defaultCultureCode)
 }
 
-// Slug identifies this board within the dayforce roster: the tenant
-// namespace, suffixed with the lowercased job board code when the board is
-// not the default CANDIDATEPORTAL board, so a multi-board tenant can carry
-// more than one board without its slugs colliding.
+// Slug is the roster-side Search key. A default CANDIDATEPORTAL board is
+// the namespace alone; any other board is namespace-board so two boards on
+// one tenant do not collide. Unlisted boards never go through this method:
+// a careers URL outside the roster is minted as "ns/board[/culture]" so
+// those three fields can travel without a YAML row.
 func (c Company) Slug() string {
 	if strings.EqualFold(c.JobBoardCode, candidatePortalBoardCode) {
 		return c.Namespace

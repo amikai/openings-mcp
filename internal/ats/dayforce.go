@@ -13,6 +13,7 @@ import (
 	"sync"
 
 	"github.com/jaytaylor/html2text"
+	"golang.org/x/sync/errgroup"
 
 	"github.com/amikai/openings-mcp/internal/provider/dayforce"
 )
@@ -129,12 +130,30 @@ func (a *DayforceAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-// ParseCareersURL recognizes every board URL shape documented on
-// dayforceBoardURLRE and dayforceLegacyURLRE. A roster company folds back
-// to its roster slug only when both namespace and job board code match a
-// curated row — a same-namespace URL for a different board must not
-// collapse onto it, mirroring [UltiProAdapter.ParseCareersURL]. Anything
-// else gets a canonical slug, lowercased for namespace and board code.
+// ParseCareersURL accepts current jobs.dayforcehcm.com board or job URLs and
+// legacy <region>.dayforcehcm.com CandidatePortal URLs.
+//
+// Search has two entry points that cannot share one slug shape. A curated
+// row keeps namespace, board, and culture in YAML, so its Search key is the
+// short [dayforce.Company.Slug] (usually just the namespace). A careers URL
+// for a board that is not in the roster has nowhere else to put those three
+// fields, so this method mints "ns/board" and appends "/culture" only when
+// culture is not en-US — [DayforceAdapter.resolveSlug] splits that form back
+// apart. Roster matching is the namespace+board fields, not slug strings: a
+// hit returns Company.Slug() (e.g. "pca"); "pca" and "pca/candidateportal"
+// are never compared to each other.
+//
+// Examples:
+//   - https://jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL/jobs/62374
+//     returns ("pca", true)
+//   - https://jobs.dayforcehcm.com/en-US/pca/ENGINEERING
+//     returns ("pca/engineering", true)
+//   - https://jobs.dayforcehcm.com/fr-CA/unknown/CANDIDATEPORTAL
+//     returns ("unknown/candidateportal/fr-CA", true)
+//   - https://us1234.dayforcehcm.com/CandidatePortal/en-US/mydayforce/Site/alljobs
+//     returns ("mydayforce/alljobs", true)
+//
+// Non-Dayforce, API, asset, and incomplete board URLs return ("", false).
 func (a *DayforceAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	ns, xref, culture, ok := parseDayforceCareersURL(u)
 	if !ok {
@@ -227,11 +246,13 @@ func dayforceJobURL(board dayforce.Company, jobPostingID int) string {
 	return fmt.Sprintf("%s/jobs/%d", dayforceBoardURL(board), jobPostingID)
 }
 
-// resolveSlug maps a slug to its board and display name: a curated roster
-// row first, then the canonical form [DayforceAdapter.ParseCareersURL]
-// mints for non-roster boards. Non-roster rows leave JobBoardID unset;
-// [DayforceAdapter.jobBoardID] fills it from a memoized SiteInfo on the
-// paths that need it.
+// resolveSlug maps a slug to its board and display name. A roster slug
+// (from [dayforce.Company.Slug]) hits CompaniesBySlug and uses that YAML
+// row. Anything else that contains "/" is the form
+// [DayforceAdapter.ParseCareersURL] mints for an unlisted URL — split into
+// namespace, board, and optional culture; there is no second YAML lookup.
+// Non-roster rows leave JobBoardID unset; [DayforceAdapter.jobBoardID]
+// fills it from a memoized SiteInfo on the paths that need it.
 func (a *DayforceAdapter) resolveSlug(_ context.Context, slug string) (name string, board dayforce.Company, err error) {
 	if c, ok := dayforce.CompaniesBySlug[strings.ToLower(slug)]; ok {
 		return c.Name, c, nil
@@ -553,16 +574,21 @@ func (a *DayforceAdapter) Filters(ctx context.Context, slug string) (FilterSet, 
 		return nil, err
 	}
 
-	departments, err := a.client.Departments(ctx, board.Namespace, board.JobBoardID, board.Culture())
-	if err != nil {
-		return nil, fmt.Errorf("dayforce: filters %q: %w", slug, err)
-	}
-	payClasses, err := a.client.PayClasses(ctx, board.Namespace, board.JobBoardID, board.Culture())
-	if err != nil {
-		return nil, fmt.Errorf("dayforce: filters %q: %w", slug, err)
-	}
-	payTypes, err := a.client.PayTypes(ctx, board.Namespace, board.JobBoardID, board.Culture())
-	if err != nil {
+	var departments, payClasses, payTypes *dayforce.PostingAttributeList
+	g, gCtx := errgroup.WithContext(ctx)
+	g.Go(func() (err error) {
+		departments, err = a.client.Departments(gCtx, board.Namespace, board.JobBoardID, board.Culture())
+		return err
+	})
+	g.Go(func() (err error) {
+		payClasses, err = a.client.PayClasses(gCtx, board.Namespace, board.JobBoardID, board.Culture())
+		return err
+	})
+	g.Go(func() (err error) {
+		payTypes, err = a.client.PayTypes(gCtx, board.Namespace, board.JobBoardID, board.Culture())
+		return err
+	})
+	if err := g.Wait(); err != nil {
 		return nil, fmt.Errorf("dayforce: filters %q: %w", slug, err)
 	}
 
