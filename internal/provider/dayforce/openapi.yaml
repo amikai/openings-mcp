@@ -472,17 +472,15 @@ components:
       properties:
         jobDescriptionHeader:
           description: >
-            HTML, usually boilerplate company copy. Confirmed non-null
-            across 158 live detail responses spanning all 14 surveyed
-            tenants (pca, jdemea, mymilacron, wikoff, avgroup, nam, corpay,
-            odc, ipg, kiinc, medplast, opta, paradigm, thechronicle),
-            2026-08-11.
-          type: string
+            HTML, usually boilerplate company copy. Null on some live boards
+            (e.g. ara posting 8) even when jobDescription is present —
+            confirmed 2026-08-13.
+          type: [string, "null"]
         jobDescription:
           description: >
-            HTML. Confirmed non-null across the same 158-response survey as
-            jobDescriptionHeader.
-          type: string
+            HTML. Null on some live boards even when jobDescriptionHeader is
+            present — confirmed 2026-08-13.
+          type: [string, "null"]
         jobDescriptionFooter:
           description: >
             HTML, usually compensation/benefits/EEO boilerplate. Null on

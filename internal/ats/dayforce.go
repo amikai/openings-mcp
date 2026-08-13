@@ -647,7 +647,11 @@ func (a *DayforceAdapter) Detail(ctx context.Context, slug, jobID string) (*JobD
 // dropping it.
 func dayforceDescription(c dayforce.JobPostingContent) string {
 	var b strings.Builder
-	for _, html := range []string{c.JobDescriptionHeader, c.JobDescription, c.JobDescriptionFooter.Or("")} {
+	for _, html := range []string{
+		c.JobDescriptionHeader.Or(""),
+		c.JobDescription.Or(""),
+		c.JobDescriptionFooter.Or(""),
+	} {
 		if html == "" {
 			continue
 		}

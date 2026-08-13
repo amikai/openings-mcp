@@ -38,6 +38,12 @@ const (
 	// (mymilacron 2684), whose TravelRequired attribute is a JSON bool with
 	// type "bool".
 	MockBoolAttributeJobID = 2684
+
+	// MockNullDescriptionHeaderJobID is detail_null_description_header_rsp.json's
+	// posting id (ara 8), whose jobDescriptionHeader is null while
+	// jobDescription is present — for tests exercising [BoardClient.Job]
+	// against that shape.
+	MockNullDescriptionHeaderJobID = 8
 )
 
 //go:embed testdata/search_rsp.json
@@ -69,6 +75,9 @@ var mockDetailNullCurrencyRsp []byte
 
 //go:embed testdata/detail_bool_attribute_rsp.json
 var mockDetailBoolAttributeRsp []byte
+
+//go:embed testdata/detail_null_description_header_rsp.json
+var mockDetailNullDescriptionHeaderRsp []byte
 
 //go:embed testdata/detail_not_found_rsp.json
 var mockDetailNotFoundRsp []byte
@@ -153,6 +162,12 @@ func NewMockServer() *httptest.Server {
 			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
 			r.PathValue("postingId") == "2684" {
 			serveMockJSON(w, http.StatusOK, mockDetailBoolAttributeRsp)
+			return
+		}
+		if r.PathValue("ns") == "ara" && r.PathValue("ns2") == "ara" &&
+			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
+			r.PathValue("postingId") == "8" {
+			serveMockJSON(w, http.StatusOK, mockDetailNullDescriptionHeaderRsp)
 			return
 		}
 		// Any other ns/culture/jobBoardId/postingId combination, including a
