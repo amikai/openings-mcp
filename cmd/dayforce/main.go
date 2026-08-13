@@ -316,8 +316,8 @@ func printDetail(d *dayforce.JobPostingDetail, format string) error {
 	fmt.Printf("Posted: %s\n", d.PostingStartTimestampUTC.Format("2006-01-02"))
 	fmt.Printf("ID: %d\n", d.JobPostingId)
 
-	printSection("Job Description Header", d.JobPostingContent.JobDescriptionHeader)
-	printSection("Job Description", d.JobPostingContent.JobDescription)
+	printSection("Job Description Header", d.JobPostingContent.JobDescriptionHeader.Or(""))
+	printSection("Job Description", d.JobPostingContent.JobDescription.Or(""))
 	printSection("Job Description Footer", d.JobPostingContent.JobDescriptionFooter.Or(""))
 	return nil
 }

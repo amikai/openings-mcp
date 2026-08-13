@@ -51,6 +51,7 @@ Alchemy	workday|Alchemy|https://alchemy.wd1.myworkdayjobs.com/en-US/alchemy	ashb
 Algolia	greenhouse|Algolia|https://job-boards.greenhouse.io/algolia	bamboohr|Algolia (algolia)|https://algolia.bamboohr.com/careers
 Aline	bamboohr|A-Line|https://aline.bamboohr.com/careers	dayforce|Aline|https://jobs.dayforcehcm.com/en-US/aline/CANDIDATEPORTAL
 Alliance	workday|Alliance|https://alliance.wd3.myworkdayjobs.com/en-US/NissanPrivateExternal	bamboohr|Alliance Insurance Services|https://alliance.bamboohr.com/careers
+Alltech	smartrecruiters|Alltech|https://jobs.smartrecruiters.com/Alltech2	dayforce|Alltech|https://jobs.dayforcehcm.com/en-US/alltech/HUBBARD
 Allwyn Lottery Solutions	bamboohr|Allwyn Lottery Solutions Ltd.|https://allwynlotterysolutions.bamboohr.com/careers	workable|Allwyn Lottery Solutions|https://apply.workable.com/allwynls/
 Alma	bamboohr|MedStaffers/Alma Health|https://alma.bamboohr.com/careers	ashby|Alma|https://jobs.ashbyhq.com/tryalma
 Alpaca	greenhouse|Alpaca|https://job-boards.greenhouse.io/alpaca	bamboohr|AlpacaDB Inc.|https://alpaca.bamboohr.com/careers
@@ -110,6 +111,7 @@ BetterHelp	greenhouse|Betterhelp (betterhelp)|https://job-boards.greenhouse.io/b
 Bft	workday|Bft|https://bft.wd501.myworkdayjobs.com/en-US/Ben_Franklin_Transit_External_Careers	herp|株式会社ＢＦＴ|https://herp.careers/careers/companies/bft	hrmos|株式会社ＢＦＴ|https://hrmos.co/pages/bft/jobs
 Bgeinc	greenhouse|Bgeinc|https://job-boards.greenhouse.io/bgeinc	ultipro|BGE, Inc.|https://recruiting.ultipro.com/BRO1015BGEI/JobBoard/0998bdfc-1d18-a181-4c4b-6ead20918301/
 Bhs	workday|Bhs|https://bhs.wd1.myworkdayjobs.com/en-US/careers	dayforce|Legacy Behavioral Health Services|https://jobs.dayforcehcm.com/en-US/bhs/CANDIDATEPORTAL
+Bison	workday|Bison Driving Careers|https://bison.wd3.myworkdayjobs.com/en-US/BisonDriverCareers	dayforce|Bison|https://jobs.dayforcehcm.com/en-US/muellerindustries/BISONMETALSTECHNOLOGIESLLC
 Bitgo	greenhouse|Bitgo|https://job-boards.greenhouse.io/bitgo	bamboohr|BitGo (bitgo)|https://bitgo.bamboohr.com/careers
 Blacklane	greenhouse|Blacklane|https://job-boards.greenhouse.io/blacklane	bamboohr|Blacklane GmbH|https://blacklane.bamboohr.com/careers
 Blackstone	workday|Blackstone Inc.|https://blackstone.wd1.myworkdayjobs.com/en-US/Blackstone_Careers	smartrecruiters|Blackstone|https://jobs.smartrecruiters.com/Blackstone1
@@ -144,6 +146,7 @@ Campfire	ashby|Campfire|https://jobs.ashbyhq.com/campfire	hrmos|株式会社CAMP
 Canam Steel Corporation	smartrecruiters|Canam Steel Corporation|https://jobs.smartrecruiters.com/CanamSteelCorporation	adp_myjobs|Canam Steel Corporation|https://myjobs.adp.com/cscexternalcareersite/cx
 Canon	hrmos|キヤノン株式会社|https://hrmos.co/pages/canon/jobs	oracle|Canon|https://ejqe.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 Canopy	greenhouse|Canopy|https://job-boards.greenhouse.io/canopytax	workable|Canopy|https://apply.workable.com/canopy-7/
+Careers	successfactors|Careers|https://careers.valmet-automotive.com/search/	dayforce|Careers|https://jobs.dayforcehcm.com/en-US/schwarzpartners/ENCORR-SHEETS-CAREERS
 Carharttwip	workday|Carharttwip|https://carharttwip.wd103.myworkdayjobs.com/en-US/carharttwip	join|Work In Progress Textilhandels GmbH|https://join.com/companies/carhartt-wip
 Caribou	greenhouse|Caribou|https://job-boards.greenhouse.io/caribou	bamboohr|Caribou (caribou)|https://caribou.bamboohr.com/careers
 Catalyze	lever|Catalyze|https://jobs.lever.co/catalyze	workable|Catalyze|https://apply.workable.com/catalyze/
@@ -296,6 +299,7 @@ Gravity Payments	greenhouse|Gravity Payments|https://job-boards.greenhouse.io/gr
 Griffith Foods	workday|Griffith Foods|https://griffithfoods.wd12.myworkdayjobs.com/en-US/External	dayforce|Griffith Foods|https://jobs.dayforcehcm.com/en-US/griffith/CANDIDATEPORTAL
 H.R.I株式会社	herp|H.R.I株式会社|https://herp.careers/careers/companies/hri-recruit2016	hrmos|H.R.I株式会社|https://hrmos.co/pages/hri-recruit2016/jobs
 HARMAN	workday|ATTENTION! Please read carefully:|https://harman.wd3.myworkdayjobs.com/en-US/harman	avature|HARMAN|https://jobsearch.harman.com/careers/SearchJobs
+HCMS	smartrecruiters|HCMS|https://jobs.smartrecruiters.com/HCMS	dayforce|The Employee Experience Team|https://jobs.dayforcehcm.com/en-US/hcms/CANDIDATEPORTAL
 HERE	greenhouse|HERE|https://job-boards.greenhouse.io/hereio	teamtailor|Here|https://here.teamtailor.com/jobs	icims|HERE|https://careers-here.icims.com/jobs/search?ss=1
 HHC	workday|HHC Careers|https://hhc.wd5.myworkdayjobs.com/en-US/HHC	successfactors|HHC|https://careers.hhcorp.org/search/
 HIVED	recruitee|Hived NV|https://hived.recruitee.com	teamtailor|HIVED|https://hivedhq.teamtailor.com/jobs
@@ -376,7 +380,7 @@ LINE WORKS株式会社	herp|LINE WORKS株式会社|https://herp.careers/careers/
 LOFT	workable|LOFT|https://apply.workable.com/loft/	teamtailor|Loft|https://loft.teamtailor.com/jobs
 LOOP®	lever|Loop|https://jobs.lever.co/loopreturns	workable|LOOP®|https://apply.workable.com/followloop/	rippling|Loop|https://ats.rippling.com/loop-careers/jobs
 LSS	recruitee|SSC|https://lss.recruitee.com	dayforce|Legal Aid BC|https://jobs.dayforcehcm.com/en-US/lss/CANDIDATEPORTAL	workday|LSS|https://lssliving.wd1.myworkdayjobs.com/en-US/LSS_External
-Lakeshore	smartrecruiters|Lakeshore Learning Materials, LLC|https://jobs.smartrecruiters.com/Lakeshore	smartrecruiters|Lakeshore|https://jobs.smartrecruiters.com/Lakeshore2
+Lakeshore	smartrecruiters|Lakeshore Learning Materials, LLC|https://jobs.smartrecruiters.com/Lakeshore	dayforce|Workforce Development|https://jobs.dayforcehcm.com/en-US/lakeshore/CANDIDATEPORTAL	smartrecruiters|Lakeshore|https://jobs.smartrecruiters.com/Lakeshore2
 Lawzero	greenhouse|Lawzero|https://job-boards.greenhouse.io/lawzero	bamboohr|LawZero (lawzero)|https://lawzero.bamboohr.com/careers
 Lead	engage|株式会社リード|https://en-gage.net/lead/	ashby|Lead|https://jobs.ashbyhq.com/leadbank
 Lean In	dayforce|Leanin’ Tree Inc|https://jobs.dayforcehcm.com/en-US/leanin/CANDIDATEPORTAL	lever|Lean In|https://jobs.lever.co/sgff.org
@@ -398,6 +402,7 @@ Lodgify	lever|Lodgify|https://jobs.lever.co/lodgify	workable|Lodgify|https://app
 Loft	workable|LOFT|https://apply.workable.com/loft/	teamtailor|Loft|https://loft.teamtailor.com/jobs
 Loop	lever|Loop|https://jobs.lever.co/loopreturns	workable|LOOP®|https://apply.workable.com/followloop/	rippling|Loop|https://ats.rippling.com/loop-careers/jobs
 Lorian Health	smartrecruiters|Lorian Health|https://jobs.smartrecruiters.com/LorianHealth	dayforce|Lorian Health|https://jobs.dayforcehcm.com/en-US/lorian/CANDIDATEPORTAL
+Lucky	icims|Lucky|https://careers-lucky.icims.com/jobs/search?ss=1	dayforce|Lucky|https://jobs.dayforcehcm.com/en-US/aeropostale/LUCKYRETAIL
 Lumos	dayforce|Segra|https://jobs.dayforcehcm.com/en-US/lumos/CANDIDATEPORTAL	greenhouse|Lumos|https://job-boards.greenhouse.io/lumosfiber
 MEC	hrmos|三菱地所株式会社|https://hrmos.co/pages/mec/jobs	icims|MEC|https://careers-mayvl.icims.com/jobs/search?ss=1
 MFS	workday|MFS Careers|https://mfs.wd1.myworkdayjobs.com/en-US/MFS-Careers	smartrecruiters|MFS|https://jobs.smartrecruiters.com/MFS1
@@ -418,6 +423,8 @@ Mattson	workable|Mattson|https://apply.workable.com/mattson/	oracle|Mattson|http
 McKesson	workday|McKesson Corporation|https://mckesson.wd3.myworkdayjobs.com/en-US/External_Careers	smartrecruiters|McKesson|https://jobs.smartrecruiters.com/McKesson4
 Medallion	greenhouse|Medallion|https://job-boards.greenhouse.io/medallionakafirstlayerai	rippling|Medallion|https://ats.rippling.com/medallion-careers/jobs
 Medicom	herp|メディコム株式会社|https://herp.careers/careers/companies/medicom	rippling|Medicom|https://ats.rippling.com/medicom-careers/jobs
+MercyCare	workday|Mercycare|https://mercycare.wd5.myworkdayjobs.com/en-US/Mercy_Cedar_Rapids_Careers	dayforce|MercyCare|https://jobs.dayforcehcm.com/en-AU/mercycare/MCCAREERSSITE
+Mercycare	workday|Mercycare|https://mercycare.wd5.myworkdayjobs.com/en-US/Mercy_Cedar_Rapids_Careers	dayforce|MercyCare|https://jobs.dayforcehcm.com/en-AU/mercycare/MCCAREERSSITE
 Mesh	greenhouse|Mesh|https://job-boards.greenhouse.io/mesh	bamboohr|Mesh (mesh)|https://mesh.bamboohr.com/careers
 Metropolis	greenhouse|Metropolis|https://job-boards.greenhouse.io/metropolis	dayforce|Metropolis|https://jobs.dayforcehcm.com/en-US/metropolis/CANDIDATEPORTAL
 Micron Technology	workday|Micron Technology|https://micron.wd1.myworkdayjobs.com/en-US/External	eightfold|Micron Technology|https://micron.eightfold.ai/careers
@@ -491,6 +498,7 @@ PRONI株式会社	herp|PRONI株式会社|https://herp.careers/careers/companies/
 PSI CRO	engage|ＰＳＩＣＲＯＪａｐａｎ株式会社|https://en-gage.net/psicro/	smartrecruiters|PSI CRO|https://jobs.smartrecruiters.com/PSICRO
 Pacifico Energy	lever|Pacifico Energy|https://jobs.lever.co/pacificoenergy	recruitee|Pacifico Energy Group|https://pacificoenergy.recruitee.com
 Panorama	rippling|Panorama|https://ats.rippling.com/panorama/jobs	dayforce|Panorama Mountain Resort|https://jobs.dayforcehcm.com/en-US/panorama/CANDIDATEPORTAL
+Paradigm	dayforce|Paradigm (paradigm)|https://jobs.dayforcehcm.com/en-US/paradigm/CANDIDATEPORTAL	dayforce|Paradigm|https://jobs.dayforcehcm.com/en-US/f305/CANDIDATEPORTAL
 Paradox	ashby|Paradox|https://jobs.ashbyhq.com/paradox	hrmos|株式会社パラドックス|https://hrmos.co/pages/paradox/jobs
 Parallel	ashby|Parallel Web Systems|https://jobs.ashbyhq.com/parallel	greenhouse|Parallel|https://job-boards.greenhouse.io/parallel
 Paramount	hrmos|パラマウントベッド株式会社|https://hrmos.co/pages/paramount/jobs	smartrecruiters|Paramount|https://jobs.smartrecruiters.com/ParamountATL
@@ -523,6 +531,7 @@ Planet	workday|Planet|https://planet.wd3.myworkdayjobs.com/en-US/planet	dayforce
 Planned Parenthood Columbia Willamette	lever|Planned Parenthood Columbia Willamette|https://jobs.lever.co/ppcw	dayforce|Planned Parenthood Columbia Willamette|https://jobs.dayforcehcm.com/en-US/ppcw/CANDIDATEPORTAL
 Plexus	lever|Plexus|https://jobs.lever.co/plexus	eightfold|Plexus|https://plexus.eightfold.ai/careers
 PlusAI	lever|PlusAI|https://jobs.lever.co/plus-2	mokahr|PlusAI|https://app.mokahr.com/social-recruitment/plus/69931
+Pohlad Companies	adp_myjobs|Pohlad Companies|https://myjobs.adp.com/pohlad/cx	dayforce|Pohlad Companies|https://jobs.dayforcehcm.com/en-US/pohlad/UPI
 Press Ganey	workday|Company Description Press Ganey|https://pressganey.wd1.myworkdayjobs.com/en-US/Careers	smartrecruiters|Press Ganey|https://jobs.smartrecruiters.com/PressGaney2
 PrimeSource Building Products	smartrecruiters|PrimeSource Building Products|https://jobs.smartrecruiters.com/PrimeSourceBuildingProducts	adp_myjobs|PrimeSource Building Products|https://myjobs.adp.com/primesourceexternalcareers/cx
 Principle	herp|株式会社プリンシプル|https://herp.careers/careers/companies/principle	smartrecruiters|Principle|https://jobs.smartrecruiters.com/Principle2
@@ -578,6 +587,7 @@ SAR	lever|SAR Academy & SAR High School|https://jobs.lever.co/sar	oracle|SAR|htt
 SAS	icims|SAS|https://careers-sas.icims.com/jobs/search?ss=1	dayforce|SAS|https://jobs.dayforcehcm.com/en-US/sasholdings/CANDIDATEPORTAL
 SCデジタル株式会社	herp|SCデジタル株式会社|https://herp.careers/careers/companies/scd	hrmos|SCデジタル株式会社|https://hrmos.co/pages/scd/jobs
 SECURE	herp|株式会社セキュア|https://herp.careers/careers/companies/secure	icims|SECURE|https://careers-canada-secure.icims.com/jobs/search?ss=1
+SGS	smartrecruiters|SGS|https://jobs.smartrecruiters.com/SGS	dayforce|SGS|https://jobs.dayforcehcm.com/en-US/brs/SGSCANDIDATEPORTAL
 SHEIN	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs	mokahr|SHEIN|https://app.mokahr.com/social-recruitment/shein/2933
 SHI	workday|SHI|https://shi.wd12.myworkdayjobs.com/en-US/shicareers	hrmos|住友重機械工業株式会社|https://hrmos.co/pages/shi/jobs
 SMB Team	bamboohr|SMB Team|https://smbteam.bamboohr.com/careers	workable|SMB Team|https://apply.workable.com/smb-team/
@@ -596,6 +606,7 @@ Saaf Finance	bamboohr|Saaf Finance|https://saaffinance.bamboohr.com/careers	work
 Safely	herp|株式会社SAFELY|https://herp.careers/careers/companies/safely	hrmos|株式会社SAFELY|https://hrmos.co/pages/safely/jobs	teamtailor|Safely|https://safely.teamtailor.com/jobs
 Sales Hub	workable|Saleshub|https://apply.workable.com/saleshub/	rippling|Sales Hub|https://ats.rippling.com/sales-hub-careers/jobs
 Saleshub	workable|Saleshub|https://apply.workable.com/saleshub/	rippling|Sales Hub|https://ats.rippling.com/sales-hub-careers/jobs
+Salus	rippling|Salus|https://ats.rippling.com/salus-careers/jobs	dayforce|Salus|https://jobs.dayforcehcm.com/en-US/salus/SALUSSD
 Sama	dayforce|SAMA|https://jobs.dayforcehcm.com/en-US/sama/CANDIDATEPORTAL	workable|Sama|https://apply.workable.com/samacoaching/
 Samsonite	join|Samsonite GmbH|https://join.com/companies/samsonite	oracle|Samsonite|https://ekkf.fa.em2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 Sandbox VR	lever|Sandbox VR|https://jobs.lever.co/sandboxvr	bamboohr|Sandbox VR|https://sandboxvr.bamboohr.com/careers
@@ -712,6 +723,7 @@ Unit8	bamboohr|Unit8|https://unit8.bamboohr.com/careers	workable|Unit8 SA|https:
 Upbound	workday|Upbound|https://upbound.wd501.myworkdayjobs.com/en-US/Upbound	greenhouse|Upbound|https://job-boards.greenhouse.io/upbound
 Upgrade	herp|株式会社アップグレード|https://herp.careers/careers/companies/upgrade	workable|Upgrade|https://apply.workable.com/upgrade-1/
 Urbanise	bamboohr|Urbanise|https://urbanise.bamboohr.com/careers	workable|Urbanise|https://apply.workable.com/urbanise/
+VGS	lever|VGS|https://jobs.lever.co/verygoodsecurity	dayforce|VGS|https://jobs.dayforcehcm.com/en-US/brs/VGSCANDIDATEPORTAL
 VHC Health	workday|Vhchealth|https://vhchealth.wd1.myworkdayjobs.com/en-US/vhchealth	icims|VHC Health|https://careers-vhchealth.icims.com/jobs/search?ss=1
 VITAS Healthcare	smartrecruiters|Vitas Healthcare|https://jobs.smartrecruiters.com/VitasHealthcare	oracle|VITAS Healthcare|https://ejrz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 ValGenesis	lever|ValGenesis|https://jobs.lever.co/valgenesis	workable|ValGenesis|https://apply.workable.com/valgenesis-1/
@@ -725,6 +737,7 @@ Veracross	bamboohr|Veracross LLC|https://veracross.bamboohr.com/careers	workable
 Vhchealth	workday|Vhchealth|https://vhchealth.wd1.myworkdayjobs.com/en-US/vhchealth	icims|VHC Health|https://careers-vhchealth.icims.com/jobs/search?ss=1
 ViaBill	lever|ViaBill|https://jobs.lever.co/viabill	bamboohr|ViaBill|https://viabill.bamboohr.com/careers
 Vialto	workday|Vialto|https://vialto.wd107.myworkdayjobs.com/en-US/VialtoExternalCareers	eightfold|Vialto Partners|https://vialto.eightfold.ai/careers
+Virginia Housing	icims|Virginia Housing|https://careers-virginiahousing.icims.com/jobs/search?ss=1	dayforce|Virginia Housing|https://jobs.dayforcehcm.com/en-US/vhda/CANDIDATEPORTAL
 Vista Group	bamboohr|Vista Group|https://vistagroup.bamboohr.com/careers	workable|Vista Group|https://apply.workable.com/vista-group/
 Vitas Healthcare	smartrecruiters|Vitas Healthcare|https://jobs.smartrecruiters.com/VitasHealthcare	oracle|VITAS Healthcare|https://ejrz.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 Vuealta	bamboohr|Vuealta|https://vuealta.bamboohr.com/careers	workable|Vuealta|https://apply.workable.com/vuealta/
@@ -741,7 +754,9 @@ Web Summit	lever|Web Summit|https://jobs.lever.co/websummit	bamboohr|Web Summit|
 Werner	workday|Roadmaster Drivers School|https://werner.wd501.myworkdayjobs.com/en-US/Roadmaster	ultipro|Werner|https://recruiting2.ultipro.com/WER1000WERE/JobBoard/9cc9fbca-288f-4c69-99d7-b81d31b89844/
 White Swan Data	bamboohr|White Swan Data|https://whiteswandata.bamboohr.com/careers	workable|White Swan Data|https://apply.workable.com/whiteswandata/
 Wilson HCG	workday|Wilson Careers|https://wilsonhcg.wd5.myworkdayjobs.com/en-US/Wilson_Careers	avature|Wilson HCG|https://wilsonhcg.avature.net/ctscareers/SearchJobs
+WinnCompanies	lever|WinnCompanies|https://jobs.lever.co/winnco	dayforce|WinnCompanies|https://jobs.dayforcehcm.com/en-US/winn/CANDIDATEPORTAL
 With Intelligence	bamboohr|With Intelligence|https://withintelligence.bamboohr.com/careers	workable|With Intelligence|https://apply.workable.com/with-intelligence/
+WorkWave	lever|WorkWave|https://jobs.lever.co/workwave	dayforce|WorkWave|https://jobs.dayforcehcm.com/en-US/workwave/CANDIDATEPORTAL
 Wristcheck	lever|Wristcheck|https://jobs.lever.co/wristcheck	bamboohr|Wristcheck|https://wristcheck.bamboohr.com/careers
 Yamaha Motor	adp_myjobs|Yamaha Motor|https://myjobs.adp.com/yamahaexternalcareersite/cx	successfactors|Yamaha Motor|https://careers.yamaha-motor.eu/search/
 Yapily	bamboohr|Yapily|https://yapily.bamboohr.com/careers	workable|Yapily|https://apply.workable.com/yapily/
@@ -893,6 +908,7 @@ bft	workday|Bft|https://bft.wd501.myworkdayjobs.com/en-US/Ben_Franklin_Transit_E
 bgeinc	greenhouse|Bgeinc|https://job-boards.greenhouse.io/bgeinc	ultipro|BGE, Inc.|https://recruiting.ultipro.com/BRO1015BGEI/JobBoard/0998bdfc-1d18-a181-4c4b-6ead20918301/
 bhs	workday|Bhs|https://bhs.wd1.myworkdayjobs.com/en-US/careers	dayforce|Legacy Behavioral Health Services|https://jobs.dayforcehcm.com/en-US/bhs/CANDIDATEPORTAL
 bis	lever|BIS Safety Software|https://jobs.lever.co/bis	smartrecruiters|BIS|https://jobs.smartrecruiters.com/BIS1
+bison	workday|Bison Driving Careers|https://bison.wd3.myworkdayjobs.com/en-US/BisonDriverCareers	dayforce|Bison|https://jobs.dayforcehcm.com/en-US/muellerindustries/BISONMETALSTECHNOLOGIESLLC
 bitgo	greenhouse|Bitgo|https://job-boards.greenhouse.io/bitgo	bamboohr|BitGo (bitgo)|https://bitgo.bamboohr.com/careers
 blacklane	greenhouse|Blacklane|https://job-boards.greenhouse.io/blacklane	bamboohr|Blacklane GmbH|https://blacklane.bamboohr.com/careers
 blackstone	workday|Blackstone Inc.|https://blackstone.wd1.myworkdayjobs.com/en-US/Blackstone_Careers	smartrecruiters|Blackstone|https://jobs.smartrecruiters.com/Blackstone1
@@ -1141,6 +1157,7 @@ harman	workday|ATTENTION! Please read carefully:|https://harman.wd3.myworkdayjob
 harpergroup	greenhouse|Harpergroup|https://job-boards.greenhouse.io/harpergroup	bamboohr|Harper Group|https://harpergroup.bamboohr.com/careers
 harvest	workable|Harvest|https://apply.workable.com/harvest/	rippling|Harvest Christian Fellowship|https://ats.rippling.com/harvest/jobs
 hcmportal	workday|UPS|https://hcmportal.wd5.myworkdayjobs.com/en-US/Search	dayforce|Security Benefit Business Services / Everly Life|https://jobs.dayforcehcm.com/en-US/hcmportal/CANDIDATEPORTAL
+hcms	smartrecruiters|HCMS|https://jobs.smartrecruiters.com/HCMS	dayforce|The Employee Experience Team|https://jobs.dayforcehcm.com/en-US/hcms/CANDIDATEPORTAL
 headquarters	workable|HeadQuarters|https://apply.workable.com/headquarters/	icims|Headquarters|https://careers-kyocera.icims.com/jobs/search?ss=1
 healthcarerecruiting	recruitee|Anchor Health Homecare Services|https://healthcarerecruiting.recruitee.com	smartrecruiters|Healthcare Recruiting|https://jobs.smartrecruiters.com/HealthcareRecruiting1
 healthpartners	smartrecruiters|HealthPartners|https://jobs.smartrecruiters.com/HealthPartners	oracle|HealthPartners|https://fa-etnv-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/healthpartners/jobs
@@ -1232,7 +1249,7 @@ kroll	bamboohr|D&P China (HK) Limited|https://kroll.bamboohr.com/careers	oracle|
 kumon	dayforce|Kumon|https://jobs.dayforcehcm.com/en-US/kumon/CANDIDATEPORTAL	smartrecruiters|Kumon|https://jobs.smartrecruiters.com/Kumon1
 la belle vie 株式会社	herp|la belle vie 株式会社|https://herp.careers/careers/companies/labellevie	hrmos|la belle vie 株式会社|https://hrmos.co/pages/labellevie/jobs
 labellevie	herp|la belle vie 株式会社|https://herp.careers/careers/companies/labellevie	hrmos|la belle vie 株式会社|https://hrmos.co/pages/labellevie/jobs
-lakeshore	smartrecruiters|Lakeshore Learning Materials, LLC|https://jobs.smartrecruiters.com/Lakeshore	smartrecruiters|Lakeshore|https://jobs.smartrecruiters.com/Lakeshore2
+lakeshore	smartrecruiters|Lakeshore Learning Materials, LLC|https://jobs.smartrecruiters.com/Lakeshore	dayforce|Workforce Development|https://jobs.dayforcehcm.com/en-US/lakeshore/CANDIDATEPORTAL	smartrecruiters|Lakeshore|https://jobs.smartrecruiters.com/Lakeshore2
 lawzero	greenhouse|Lawzero|https://job-boards.greenhouse.io/lawzero	bamboohr|LawZero (lawzero)|https://lawzero.bamboohr.com/careers
 lci	dayforce|LCI Education|https://jobs.dayforcehcm.com/en-US/lci/CANDIDATEPORTAL	ultipro|LCI|https://recruiting.ultipro.com/LCI1000LCIN/JobBoard/f344a078-07a4-443e-af53-91e477cf7d3f/
 lead	engage|株式会社リード|https://en-gage.net/lead/	ashby|Lead|https://jobs.ashbyhq.com/leadbank
@@ -1280,6 +1297,7 @@ mediphone	herp|メディフォン株式会社|https://herp.careers/careers/compa
 medix	herp|株式会社メディックス|https://herp.careers/careers/companies/medix	hrmos|株式会社メディックス|https://hrmos.co/pages/medix/jobs
 medline	workday|Medline Careers|https://medline.wd5.myworkdayjobs.com/en-US/Medline	hrmos|メドライン・ジャパン合同会社|https://hrmos.co/pages/medline/jobs
 meetsmore	herp|株式会社ミツモア|https://herp.careers/careers/companies/meetsmore	hrmos|株式会社ミツモア|https://hrmos.co/pages/meetsmore/jobs
+mercycare	workday|Mercycare|https://mercycare.wd5.myworkdayjobs.com/en-US/Mercy_Cedar_Rapids_Careers	dayforce|MercyCare|https://jobs.dayforcehcm.com/en-AU/mercycare/MCCAREERSSITE
 mesh	greenhouse|Mesh|https://job-boards.greenhouse.io/mesh	bamboohr|Mesh (mesh)|https://mesh.bamboohr.com/careers
 meta-team	herp|ＭＥＴＡＴＥＡＭ株式会社|https://herp.careers/careers/companies/meta-team	hrmos|ＭＥＴＡＴＥＡＭ株式会社|https://hrmos.co/pages/meta-team/jobs
 metropolis	greenhouse|Metropolis|https://job-boards.greenhouse.io/metropolis	dayforce|Metropolis|https://jobs.dayforcehcm.com/en-US/metropolis/CANDIDATEPORTAL
@@ -1367,6 +1385,7 @@ owner	ashby|Owner.com|https://jobs.ashbyhq.com/owner	smartrecruiters|Owner|https
 ozma	herp|株式会社オズマピーアール|https://herp.careers/careers/companies/ozma	hrmos|株式会社オズマピーアール|https://hrmos.co/pages/ozma/jobs
 pacificoenergy	lever|Pacifico Energy|https://jobs.lever.co/pacificoenergy	recruitee|Pacifico Energy Group|https://pacificoenergy.recruitee.com
 panorama	rippling|Panorama|https://ats.rippling.com/panorama/jobs	dayforce|Panorama Mountain Resort|https://jobs.dayforcehcm.com/en-US/panorama/CANDIDATEPORTAL
+paradigm	dayforce|Paradigm (paradigm)|https://jobs.dayforcehcm.com/en-US/paradigm/CANDIDATEPORTAL	dayforce|Paradigm|https://jobs.dayforcehcm.com/en-US/f305/CANDIDATEPORTAL
 paradox	ashby|Paradox|https://jobs.ashbyhq.com/paradox	hrmos|株式会社パラドックス|https://hrmos.co/pages/paradox/jobs
 parallel	ashby|Parallel Web Systems|https://jobs.ashbyhq.com/parallel	greenhouse|Parallel|https://job-boards.greenhouse.io/parallel
 paramount	hrmos|パラマウントベッド株式会社|https://hrmos.co/pages/paramount/jobs	smartrecruiters|Paramount|https://jobs.smartrecruiters.com/ParamountATL
@@ -1503,6 +1522,7 @@ sense-trust	herp|センス・トラスト株式会社|https://herp.careers/caree
 serverworks	herp|サーバーワークスグループ|https://herp.careers/careers/companies/serverworks	hrmos|サーバーワークスグループ|https://hrmos.co/pages/serverworks/jobs
 servicetitan	workday|ServiceTitan Careers|https://servicetitan.wd1.myworkdayjobs.com/en-US/servicetitan	smartrecruiters|ServiceTitan|https://jobs.smartrecruiters.com/ServiceTitan
 seven-garden	herp|株式会社7garden|https://herp.careers/careers/companies/seven-garden	hrmos|株式会社７ｇａｒｄｅｎ|https://hrmos.co/pages/seven-garden/jobs
+sgs	smartrecruiters|SGS|https://jobs.smartrecruiters.com/SGS	dayforce|SGS|https://jobs.dayforcehcm.com/en-US/brs/SGSCANDIDATEPORTAL
 shanon	herp|株式会社シャノン|https://herp.careers/careers/companies/shanon	hrmos|株式会社シャノン|https://hrmos.co/pages/shanon/jobs
 sharp	workday|Sharp HealthCare|https://sharp.wd1.myworkdayjobs.com/en-US/External	hrmos|シャープ株式会社|https://hrmos.co/pages/sharp/jobs
 shein	greenhouse|SHEIN|https://job-boards.greenhouse.io/shein	oracle|SHEIN|https://fa-exjq-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/SHEIN/jobs	mokahr|SHEIN|https://app.mokahr.com/social-recruitment/shein/2933
@@ -1692,6 +1712,7 @@ wilsonhcg	workday|Wilson Careers|https://wilsonhcg.wd5.myworkdayjobs.com/en-US/W
 wishpond	lever|Wishpond Technologies|https://jobs.lever.co/wishpond	bamboohr|Wishpond Technologies Ltd.|https://wishpond.bamboohr.com/careers
 with-intelligence	bamboohr|With Intelligence|https://withintelligence.bamboohr.com/careers	workable|With Intelligence|https://apply.workable.com/with-intelligence/
 withintelligence	bamboohr|With Intelligence|https://withintelligence.bamboohr.com/careers	workable|With Intelligence|https://apply.workable.com/with-intelligence/
+workwave	lever|WorkWave|https://jobs.lever.co/workwave	dayforce|WorkWave|https://jobs.dayforcehcm.com/en-US/workwave/CANDIDATEPORTAL
 wristcheck	lever|Wristcheck|https://jobs.lever.co/wristcheck	bamboohr|Wristcheck|https://wristcheck.bamboohr.com/careers
 wsc	workday|Wright Tree Service|https://wsc.wd1.myworkdayjobs.com/en-US/WTS	greenhouse|WSC|https://job-boards.greenhouse.io/watersystemsconsulting
 wwf	workable|WWF|https://apply.workable.com/wwf/	teamtailor|WWF|https://wwf.teamtailor.com/jobs
