@@ -15,7 +15,11 @@ func TestCompaniesLoaded(t *testing.T) {
 		assert.NotEmpty(t, c.Namespace)
 		assert.NotEmpty(t, c.JobBoardCode)
 		assert.Positive(t, c.JobBoardID)
-		assert.Equal(t, defaultCultureCode, c.Culture())
+		if c.CultureCode == "" {
+			assert.Equal(t, defaultCultureCode, c.Culture())
+		} else {
+			assert.Equal(t, c.CultureCode, c.Culture())
+		}
 		got, ok := CompaniesBySlug[strings.ToLower(c.Slug())]
 		require.True(t, ok, "slug index missing %q", c.Slug())
 		assert.Equal(t, c, got)
@@ -112,4 +116,20 @@ func TestCultureDefault(t *testing.T) {
 
 	c.CultureCode = "fr-CA"
 	assert.Equal(t, "fr-CA", c.Culture())
+}
+
+func TestRosterPinsNonDefaultCulture(t *testing.T) {
+	want := map[string]string{
+		"ausredcross":  "en-AU",
+		"cht":          "en-NZ",
+		"cmhr":         "en-CA",
+		"costa":        "en-GB",
+		"eldoradogold": "fr-CA",
+	}
+	for slug, culture := range want {
+		c, ok := CompaniesBySlug[slug]
+		require.True(t, ok, "missing roster slug %q", slug)
+		assert.Equal(t, culture, c.CultureCode)
+		assert.Equal(t, culture, c.Culture())
+	}
 }

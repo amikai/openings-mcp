@@ -1,0 +1,2555 @@
+# Live Dayforce boards whose display name is unconfirmed, or whose culture
+# / board is not the curated default. Promote into
+# internal/provider/dayforce/companies.yaml only after an authoritative name
+# is confirmed.
+
+- company: "abbeyfield"
+  namespace: "abbeyfield"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Accent Group"
+  namespace: "accentdayforce"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "ACCES Employment"
+  namespace: "acces"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Accor Apartments & Realty"
+  namespace: "accorpacific"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "ACH Group"
+  namespace: "achg"
+  job_board_code: "117516"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Achev"
+  namespace: "achev"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "ACI_Full_Color_Rings_200x200"
+  namespace: "aliviacare"
+  job_board_code: "join-our-team-alivia-care"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Advara HeartCare"
+  namespace: "advara"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "AERO-FLITE, INC"
+  namespace: "afi"
+  job_board_code: "aeroflite"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "aeropostale"
+  namespace: "aeropostale"
+  job_board_code: "nauticaretail"
+  job_board_id: 16
+  culture_code: "en-US"
+- company: "Al-Terra"
+  namespace: "alterra"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Alberta Innovates / InnoTech Alberta"
+  namespace: "innovates"
+  job_board_code: "albertainnovates"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Alberta Pensions Services Corporation"
+  namespace: "apsc"
+  job_board_code: "externalcandidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Albright College"
+  namespace: "albrightcollege"
+  job_board_code: "albrightexternalstudents"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "allianthcm"
+  namespace: "allianthcm"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Alltech"
+  namespace: "alltech"
+  job_board_code: "akralos"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Altus Biologics"
+  namespace: "summit"
+  job_board_code: "candidateportal1"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Alvin Ailey Dance Foundation Inc"
+  namespace: "alvinailey"
+  job_board_code: "alvinaileywebsitefulltime"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Amphenol"
+  namespace: "amphenoluk"
+  job_board_code: "altd"
+  job_board_id: 5
+  culture_code: "en-GB"
+- company: "Android/Avancez"
+  namespace: "androidind"
+  job_board_code: "androidind"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "AngioDynamics"
+  namespace: "angio"
+  job_board_code: "angiocareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "APG&Co"
+  namespace: "apgandco"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Aris New V2"
+  namespace: "aris"
+  job_board_code: "arisportal"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Asbury Automotive"
+  namespace: "asburyauto"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Ascent Aerospace"
+  namespace: "ascentaerospace"
+  job_board_code: "ascentaerospace"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "authority"
+  namespace: "authority"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Avant"
+  namespace: "avant"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "avgfi"
+  namespace: "avgfi"
+  job_board_code: "candidateportalcareers-usa"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "BAI Communications"
+  namespace: "baicomms"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Baillie Lumber"
+  namespace: "baillielumberco"
+  job_board_code: "superior"
+  job_board_id: 10
+  culture_code: "en-US"
+- company: "Balfour Beatty"
+  namespace: "balfourbeatty"
+  job_board_code: "candidateportalbuildingcivils"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Ballyhack Large"
+  namespace: "dormienetwork"
+  job_board_code: "ballyhack"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Benson Enterprises - HR"
+  namespace: "bensonenterprises"
+  job_board_code: "saintspelscareers"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "bhi"
+  namespace: "bhi"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Big Country Equipment Repair, Ltd"
+  namespace: "bcer"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Big Country Pet Co"
+  namespace: "bcr"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "biovectra"
+  namespace: "biovectra"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Blatchford"
+  namespace: "blatchford"
+  job_board_code: "blatchforduk"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "bmsa"
+  namespace: "bmsa"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "boardwalkreit"
+  namespace: "boardwalkreit"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "BPA"
+  namespace: "bpapointca"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Brainkind"
+  namespace: "brainkind"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Brightline Trains"
+  namespace: "brightline"
+  job_board_code: "blfcareerssite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Brighton & Hove Albion FC"
+  namespace: "bhafc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Bristol Bay Construction Holdings LLC"
+  namespace: "bbch"
+  job_board_code: "bbchcandidateportal"
+  job_board_id: 50
+  culture_code: "en-US"
+- company: "Brookstreet"
+  namespace: "wesleyclover"
+  job_board_code: "brookstreet"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "brs"
+  namespace: "brs"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Bucherer"
+  namespace: "bucherer"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Bulk Barn"
+  namespace: "bulkbarn"
+  job_board_code: "corporatestores"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Burris Logistics"
+  namespace: "burris"
+  job_board_code: "burriscareersite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Burton"
+  namespace: "burton"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Bytes Software Services"
+  namespace: "bytes001"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "CACI Ltd"
+  namespace: "caciltd"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Caisse Alliance"
+  namespace: "cpal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Caloundra RSL"
+  namespace: "caloundrarsl"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Camions Excellence Peterbilt"
+  namespace: "camion"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Canadore College"
+  namespace: "canadore"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Canal & River Trust"
+  namespace: "canalriver"
+  job_board_code: "120958"
+  job_board_id: 5
+  culture_code: "en-GB"
+- company: "canderel"
+  namespace: "canderel"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Canopy Growth Corporation and its subsidiaries"
+  namespace: "cgc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "cardinalcouriers"
+  namespace: "cardinalcouriers"
+  job_board_code: "indeedexclude"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "CardWorks/Merrick Bank"
+  namespace: "cmm"
+  job_board_code: "callcentercandidateportal"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "Care Initiatives"
+  namespace: "cwu"
+  job_board_code: "careinitiativescareers"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "Careers at Ally Fashion"
+  namespace: "allyfashion"
+  job_board_code: "amcareers"
+  job_board_id: 7
+  culture_code: "en-AU"
+- company: "Careers@Hazeldenes"
+  namespace: "hazeldenes"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "catchinc"
+  namespace: "catchinc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "cathedralenergy"
+  namespace: "cathedralenergy"
+  job_board_code: "altitudeclientwebsite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Catholic Education South Australia"
+  namespace: "cces"
+  job_board_code: "staugustines"
+  job_board_id: 51
+  culture_code: "en-AU"
+- company: "Catholic Healthcare"
+  namespace: "chl"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "cayuga"
+  namespace: "cayuga"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "CBC Companies"
+  namespace: "cbccompanies"
+  job_board_code: "factualdata"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "cciinc"
+  namespace: "cciinc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Centennial Food Solutions"
+  namespace: "cfs"
+  job_board_code: "centennialcareers"
+  job_board_id: 4
+  culture_code: "en-CA"
+- company: "Central Wire"
+  namespace: "centralwire"
+  job_board_code: "looscareers"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Cermaq Canada Ltd"
+  namespace: "cermaq"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Circa"
+  namespace: "dtlvgroup"
+  job_board_code: "circa"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "City FM Australia"
+  namespace: "cityfmaus"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "City of Brandon"
+  namespace: "brandon"
+  job_board_code: "cob"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "City of Columbus"
+  namespace: "cityofcolumbus"
+  job_board_code: "courtjobs"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "City of Lebanon"
+  namespace: "lebanon"
+  job_board_code: "extcareerportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "City of Quinte West"
+  namespace: "quintewest"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Citycare Property"
+  namespace: "citycareprop"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-NZ"
+- company: "Citycare Water"
+  namespace: "citycarewate"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-NZ"
+- company: "clareholdings"
+  namespace: "clareholdings"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "CMV Group"
+  namespace: "cmv"
+  job_board_code: "clientcareersitemntc"
+  job_board_id: 36
+  culture_code: "en-AU"
+- company: "CNX"
+  namespace: "cnx"
+  job_board_code: "cnxcandidateportal"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Coal Services"
+  namespace: "cshris"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "colter"
+  namespace: "colter"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "CommunityCare"
+  namespace: "ccok"
+  job_board_code: "ccok"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Compassion Canada"
+  namespace: "compassion"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Concert Properties Ltd"
+  namespace: "concert"
+  job_board_code: "concert"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Conestoga Meats"
+  namespace: "conestoga"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "ConGlobal"
+  namespace: "itsc"
+  job_board_code: "cgexternal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Continental Battery Systems"
+  namespace: "cbs"
+  job_board_code: "bsiwebsite"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "core"
+  namespace: "core"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Corin Group"
+  namespace: "coringroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "it-IT"
+- company: "Cornerstone Building Brands"
+  namespace: "cbb"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "corporatehcm"
+  namespace: "corporatehcm"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Corus Entertainment"
+  namespace: "corusent"
+  job_board_code: "corus"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "corusortho"
+  namespace: "corusortho"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Cove UK"
+  namespace: "covecommunities"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Covenant Care + Covenant Living"
+  namespace: "covcareliving"
+  job_board_code: "covcarebranding"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "CPFNA"
+  namespace: "cpfna"
+  job_board_code: "candidateportalofi"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "cpsbc"
+  namespace: "cpsbc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "CREB®"
+  namespace: "cal1546"
+  job_board_code: "crebcom"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "creditonebank"
+  namespace: "creditonebank"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Cripps"
+  namespace: "crippspeople"
+  job_board_code: "crippsemergingtalent"
+  job_board_id: 4
+  culture_code: "en-GB"
+- company: "CWG/Blended Health"
+  namespace: "vertavahealth"
+  job_board_code: "vertavacandidateportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Dayforce"
+  namespace: "arcnewyork"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Dayforce"
+  namespace: "intandem"
+  job_board_code: "intandem"
+  job_board_id: 22
+  culture_code: "en-US"
+- company: "Dayforce"
+  namespace: "mydayforce"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Dayforce"
+  namespace: "trcny"
+  job_board_code: "theresourcecenter"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Decron Properties"
+  namespace: "decron"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Del Property Management"
+  namespace: "delcondo"
+  job_board_code: "dpmclientcareerssite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Delrin"
+  namespace: "delrin"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "deltastar"
+  namespace: "deltastar"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Denver Broncos, Stadium Management Company"
+  namespace: "denverbroncos"
+  job_board_code: "broncosstadium"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "Dhilmar Eleonore Inc"
+  namespace: "dhilmarele"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Diabetes Canada / National Diabetes Trust"
+  namespace: "diabetescanada"
+  job_board_code: "diabetescanada"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "diamondgen"
+  namespace: "diamondgen"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Digital Extremes Ltd"
+  namespace: "digitalextremes"
+  job_board_code: "deapply"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "diobr"
+  namespace: "diobr"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Divertissement Reflector Ltée"
+  namespace: "ref"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "DNATA US Inflight Catering"
+  namespace: "dcrusa"
+  job_board_code: "join-us"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Doncasters"
+  namespace: "doncasters"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Dr. Schär"
+  namespace: "drschaer"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "it-IT"
+- company: "Driving Force Group of Companies"
+  namespace: "drivingforce"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "dusk People Experience"
+  namespace: "dusk"
+  job_board_code: "duskcareers"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "dwv"
+  namespace: "dwv"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Dynamic Aviation"
+  namespace: "dynamicaviation"
+  job_board_code: "dynamicaviationcareers"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "eaglemds"
+  namespace: "eaglemds"
+  job_board_code: "eaglecareersite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "EasterSeals NH"
+  namespace: "eastersealsnh"
+  job_board_code: "candidateportalvt"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "eastpenn"
+  namespace: "eastpenn"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "ECH"
+  namespace: "echinc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "eCycle Solutions Inc"
+  namespace: "ecyclesolu"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "EDC"
+  namespace: "edc"
+  job_board_code: "candidateportaledc"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Eden Project"
+  namespace: "edenprojecthr"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "EFCO Forming & Shoring Solutions"
+  namespace: "efcoforms"
+  job_board_code: "efcocareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Eidos-Montréal"
+  namespace: "eic"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Elbit America"
+  namespace: "esa"
+  job_board_code: "esacareersite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Elior UK"
+  namespace: "elioruk"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Elite Quartz Manufacturing"
+  namespace: "shahco"
+  job_board_code: "elite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "ensemble"
+  namespace: "ensemble"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "equiton"
+  namespace: "equiton"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Esri UK & Ireland & Helyx"
+  namespace: "esriholdings"
+  job_board_code: "helyx"
+  job_board_id: 4
+  culture_code: "en-GB"
+- company: "EV Cargo"
+  namespace: "evpeople"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Evri Group"
+  namespace: "evri"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "EVT Group"
+  namespace: "evtelevate"
+  job_board_code: "118612"
+  job_board_id: 14
+  culture_code: "en-AU"
+- company: "Exchange Technology Services Inc"
+  namespace: "exchangetech"
+  job_board_code: "alljobs"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "Family Residences and Essential Enterprises, Inc"
+  namespace: "familyres"
+  job_board_code: "careeropportunitiesmaryland"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Farm Credit"
+  namespace: "fcf"
+  job_board_code: "sbscareersite"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Fastco"
+  namespace: "fastco"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Festival d'été de Québec"
+  namespace: "feiq"
+  job_board_code: "imperial"
+  job_board_id: 3
+  culture_code: "fr-CA"
+- company: "fffenter"
+  namespace: "fffenter"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "FFG Header"
+  namespace: "finsburyfoods"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Fire & Flower Inc"
+  namespace: "fikacompany"
+  job_board_code: "candidateportal20"
+  job_board_id: 26
+  culture_code: "en-US"
+- company: "First Nations Financial Management Board"
+  namespace: "fnfmb"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "firstnational"
+  namespace: "firstnational"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Firstrust Bank"
+  namespace: "firstrust"
+  job_board_code: "firstrustcandidateportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Fisherman's Market International Inc"
+  namespace: "ppg2277"
+  job_board_code: "fmiiclientsite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "flanagan1977"
+  namespace: "flanagan1977"
+  job_board_code: "flgncandidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Focus Cloud Group"
+  namespace: "focuscloud"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Forensicare"
+  namespace: "forensicare"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Forestry Corporation of NSW"
+  namespace: "fcnsw"
+  job_board_code: "fcnswcareers"
+  job_board_id: 7
+  culture_code: "en-AU"
+- company: "forhealthgroup"
+  namespace: "forhealthgroup"
+  job_board_code: "nursemedctr"
+  job_board_id: 5
+  culture_code: "en-AU"
+- company: "Forman Mills"
+  namespace: "formanmills"
+  job_board_code: "candidateportalstores"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Forterra Building Products Ltd"
+  namespace: "forterra"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Freedom Energy Holdings"
+  namespace: "freedomenrgy"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Freson Bros"
+  namespace: "fresonbros"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "fsasbu"
+  namespace: "fsasbu"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Gamma"
+  namespace: "gammacomms"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-FR"
+- company: "GATE HR"
+  namespace: "gate"
+  job_board_code: "hospitality"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "gbank"
+  namespace: "gbank"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "gefportal"
+  namespace: "gefportal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "ggigroup"
+  namespace: "ggigroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "glovis"
+  namespace: "glovis"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Good Food Holdings Companies"
+  namespace: "gfh"
+  job_board_code: "lazyacres"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Grandir UK"
+  namespace: "grandiruk"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "graycorp"
+  namespace: "graycorp"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Great River Group"
+  namespace: "greatriver"
+  job_board_code: "g2candidateportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Groupe AGF / AGF Group"
+  namespace: "agfgroup"
+  job_board_code: "employeereferralposting"
+  job_board_id: 7
+  culture_code: "fr-CA"
+- company: "Groupe Marcelle"
+  namespace: "groupemarcelle"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Groupe Norbec"
+  namespace: "groupenorbec"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "gty"
+  namespace: "gty"
+  job_board_code: "questica"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "H Mart"
+  namespace: "hmart"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "haeco"
+  namespace: "haeco"
+  job_board_code: "haecoamericas"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "harberco"
+  namespace: "harberco"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "haskins"
+  namespace: "haskins"
+  job_board_code: "haskins"
+  job_board_id: 5
+  culture_code: "en-GB"
+- company: "Haydon Companies"
+  namespace: "haydon"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Healthdirect Australia"
+  namespace: "healthdirect"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Heart to Heart Hospice"
+  namespace: "htohh"
+  job_board_code: "htohh"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Helix Traffic Solutions, LLC"
+  namespace: "helix"
+  job_board_code: "hsscareerportal"
+  job_board_id: 25
+  culture_code: "en-US"
+- company: "HLI and its subsidiaries"
+  namespace: "hlna"
+  job_board_code: "oneworldlogisticsofamerica"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Holt Logistics Corp"
+  namespace: "holtceridian"
+  job_board_code: "commerceservices"
+  job_board_id: 18
+  culture_code: "en-US"
+- company: "Homestyle Aged Care"
+  namespace: "hsac"
+  job_board_code: "110370"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Homeward Trust Edmonton"
+  namespace: "hte"
+  job_board_code: "htecandidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Honey Bee Manufacturing Ltd"
+  namespace: "honeybee"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Hotels and Resorts of Halekulani"
+  namespace: "halekulani"
+  job_board_code: "companywebsite"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "HR"
+  namespace: "cts"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "HR"
+  namespace: "wfg"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "HR Department at Carson Air"
+  namespace: "carsonair"
+  job_board_code: "carson-cargo-opportunities"
+  job_board_id: 5
+  culture_code: "en-CA"
+- company: "HR Team"
+  namespace: "myepay"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "HR_RH"
+  namespace: "gscandinave"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "hs"
+  namespace: "hs"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "borderfoods"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "buschgroupphg"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "csc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "jadex"
+  job_board_code: "lifemadecareers"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "middlesex"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "millerwaste"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "nott"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "ocwcog"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "polyad"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "prwt"
+  job_board_code: "usfcareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "pviholdings"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "scarletsecurity"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources"
+  namespace: "topsproducts"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources Department"
+  namespace: "dtgu"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources Department"
+  namespace: "pp4u514"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources Team"
+  namespace: "prh"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Human Resources, The Aaron's Family of Companies"
+  namespace: "aan"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "humanesociety"
+  namespace: "humanesociety"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Humanetics Stacked"
+  namespace: "safetytechnology"
+  job_board_code: "humaneticsgermany"
+  job_board_id: 11
+  culture_code: "en-US"
+- company: "Hytrol Conveyor Company, Inc"
+  namespace: "hytrol"
+  job_board_code: "joinourfamily"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "i80gold"
+  namespace: "i80gold"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "IBL Together"
+  namespace: "ibltogether"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "ibt"
+  namespace: "ibt"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "ICBA/TCM Bank"
+  namespace: "icba"
+  job_board_code: "candidateportalicba"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "iGaming Ontario"
+  namespace: "igo"
+  job_board_code: "igo"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "iip"
+  namespace: "iip"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "imgacademy"
+  namespace: "imgacademy"
+  job_board_code: "imgacademycorporatecareers"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "Impact Fire"
+  namespace: "aifire"
+  job_board_code: "impact"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "ims"
+  namespace: "ims"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Ingenia"
+  namespace: "ingenia"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Interactive"
+  namespace: "interactive"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Intermountain Centers"
+  namespace: "intermountain"
+  job_board_code: "intermountaincenters"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Intertape Polymer Group (IPG)"
+  namespace: "ipg"
+  job_board_code: "ipg"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "intouchcx"
+  namespace: "intouchcx"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Ironclad Developments Inc"
+  namespace: "ironcladgroup"
+  job_board_code: "ironcladpropertiesinc"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Jealous Fruits Ltd"
+  namespace: "jealousfruits"
+  job_board_code: "applynowjfl"
+  job_board_id: 4
+  culture_code: "en-CA"
+- company: "Jisc"
+  namespace: "jisc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "JOHNNY BIGG IMAGE"
+  namespace: "rag"
+  job_board_code: "johnnybiggcareersite"
+  job_board_id: 7
+  culture_code: "en-AU"
+- company: "Johnstons of Elgin"
+  namespace: "joe"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Jones"
+  namespace: "jones"
+  job_board_code: "jonespowercareers"
+  job_board_id: 16
+  culture_code: "en-US"
+- company: "jrgroup"
+  namespace: "jrgroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "JTB Perfect Moments Always"
+  namespace: "jtbamericas"
+  job_board_code: "jtbamericasltd-jtbusainc"
+  job_board_id: 11
+  culture_code: "en-US"
+- company: "K&M TIre"
+  namespace: "kmtire"
+  job_board_code: "kmtire"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Kalispel Tribe"
+  namespace: "kalispel"
+  job_board_code: "kgccclientsite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Kandor"
+  namespace: "kandor"
+  job_board_code: "guardteck"
+  job_board_id: 6
+  culture_code: "en-CA"
+- company: "Kardium Inc"
+  namespace: "kardium"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Keewatin Air LP"
+  namespace: "keewatinair"
+  job_board_code: "admin"
+  job_board_id: 11
+  culture_code: "en-US"
+- company: "KenCrest"
+  namespace: "kencrest"
+  job_board_code: "kencrestjobspage"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Keplr Vision"
+  namespace: "keplrvision"
+  job_board_code: "precisioneyecareprofessionals"
+  job_board_id: 111
+  culture_code: "en-US"
+- company: "Kestra"
+  namespace: "kestra"
+  job_board_code: "ardencareersite"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Keystone Sheets"
+  namespace: "schwarzpartners"
+  job_board_code: "keystone-sheets-careers"
+  job_board_id: 21
+  culture_code: "en-US"
+- company: "Kirmac Collision and Autoglass"
+  namespace: "kirmac"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "kmdbrands"
+  namespace: "kmdbrands"
+  job_board_code: "kmdcandidateportal"
+  job_board_id: 8
+  culture_code: "en-AU"
+- company: "Knoa Pharma LLC"
+  namespace: "purdue"
+  job_board_code: "candidateportalrhodes"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "kpdn"
+  namespace: "kpdn"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "KSR"
+  namespace: "ksr"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "cs-CZ"
+- company: "Kurt Manufacturing"
+  namespace: "kurt"
+  job_board_code: "58477"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "L'équipe attraction de talent de Cominar"
+  namespace: "cominar"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "La Presse et ses filiales"
+  namespace: "lapresse2018inc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "LAB3"
+  namespace: "lab3"
+  job_board_code: "externalcompanywesbite"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Large 200 x 100"
+  namespace: "herffjones"
+  job_board_code: "herffjonescandidateportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Laura Canada"
+  namespace: "laurashoppe"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Law Society"
+  namespace: "lawsocietybc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "lcm"
+  namespace: "lcm"
+  job_board_code: "vitrumpostingsite"
+  job_board_id: 5
+  culture_code: "en-CA"
+- company: "Le Groupe Maurice"
+  namespace: "gm"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Le Massif"
+  namespace: "lemassif"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Lepine"
+  namespace: "lepine"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Les Câbles Ben-Mor"
+  namespace: "benmor"
+  job_board_code: "careerprod"
+  job_board_id: 5
+  culture_code: "fr-CA"
+- company: "Levande"
+  namespace: "myplace"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "lexitas"
+  namespace: "lexitas"
+  job_board_code: "lexitas"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Liftow Limited"
+  namespace: "liftow"
+  job_board_code: "liftowlimited"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Lightstone Group & Affiliates"
+  namespace: "lightstonegroup"
+  job_board_code: "beaconproperties"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "LISI"
+  namespace: "lisina"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Lives Lived Well"
+  namespace: "llw"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "LL Flooring"
+  namespace: "lls"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Location GM / Équipements GM"
+  namespace: "logm"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Longevity Holdings"
+  namespace: "longevity"
+  job_board_code: "berwynsite"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "Los Angeles Chargers"
+  namespace: "lachargers"
+  job_board_code: "losangeleschargers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "lpwgroup"
+  namespace: "lpwgroup"
+  job_board_code: "ladish-jobs"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Lumexa Imaging"
+  namespace: "usrs1"
+  job_board_code: "charlotteradiology"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Lutheran Aged Care Albury"
+  namespace: "lacalbury"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Make-A-Wish Canada / Rêves d'enfants Canada"
+  namespace: "makeawishca"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "MakeWay"
+  namespace: "makeway"
+  job_board_code: "makeway"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Mall of America"
+  namespace: "admoa"
+  job_board_code: "moajobstourismgroupsalesintern"
+  job_board_id: 19
+  culture_code: "en-US"
+- company: "Martin & Bayley, Inc., DBA Huck's Market"
+  namespace: "hucks"
+  job_board_code: "hucksmarket"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Maxi Canada Inc"
+  namespace: "maxicanada"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "mca"
+  namespace: "mca"
+  job_board_code: "micmcacombinedcareersite"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "mcelhanney"
+  namespace: "mcelhanney"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Melbourne Cricket Club"
+  namespace: "mcc1838"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Memorial Health System"
+  namespace: "mhsystem"
+  job_board_code: "volstudentportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "MercyCare"
+  namespace: "mercycare"
+  job_board_code: "mcvolunteercareers"
+  job_board_id: 5
+  culture_code: "en-AU"
+- company: "Milestones Trust"
+  namespace: "milestones"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Mill Creek Residential"
+  namespace: "mcrtrllc"
+  job_board_code: "millcreekcareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Miller Thomson"
+  namespace: "mthris"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Minnesota United FC"
+  namespace: "mnufc"
+  job_board_code: "mnufccareersportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Mirion"
+  namespace: "mirion"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-FR"
+- company: "Mission Old Brewery"
+  namespace: "obm"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Myers Industries Inc"
+  namespace: "myers"
+  job_board_code: "signatureclientcareersite"
+  job_board_id: 15
+  culture_code: "en-US"
+- company: "N G Bailey"
+  namespace: "ngbailey"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "nant"
+  namespace: "nant"
+  job_board_code: "nanthealth"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "National Material L.P"
+  namespace: "nmlp"
+  job_board_code: "nationalgalvanizing"
+  job_board_id: 7
+  culture_code: "en-US"
+- company: "National Star"
+  namespace: "natstar"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "NBH Bank"
+  namespace: "nbhbank"
+  job_board_code: "bankmidwest"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "NDT Global Group"
+  namespace: "ndtglobal"
+  job_board_code: "tscsubsea"
+  job_board_id: 10
+  culture_code: "en-US"
+- company: "NearU, and Affiliate Regional HVAC Branches"
+  namespace: "nearu"
+  job_board_code: "customair"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Nebraska Furniture Mart"
+  namespace: "nfmstaff"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Nederman Shared Services, LLC"
+  namespace: "nss"
+  job_board_code: "menardi-immigration"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "New England Lead Burning Company"
+  namespace: "lead"
+  job_board_code: "nelcowebsite"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "New Look"
+  namespace: "newlook"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "nexus"
+  namespace: "nexus"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "NHS Supply Chain"
+  namespace: "nhsscclpeopleconnect"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Nisbets"
+  namespace: "nisbets"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "NORA"
+  namespace: "nora"
+  job_board_code: "noraportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "NORR"
+  namespace: "norrcion"
+  job_board_code: "cioncareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "North American Rail Solutions"
+  namespace: "nars"
+  job_board_code: "canadiateportaltri"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "Northland Properties"
+  namespace: "northlandproperties"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "nun"
+  namespace: "nun"
+  job_board_code: "explorerhotel"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "NVS Group"
+  namespace: "nvsgroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "OEC"
+  namespace: "oec"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Okanagan Specialty Fruits"
+  namespace: "osf"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "okayind"
+  namespace: "okayind"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Old World Industries"
+  namespace: "owi"
+  job_board_code: "candidateportalowi"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "olvhs"
+  namespace: "olvhs"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Onit, Inc"
+  namespace: "onit"
+  job_board_code: "candidateportalonit"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "onpoint"
+  namespace: "onpoint"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Opal HealthCare"
+  namespace: "opalhealthcare"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Optima Living"
+  namespace: "optimaliving"
+  job_board_code: "joinus"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Organigram"
+  namespace: "organigram"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Orion Associates, Meridian Services, & Zenith Services"
+  namespace: "orionassoc"
+  job_board_code: "mscareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "orvis"
+  namespace: "orvis"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "OSB Group"
+  namespace: "peoplespace"
+  job_board_code: "candidateportal2"
+  job_board_id: 4
+  culture_code: "en-GB"
+- company: "OSI Maritime Systems"
+  namespace: "osimaritime"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "OTR Group"
+  namespace: "vivaenergyau"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "our company"
+  namespace: "ijwwhiskey"
+  job_board_code: "candidateportalsolidus"
+  job_board_id: 11
+  culture_code: "en-US"
+- company: "padnos"
+  namespace: "padnos"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "paralosninos"
+  namespace: "paralosninos"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "Passion Dental Group Inc"
+  namespace: "pp51400"
+  job_board_code: "pdgcareerportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "pennfostercarrus"
+  namespace: "pennfostercarrus"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Phantom Screens"
+  namespace: "phantomscreens"
+  job_board_code: "phantomextncareers"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Phil's BBQ"
+  namespace: "philsbbq"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Phillips & Cohen Associates Ltd"
+  namespace: "pcaltd"
+  job_board_code: "companysiteonly"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "PHL"
+  namespace: "totallygroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "PICA Group"
+  namespace: "picagroup"
+  job_board_code: "ace"
+  job_board_id: 10
+  culture_code: "en-AU"
+- company: "Pohlad Companies"
+  namespace: "pohlad"
+  job_board_code: "par"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Poly-Nova Technologies"
+  namespace: "pnt"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Postmedia Network Inc"
+  namespace: "postmedia"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "pqchc"
+  namespace: "pqchc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "prclworld"
+  namespace: "prclworld"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Precisional"
+  namespace: "prec"
+  job_board_code: "spectracareersite"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Primary Engineering and Construction"
+  namespace: "primaryeng"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Prince Alfred College"
+  namespace: "pac"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Product Care Recycling"
+  namespace: "pcarecycling"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "projectrenewal"
+  namespace: "projectrenewal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Proliance Surgeons"
+  namespace: "proliance"
+  job_board_code: "proliancecareersite"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Prouds Jewellers PTY LTD trading as Prouds the Jewellers, Goldmark and Angus & Coote"
+  namespace: "jpla"
+  job_board_code: "anguscootewebsite"
+  job_board_id: 5
+  culture_code: "en-AU"
+- company: "PSB BOISJOLI S.E.N.C.R.L. LLP"
+  namespace: "psbbcpa"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "PureGym People"
+  namespace: "puregympeople"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Purpose Unlimited"
+  namespace: "purposefin"
+  job_board_code: "pas"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Quest Windows"
+  namespace: "questwindows"
+  job_board_code: "candidateportalcaa"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "raceroster"
+  namespace: "raceroster"
+  job_board_code: "racerostercareers"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Randwick City Council"
+  namespace: "randwickcouncil"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Recipe Unlimited"
+  namespace: "recipe"
+  job_board_code: "kelseyscareers"
+  job_board_id: 9
+  culture_code: "en-US"
+- company: "Recruiting@BabyOne"
+  namespace: "gerbabyone"
+  job_board_code: "initiativbewerbung"
+  job_board_id: 9
+  culture_code: "de-DE"
+- company: "Recruitment Team"
+  namespace: "lmdp"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "REDW"
+  namespace: "redw"
+  job_board_code: "redwcareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "reg"
+  namespace: "reg"
+  job_board_code: "candidateportal1"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Reliance Home Comfort"
+  namespace: "reliancecomfort"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "remco"
+  namespace: "remco"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Ressources humaines - Port Québec"
+  namespace: "apq"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Rethink Mental Illness"
+  namespace: "rethink"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "rfrk"
+  namespace: "rfrk"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "richmondsteel"
+  namespace: "richmondsteel"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Ridley Corporation"
+  namespace: "ridley"
+  job_board_code: "ridleyccs"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Right Time Group of Companies"
+  namespace: "righttime"
+  job_board_code: "atlascare"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "rockingj"
+  namespace: "rockingj"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Roke"
+  namespace: "roke"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Rotorua Lakes Council"
+  namespace: "rotorualakes"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-NZ"
+- company: "roundglass"
+  namespace: "roundglass"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Royal Ballet and Opera"
+  namespace: "rohcgf"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "RSMI-JTAC"
+  namespace: "rmsijtac"
+  job_board_code: "marmot"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "safariland"
+  namespace: "safariland"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "es-MX"
+- company: "sagann"
+  namespace: "sagann"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Salus"
+  namespace: "salus"
+  job_board_code: "salusoc"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Sanitarium Health Food Company"
+  namespace: "sanitarium"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "saul"
+  namespace: "saul"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "schuh"
+  namespace: "schuh"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Scott Dunn"
+  namespace: "scottdunn"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Seasalt Cornwall"
+  namespace: "seasalt"
+  job_board_code: "dcportal"
+  job_board_id: 6
+  culture_code: "en-GB"
+- company: "Segal GCSE LLP"
+  namespace: "segal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Settlement Services International Limited (SSI)"
+  namespace: "peoplessi"
+  job_board_code: "ssi"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Sexton Family of Companies"
+  namespace: "sextonfc"
+  job_board_code: "sfoc"
+  job_board_id: 7
+  culture_code: "en-CA"
+- company: "Shawano County"
+  namespace: "shawano"
+  job_board_code: "shawanocounty"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "shbc"
+  namespace: "shbc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "shccares"
+  namespace: "shccares"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "shrm"
+  namespace: "shrm"
+  job_board_code: "external"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "sibcorp"
+  namespace: "sibcorp"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Signicast"
+  namespace: "formtechnologies"
+  job_board_code: "signicast"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "SILK Laser Clinics"
+  namespace: "silklaser"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "SkilledTradesBC"
+  namespace: "stbc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "skygrid"
+  namespace: "skygrid"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "smartcentres"
+  namespace: "smartcentres"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "SMCT"
+  namespace: "smct"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "smteam"
+  namespace: "smteam"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Sobeys Capital Incorporated or a Franchise/Affiliate / ou une franchise/société affiliée"
+  namespace: "sobeys"
+  job_board_code: "privateclientsite"
+  job_board_id: 13
+  culture_code: "en-CA"
+- company: "SOPREMA Canada"
+  namespace: "soprema"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Soufflet Malt Family of Companies"
+  namespace: "souffletmalt"
+  job_board_code: "bairdsmaltlimited"
+  job_board_id: 7
+  culture_code: "en-GB"
+- company: "Source Atlantic Ltd"
+  namespace: "homebase"
+  job_board_code: "soucie-salo-careers"
+  job_board_id: 6
+  culture_code: "en-CA"
+- company: "Southern Cross Austereo"
+  namespace: "sxl"
+  job_board_code: "120869"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Spire Holdings, LLC. and affiliated companies"
+  namespace: "spireall"
+  job_board_code: "rushrecruiting"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "spiritofmath"
+  namespace: "spiritofmath"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Sporting Life Group"
+  namespace: "slg001"
+  job_board_code: "ttscareers"
+  job_board_id: 6
+  culture_code: "en-CA"
+- company: "sports"
+  namespace: "sports"
+  job_board_code: "sportsendeavorscareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Squires Garden Centres"
+  namespace: "squiresgc1936"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "St. Camillus"
+  namespace: "stcam"
+  job_board_code: "other"
+  job_board_id: 8
+  culture_code: "en-US"
+- company: "Standards Council of Canada | Conseil canadien des normes"
+  namespace: "sccccn"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "standvast"
+  namespace: "standvast"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "State Sports Centres"
+  namespace: "melbsportscentres"
+  job_board_code: "ssccareers"
+  job_board_id: 4
+  culture_code: "en-AU"
+- company: "Stella-Jones"
+  namespace: "stellajones"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "stellarbank"
+  namespace: "stellarbank"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Stephenson's Rental Services"
+  namespace: "stephensons"
+  job_board_code: "candidateportalexclin"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Stretto, Inc"
+  namespace: "stretto"
+  job_board_code: "strettocareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Sunwing Vacations Group"
+  namespace: "sunwing"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Superior Ambulance"
+  namespace: "superiorambulance"
+  job_board_code: "superiorambulance"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "SW Accountants & Advisors"
+  namespace: "swaa"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Sydney Water"
+  namespace: "sydneywater"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Talcott Financial Group"
+  namespace: "talcott"
+  job_board_code: "talcottcareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Talent Acquisition"
+  namespace: "febenjamin"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Talent Acquisition Team"
+  namespace: "aspensurgical"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Talize Inc / Recycling Rewards"
+  namespace: "talize"
+  job_board_code: "talize"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Tampa Bay Buccaneers"
+  namespace: "tbb"
+  job_board_code: "candidateportaltbb"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "taq | SCI Lease Corp"
+  namespace: "scigroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "tcw"
+  namespace: "tcw"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Tes"
+  namespace: "tesglobal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "TFO"
+  namespace: "groupemediatfo"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "tgguk"
+  namespace: "tgguk"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "The Arc Jefferson - St. Lawrence"
+  namespace: "jslcarc"
+  job_board_code: "jslc"
+  job_board_id: 15
+  culture_code: "en-US"
+- company: "The Associated and its Agencies"
+  namespace: "associated"
+  job_board_code: "jcccandidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "The Corporation of The City of St. Thomas"
+  namespace: "stthomas"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "The Employment Team at Hattiesburg Clinic, P.A"
+  namespace: "hcpa"
+  job_board_code: "hattiesburgclinicwebsite"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "The Erb Group"
+  namespace: "erb"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "The GLI Group"
+  namespace: "gligroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "ja-JP"
+- company: "The Hanover Insurance Group"
+  namespace: "thg"
+  job_board_code: "technology"
+  job_board_id: 10
+  culture_code: "en-US"
+- company: "The HOYTS Group"
+  namespace: "hoyts"
+  job_board_code: "hoytsau"
+  job_board_id: 6
+  culture_code: "en-AU"
+- company: "The Inland Real Estate Group of Companies"
+  namespace: "inlandgroup"
+  job_board_code: "inland-candidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "The Mahoney Group"
+  namespace: "mahoney"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "The Nashville Predators Hockey Club"
+  namespace: "nashhockeyclub"
+  job_board_code: "nashvillepred"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "The Palace"
+  namespace: "thepalace"
+  job_board_code: "careone"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "The Rank Group"
+  namespace: "rankgroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "The Royal Mint"
+  namespace: "trmdayforce"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "The Travel Corporation"
+  namespace: "travelcorp"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "The Weather Network / MétéoMédia"
+  namespace: "pelmorex"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "thelatestscoop"
+  namespace: "thelatestscoop"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "torontohumanesociety"
+  namespace: "torontohumanesociety"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Tourism Holdings Australia Pty Ltd"
+  namespace: "apollotourism"
+  job_board_code: "CDCP"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Tourism Holdings Ltd"
+  namespace: "tourismholdings"
+  job_board_code: "NZcareersSite"
+  job_board_id: 18
+  culture_code: "en-AU"
+- company: "Tourism Whistler"
+  namespace: "tourismwhistler"
+  job_board_code: "golfcandidateportal"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Town of High River"
+  namespace: "tohr"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Town of Tecumseh"
+  namespace: "tecumseh"
+  job_board_code: "employment-opportunities"
+  job_board_id: 4
+  culture_code: "en-CA"
+- company: "Tribe513 | The Onyx Group"
+  namespace: "tog"
+  job_board_code: "vivecareers"
+  job_board_id: 14
+  culture_code: "en-US"
+- company: "Tridel Group of Companies"
+  namespace: "tridel"
+  job_board_code: "dnt"
+  job_board_id: 13
+  culture_code: "en-US"
+- company: "Triton Environmental Consultants Ltd"
+  namespace: "tec"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "trojanholdings"
+  namespace: "trojanholdings"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-NZ"
+- company: "Trudell Medical Group"
+  namespace: "tml"
+  job_board_code: "mmc"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Turn 14 Distribution"
+  namespace: "turn14"
+  job_board_code: "t14careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "twoharbors"
+  namespace: "twoharbors"
+  job_board_code: "round-point"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Téléfilm Canada | Telefilm Canada"
+  namespace: "telefilmcanada"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Ultratec, Inc. / CapTel, Inc. / CapTel Service Specialists, LLC. (CSS) / Outreach Experts, Inc. (OEI) / Weitbrecht Communications, Inc. / Advanced Assembly, Inc"
+  namespace: "ultratec"
+  job_board_code: "ultrateccareersapplication"
+  job_board_id: 14
+  culture_code: "en-US"
+- company: "Uniting NSW.ACT"
+  namespace: "unitingaunsw"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "University Pension Plan"
+  namespace: "upp"
+  job_board_code: "externalcandidateportal"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Université de Saint-Boniface"
+  namespace: "usb"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "usgroup"
+  namespace: "usgroup"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Vacances Air Canada Vacations / Air Canada Rouge"
+  namespace: "acvrouge"
+  job_board_code: "acvclientcareersitev2"
+  job_board_id: 6
+  culture_code: "fr-CA"
+- company: "Vanquis"
+  namespace: "vbg"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Venues NSW"
+  namespace: "venuesnsw"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Veritext"
+  namespace: "veritext"
+  job_board_code: "veritextcareers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Versant Health"
+  namespace: "versanthealth"
+  job_board_code: "versanthealth"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "vertexone"
+  namespace: "vertexone"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Villages Vacances Valcartier, Wet 'n' Wild Toronto and Calypso Waterpark Entertainment Properties"
+  namespace: "premierparks"
+  job_board_code: "valcartier"
+  job_board_id: 4
+  culture_code: "fr-CA"
+- company: "Virgin Active Australia"
+  namespace: "vaa"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "vitu"
+  namespace: "vitu"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "Vocus"
+  namespace: "vocus"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Von Maur/Dry Goods"
+  namespace: "vonmaur"
+  job_board_code: "candidateportaldrygoods"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "VPNE"
+  namespace: "vpne"
+  job_board_code: "careers"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "Ward Talent Team"
+  namespace: "teamward"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Watlow"
+  namespace: "watlow"
+  job_board_code: "watlowcareersite"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "wdtmilk"
+  namespace: "wdtmilk"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-US"
+- company: "West Edmonton Mall Property Inc. (West Edmonton Mall & Fantasyland Hotel)"
+  namespace: "wem"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Westerkirk"
+  namespace: "westerkirk"
+  job_board_code: "vistaradiocorporatecareers"
+  job_board_id: 12
+  culture_code: "en-US"
+- company: "Western Home Services"
+  namespace: "whsi"
+  job_board_code: "westernhomecareersite"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Western Ottawa Community Resource Centre"
+  namespace: "wocrc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "WestJet Group"
+  namespace: "westjet"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Westminster Management"
+  namespace: "westminster"
+  job_board_code: "westminster"
+  job_board_id: 6
+  culture_code: "en-US"
+- company: "Westmont Living"
+  namespace: "westmontliving"
+  job_board_code: "westmontlivingcareers"
+  job_board_id: 3
+  culture_code: "en-US"
+- company: "Whitbread"
+  namespace: "whb"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-GB"
+- company: "Whitehaven Coal"
+  namespace: "whitehavencoal"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "WHSmith"
+  namespace: "whsmith"
+  job_board_code: "whsmithinternationalcareerssite"
+  job_board_id: 14
+  culture_code: "en-GB"
+- company: "William Adams"
+  namespace: "williamadams"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-AU"
+- company: "Wirelessdna"
+  namespace: "wirelessdna"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "Wismettac Asian Foods, Inc"
+  namespace: "wafna"
+  job_board_code: "usacareersite"
+  job_board_id: 4
+  culture_code: "en-US"
+- company: "World Vision, Inc"
+  namespace: "worldvisionus"
+  job_board_code: "candidateportalext"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "WQS"
+  namespace: "wqsgoc"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "en-CA"
+- company: "WWF International"
+  namespace: "wwfint"
+  job_board_code: "external"
+  job_board_id: 5
+  culture_code: "en-GB"
+- company: "Xencor"
+  namespace: "xencor"
+  job_board_code: "112515"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Zufall Health"
+  namespace: "zufallhealth"
+  job_board_code: "volunteerportal"
+  job_board_id: 5
+  culture_code: "en-US"
+- company: "Équipe MASKA"
+  namespace: "kenworthmaska"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"
+- company: "Équipe RH"
+  namespace: "groupecarbur"
+  job_board_code: "CANDIDATEPORTAL"
+  job_board_id: 1
+  culture_code: "fr-CA"

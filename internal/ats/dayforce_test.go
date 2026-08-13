@@ -40,6 +40,10 @@ func TestDayforceCareersURL(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "https://jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL", url)
 
+	url, ok = a.CareersURL("costa")
+	require.True(t, ok)
+	assert.Equal(t, "https://jobs.dayforcehcm.com/en-GB/costa/CANDIDATEPORTAL", url)
+
 	_, ok = a.CareersURL("no-such-company")
 	assert.False(t, ok)
 }
@@ -54,10 +58,11 @@ func TestDayforceParseCareersURL(t *testing.T) {
 		slug string
 	}{
 		{"culture form folds to roster slug", "https://jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL", "pca"},
+		{"pinned culture form folds to roster slug", "https://jobs.dayforcehcm.com/en-GB/costa/CANDIDATEPORTAL", "costa"},
 		{"culture form with job id folds to roster slug", "https://jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL/jobs/62374", "pca"},
 		{"locale-less form folds to roster slug", "https://jobs.dayforcehcm.com/pca/CANDIDATEPORTAL", "pca"},
 		{"case-insensitive board code folds to roster slug", "https://jobs.dayforcehcm.com/en-US/PCA/candidateportal", "pca"},
-		{"non-roster board mints canonical slug", "https://jobs.dayforcehcm.com/en-US/corpay/CANDIDATEPORTAL", "corpay/candidateportal"},
+		{"non-roster board mints canonical slug", "https://jobs.dayforcehcm.com/en-US/notinaroster/CANDIDATEPORTAL", "notinaroster/candidateportal"},
 		{"non-roster locale-less board uses default culture", "https://jobs.dayforcehcm.com/unknown/CANDIDATEPORTAL", "unknown/candidateportal"},
 		{"non-roster board preserves non-default culture", "https://jobs.dayforcehcm.com/fr-CA/unknown/CANDIDATEPORTAL", "unknown/candidateportal/fr-CA"},
 		{"non-roster board omits default culture", "https://jobs.dayforcehcm.com/en-US/unknown/CANDIDATEPORTAL", "unknown/candidateportal"},

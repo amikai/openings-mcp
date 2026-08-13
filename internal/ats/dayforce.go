@@ -66,7 +66,7 @@ var dayforceFilterKeys = map[string]bool{
 // Examples (hostname + escaped path):
 //   - jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL
 //   - jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL/jobs/62374
-//   - jobs.dayforcehcm.com/corpay/CANDIDATEPORTAL (locale-less form)
+//   - jobs.dayforcehcm.com/unknown/CANDIDATEPORTAL (locale-less form)
 var dayforceBoardURLRE = regexp.MustCompile(
 	`(?i)^jobs\.dayforcehcm\.com/(?:(?P<culture>[a-z]{2}-[a-z]{2})/)?(?P<ns>[^/]+)/(?P<xref>[^/]+)(?:/jobs/[^/]+)?/?$`,
 )
