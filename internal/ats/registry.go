@@ -68,6 +68,7 @@ var careersHostPatternsByAdapter = map[string]string{
 	"join":            "join.com/companies/<company> (roster companies only)",
 	"mokahr":          "app.mokahr.com/<social-recruitment|campus[_-]apply|campus[_-]recruitment>/<org>/<siteId>",
 	"ultipro":         "recruiting<N>.ultipro.com/<companyCode>/JobBoard/<boardId>",
+	"dayforce":        "jobs.dayforcehcm.com/[<culture>/]<namespace>/<jobBoardCode>",
 }
 
 // CompanyCandidate is one human-readable choice in a [CompanyResolution].

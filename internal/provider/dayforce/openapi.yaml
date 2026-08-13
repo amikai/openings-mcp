@@ -1,0 +1,587 @@
+openapi: 3.1.0
+
+info:
+  title: Dayforce Recruiting Candidate Portal API
+  version: "1"
+  description: |
+    Undocumented public JSON API behind every Dayforce (formerly Ceridian
+    Dayforce) Recruiting candidate portal on `jobs.dayforcehcm.com`, keyed by
+    `clientNamespace` (tenant) and `careerSiteXRefCode`/`jobBoardCode` (board
+    within the tenant). Recovered from the site's Next.js bundle and verified
+    field by field against live responses on 2026-08-11.
+
+    ## CSRF pre-flight (search only)
+
+    `search` is a POST and is rejected with a bare, non-JSON `403 Forbidden`
+    body (9 bytes, no `Content-Type`) unless the caller first `GET`s
+    `/api/auth/csrf`, retains its `__Host-next-auth.csrf-token` cookie, and
+    echoes the returned token back as the `X-CSRF-TOKEN` header on the POST.
+    This is a stock next-auth double-submit token, not bot detection: it is
+    reusable for the life of the cookie jar, so one `getCsrf` call serves any
+    number of subsequent searches. `GET` endpoints (detail, posting
+    attributes) need neither the cookie nor the header. Modeled here with no
+    response body for 403, since the live body is not JSON and callers only
+    need the status.
+
+    ## Search quirks confirmed live
+
+    - **Page size is fixed at 25** and not client-controllable; the only
+      pagination knob is `paginationStart` (an item offset, not a page
+      number), which the API echoes back as `offset`. Past the end it
+      returns `200` with an empty `jobPostings` and the true `maxCount`.
+    - Every documented filter is genuinely server-side (verified against
+      `pca`'s ~350-job board): `searchText` narrows 352 → 115,
+      `departmentId` narrows to 1, `fromDate` to 23, `locationString` +
+      `distance` to 13.
+    - `clientNamespace` and `jobBoardCode` are both required in the request
+      body **and** repeated in the URL path; an unknown tenant or an unknown
+      `jobBoardCode` for a known tenant both 404, so either is a valid way to
+      confirm a roster candidate.
+    - **Silent-empty trap:** an unsupported `cultureCode` returns `200` with
+      `maxCount: 0` rather than an error — indistinguishable from a real,
+      empty board unless the culture is pinned per tenant.
+    - A search result row's `postingLocations[].coordinates` is a
+      semicolon-joined string (`"lat:46.09;lng:-118.91"`), while the same
+      field on the detail endpoint is a `{lat, lng}` object — the two
+      `coordinates` shapes are genuinely different and are modeled as
+      separate schemas (`SearchCoordinates` / `Coordinates`).
+
+    ## `jobBoardId` — not the same as `jobBoardCode`
+
+    Detail and the posting-attribute endpoints need the numeric
+    `jobBoardId`, which is not visible in the human-facing URL. Every search
+    row carries it, and so does the SSR board page's `__NEXT_DATA__`
+    `site-info` query (see `siteinfo.go`, not part of this spec — it scrapes
+    HTML rather than calling a JSON endpoint). It is `1` for the default
+    `CANDIDATEPORTAL` board on every tenant sampled so far, but **not
+    universally 1**: `mydayforce`'s `alljobs` board is `jobBoardId 8`, so it
+    must be resolved per board rather than assumed.
+
+    ## Deliberately unmodeled: candidate-portal apply/assessment state
+
+    ogen generates a strict decoder: one response field whose live value
+    contradicts its declared type fails the whole response, and this API's
+    tail of per-tenant type quirks kept surfacing one more such field every
+    time an earlier one was patched (see the repo's
+    `2026-08-11-dayforce-provider.md` plan doc for the history). The fix
+    adopted here is to declare only the fields this provider actually
+    consumes, since ogen silently ignores response fields absent from the
+    spec. Dropped on that basis — not an oversight — are the
+    candidate-portal's own apply/assessment/render-state fields:
+    `SearchPosting.postingAppliedStatus`, and on `JobPostingDetail`:
+    `assessmentId`, `assessmentSentType`, `hasApplied`, `canApplyAgain`,
+    `jobApplicationTemplateId`, `postingThemeOverrideBoardCode`,
+    `postingStatus`, `postingType`. `assessmentSentType` in particular was
+    never observed as a string — it was a guess that live data (corpay,
+    integer `3`) proved wrong. Re-adding any of these needs a type pinned
+    from live evidence, not inference.
+
+  contact:
+    url: https://jobs.dayforcehcm.com
+
+servers:
+  - url: https://jobs.dayforcehcm.com
+
+paths:
+  /api/auth/csrf:
+    get:
+      operationId: getCsrf
+      summary: Fetch a next-auth CSRF token for the search POST
+      description: >
+        Also sets the `__Host-next-auth.csrf-token` cookie that must
+        accompany the returned token on the search request; the cookie jar,
+        not this response body, carries that half of the pair.
+      responses:
+        "200":
+          description: CSRF token, reusable for the life of the cookie jar.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CsrfResponse"
+
+  /api/geo/{clientNamespace}/jobposting/search:
+    post:
+      operationId: searchJobPostings
+      summary: Search one tenant's job board
+      parameters:
+        - name: clientNamespace
+          in: path
+          required: true
+          description: Tenant slug, e.g. "pca"; must match the request body's clientNamespace.
+          schema:
+            type: string
+        - name: X-CSRF-TOKEN
+          in: header
+          required: true
+          description: Token from getCsrf, valid only with its matching cookie.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: One 25-row page of job postings.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "403":
+          description: >
+            Missing or stale CSRF cookie/header. The live body is a bare
+            9-byte "Forbidden" string with no Content-Type, so it is not
+            modeled as content here; callers key off the status alone.
+        "404":
+          description: Unknown clientNamespace, or an unknown jobBoardCode for a known tenant.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /api/geo/{clientNamespace}/jobposting/{postingNamespace}/{cultureCode}/{jobBoardId}/{postingId}:
+    get:
+      operationId: getJobPosting
+      summary: Get one job posting
+      description: >
+        The tenant slug appears twice in the path (`clientNamespace` and
+        `postingNamespace`); the live API always uses the same value in both
+        positions, but the two are modeled separately because a single
+        OpenAPI path parameter cannot be substituted at two different
+        template positions.
+      parameters:
+        - name: clientNamespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: postingNamespace
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: cultureCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: jobBoardId
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: postingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Full job posting, a superset of the search row.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobPostingDetail"
+        "404":
+          description: Unknown posting id, or a posting id belonging to another tenant.
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+
+  /api/geo/{clientNamespace}/postingattributes/departments/{attributeNamespace}/{jobBoardId}/{cultureCode}:
+    get:
+      operationId: listDepartments
+      summary: List a board's department filter values
+      parameters:
+        - $ref: "#/components/parameters/AttributeClientNamespace"
+        - $ref: "#/components/parameters/AttributeNamespace"
+        - $ref: "#/components/parameters/AttributeJobBoardId"
+        - $ref: "#/components/parameters/AttributeCultureCode"
+      responses:
+        "200":
+          description: Department id/value pairs, keyed by attributeId.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingAttributeList"
+
+  /api/geo/{clientNamespace}/postingattributes/payclasses/{attributeNamespace}/{jobBoardId}/{cultureCode}:
+    get:
+      operationId: listPayClasses
+      summary: List a board's pay-class filter values
+      parameters:
+        - $ref: "#/components/parameters/AttributeClientNamespace"
+        - $ref: "#/components/parameters/AttributeNamespace"
+        - $ref: "#/components/parameters/AttributeJobBoardId"
+        - $ref: "#/components/parameters/AttributeCultureCode"
+      responses:
+        "200":
+          description: Pay-class id/value pairs, keyed by attributeId.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingAttributeList"
+
+  /api/geo/{clientNamespace}/postingattributes/paytypes/{attributeNamespace}/{jobBoardId}/{cultureCode}:
+    get:
+      operationId: listPayTypes
+      summary: List a board's pay-type filter values
+      parameters:
+        - $ref: "#/components/parameters/AttributeClientNamespace"
+        - $ref: "#/components/parameters/AttributeNamespace"
+        - $ref: "#/components/parameters/AttributeJobBoardId"
+        - $ref: "#/components/parameters/AttributeCultureCode"
+      responses:
+        "200":
+          description: Pay-type id/value pairs, keyed by attributeId.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostingAttributeList"
+
+components:
+  parameters:
+    AttributeClientNamespace:
+      name: clientNamespace
+      in: path
+      required: true
+      schema:
+        type: string
+    AttributeNamespace:
+      name: attributeNamespace
+      in: path
+      required: true
+      description: >
+        Repeats clientNamespace, the same duplicate-tenant-slug quirk as
+        getJobPosting's postingNamespace.
+      schema:
+        type: string
+    AttributeJobBoardId:
+      name: jobBoardId
+      in: path
+      required: true
+      schema:
+        type: integer
+    AttributeCultureCode:
+      name: cultureCode
+      in: path
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    CsrfResponse:
+      type: object
+      required: [csrfToken]
+      properties:
+        csrfToken:
+          type: string
+
+    ProblemDetails:
+      description: >
+        RFC 9457-shaped problem document returned for every observed 404,
+        with a wire Content-Type of application/problem+json (not
+        application/json, unlike every 200 response in this spec).
+      type: object
+      required: [type, title, status, traceId]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        traceId:
+          type: string
+
+    SearchRequest:
+      type: object
+      additionalProperties: false
+      required: [clientNamespace, jobBoardCode, cultureCode]
+      properties:
+        clientNamespace:
+          type: string
+        jobBoardCode:
+          description: Case-insensitive board code, e.g. "CANDIDATEPORTAL" or "alljobs".
+          type: string
+        cultureCode:
+          description: >
+            Required; an unsupported value returns 200 with maxCount 0
+            rather than an error, so pin this per tenant rather than
+            guessing.
+          type: string
+        searchText:
+          type: string
+        locationId:
+          type: integer
+        locationType:
+          type: integer
+        locationString:
+          type: string
+        distance:
+          type: number
+        distanceUnit:
+          type: integer
+        payClass:
+          type: integer
+        payType:
+          type: integer
+        departmentId:
+          type: integer
+        travelRequired:
+          type: boolean
+        fromDate:
+          type: string
+          format: date-time
+        paginationStart:
+          description: Item offset, not a page number; page size is a fixed 25.
+          type: integer
+          minimum: 0
+
+    SearchResponse:
+      type: object
+      required: [jobPostings, maxCount, offset, count]
+      properties:
+        jobPostings:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchPosting"
+        maxCount:
+          type: integer
+        offset:
+          type: integer
+        count:
+          type: integer
+
+    SearchPosting:
+      type: object
+      required:
+        - jobPostingId
+        - jobTitle
+        - hasVirtualLocation
+        - postingStartTimestampUTC
+        - postingLocations
+      properties:
+        clientNamespace:
+          type: string
+        jobBoardId:
+          type: integer
+        jobPostingId:
+          type: integer
+        jobReqId:
+          type: integer
+        jobTitle:
+          type: string
+        jobDescription:
+          type: string
+        hasVirtualLocation:
+          description: The remote signal on list results; detail carries the same field.
+          type: boolean
+        postingStartTimestampUTC:
+          type: string
+          format: date-time
+        postingExpiryTimestampUTC:
+          type: [string, "null"]
+          format: date-time
+        isEvergreen:
+          type: boolean
+        reapplyPeriodDays:
+          type: [integer, "null"]
+        postingLocations:
+          description: >
+            Null on rows with no location at all (confirmed live on corpay,
+            jdemea, and mymilacron) — always an empty array rather than null
+            on the corresponding detail endpoint (JobPostingDetail).
+          type: [array, "null"]
+          items:
+            $ref: "#/components/schemas/SearchPostingLocation"
+        searchScore:
+          type: number
+
+    SearchPostingLocation:
+      type: object
+      required:
+        - formattedAddress
+        - coordinates
+      properties:
+        formattedAddress:
+          type: string
+        locationId:
+          type: integer
+        locationType:
+          type: integer
+        isoCountryCode:
+          description: >
+            Null for continent-level locations (e.g. a "Europe" catch-all
+            posting location, locationType 2), alongside a null stateCode
+            and cityName on the same row.
+          type: [string, "null"]
+        stateCode:
+          description: Null for country-level (non-US/CA) locations.
+          type: [string, "null"]
+        cityName:
+          description: Null for country- or state-level locations.
+          type: [string, "null"]
+        coordinates:
+          description: >
+            Semicolon-joined "lat:<lat>;lng:<lng>" string on search results
+            — unlike the {lat, lng} object on the detail endpoint
+            (Coordinates).
+          type: string
+
+    Coordinates:
+      type: object
+      required: [lat, lng]
+      properties:
+        lat:
+          type: number
+        lng:
+          type: number
+
+    DetailPostingLocation:
+      type: object
+      required:
+        - formattedAddress
+        - coordinates
+      properties:
+        formattedAddress:
+          type: string
+        locationId:
+          type: integer
+        locationType:
+          type: integer
+        isoCountryCode:
+          description: >
+            Null for continent-level locations, mirroring
+            SearchPostingLocation (confirmed live on the detail endpoint
+            for the same posting).
+          type: [string, "null"]
+        stateCode:
+          type: [string, "null"]
+        cityName:
+          type: [string, "null"]
+        coordinates:
+          $ref: "#/components/schemas/Coordinates"
+
+    JobPostingContent:
+      type: object
+      required: [jobDescriptionHeader, jobDescription, jobDescriptionFooter]
+      properties:
+        jobDescriptionHeader:
+          description: >
+            HTML, usually boilerplate company copy. Confirmed non-null
+            across 158 live detail responses spanning all 14 surveyed
+            tenants (pca, jdemea, mymilacron, wikoff, avgroup, nam, corpay,
+            odc, ipg, kiinc, medplast, opta, paradigm, thechronicle),
+            2026-08-11.
+          type: string
+        jobDescription:
+          description: >
+            HTML. Confirmed non-null across the same 158-response survey as
+            jobDescriptionHeader.
+          type: string
+        jobDescriptionFooter:
+          description: >
+            HTML, usually compensation/benefits/EEO boilerplate. Null on
+            roster tenant avgroup (postings 2482, 2442) even though
+            jobDescriptionHeader/jobDescription are non-null on the same
+            responses — confirmed live 2026-08-11.
+          type: [string, "null"]
+
+    JobPostingAttributeValue:
+      description: >
+        A string for `type: "string"` attributes (e.g. PayType), a number
+        for `type: "currency"` ones (e.g. HiringMinRate/HiringMaxRate), or a
+        boolean for `type: "bool"` ones (e.g. TravelRequired — confirmed
+        live on mymilacron posting 2684).
+      oneOf:
+        - type: string
+        - type: number
+        - type: boolean
+
+    JobPostingAttribute:
+      type: object
+      required: [name, value, type]
+      properties:
+        name:
+          type: string
+        value:
+          $ref: "#/components/schemas/JobPostingAttributeValue"
+        type:
+          type: string
+
+    JobPostingDetail:
+      type: object
+      required:
+        - jobPostingId
+        - jobTitle
+        - postingStartTimestampUTC
+        - jobPostingContent
+        - hasVirtualLocation
+        - postingLocations
+      properties:
+        jobPostingId:
+          type: integer
+        jobReqId:
+          type: integer
+        jobTitle:
+          type: string
+        postingStartTimestampUTC:
+          type: string
+          format: date-time
+        postingExpiryTimestampUTC:
+          type: [string, "null"]
+          format: date-time
+        isEvergreen:
+          type: boolean
+        isInternal:
+          type: boolean
+        relocationEligible:
+          type: [boolean, "null"]
+        reapplyPeriodDays:
+          type: [integer, "null"]
+        createdTimestampUTC:
+          type: string
+          format: date-time
+        lastModifiedTimestampUTC:
+          type: string
+          format: date-time
+        isoCurrencyRegion:
+          description: >
+            Null on 9 of 10 surveyed tenants (avgroup, corpay, ipg, jdemea,
+            kiinc, mymilacron, nam, thechronicle, wikoff); only PCA returns a
+            value ("USD").
+          type: [string, "null"]
+        jobPostingContent:
+          $ref: "#/components/schemas/JobPostingContent"
+        hasVirtualLocation:
+          type: boolean
+        postingLocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/DetailPostingLocation"
+        jobPostingAttributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobPostingAttribute"
+
+    PostingAttribute:
+      type: object
+      required: [attributeId, attributeValue]
+      properties:
+        attributeId:
+          type: integer
+        attributeValue:
+          type: string
+
+    PostingAttributeList:
+      type: object
+      required: [postingAttributesAttributesList]
+      properties:
+        postingAttributesAttributesList:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostingAttribute"

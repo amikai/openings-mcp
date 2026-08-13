@@ -35,6 +35,7 @@ var providerOrder = []string{
 	"ashby",
 	"avature",
 	"bamboohr",
+	"dayforce",
 	"eightfold",
 	"engage",
 	"greenhouse",
@@ -191,6 +192,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 			a = ats.NewAvatureAdapter(hc)
 		case "bamboohr":
 			a = ats.NewBambooHRAdapter(hc, nil)
+		case "dayforce":
+			a, err = ats.NewDayforceAdapter("https://jobs.dayforcehcm.com", hc)
 		case "eightfold":
 			// Eightfold's edge 403s Go's default User-Agent instead of
 			// returning JSON, so it gets its own client rather than hc.
