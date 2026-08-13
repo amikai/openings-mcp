@@ -403,6 +403,10 @@ func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.
 	if err != nil {
 		return nil, fmt.Errorf("create MokaHR ATS adapter: %w", err)
 	}
+	dayforceAdapter, err := ats.NewDayforceAdapter("https://jobs.dayforcehcm.com", hc)
+	if err != nil {
+		return nil, fmt.Errorf("create Dayforce ATS adapter: %w", err)
+	}
 
 	return []ats.Adapter{
 		ats.NewWorkdayAdapter(hc),
@@ -427,6 +431,7 @@ func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.
 		ats.NewUltiProAdapter(hc),
 		ats.NewHrmosAdapter("https://hrmos.co", hc, dumpCache),
 		mokahrAdapter,
+		dayforceAdapter,
 	}, nil
 }
 

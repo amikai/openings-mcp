@@ -27,6 +27,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[Oracle Recruiting Cloud](https://www.oracle.com/human-capital-management/recruiting/)**,
   **[JOIN](https://join.com)**,
   **[UKG Pro (UltiPro)](https://www.ukg.com/products/ukg-pro)**,
+  **[Dayforce](https://www.dayforce.com)**,
   **[Avature](https://www.avature.net)**,
   **[HERP Hire](https://lp.herp.cloud/lp/boost-applications)** (Japan),
   **[engage](https://en-gage.net)** (Japan),
