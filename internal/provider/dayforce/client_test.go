@@ -355,6 +355,24 @@ func TestJobNullCurrencyAndEmptyLocations(t *testing.T) {
 	assert.NotNil(t, res.PostingLocations, "detail postingLocations is documented as never null, only ever empty")
 }
 
+// TestJobNullDescriptionHeader proves a detail response with
+// jobDescriptionHeader: null decodes without error — ara posting 8's real
+// shape when only jobDescription is present.
+func TestJobNullDescriptionHeader(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+
+	client, err := NewBoardClient(srv.URL, srv.Client())
+	require.NoError(t, err)
+
+	res, err := client.Job(t.Context(), "ara", "en-US", 1, MockNullDescriptionHeaderJobID)
+	require.NoError(t, err)
+
+	assert.Equal(t, MockNullDescriptionHeaderJobID, res.JobPostingId)
+	assert.True(t, res.JobPostingContent.JobDescriptionHeader.IsNull())
+	assert.False(t, res.JobPostingContent.JobDescription.IsNull())
+}
+
 // TestJobBoolAttribute proves a jobPostingAttributes entry with a boolean
 // value (TravelRequired, type "bool") decodes without error — a shape
 // JobPostingAttributeValue (originally string|number only) missed, found

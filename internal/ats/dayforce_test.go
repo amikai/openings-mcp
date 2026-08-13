@@ -347,6 +347,19 @@ func TestDayforceDetailNoLocationNotRemote(t *testing.T) {
 	assert.Equal(t, "", d.Location)
 }
 
+// TestDayforceDetailNullDescriptionHeader proves a posting with
+// jobDescriptionHeader: null still renders a non-empty description from the
+// remaining HTML fields.
+func TestDayforceDetailNullDescriptionHeader(t *testing.T) {
+	a, closeSrv := newTestDayforceAdapter(t)
+	defer closeSrv()
+
+	d, err := a.Detail(t.Context(), "ara/candidateportal", strconv.Itoa(dayforce.MockNullDescriptionHeaderJobID))
+	require.NoError(t, err)
+	assert.NotEmpty(t, d.Description)
+	assert.NotContains(t, d.Description, "<p")
+}
+
 func TestDayforceDetailNotFound(t *testing.T) {
 	a, closeSrv := newTestDayforceAdapter(t)
 	defer closeSrv()

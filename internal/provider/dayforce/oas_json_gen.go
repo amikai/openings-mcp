@@ -616,11 +616,11 @@ func (s *JobPostingContent) Encode(e *jx.Encoder) {
 func (s *JobPostingContent) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("jobDescriptionHeader")
-		e.Str(s.JobDescriptionHeader)
+		s.JobDescriptionHeader.Encode(e)
 	}
 	{
 		e.FieldStart("jobDescription")
-		e.Str(s.JobDescription)
+		s.JobDescription.Encode(e)
 	}
 	{
 		e.FieldStart("jobDescriptionFooter")
@@ -646,9 +646,7 @@ func (s *JobPostingContent) Decode(d *jx.Decoder) error {
 		case "jobDescriptionHeader":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				v, err := d.Str()
-				s.JobDescriptionHeader = string(v)
-				if err != nil {
+				if err := s.JobDescriptionHeader.Decode(d); err != nil {
 					return err
 				}
 				return nil
@@ -658,9 +656,7 @@ func (s *JobPostingContent) Decode(d *jx.Decoder) error {
 		case "jobDescription":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				v, err := d.Str()
-				s.JobDescription = string(v)
-				if err != nil {
+				if err := s.JobDescription.Decode(d); err != nil {
 					return err
 				}
 				return nil

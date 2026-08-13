@@ -264,12 +264,11 @@ func NewBoolJobPostingAttributeValue(v bool) JobPostingAttributeValue {
 
 // Ref: #/components/schemas/JobPostingContent
 type JobPostingContent struct {
-	// HTML, usually boilerplate company copy. Confirmed non-null across 158 live detail responses spanning
-	// all 14 surveyed tenants (pca, jdemea, mymilacron, wikoff, avgroup, nam, corpay, odc, ipg, kiinc,
-	// medplast, opta, paradigm, thechronicle), 2026-08-11.
-	JobDescriptionHeader string `json:"jobDescriptionHeader"`
-	// HTML. Confirmed non-null across the same 158-response survey as jobDescriptionHeader.
-	JobDescription string `json:"jobDescription"`
+	// HTML, usually boilerplate company copy. Null on some live boards (e.g. ara posting 8) even when
+	// jobDescription is present — confirmed 2026-08-13.
+	JobDescriptionHeader NilString `json:"jobDescriptionHeader"`
+	// HTML. Null on some live boards even when jobDescriptionHeader is present — confirmed 2026-08-13.
+	JobDescription NilString `json:"jobDescription"`
 	// HTML, usually compensation/benefits/EEO boilerplate. Null on roster tenant avgroup (postings 2482,
 	// 2442) even though jobDescriptionHeader/jobDescription are non-null on the same responses —
 	// confirmed live 2026-08-11.
@@ -277,12 +276,12 @@ type JobPostingContent struct {
 }
 
 // GetJobDescriptionHeader returns the value of JobDescriptionHeader.
-func (s *JobPostingContent) GetJobDescriptionHeader() string {
+func (s *JobPostingContent) GetJobDescriptionHeader() NilString {
 	return s.JobDescriptionHeader
 }
 
 // GetJobDescription returns the value of JobDescription.
-func (s *JobPostingContent) GetJobDescription() string {
+func (s *JobPostingContent) GetJobDescription() NilString {
 	return s.JobDescription
 }
 
@@ -292,12 +291,12 @@ func (s *JobPostingContent) GetJobDescriptionFooter() NilString {
 }
 
 // SetJobDescriptionHeader sets the value of JobDescriptionHeader.
-func (s *JobPostingContent) SetJobDescriptionHeader(val string) {
+func (s *JobPostingContent) SetJobDescriptionHeader(val NilString) {
 	s.JobDescriptionHeader = val
 }
 
 // SetJobDescription sets the value of JobDescription.
-func (s *JobPostingContent) SetJobDescription(val string) {
+func (s *JobPostingContent) SetJobDescription(val NilString) {
 	s.JobDescription = val
 }
 
