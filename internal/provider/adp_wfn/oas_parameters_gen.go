@@ -506,9 +506,15 @@ type ListJobRequisitionsParams struct {
 	// Job-type filter, taking the `oid` values published by `getSearchFilters`. Multiple comma-separated
 	// oids OR together.
 	//
-	// Carries the same silent-fallback hazard as `locationsList`: a bogus oid, or the human-readable label
-	// sent where an oid belongs, answers the whole unfiltered board rather than an error or an empty set.
-	// Validate against the tenant's published oids first.
+	// Carries a silent-fallback hazard, and a nastier one than `locationsList`. An oid the tenant does not
+	// publish — a bogus value, or the human-readable label sent where an oid belongs — answers neither
+	// an error, nor an empty set, nor the whole board. It answers a large arbitrary subset: on a verified
+	// 21-posting board, three unrelated bogus values each returned the identical 19 rows, with an inflated
+	// total of 23. A whole-board fallback is at least recognisable; a 19-of-21 result looks like a filter
+	// that worked. Validate against the tenant's published oids first.
+	//
+	// The tenant's own oids partition its board exactly — on that same board the four published
+	// categories summed to 21 with no overlap.
 	//
 	// Oids are tenant-specific and not comparable across tenants — `7:132` on one board and
 	// `9200345894316_1` on another — so no cross-tenant normalization is possible.

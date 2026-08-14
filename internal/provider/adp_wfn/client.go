@@ -97,7 +97,11 @@ type ListParams struct {
 	// they reach here.
 	Locations []string
 	// WorkerCategories must be oids published by [BoardClient.SearchFilters].
-	// A label, or an oid from another tenant, returns the whole board.
+	// An oid the tenant does not publish — a label sent where an oid belongs,
+	// or an oid from another tenant — is answered with HTTP 200 and a large
+	// arbitrary subset of the board rather than an error, an empty set, or the
+	// whole board. It looks like a filter that worked, so callers validate
+	// against the catalog first.
 	WorkerCategories []string
 	// Page is 1-based and converted to the upstream's 1-based row offset.
 	Page int

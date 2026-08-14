@@ -239,10 +239,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 		if err != nil {
 			return nil, fmt.Errorf("build %s adapter: %w", name, err)
 		}
-		// A provider listed in providerOrder with no case above leaves a nil
-		// adapter that only fails when its roster is walked, and since
-		// providerOrder is also the --provider default, that failure lands on
-		// every invocation rather than only the new provider's.
+		// A providerOrder name with no case above leaves a nil adapter that
+		// would otherwise fail far from here, when its roster is walked.
 		if a == nil {
 			return nil, fmt.Errorf("provider %q has no adapter constructor", name)
 		}

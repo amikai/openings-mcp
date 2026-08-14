@@ -163,15 +163,21 @@ func (a *ADPWFNAdapter) resolveSlug(slug string) (adpWFNTenant, error) {
 // a known-but-wrong one with an empty board. Both are indistinguishable from a
 // tenant with no openings, so guessing is not an option when the tenant did
 // not tell us.
-func (a *ADPWFNAdapter) locale(ctx context.Context, t adpWFNTenant) string {
+//
+// A discovery failure is therefore reported rather than absorbed: proceeding
+// without a locale would turn a timed-out or malformed lookup into a confident
+// "this company has no openings". An empty return is reserved for the one case
+// that is genuinely benign — a tenant that advertises no locale at all, where
+// the upstream default is as good an answer as exists.
+func (a *ADPWFNAdapter) locale(ctx context.Context, t adpWFNTenant) (string, error) {
 	if t.locale != "" {
-		return t.locale
+		return t.locale, nil
 	}
 	locale, err := a.client().PrimaryLocale(ctx, t.cid)
-	if err != nil || locale == "" {
-		return ""
+	if err != nil {
+		return "", fmt.Errorf("adp_wfn: discover locale for %q: %w", t.cid, err)
 	}
-	return locale
+	return locale, nil
 }
 
 func (a *ADPWFNAdapter) Search(ctx context.Context, slug string, p SearchParams) (*SearchResult, error) {
@@ -192,7 +198,10 @@ func (a *ADPWFNAdapter) Search(ctx context.Context, slug string, p SearchParams)
 	// Resolved once and threaded through: discovering it costs a request for a
 	// tenant that arrived without one, and the rendered URLs must carry the
 	// same locale the board was read under or the link opens an empty page.
-	locale := a.locale(ctx, tenant)
+	locale, err := a.locale(ctx, tenant)
+	if err != nil {
+		return nil, err
+	}
 
 	locations, categories, err := a.resolveFilters(ctx, tenant, locale, p)
 	if err != nil {
@@ -212,8 +221,13 @@ func (a *ADPWFNAdapter) Search(ctx context.Context, slug string, p SearchParams)
 
 	jobs := make([]JobSummary, 0, len(res.Jobs))
 	for _, r := range res.Jobs {
-		id := adp_wfn.ExternalJobID(r)
-		if id == "" {
+		// Detail accepts either id, but only the external one builds a share
+		// link that resolves, so a row without it keeps its posting and loses
+		// its URL rather than carrying a link that 404s.
+		id, url := adp_wfn.ExternalJobID(r), ""
+		if id != "" {
+			url = adp_wfn.JobURL(tenant.cid, tenant.ccID, id, locale)
+		} else {
 			id = strings.TrimSpace(r.ItemID.Value)
 		}
 		if id == "" {
@@ -228,7 +242,7 @@ func (a *ADPWFNAdapter) Search(ctx context.Context, slug string, p SearchParams)
 			Title:    strings.TrimSpace(r.RequisitionTitle.Value),
 			Location: adp_wfn.PrimaryLocation(r),
 			PostedAt: posted,
-			URL:      adp_wfn.JobURL(tenant.cid, tenant.ccID, id, locale),
+			URL:      url,
 		})
 	}
 
@@ -383,7 +397,11 @@ func (a *ADPWFNAdapter) Filters(ctx context.Context, slug string) (FilterSet, er
 	if err != nil {
 		return nil, err
 	}
-	catalog, err := a.client().SearchFilters(ctx, tenant.cid, a.locale(ctx, tenant))
+	locale, err := a.locale(ctx, tenant)
+	if err != nil {
+		return nil, err
+	}
+	catalog, err := a.client().SearchFilters(ctx, tenant.cid, locale)
 	if err != nil {
 		return nil, err
 	}
@@ -412,7 +430,10 @@ func (a *ADPWFNAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 	if err != nil {
 		return nil, err
 	}
-	locale := a.locale(ctx, tenant)
+	locale, err := a.locale(ctx, tenant)
+	if err != nil {
+		return nil, err
+	}
 	r, err := a.client().Job(ctx, tenant.cid, strings.TrimSpace(jobID), locale)
 	if err != nil {
 		return nil, err
@@ -426,8 +447,13 @@ func (a *ADPWFNAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 		desc = salary + "\n\n" + desc
 	}
 
-	id := adp_wfn.ExternalJobID(*r)
-	if id == "" {
+	// Same split as Search: the external id is the only one the public page
+	// resolves, so a posting that lacks it is returned without a URL rather
+	// than with a broken one.
+	id, url := adp_wfn.ExternalJobID(*r), ""
+	if id != "" {
+		url = adp_wfn.JobURL(tenant.cid, tenant.ccID, id, locale)
+	} else {
 		id = strings.TrimSpace(r.ItemID.Value)
 	}
 	posted := ""
@@ -441,7 +467,7 @@ func (a *ADPWFNAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDet
 		Company:     a.companyName(ctx, tenant),
 		Location:    adp_wfn.PrimaryLocation(*r),
 		PostedAt:    posted,
-		URL:         adp_wfn.JobURL(tenant.cid, tenant.ccID, id, locale),
+		URL:         url,
 		Description: desc,
 	}, nil
 }

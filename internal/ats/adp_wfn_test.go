@@ -194,6 +194,35 @@ func TestADPWFNSearchRejectsUnvalidatableFilters(t *testing.T) {
 	assert.Contains(t, err.Error(), "not found")
 }
 
+func TestADPWFNSearchRejectsUnpublishedJobTypeBeforeItReachesTheWire(t *testing.T) {
+	a := newADPWFNAdapter(t)
+	ctx := context.Background()
+	slug := adp_wfn.BoardURL(adp_wfn.MockJobTypeCID, "", "en_US")
+
+	// The worst of the two silent fallbacks: upstream answers an unpublished
+	// oid with 19 of this board's 21 rows, which reads as a filter that
+	// worked. The adapter has to stop it here, because nothing downstream can
+	// tell that result from a real one.
+	_, err := a.Search(ctx, slug, SearchParams{
+		Filters: FilterSet{adpWFNJobTypeKey: []string{adp_wfn.MockBogusJobTypeOID}},
+	})
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), "not found")
+
+	// A published label is a legitimate way to name a job type, and must be
+	// translated to its oid rather than forwarded — sending the label itself
+	// hits the same fallback.
+	catalog, err := a.client().SearchFilters(ctx, adp_wfn.MockJobTypeCID, "en_US")
+	require.NoError(t, err)
+	require.NotEmpty(t, catalog.WorkerCategories)
+	published := catalog.WorkerCategories[0]
+	require.NotEqual(t, published.Label, published.Wire)
+
+	wire, ok := matchFilterValue(catalog.WorkerCategories, published.Label)
+	require.True(t, ok)
+	assert.Equal(t, published.Wire, wire, "a label resolves to the oid that goes on the wire")
+}
+
 func TestADPWFNSearchAcceptsSeveralValuesForOneDimension(t *testing.T) {
 	a := newADPWFNAdapter(t)
 	_, err := a.Search(context.Background(), adp_wfn.MockSlug, SearchParams{

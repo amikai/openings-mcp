@@ -50,8 +50,8 @@ func main() {
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
 		keyword  = searchFS.StringLong("keyword", "", "relevance search over the description; first page only")
-		location = searchFS.StringLong("location", "", "one published location value, or a city or two-letter state")
-		jobType  = searchFS.StringLong("job-type", "", "one job-type oid; run the filters subcommand for the values")
+		location = searchFS.StringLong("location", "", "a published location value, a city, or a two-letter state; paired automatically")
+		jobType  = searchFS.StringLong("job-type", "", "one job-type oid or label; must be published by the board (see filters)")
 		page     = searchFS.IntLong("page", 1, "1-based page number")
 	)
 	rootCmd.Subcommands = append(rootCmd.Subcommands, &ff.Command{
@@ -219,16 +219,36 @@ func runSearch(ctx context.Context, company, cid, locale, keyword, location, job
 	if err != nil {
 		return err
 	}
-	params := adp_wfn.ListParams{Locale: tenantLocale, Query: strings.TrimSpace(keyword), Page: page}
+	keyword = strings.TrimSpace(keyword)
+	if keyword != "" && page > 1 {
+		return fmt.Errorf("--keyword cannot be paged: upstream reorders relevance results between identical calls, "+
+			"so page %d would overlap page 1 and omit rows. Drop --page, or narrow with --location or --job-type, which page soundly", page)
+	}
+	params := adp_wfn.ListParams{Locale: tenantLocale, Query: keyword, Page: page}
+
 	if location = strings.TrimSpace(location); location != "" {
-		if !strings.Contains(location, ",") {
-			return fmt.Errorf("--location %q forms no value,qualifier pair; upstream would ignore it and return the whole board. "+
-				"Use %q or %q", location, location+",LOCATION_CITY", "IN,LOCATION_STATE")
+		wire, ok := locationPair(location)
+		if !ok {
+			return fmt.Errorf("--location %q is empty once trimmed", location)
 		}
-		params.Locations = []string{location}
+		params.Locations = []string{wire}
 	}
 	if jobType = strings.TrimSpace(jobType); jobType != "" {
-		params.WorkerCategories = []string{jobType}
+		// An unpublished oid is answered with a large plausible-looking subset
+		// rather than an error, so it is checked against the tenant's catalog
+		// before it goes on the wire. The filters subcommand prints the label
+		// on the left and the oid on the right, and pasting the left column is
+		// the easy mistake, so labels resolve too.
+		catalog, err := client.SearchFilters(ctx, tenantCID, tenantLocale)
+		if err != nil {
+			return err
+		}
+		wire, ok := matchCatalog(catalog.WorkerCategories, jobType)
+		if !ok {
+			return fmt.Errorf("--job-type %q is not published by this board; run the filters subcommand. "+
+				"An unpublished value is not rejected upstream — it returns a subset that looks filtered", jobType)
+		}
+		params.WorkerCategories = []string{wire}
 	}
 
 	res, err := client.List(ctx, tenantCID, params)
@@ -321,6 +341,39 @@ func runWhois(ctx context.Context, company, cid, legacySlug, format string) erro
 	fmt.Printf("cid\t%s\nclient_name\t%s\nclient_id\t%s\nlocale\t%s\n",
 		tenantCID, info.ClientName, info.ClientID, tenantLocale)
 	return nil
+}
+
+// locationPair mirrors what the adapter does with a free-text location: build
+// a value,qualifier pair rather than forward a bare token, which upstream
+// answers with the whole unfiltered board.
+func locationPair(location string) (string, bool) {
+	location = strings.TrimSpace(location)
+	if location == "" {
+		return "", false
+	}
+	if len(location) == 2 && strings.IndexFunc(location, func(r rune) bool {
+		return !((r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z'))
+	}) < 0 {
+		return strings.ToUpper(location) + ",LOCATION_STATE", true
+	}
+	if value, qualifier, ok := strings.Cut(location, ","); ok {
+		if strings.TrimSpace(value) != "" && strings.TrimSpace(qualifier) != "" {
+			return location, true
+		}
+	}
+	return strings.Trim(location, " ,") + ",LOCATION_CITY", true
+}
+
+// matchCatalog resolves caller text against a published dimension on either
+// the label or the wire value.
+func matchCatalog(values []adp_wfn.FilterValue, raw string) (string, bool) {
+	needle := strings.ToLower(strings.TrimSpace(raw))
+	for _, v := range values {
+		if strings.ToLower(v.Label) == needle || strings.ToLower(v.Wire) == needle {
+			return v.Wire, true
+		}
+	}
+	return "", false
 }
 
 func encodeJSON(v any) error {

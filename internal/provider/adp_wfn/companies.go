@@ -61,10 +61,25 @@ func mustLoadCompanies() []Company {
 	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("adp_wfn: parse companies.yaml: %v", err))
 	}
+	// Duplicates are rejected here rather than left to the index builders,
+	// whose last-write-wins would drop a tenant silently. A repeated cid is
+	// the more dangerous of the two: CompaniesByCID is what resolves a careers
+	// URL, so the losing entry becomes unreachable by URL while still looking
+	// present in the roster.
+	seenSlug := make(map[string]string, len(cs))
+	seenCID := make(map[string]string, len(cs))
 	for _, c := range cs {
 		if c.Name == "" || c.Slug == "" || c.CID == "" || c.Locale == "" {
 			panic(fmt.Sprintf("adp_wfn: companies.yaml entry %+v is missing company, slug, cid, or locale", c))
 		}
+		slugKey, cidKey := strings.ToLower(c.Slug), strings.ToLower(c.CID)
+		if prev, dup := seenSlug[slugKey]; dup {
+			panic(fmt.Sprintf("adp_wfn: companies.yaml slug %q is used by both %q and %q", c.Slug, prev, c.Name))
+		}
+		if prev, dup := seenCID[cidKey]; dup {
+			panic(fmt.Sprintf("adp_wfn: companies.yaml cid %q is used by both %q and %q", c.CID, prev, c.Name))
+		}
+		seenSlug[slugKey], seenCID[cidKey] = c.Name, c.Name
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })
 	return cs
