@@ -1,0 +1,505 @@
+openapi: 3.0.3
+info:
+  title: ADP Workforce Now public career center
+  version: "1.0.0"
+  description: |
+    Public, unauthenticated career-center API behind the Workforce Now
+    recruitment SPA (workforcenow.adp.com). No token, no cookie, and no
+    session is required on any operation here.
+
+    Only the fields this repository consumes are declared. The upstream sends
+    considerably more on every object; leaving those undeclared keeps the
+    generated decoder from breaking each time ADP adds a field.
+
+    Two whole-surface quirks that every operation inherits:
+
+    - `cid` is the only required parameter. Omitting it answers HTTP 500, and
+      a syntactically valid but unknown GUID answers HTTP 404 with an
+      openresty HTML error page rather than JSON.
+    - `ccId` (the career-center id) is deliberately absent from this spec.
+      It is not the constant it appears to be — one verified tenant publishes
+      `19000101_000003` — and a wrong value answers HTTP 200 with an empty
+      board instead of an error. Omitting it entirely returned the correct
+      board on every tenant tested, so it is never sent.
+servers:
+  - url: https://workforcenow.adp.com/mascsr/default/careercenter/public/events/staffing
+paths:
+  /v1/job-requisitions:
+    get:
+      operationId: listJobRequisitions
+      summary: One page of a tenant's public job board
+      description: |
+        Server-side paging. Note that only `userQuery` below is a real query
+        parameter: every other filter-shaped parameter this API appears to
+        accept is silently ignored, and answers HTTP 200 with the whole
+        unfiltered board. `$search`, `searchText`, `keyword`,
+        `$filter=requisitionTitle eq '...'`, and an outright nonsense
+        parameter were all verified to behave this way. Real filtering by
+        location and job type happens through the request headers declared
+        below.
+
+        Paging rules, all verified against live boards:
+
+        - `$skip` is **one-based**. `$skip=0` silently drops a row:
+          `$skip=0&$top=5` returns four items.
+        - `$top` caps at 20, and is honored **only when no filter is
+          applied**. Under any filter — header or `userQuery` — it is ignored
+          entirely, so a caller that steps by anything other than 20 refetches
+          rows it has already seen.
+        - Terminate on an empty `jobRequisitions` array. Never compute a page
+          count from `meta.totalNumber` under a filter; see that field.
+      parameters:
+        - $ref: "#/components/parameters/Cid"
+        - $ref: "#/components/parameters/Locale"
+        - name: $skip
+          in: query
+          required: false
+          description: One-based offset of the first row. Use 1, 21, 41, ...
+          schema:
+            type: integer
+            format: int32
+        - name: $top
+          in: query
+          required: false
+          description: Page size, capped at 20 and ignored under any filter.
+          schema:
+            type: integer
+            format: int32
+        - name: userQuery
+          in: query
+          required: false
+          description: |
+            Full-text relevance search over the posting description, not the
+            title alone. Case-insensitive, tokenizes with OR semantics (an
+            unmatched extra term is ignored rather than narrowing the result),
+            and honors a quoted phrase. An unmatched query answers zero rows,
+            but an empty or whitespace-only value answers the whole board.
+
+            This is a relevance probe, not a filter: the result set is stable
+            across identical calls but its **order is not**, so `$skip`
+            windows overlap and paging it both duplicates and misses rows.
+            Callers must take the first page only.
+          schema:
+            type: string
+        - name: locationsList
+          in: header
+          required: false
+          description: |
+            Location filter. The value is a flat comma-separated token stream
+            consumed in `<value>,<qualifier>` **pairs**; multiple pairs OR
+            together, and a trailing unpaired token is dropped.
+
+            Valid qualifiers are `LOCATION_CITY`, `LOCATION_STATE`, and
+            `LOCATION_COUNTRY`. A bare two-letter state code also acts as a
+            qualifier, so `Markle, IN` is equivalent to
+            `Markle,LOCATION_CITY`. `LOCATION_STATE` requires the two-letter
+            code — `Indiana,LOCATION_STATE` matches nothing. Case and
+            surrounding whitespace are tolerated.
+
+            Failure modes differ in a way that matters. A well-formed pair
+            naming something that does not exist answers **zero rows**, which
+            is safe. A value that does not form a pair at all — a bare
+            `Markle`, an empty string, punctuation — answers the **whole
+            unfiltered board** with HTTP 200. Callers must therefore validate
+            that every value forms a pair before sending it, and must never
+            forward caller input unchecked.
+
+            Feed values from `getSearchFilters` verbatim: that operation
+            publishes them already pair-formed.
+          schema:
+            type: string
+        - name: workerCategoriesList
+          in: header
+          required: false
+          description: |
+            Job-type filter, taking the `oid` values published by
+            `getSearchFilters`. Multiple comma-separated oids OR together.
+
+            Carries a silent-fallback hazard, and a nastier one than
+            `locationsList`. An oid the tenant does not publish — a bogus
+            value, or the human-readable label sent where an oid belongs —
+            answers neither an error, nor an empty set, nor the whole board.
+            It answers a large arbitrary **subset**: on a verified 21-posting
+            board, three unrelated bogus values each returned the identical
+            19 rows, with an inflated total of 23. A whole-board fallback is
+            at least recognisable; a 19-of-21 result looks like a filter that
+            worked. Validate against the tenant's published oids first.
+
+            The tenant's own oids partition its board exactly — on that same
+            board the four published categories summed to 21 with no overlap.
+
+            Oids are tenant-specific and not comparable across tenants —
+            `7:132` on one board and `9200345894316_1` on another — so no
+            cross-tenant normalization is possible.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: One page of the board. An unknown tenant does not land here.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRequisitionList"
+        "404":
+          description: |
+            Unknown `cid`. The body is an openresty HTML error page, not JSON.
+        "500":
+          description: |
+            `cid` was omitted entirely.
+  /v1/job-requisitions/getSearchFilters:
+    get:
+      operationId: getSearchFilters
+      summary: The filter dimensions this tenant publishes
+      description: |
+        Returns each dimension the tenant configured, with its values, in one
+        request.
+
+        The two dimensions invert which column belongs on the wire, so they
+        cannot be handled uniformly:
+
+        - `FILTER LOCATION` — send `value`, which already arrives pair-formed
+          (`"Markle, IN"`, `"IN,LOCATION_STATE"`). `oid` is the display label
+          (`"Indiana (Statewide)"`).
+        - `FILTER JOB TYPE` — send `oid` (`"7:132"`). `value` is the display
+          label (`"FT"`, `"Active - Regular full-time"`), and sending it
+          answers the whole board.
+
+        A tenant may publish no `FILTER LOCATION` block at all and still
+        accept `locationsList` — one verified tenant publishes only
+        `FILTER JOB TYPE` yet filters correctly by city and by state. Absence
+        of the dimension means there is no published list to validate
+        against, not that the capability is missing.
+      parameters:
+        - $ref: "#/components/parameters/Cid"
+        - $ref: "#/components/parameters/Locale"
+      responses:
+        "200":
+          description: The tenant's dimensions.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchFilters"
+        "404":
+          description: Unknown `cid`; HTML body.
+  /v1/job-requisitions/{jobId}:
+    get:
+      operationId: getJobRequisition
+      summary: One posting in full
+      description: |
+        Accepts either the `itemID` (`"9206691534014_1"`) or the
+        `ExternalJobID` custom field (`"584587"`); both return the same
+        record. The `clientRequisitionID` is **not** a valid key — it answers
+        HTTP 200 with a hollow record rather than an error.
+
+        An unknown id behaves the same way: HTTP 200, with every array field
+        present but empty and no `itemID`. Absence of `itemID` is the only
+        not-found signal this operation gives.
+
+        The response adds exactly one field over the corresponding list row —
+        `requisitionDescription` — which is the sole reason to call it.
+        `payGradeRange` and `workLevelCode` are per-row optional and identical
+        between list and detail.
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: An `itemID` or an `ExternalJobID`.
+          schema:
+            type: string
+        - $ref: "#/components/parameters/Cid"
+        - $ref: "#/components/parameters/Locale"
+      responses:
+        "200":
+          description: |
+            The posting, or a hollow record with no `itemID` when the id is
+            unknown.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobRequisition"
+        "404":
+          description: Unknown `cid`; HTML body.
+  /client-features:
+    get:
+      operationId: getClientFeatures
+      summary: Tenant identity and feature flags
+      description: |
+        Note the path: this operation lives directly under `staffing/`, not
+        under the `/v1/` prefix every other operation uses.
+
+        This is the only public place a tenant's company name appears — the
+        job list and job detail carry none. `ClientName` is ADP's own record
+        of the client and is passed through verbatim; it is imperfect
+        (observed truncation, and casing such as `Metlife` for MetLife), but
+        reconstructing a nicer name from slugs or domains would be
+        manufacturing one.
+
+        `ClientID` is a readable tenant slug, useful as the input to the
+        legacy careers-URL resolver.
+
+        `ClientDefaultLocale` is present and **must not be used to pick a
+        locale for the job board**: it reports `en_US` for a verified tenant
+        whose postings exist only under `en_CA`.
+
+        `cid` alone is sufficient; `ccId` and `lang` change nothing.
+      parameters:
+        - $ref: "#/components/parameters/Cid"
+      responses:
+        "200":
+          description: Tenant identity and feature flags.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaEnvelope"
+        "404":
+          description: Unknown `cid`; HTML body.
+  /v1/content-links/career-center:
+    get:
+      operationId: getCareerCenterContentLinks
+      summary: Career-center branding and the tenant's locale set
+      description: |
+        Used here for one field only: the repeated `Locale` string entries,
+        which list the locales the career-center UI is translated into. The
+        **first** entry was the tenant's job-bearing locale on every tenant
+        checked, which makes this the only reliable way to pick a locale for
+        a tenant that is not on the roster.
+
+        The list is not a list of locales that have postings. A tenant's jobs
+        exist under exactly one locale; every other advertised locale answers
+        an empty board.
+
+        There is no company name anywhere in this response at any depth —
+        the career-center header is rendered as a logo image, so the SPA never
+        receives one. Use `client-features` for the name.
+
+        A valid `cid` with a wrong `ccId` answers HTTP 200 with an empty
+        `contentLinks` array and a `meta` whose `PublishedIndicator` is
+        `false`; that flag is `true` for every real tenant.
+      parameters:
+        - $ref: "#/components/parameters/Cid"
+        - $ref: "#/components/parameters/Locale"
+      responses:
+        "200":
+          description: Branding entries and tenant metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MetaEnvelope"
+        "404":
+          description: Unknown `cid`; HTML body.
+components:
+  parameters:
+    Cid:
+      name: cid
+      in: query
+      required: true
+      description: The tenant GUID; the only tenant key this API accepts.
+      schema:
+        type: string
+    Locale:
+      name: locale
+      in: query
+      required: false
+      description: |
+        The tenant's locale. Nominally optional, effectively required: a
+        recognized locale is applied as a strict filter, so naming the wrong
+        one answers an empty board rather than an error, while omitting it or
+        naming an unrecognized one falls back to the server default of
+        `en_US`. Both mistakes are indistinguishable from a tenant with no
+        open postings, so callers pin it explicitly.
+      schema:
+        type: string
+  schemas:
+    JobRequisitionList:
+      type: object
+      properties:
+        jobRequisitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobRequisition"
+        meta:
+          $ref: "#/components/schemas/ListMeta"
+    ListMeta:
+      type: object
+      properties:
+        startSequence:
+          type: integer
+          format: int32
+        totalNumber:
+          type: integer
+          format: int32
+          description: |
+            Trustworthy **only on an unfiltered request**. Under any filter it
+            becomes a relevance tally rather than a row count and routinely
+            exceeds the whole board: a 26-row filtered result reported 69, and
+            a no-op filter on a 48-row board reported 133. Callers must derive
+            a count from the rows they actually walked whenever a filter is
+            applied.
+    JobRequisition:
+      type: object
+      properties:
+        itemID:
+          type: string
+          description: |
+            The canonical posting id. Its absence is how an unknown id is
+            reported, since the endpoint answers HTTP 200 either way.
+        requisitionTitle:
+          type: string
+        postDate:
+          type: string
+          description: ISO 8601 with a UTC offset.
+        clientRequisitionID:
+          type: string
+          description: |
+            The tenant's own requisition number. Not addressable — passing it
+            to the detail operation returns a hollow record.
+        requisitionDescription:
+          type: string
+          description: HTML. Present on the detail response only.
+        payGradeRange:
+          $ref: "#/components/schemas/PayGradeRange"
+        workLevelCode:
+          $ref: "#/components/schemas/ShortNameCode"
+        requisitionLocations:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequisitionLocation"
+        customFieldGroup:
+          $ref: "#/components/schemas/CustomFieldGroup"
+    PayGradeRange:
+      type: object
+      description: |
+        Present on roughly one row in eight, and entirely absent on some
+        tenants. Identical between the list and detail responses. There is no
+        way to request it for a row that lacks it: `$select`, `$expand`, and
+        an invented `includeSalary` are all silently ignored.
+      properties:
+        minimumRate:
+          $ref: "#/components/schemas/Rate"
+        maximumRate:
+          $ref: "#/components/schemas/Rate"
+    Rate:
+      type: object
+      properties:
+        amountValue:
+          type: number
+          format: double
+        currencyCode:
+          type: string
+    ShortNameCode:
+      type: object
+      properties:
+        shortName:
+          type: string
+    RequisitionLocation:
+      type: object
+      properties:
+        address:
+          $ref: "#/components/schemas/Address"
+        nameCode:
+          $ref: "#/components/schemas/ShortNameCode"
+    Address:
+      type: object
+      properties:
+        cityName:
+          type: string
+        postalCode:
+          type: string
+        countrySubdivisionLevel1:
+          $ref: "#/components/schemas/CodeValue"
+    CodeValue:
+      type: object
+      properties:
+        codeValue:
+          type: string
+    CustomFieldGroup:
+      type: object
+      description: |
+        A bag of name-keyed fields. The one this repository needs is the
+        `ExternalJobID` string field: it is present on every row of every
+        tenant swept, and it is the id the public posting URL requires.
+      properties:
+        stringFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/StringField"
+        codeFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/CodeField"
+    StringField:
+      type: object
+      properties:
+        stringValue:
+          type: string
+        nameCode:
+          $ref: "#/components/schemas/CodeValue"
+    CodeField:
+      type: object
+      properties:
+        codeValue:
+          type: string
+        shortName:
+          type: string
+        nameCode:
+          $ref: "#/components/schemas/CodeValue"
+    SearchFilters:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchFilterGroup"
+    SearchFilterGroup:
+      type: object
+      properties:
+        filterType:
+          type: string
+          description: '`FILTER LOCATION` or `FILTER JOB TYPE`.'
+        searchFilterInfo:
+          type: array
+          items:
+            $ref: "#/components/schemas/SearchFilterValue"
+    SearchFilterValue:
+      type: object
+      description: |
+        Which of the two fields goes on the wire depends on the group:
+        locations send `value`, job types send `oid`.
+      properties:
+        oid:
+          type: string
+        value:
+          type: string
+    MetaEnvelope:
+      type: object
+      description: |
+        Shared shape of `client-features` and `content-links/career-center`.
+        Both carry their payload as name-keyed field bags under `meta`.
+      properties:
+        meta:
+          $ref: "#/components/schemas/Meta"
+    Meta:
+      type: object
+      properties:
+        customFieldGroup:
+          $ref: "#/components/schemas/MetaCustomFieldGroup"
+    MetaCustomFieldGroup:
+      type: object
+      properties:
+        stringFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/StringField"
+        indicatorFields:
+          type: array
+          items:
+            $ref: "#/components/schemas/IndicatorField"
+    IndicatorField:
+      type: object
+      properties:
+        indicatorValue:
+          type: boolean
+        nameCode:
+          $ref: "#/components/schemas/CodeValue"

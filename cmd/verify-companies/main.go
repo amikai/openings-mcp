@@ -32,6 +32,7 @@ import (
 // providerOrder fixes the --provider default and the report's grouping order.
 var providerOrder = []string{
 	"adp_myjobs",
+	"adp_wfn",
 	"ashby",
 	"avature",
 	"bamboohr",
@@ -186,6 +187,8 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 		switch name {
 		case "adp_myjobs":
 			a = ats.NewADPMyJobsAdapter(hc, nil)
+		case "adp_wfn":
+			a = ats.NewADPWFNAdapter(hc)
 		case "ashby":
 			a, err = ats.NewAshbyAdapter("https://api.ashbyhq.com", hc, nil)
 		case "avature":
@@ -235,6 +238,13 @@ func buildAdapters(names []string) ([]ats.Adapter, error) {
 		}
 		if err != nil {
 			return nil, fmt.Errorf("build %s adapter: %w", name, err)
+		}
+		// A provider listed in providerOrder with no case above leaves a nil
+		// adapter that only fails when its roster is walked, and since
+		// providerOrder is also the --provider default, that failure lands on
+		// every invocation rather than only the new provider's.
+		if a == nil {
+			return nil, fmt.Errorf("provider %q has no adapter constructor", name)
 		}
 		adapters = append(adapters, a)
 	}
