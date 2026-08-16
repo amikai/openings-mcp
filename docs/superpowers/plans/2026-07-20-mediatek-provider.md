@@ -1,6 +1,6 @@
 # MediaTek Careers Provider — Plan
 
-Design: [specs/2026-07-20-mtk-provider-design.md](../specs/2026-07-20-mtk-provider-design.md)
+Design: [specs/2026-07-20-mediatek-provider-design.md](../specs/2026-07-20-mediatek-provider-design.md)
 
 1. ~~Spec hunt/recon~~ — confirmed no official API spec; recovered and
    replayed the public tRPC search endpoint and SSR detail route.
