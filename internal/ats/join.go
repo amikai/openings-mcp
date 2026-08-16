@@ -24,6 +24,8 @@ type JoinAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*JoinAdapter)(nil)
+
 // joinCareersURLRE matches join.com company page URLs and captures the
 // slug (first path segment after /companies/).
 //
@@ -142,7 +144,7 @@ func (a *JoinAdapter) fetchDumpJobs(ctx context.Context, c join.RosterCompany) (
 	}
 	out := make([]dumpJob, 0, len(jobs))
 	for _, j := range jobs {
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if j.Category != "" {
 			fields["category"] = []string{j.Category}
 		}

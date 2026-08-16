@@ -208,7 +208,7 @@ func filterMockBySearch(jobs []JobRequisition, needle string) []JobRequisition {
 // filterMockByCustomFilters applies every clause it recognizes. A clause naming
 // an unconfigured slot code is ignored, which is what upstream does.
 func filterMockByCustomFilters(jobs []JobRequisition, filter string) []JobRequisition {
-	configured := map[string]bool{}
+	configured := make(map[string]bool)
 	for _, c := range mockFacets().FilterList {
 		configured[c.Category] = true
 	}

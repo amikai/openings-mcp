@@ -24,7 +24,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"net/http/cookiejar"
@@ -146,14 +145,15 @@ func run() int {
 
 	var level slog.Level
 	if err := level.UnmarshalText([]byte(*logLevel)); err != nil {
-		log.Fatalf("invalid log-level %q: %v", *logLevel, err)
+		fmt.Fprintf(os.Stderr, "invalid log-level %q: %v\n", *logLevel, err)
+		return 1
 	}
 
 	logOutput := io.Writer(os.Stderr)
 	if *logFile != "" {
 		file, err := os.OpenFile(*logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0o600)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to open log file: %v\n", err)
+			fmt.Fprintf(os.Stderr, "open log file: %v\n", err)
 			return 1
 		}
 		defer file.Close()

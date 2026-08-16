@@ -101,7 +101,7 @@ func (a *OracleAdapter) Search(
 		return nil, fmt.Errorf("oracle: page %d is too large; retry with a smaller page", page)
 	}
 
-	filters := map[oracle.Facet][]string{}
+	filters := make(map[oracle.Facet][]string)
 	location := strings.TrimSpace(p.Location)
 	if location != "" || len(p.Filters) > 0 {
 		facets, err := a.probeFacets(ctx, client, slug)

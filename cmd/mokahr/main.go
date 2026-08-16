@@ -25,6 +25,10 @@ import (
 const formatJSON = "json"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("mokahr")
 	var (
 		company = rootFlags.StringLong("company", "", `curated roster company name or "<org>/<site>" slug from the careers URL, e.g. "high-flyer/140576"`)
@@ -67,14 +71,16 @@ func main() {
 		Usage:    "location id from 'filters' output; repeatable, ORed",
 		Value:    ffval.NewList(&locationIDs),
 	}); err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "err:", err)
+		return 1
 	}
 	if _, err := searchFS.AddFlag(ff.FlagConfig{
 		LongName: "zhineng-id",
 		Usage:    "职能 (job-function) id from 'filters' output; repeatable, ORed",
 		Value:    ffval.NewList(&zhinengIDs),
 	}); err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "err:", err)
+		return 1
 	}
 	searchCmd := &ff.Command{
 		Name:      "search",
@@ -133,22 +139,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, get, or filters) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveCompany accepts a roster company name (case-insensitive) or an

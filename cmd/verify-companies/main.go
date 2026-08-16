@@ -87,6 +87,10 @@ type result struct {
 }
 
 func main() {
+	os.Exit(runMain())
+}
+
+func runMain() int {
 	fs := ff.NewFlagSet("verify-companies")
 	var (
 		providers = fs.StringLong(
@@ -114,19 +118,20 @@ func main() {
 	if err := cmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(cmd))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if err := cmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if errorCount > 0 {
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func run(ctx context.Context, providerList string, timeout time.Duration, concurrency int, format string) (errs int, err error) {
@@ -156,7 +161,7 @@ func run(ctx context.Context, providerList string, timeout time.Duration, concur
 // parseProviders validates the --provider list and returns it in
 // providerOrder so the report grouping is stable regardless of input order.
 func parseProviders(list string) ([]string, error) {
-	selected := map[string]bool{}
+	selected := make(map[string]bool)
 	for name := range strings.SplitSeq(list, ",") {
 		name = strings.ToLower(strings.TrimSpace(name))
 		if !slices.Contains(providerOrder, name) {

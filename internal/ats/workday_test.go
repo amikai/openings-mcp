@@ -56,7 +56,7 @@ func testWorkdayAdapter(t *testing.T) (*WorkdayAdapter, *[][]byte) {
 
 func TestWorkdayRosterDedupesShareClasses(t *testing.T) {
 	a := NewWorkdayAdapter(http.DefaultClient)
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, c := range a.Roster() {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug)
 		require.Falsef(t, seen[c.Slug], "duplicate slug %q in roster", c.Slug)

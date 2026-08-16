@@ -18,6 +18,10 @@ import (
 const defaultBaseURL = "https://www.amazon.jobs"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("amazon")
 	var (
 		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Amazon Jobs base URL")
@@ -93,20 +97,21 @@ func main() {
 	if err := rootCommand.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCommand.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if rootCommand.GetSelected() == rootCommand {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCommand))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (search or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 	if err := rootCommand.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 type searchOptions struct {

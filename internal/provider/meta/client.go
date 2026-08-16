@@ -176,14 +176,14 @@ func (c *Client) SearchJobs(ctx context.Context, r SearchRequest) (*SearchRespon
 // them from.
 func (c *Client) SearchFilters(ctx context.Context) (*SearchFilters, error) {
 	var filters filtersData
-	if err := c.graphql(ctx, filtersDocID, map[string]any{}, &filters); err != nil {
+	if err := c.graphql(ctx, filtersDocID, make(map[string]any), &filters); err != nil {
 		return nil, fmt.Errorf("search filters: %w", err)
 	}
 	if filters.Filters == nil {
 		return nil, errors.New("search filters: response has no job_search_filters")
 	}
 	var locations locationsData
-	if err := c.graphql(ctx, locationsDocID, map[string]any{}, &locations); err != nil {
+	if err := c.graphql(ctx, locationsDocID, make(map[string]any), &locations); err != nil {
 		return nil, fmt.Errorf("search filters: %w", err)
 	}
 	if locations.Filters == nil {

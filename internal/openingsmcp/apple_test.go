@@ -55,7 +55,7 @@ func TestAppleGetSearchFiltersE2E(t *testing.T) {
 	client := testAppleMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name:      appleFiltersToolName,
-		Arguments: map[string]any{},
+		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
 	require.False(t, result.IsError)

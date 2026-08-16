@@ -17,6 +17,10 @@ import (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("successfactors")
 	var (
 		company = rootFlags.StringLong("company", "", `curated company name or career-site host, e.g. "SAP" or "jobs.sap.com"`)
@@ -114,22 +118,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, facets, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveCompany accepts a curated company name or its career-site host

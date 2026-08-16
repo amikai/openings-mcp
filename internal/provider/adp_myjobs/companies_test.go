@@ -10,7 +10,7 @@ import (
 
 func TestCompaniesSeed(t *testing.T) {
 	require.GreaterOrEqual(t, len(Companies), 5)
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, c := range Companies {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug)
 		require.False(t, seen[c.Slug], "dup slug %s", c.Slug)

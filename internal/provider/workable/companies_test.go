@@ -20,7 +20,7 @@ func TestBuildAccountIndexFirstRowWins(t *testing.T) {
 }
 
 func TestCompaniesByAccountMatchesFirstCompanyRow(t *testing.T) {
-	seen := map[string]RosterCompany{}
+	seen := make(map[string]RosterCompany)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Account)
 		if _, ok := seen[slug]; !ok {
@@ -37,7 +37,7 @@ func TestCompaniesByAccountMatchesFirstCompanyRow(t *testing.T) {
 // (same company added twice under different display names) is a data bug,
 // not something buildAccountIndex should silently paper over.
 func TestNoDuplicateAccounts(t *testing.T) {
-	seen := map[string]string{}
+	seen := make(map[string]string)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Account)
 		if prev, ok := seen[slug]; ok {

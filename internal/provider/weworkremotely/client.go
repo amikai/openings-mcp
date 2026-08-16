@@ -143,7 +143,7 @@ func (c *Client) Detail(ctx context.Context, id string) (*Job, error) {
 		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("job %q not found, and some category feeds failed to fetch (it may be in one of them): %w", id, err)
+		return nil, fmt.Errorf("job %q not found, and some category feeds could not be fetched (it may be in one of them): %w", id, err)
 	}
 	return nil, fmt.Errorf("job %q not found in the current feeds; it may have expired or rotated out", id)
 }

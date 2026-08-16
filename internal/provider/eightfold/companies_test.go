@@ -20,7 +20,7 @@ func TestBuildTenantIndexFirstRowWins(t *testing.T) {
 }
 
 func TestCompaniesByTenantMatchesFirstCompanyRow(t *testing.T) {
-	seen := map[string]RosterCompany{}
+	seen := make(map[string]RosterCompany)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Tenant)
 		if _, ok := seen[slug]; !ok {
@@ -37,7 +37,7 @@ func TestCompaniesByTenantMatchesFirstCompanyRow(t *testing.T) {
 // slug (same company listed twice) is a data bug, not something
 // buildTenantIndex should silently paper over.
 func TestNoDuplicateTenants(t *testing.T) {
-	seen := map[string]string{}
+	seen := make(map[string]string)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Tenant)
 		if prev, ok := seen[slug]; ok {

@@ -13,12 +13,16 @@ import (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	keyword := strings.TrimSpace(scanner.Text())
 	if keyword == "" {
 		fmt.Fprintln(os.Stderr, "keyword is required")
-		os.Exit(1)
+		return 1
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
@@ -32,7 +36,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	fmt.Fprintf(os.Stdout, "Synopsys Jobs — keyword: %q\nFound %d jobs (page %d/%d); showing %d\n\n",
@@ -42,7 +46,7 @@ func main() {
 		detail, err := c.JobDetail(ctx, job.City, job.Slug, job.JobID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.JobID, err)
-			os.Exit(1)
+			return 1
 		}
 		fmt.Printf("%d. [%s] %s\n", i+1, job.DisplayID, job.Title)
 		fmt.Printf("   Location: %s\n", job.Location)
@@ -50,6 +54,7 @@ func main() {
 		fmt.Printf("   URL: %s\n", job.URL())
 		fmt.Printf("   Description:\n%s\n\n", indent(detail.Description, "   "))
 	}
+	return 0
 }
 
 func indent(s, prefix string) string {

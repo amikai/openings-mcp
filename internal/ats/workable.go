@@ -329,7 +329,7 @@ func applyWorkableFilters(facets *workable.FiltersResponse, filters FilterSet, r
 // case-insensitively.
 func resolveWorkableDepartments(departments []workable.FacetDepartment, values []string) ([]int, error) {
 	var ids []int
-	seen := map[int]bool{}
+	seen := make(map[int]bool)
 	for _, v := range values {
 		i := slices.IndexFunc(departments, func(d workable.FacetDepartment) bool {
 			return strings.EqualFold(strings.TrimSpace(v), d.Name)
@@ -424,8 +424,8 @@ func workableDumpJob(account string, j workable.JobSummary) dumpJob {
 // duplicate of the primary). Hidden secondaries are skipped.
 func workableJobLocation(primary workable.OptLocation, secondaries []workable.Location) string {
 	var parts []string
-	seenKeys := map[string]bool{}
-	seenText := map[string]bool{}
+	seenKeys := make(map[string]bool)
+	seenText := make(map[string]bool)
 	add := func(text, key string) {
 		text = strings.TrimSpace(text)
 		if text == "" {
@@ -506,7 +506,7 @@ func (a *WorkableAdapter) Filters(ctx context.Context, slug string) (FilterSet, 
 	if err != nil {
 		return nil, err
 	}
-	fs := FilterSet{}
+	fs := make(FilterSet)
 	if len(facets.Departments) > 0 {
 		names := make([]string, len(facets.Departments))
 		for i, d := range facets.Departments {

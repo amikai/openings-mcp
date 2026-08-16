@@ -23,7 +23,7 @@ func TestBuildSlugIndexFirstRowWins(t *testing.T) {
 // company added twice) is a data bug, not something buildSlugIndex should
 // silently paper over.
 func TestNoDuplicateSlugs(t *testing.T) {
-	seen := map[string]string{}
+	seen := make(map[string]string)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Slug)
 		if prev, ok := seen[slug]; ok {

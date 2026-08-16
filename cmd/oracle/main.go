@@ -19,6 +19,10 @@ import (
 )
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("oracle")
 	var (
 		company = rootFlags.StringLong("company", "", "curated company name or Oracle Candidate Experience careers URL")
@@ -131,20 +135,21 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, facets, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 type commandEnv struct {

@@ -23,6 +23,8 @@ type LeverAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*LeverAdapter)(nil)
+
 // leverCareersURLRE matches Lever board URLs and captures the organization
 // slug (first path segment), including the EU host.
 //
@@ -129,7 +131,7 @@ func (a *LeverAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, e
 			return nil, err
 		}
 		cat := p.Categories.Value
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if cat.Team.Value != "" {
 			fields["team"] = []string{cat.Team.Value}
 		}

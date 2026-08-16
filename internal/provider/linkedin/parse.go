@@ -163,7 +163,7 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 
 	detail.ApplyURL = parseApplyURL(doc.Find("code#applyUrl").First())
 
-	criteria := map[string]string{}
+	criteria := make(map[string]string)
 	if list := doc.Find("ul.description__job-criteria-list").First(); list.Length() > 0 {
 		parseCriteria(list, criteria)
 	}

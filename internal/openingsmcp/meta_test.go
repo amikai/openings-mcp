@@ -47,7 +47,7 @@ func TestMetaGetSearchFiltersE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name:      metaFiltersToolName,
-		Arguments: map[string]any{},
+		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
 	require.False(t, result.IsError)
@@ -93,7 +93,7 @@ func TestMetaSearchJobsE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name:      metaSearchToolName,
-		Arguments: map[string]any{},
+		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
 	require.False(t, result.IsError)

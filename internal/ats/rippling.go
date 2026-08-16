@@ -24,6 +24,8 @@ type RipplingAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*RipplingAdapter)(nil)
+
 // ripplingCareersURLRE matches Rippling board URLs and captures the board
 // slug (first path segment).
 //
@@ -154,7 +156,7 @@ func (a *RipplingAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob
 			continue
 		}
 		byID[e.UUID.Value] = len(jobs)
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		dept := e.Department.Value.Label.Value
 		if dept != "" {
 			fields["department"] = []string{dept}

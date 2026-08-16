@@ -18,6 +18,10 @@ import (
 const defaultBaseURL = "https://hrmos.co"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("hrmos")
 	var (
 		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "HRMOS 採用 base URL")
@@ -90,22 +94,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveSlug accepts either a curated roster slug or an arbitrary live

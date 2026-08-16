@@ -288,7 +288,10 @@ func (a *DayforceAdapter) jobBoardID(ctx context.Context, board *dayforce.Compan
 	}
 	key := board.Namespace + "/" + board.JobBoardCode + "/" + board.Culture()
 	if v, ok := a.boardIDs.Load(key); ok {
-		id := v.(int)
+		id, ok := v.(int)
+		if !ok {
+			return 0, fmt.Errorf("dayforce: cached board id for %s has type %T", key, v)
+		}
 		board.JobBoardID = id
 		return id, nil
 	}

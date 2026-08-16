@@ -347,7 +347,7 @@ func TestGoogleSearchJobsMissingRequiredE2E(t *testing.T) {
 	}{
 		{"no keyword", map[string]any{"location": "Taiwan"}, `validating "arguments": validating root: required: missing properties: ["keyword"]`},
 		{"no location", map[string]any{"keyword": "software engineer"}, `validating "arguments": validating root: required: missing properties: ["location"]`},
-		{"empty args", map[string]any{}, `validating "arguments": validating root: required: missing properties: ["keyword" "location"]`},
+		{"empty args", make(map[string]any), `validating "arguments": validating root: required: missing properties: ["keyword" "location"]`},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

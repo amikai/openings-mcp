@@ -30,7 +30,7 @@ type FindOptions struct {
 // reachable; an id outside that window (or expired) is an error, which
 // opts can avoid by narrowing the scan to the search that surfaced it.
 func (c *Client) FindJob(ctx context.Context, id string, opts FindOptions) (*Job, error) {
-	params := SearchJobsParams{}
+	var params SearchJobsParams
 	if opts.Query != "" {
 		params.Query = NewOptString(opts.Query)
 	}
@@ -45,7 +45,11 @@ func (c *Client) FindJob(ctx context.Context, id string, opts FindOptions) (*Job
 		}
 		result, ok := res.(*SearchJobsResult)
 		if !ok {
-			return nil, fmt.Errorf("search page %d: %w", page, res.(*Error))
+			errRes, isErr := res.(*Error)
+			if !isErr {
+				return nil, fmt.Errorf("search page %d: unexpected response type %T", page, res)
+			}
+			return nil, fmt.Errorf("search page %d: %w", page, errRes)
 		}
 		for i := range result.Jobs {
 			if result.Jobs[i].ID == id {

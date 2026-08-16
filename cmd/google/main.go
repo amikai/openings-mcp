@@ -28,6 +28,10 @@ var (
 // main issues a single JobsRequest built entirely from flags, then fetches
 // JobDetail for the first ten jobs the search returned.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("google")
 	var (
 		baseURL        = fs.StringLong("base-url", "https://www.google.com/about/careers/applications", "Google Careers site base URL")
@@ -46,10 +50,10 @@ func main() {
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	req := buildJobsRequest(searchFlags{
@@ -72,7 +76,7 @@ func main() {
 	search, err := client.Jobs(ctx, req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	jobs := jobsForDetail(search.Jobs)
@@ -81,7 +85,7 @@ func main() {
 		detail, err := client.JobDetail(ctx, job.ID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.ID, err)
-			os.Exit(1)
+			return 1
 		}
 		details[job.ID] = detail
 	}
@@ -93,6 +97,7 @@ func main() {
 		jobs:    jobs,
 		details: details,
 	})
+	return 0
 }
 
 // searchFlags carries the parsed flag values into buildJobsRequest.

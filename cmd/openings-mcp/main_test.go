@@ -434,7 +434,7 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
 
-	wantNoURL := map[string]bool{}
+	wantNoURL := make(map[string]bool)
 
 	var gotNoURL []string
 	for _, a := range adapters {
@@ -484,8 +484,8 @@ func TestCompanyCollisionReport(t *testing.T) {
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
 
-	findings := map[string][]ats.CompanyCandidate{}
-	probed := map[string]bool{}
+	findings := make(map[string][]ats.CompanyCandidate)
+	probed := make(map[string]bool)
 	for _, a := range adapters {
 		for _, c := range a.Roster() {
 			for _, probe := range []string{c.Slug, c.Name} {

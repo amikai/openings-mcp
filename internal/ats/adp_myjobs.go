@@ -264,9 +264,9 @@ func (a *ADPMyJobsAdapter) facets(ctx context.Context, slug string) (*adpFacets,
 
 func buildADPFacets(catalog *adp_myjobs.CustomFilterCatalog) *adpFacets {
 	f := &adpFacets{
-		fields: map[string]string{},
-		labels: map[string][]string{},
-		values: map[string]map[string]string{},
+		fields: make(map[string]string),
+		labels: make(map[string][]string),
+		values: make(map[string]map[string]string),
 	}
 	for _, category := range catalog.FilterList {
 		if strings.TrimSpace(category.Category) == "" || len(category.FilterList) == 0 {

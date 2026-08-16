@@ -26,6 +26,8 @@ type GreenhouseAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*GreenhouseAdapter)(nil)
+
 // greenhouseCareersURLRE matches Greenhouse board URLs and captures the
 // board token (first path segment), including EU data-residency hosts.
 //
@@ -164,7 +166,7 @@ func (a *GreenhouseAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJ
 		}
 		// A job can sit in several departments/offices; keep them all so
 		// filters match secondary values and get_filters lists them.
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if len(depts) > 0 {
 			fields["department"] = depts
 		}

@@ -227,7 +227,7 @@ func (a *BambooHRAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob
 
 	jobs := make([]dumpJob, 0, len(rows))
 	for _, row := range rows {
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if v := row.DepartmentLabel.Or(""); v != "" {
 			fields["department"] = []string{v}
 		}

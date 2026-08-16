@@ -246,7 +246,7 @@ func TestClient_Detail_notFoundMentionsPartialFailure(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error for an unknown job ID")
 	}
-	if !strings.Contains(err.Error(), "some category feeds failed") {
+	if !strings.Contains(err.Error(), "some category feeds could not be fetched") {
 		t.Errorf("error %q does not mention the underlying category failure", err)
 	}
 }

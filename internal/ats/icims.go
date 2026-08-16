@@ -230,7 +230,7 @@ func (a *ICIMSAdapter) Filters(ctx context.Context, slug string) (FilterSet, err
 	if err != nil {
 		return nil, fmt.Errorf("icims: filters %q: %w", host, err)
 	}
-	fs := FilterSet{}
+	fs := make(FilterSet)
 	for _, d := range icimsFilterDims(probe) {
 		if len(d.options) == 0 {
 			continue

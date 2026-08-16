@@ -21,6 +21,10 @@ import (
 // main issues a single SearchJobs request built entirely from flags, then
 // fetches GetJobDetail for every job the search returned.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("104")
 	var (
 		timeout    = fs.DurationLong("timeout", 60*time.Second, "request timeout")
@@ -37,10 +41,10 @@ func main() {
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	params, err := buildSearchParams(searchFlags{
@@ -56,7 +60,7 @@ func main() {
 	})
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -65,13 +69,13 @@ func main() {
 	client, err := job104.NewClient("https://www.104.com.tw", job104.WithClient(&http.Client{Transport: job104.BrowserTransport{}}))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	search, err := client.SearchJobs(ctx, params)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	p := search.Metadata.Pagination
@@ -103,6 +107,7 @@ func main() {
 		writeDetail(os.Stdout, detail)
 		fmt.Println()
 	}
+	return 0
 }
 
 // searchFlags carries the parsed flag values into buildSearchParams.

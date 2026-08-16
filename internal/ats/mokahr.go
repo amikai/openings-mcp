@@ -298,7 +298,7 @@ func (a *MokaHRAdapter) Filters(ctx context.Context, slug string) (FilterSet, er
 	if err != nil {
 		return nil, err
 	}
-	fs := FilterSet{}
+	fs := make(FilterSet)
 	if len(facets.cityLabels) > 0 {
 		fs["city"] = slices.Clone(facets.cityLabels)
 	}
@@ -443,11 +443,11 @@ func (a *MokaHRAdapter) facets(ctx context.Context, site mokaHRSite) (*mokaHRFac
 		return nil, mokaHRError(site, err)
 	}
 	f := &mokaHRFacets{
-		cityIDs:        map[string][]int{},
-		categoryIDs:    map[string][]int{},
-		cityByLocation: map[int]string{},
-		provinceByLoc:  map[int]string{},
-		provinceIDs:    map[string][]int{},
+		cityIDs:        make(map[string][]int),
+		categoryIDs:    make(map[string][]int),
+		cityByLocation: make(map[int]string),
+		provinceByLoc:  make(map[int]string),
+		provinceIDs:    make(map[string][]int),
 	}
 	system := aggs.SystemFieldsAggregations.Value
 	// A city covers several districts, so its filter value maps to every
@@ -555,7 +555,7 @@ func mokaHRSummary(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) JobSumma
 
 func mokaHRDumpJob(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) dumpJob {
 	summary := mokaHRSummary(site, facets, j)
-	fields := map[string][]string{}
+	fields := make(map[string][]string)
 	if cities := mokaHRCities(facets, j.Locations.Or(nil)); len(cities) > 0 {
 		fields["city"] = cities
 	}

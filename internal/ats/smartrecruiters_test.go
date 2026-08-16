@@ -182,7 +182,7 @@ func TestSmartRecruitersRosterMirrorsProviderRoster(t *testing.T) {
 	require.NoError(t, err)
 	roster := a.Roster()
 	require.Len(t, roster, len(smartrecruiters.Companies))
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, c := range roster {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug, "slug %q must be lowercase", c.Slug)
 		require.Falsef(t, seen[c.Slug], "duplicate slug %q in roster", c.Slug)

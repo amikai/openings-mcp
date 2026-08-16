@@ -22,6 +22,8 @@ type AshbyAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*AshbyAdapter)(nil)
+
 // ashbyCareersURLRE matches Ashby board URLs and captures the organization
 // slug (first path segment; URL-decoded — org names may contain spaces).
 //
@@ -148,7 +150,7 @@ func (a *AshbyAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, e
 		if !j.IsListed.Value {
 			continue
 		}
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if j.Department.Value != "" {
 			fields["department"] = []string{j.Department.Value}
 		}

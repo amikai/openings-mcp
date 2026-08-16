@@ -28,6 +28,8 @@ type HrmosAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*HrmosAdapter)(nil)
+
 // hrmosCareersURLRE matches hrmos.co tenant URLs and captures the slug: it
 // matches /pages/{slug}, /pages/{slug}/jobs, and /pages/{slug}/jobs/{id}
 // alike since only the prefix is anchored.

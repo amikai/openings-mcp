@@ -80,7 +80,7 @@ func workableSearchServer(
 	var bodies []workableSearchBody
 	// Index every job by shortcode so detail enrichment can resolve bodies
 	// regardless of which query page produced the candidate.
-	byShortcode := map[string]workableTestJob{}
+	byShortcode := make(map[string]workableTestJob)
 	for _, jobs := range byQuery {
 		for _, j := range jobs {
 			byShortcode[j.shortcode] = j
@@ -208,7 +208,7 @@ func TestWorkableRosterMirrorsProviderRoster(t *testing.T) {
 	require.NoError(t, err)
 	roster := a.Roster()
 	require.Len(t, roster, len(workable.Companies))
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, c := range roster {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug, "slug %q must be lowercase", c.Slug)
 		require.Falsef(t, seen[c.Slug], "duplicate slug %q in roster", c.Slug)
