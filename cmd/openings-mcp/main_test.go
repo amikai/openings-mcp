@@ -22,7 +22,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
-	"github.com/amikai/openings-mcp/internal/provider/nvidia"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/peterbourgon/ff/v4"
@@ -97,8 +96,6 @@ func TestServerListsJobTools(t *testing.T) {
 	require.NoError(t, err)
 	cCake, err := cake.NewClient("https://api.cake.me", cake.WithClient(http.DefaultClient))
 	require.NoError(t, err)
-	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(http.DefaultClient))
-	require.NoError(t, err)
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", http.DefaultClient)
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", http.DefaultClient)
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
@@ -113,7 +110,6 @@ func TestServerListsJobTools(t *testing.T) {
 		job104:   c104,
 		apple:    cApple,
 		cake:     cCake,
-		nvidia:   cNvidia,
 		tsmc:     cTsmc,
 		google:   cGoogle,
 		linkedin: cLinkedin,
@@ -145,8 +141,6 @@ func TestServerListsJobTools(t *testing.T) {
 		"apple_get_job_detail",
 		"cake_search_jobs",
 		"cake_get_job_detail",
-		"nvidia_search_jobs",
-		"nvidia_get_job_detail",
 		"tsmc_search_jobs",
 		"tsmc_get_job_detail",
 		"google_search_jobs",
@@ -226,30 +220,6 @@ func assertCompanyAndIndeedSchemas(t *testing.T, got map[string]*mcp.Tool) {
 	companyOutputProperties, ok := companyOutput["properties"].(map[string]any)
 	require.True(t, ok)
 	assert.NotContains(t, companyOutputProperties, "next_cursor")
-
-	nvidiaTool := got["nvidia_search_jobs"]
-	require.NotNil(t, nvidiaTool)
-	nvidiaInput, ok := nvidiaTool.InputSchema.(map[string]any)
-	require.True(t, ok)
-	nvidiaProperties, ok := nvidiaInput["properties"].(map[string]any)
-	require.True(t, ok)
-	nvidiaLimit, ok := nvidiaProperties["limit"].(map[string]any)
-	require.True(t, ok)
-	assert.Equal(t, float64(20), nvidiaLimit["default"])
-
-	nvidiaOutput, ok := nvidiaTool.OutputSchema.(map[string]any)
-	require.True(t, ok)
-	nvidiaOutputProperties, ok := nvidiaOutput["properties"].(map[string]any)
-	require.True(t, ok)
-	nvidiaData, ok := nvidiaOutputProperties["data"].(map[string]any)
-	require.True(t, ok)
-	nvidiaItems, ok := nvidiaData["items"].(map[string]any)
-	require.True(t, ok)
-	nvidiaItemProperties, ok := nvidiaItems["properties"].(map[string]any)
-	require.True(t, ok)
-	nvidiaExternalPath, ok := nvidiaItemProperties["external_path"].(map[string]any)
-	require.True(t, ok)
-	assert.Contains(t, nvidiaExternalPath["description"], "nvidia_get_job_detail")
 
 	indeedTool := got["indeed_search_jobs"]
 	require.NotNil(t, indeedTool)

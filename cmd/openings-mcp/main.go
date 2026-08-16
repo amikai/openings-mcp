@@ -54,7 +54,6 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
-	"github.com/amikai/openings-mcp/internal/provider/nvidia"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
@@ -68,11 +67,11 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, NVIDIA, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
 
 Tool selection:
 - When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) when the company isn't covered.
-- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, NVIDIA Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
+- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs from the career systems this server supports. Do not pass other careers sites; some career systems accept URLs only for companies already in the curated roster.
 - When a company is ambiguous, the unified company tools reject the call and list the matching companies by name with their public careers URLs; retry the same tool with one of the listed careers URLs, not with the original name.
@@ -318,11 +317,6 @@ func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Serv
 		return nil, err
 	}
 
-	cNvidia, err := nvidia.NewClient("https://nvidia.wd5.myworkdayjobs.com/wday/cxs/nvidia/NVIDIAExternalCareerSite", nvidia.WithClient(hc))
-	if err != nil {
-		return nil, err
-	}
-
 	cTsmc := tsmc.NewClient("https://careers.tsmc.com", hc)
 
 	cGoogle := google.NewClient("https://www.google.com/about/careers/applications", hc)
@@ -358,7 +352,6 @@ func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Serv
 		job104:   c104,
 		apple:    cApple,
 		cake:     cCake,
-		nvidia:   cNvidia,
 		tsmc:     cTsmc,
 		google:   cGoogle,
 		linkedin: cLinkedin,
@@ -454,7 +447,6 @@ type providerClients struct {
 	job104   *job104.Client
 	apple    *apple.JobsClient
 	cake     *cake.Client
-	nvidia   *nvidia.Client
 	tsmc     *tsmc.Client
 	google   *google.Client
 	linkedin *linkedin.Client
@@ -478,7 +470,6 @@ func newServer(clients *providerClients, registry *ats.Registry, logger *slog.Lo
 	openingsmcp.RegisterJob104(server, clients.job104)
 	openingsmcp.RegisterApple(server, clients.apple)
 	openingsmcp.RegisterCake(server, clients.cake)
-	openingsmcp.RegisterNvidia(server, clients.nvidia)
 	openingsmcp.RegisterTsmc(server, clients.tsmc)
 	openingsmcp.RegisterGoogle(server, clients.google)
 	openingsmcp.RegisterLinkedin(server, clients.linkedin)

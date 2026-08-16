@@ -119,7 +119,7 @@ type googleDetailOutput struct {
 // googleTargetLevels, googleDegrees, googleEmploymentTypes, googleCompanies,
 // and googleSortBys mirror the enum values in googleSearchInputRawSchema.
 // The google provider's client is hand-written (no ogen-generated types), so
-// unlike job104/nvidia/cake there's no generated Validate() to call; the site
+// unlike job104/cake there's no generated Validate() to call; the site
 // itself silently ignores unrecognized values instead of erroring, so
 // openingsmcp validates against these sets to fail fast like the other providers.
 var googleTargetLevels = map[string]bool{

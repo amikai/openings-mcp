@@ -267,10 +267,9 @@ type searchFlags struct {
 }
 
 // runSearch searches jobs, then fetches full detail for every result
-// (mirrors cmd/nvidia's report behavior: a posting with no ExternalPath is
-// listed with a "no detail available" note rather than silently dropped, so
-// "showing N" always matches the page's posting count) — one page per
-// invocation, no auto-pagination.
+// (a posting with no ExternalPath is listed with a "no detail available"
+// note rather than silently dropped, so "showing N" always matches the
+// page's posting count) — one page per invocation, no auto-pagination.
 func runSearch(ctx context.Context, f searchFlags) error {
 	if f.tenant == "" {
 		return errors.New("--tenant is required")
@@ -359,8 +358,7 @@ func printResultLocations(r jobResultJSON) {
 // fetchJobResult fetches full detail for one job summary. A detail-fetch
 // failure is non-fatal: it falls back to a derived public site URL and the
 // summary's aggregate LocationsText, and records the error instead of a
-// description, so one bad job doesn't abort the whole search — mirrors
-// cmd/nvidia's existing per-job fallback behavior. A summary with no
+// description, so one bad job doesn't abort the whole search. A summary with no
 // ExternalPath (an incomplete/transient Workday posting) can't be fetched at
 // all, so it's returned with a "no detail available" note rather than dropped.
 func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, baseURL string, job workday.JobSummary) jobResultJSON {
@@ -422,8 +420,7 @@ func fetchJobResult(ctx context.Context, client *workday.TenantClient, tenant, b
 
 // setLocations fills both the singular Location (first entry, for quick
 // access) and the full Locations array (only when there's more than one, to
-// avoid a redundant one-element array alongside the singular field) —
-// mirrors cmd/nvidia's printLocations singular/plural distinction.
+// avoid a redundant one-element array alongside the singular field).
 func setLocations(r *jobResultJSON, locations ...string) {
 	if len(locations) == 0 {
 		return
