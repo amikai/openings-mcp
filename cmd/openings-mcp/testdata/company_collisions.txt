@@ -372,7 +372,6 @@ Kirin	ashby|Kirin|https://jobs.ashbyhq.com/kirin	hrmos|キリンホールディ�
 Kixie	lever|Kixie|https://jobs.lever.co/kixie	workable|Kixie|https://apply.workable.com/kixie/
 Known	ashby|Known|https://jobs.ashbyhq.com/known	greenhouse|Known|https://job-boards.greenhouse.io/known
 Koru	workable|Koru UX Design LLP|https://apply.workable.com/koru/	smartrecruiters|Koru|https://jobs.smartrecruiters.com/Koru1
-Kraken	lever|Kraken Digital Asset Exchange|https://jobs.lever.co/kraken	lever|Kraken|https://jobs.lever.co/kraken123	ashby|Kraken|https://jobs.ashbyhq.com/kraken.com
 Kroll	bamboohr|D&P China (HK) Limited|https://kroll.bamboohr.com/careers	oracle|Kroll|https://hcxs.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 Kumon	dayforce|Kumon|https://jobs.dayforcehcm.com/en-US/kumon/CANDIDATEPORTAL	smartrecruiters|Kumon|https://jobs.smartrecruiters.com/Kumon1
 LCI	dayforce|LCI Education|https://jobs.dayforcehcm.com/en-US/lci/CANDIDATEPORTAL	ultipro|LCI|https://recruiting.ultipro.com/LCI1000LCIN/JobBoard/f344a078-07a4-443e-af53-91e477cf7d3f/
@@ -1244,7 +1243,6 @@ known	ashby|Known|https://jobs.ashbyhq.com/known	greenhouse|Known|https://job-bo
 kokopelli	herp|株式会社ココペリ|https://herp.careers/careers/companies/kokopelli	hrmos|株式会社ココペリ|https://hrmos.co/pages/kokopelli/jobs
 koru	workable|Koru UX Design LLP|https://apply.workable.com/koru/	smartrecruiters|Koru|https://jobs.smartrecruiters.com/Koru1
 kpmg	lever|KPMG LLP|https://jobs.lever.co/kpmg	oracle|KPMG|https://elzw.fa.em8.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1001/jobs
-kraken	lever|Kraken Digital Asset Exchange|https://jobs.lever.co/kraken	lever|Kraken|https://jobs.lever.co/kraken123	ashby|Kraken|https://jobs.ashbyhq.com/kraken.com
 kroll	bamboohr|D&P China (HK) Limited|https://kroll.bamboohr.com/careers	oracle|Kroll|https://hcxs.fa.us2.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs
 kumon	dayforce|Kumon|https://jobs.dayforcehcm.com/en-US/kumon/CANDIDATEPORTAL	smartrecruiters|Kumon|https://jobs.smartrecruiters.com/Kumon1
 la belle vie 株式会社	herp|la belle vie 株式会社|https://herp.careers/careers/companies/labellevie	hrmos|la belle vie 株式会社|https://hrmos.co/pages/labellevie/jobs
