@@ -7,6 +7,7 @@ OPENAPI_SPECS := \
 	internal/provider/bamboohr/openapi.yaml \
 	internal/provider/cake/openapi.yaml \
 	internal/provider/dayforce/openapi.yaml \
+	internal/provider/delta/openapi.yaml \
 	internal/provider/eightfold/openapi.yaml \
 	internal/provider/flowxtra/openapi.yaml \
 	internal/provider/fourdayweek/openapi.yaml \
