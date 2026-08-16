@@ -1,0 +1,248 @@
+openapi: 3.1.0
+
+info:
+  title: Delta Electronics careers API
+  version: "1"
+  description: >
+    Reverse-engineered spec for the public JSON REST API backing Delta
+    Electronics' recruitment portal at https://rws.deltaww.com (served by
+    https://rws.deltaww.com/OAGateWay/RWSV2/api/). Captured 2026-08-16;
+    fixtures live in testdata/.
+
+    ## Surface notes
+
+    * **Single company careers portal**: Delta Electronics' own global recruitment
+      portal.
+
+    * **Server-side search & filtering**:
+      - `GetAreaList` returns area codes (e.g. A=TW, B=DG, C=WJ, E=SH, S=Singapore, T=TW(Cyntec)).
+      - `SearchJobList` accepts `AreaID` (e.g. "A" or "A;B" for multiple), `AddJobName` (job title keyword), and `Lang`.
+      - `GetJobDetails` accepts `EmpAddID`, `Resumeid` (empty string for anonymous lookup), and `Lang`.
+
+    * **Parameter binding**: ASP.NET Web API route matching expects `AreaID`, `AddJobName`, and `Lang` to be passed on `SearchJobList`, and `EmpAddID`, `Resumeid`, and `Lang` to be passed on `GetJobDetails`.
+
+    * **Multilingual support**: `Lang` supports tags like `zh-TW`, `zh-CN`, and `en-US`.
+
+servers:
+  - url: https://rws.deltaww.com
+
+paths:
+  /OAGateWay/RWSV2/api/Index/GetAreaList:
+    get:
+      operationId: getAreaList
+      summary: Fetch area filter options.
+      parameters:
+        - name: Lang
+          in: query
+          required: true
+          schema:
+            type: string
+            default: en-US
+          description: Language tag (e.g. en-US, zh-TW, zh-CN).
+      responses:
+        "200":
+          description: List of area options.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AreaList"
+
+  /OAGateWay/RWSV2/api/Index/SearchJobList:
+    get:
+      operationId: searchJobList
+      summary: Search job vacancies.
+      parameters:
+        - name: AreaID
+          in: query
+          required: true
+          schema:
+            type: string
+            default: ""
+          description: Area code filter (e.g. "A", "B", "A;B"). Empty string returns all areas.
+        - name: AddJobName
+          in: query
+          required: true
+          schema:
+            type: string
+            default: ""
+          description: Case-insensitive job title keyword filter. Empty string returns all titles.
+        - name: Lang
+          in: query
+          required: true
+          schema:
+            type: string
+            default: en-US
+          description: Language tag (e.g. en-US, zh-TW, zh-CN).
+      responses:
+        "200":
+          description: List of matching job vacancies.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobList"
+
+  /OAGateWay/RWSV2/api/JobDetails/GetJobDetails:
+    get:
+      operationId: getJobDetails
+      summary: Fetch job details by requisition id (EmpAddID).
+      parameters:
+        - name: EmpAddID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Requisition ID from search results (e.g. C20260814001).
+        - name: Resumeid
+          in: query
+          required: true
+          schema:
+            type: string
+            default: ""
+          description: Resume ID (empty string for anonymous queries).
+        - name: Lang
+          in: query
+          required: true
+          schema:
+            type: string
+            default: en-US
+          description: Language tag (e.g. en-US, zh-TW, zh-CN).
+      responses:
+        "200":
+          description: Detailed vacancy information and related jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobDetailResponse"
+
+components:
+  schemas:
+    AreaList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AreaItem"
+
+    AreaItem:
+      type: object
+      required:
+        - Value
+        - Text
+      properties:
+        Value:
+          type: string
+          description: Area code value (e.g. "A", "B").
+        Text:
+          type: string
+          description: Display name of the area (e.g. "TW", "台灣").
+        Count:
+          type: [integer, "null"]
+          description: Headcount count if populated.
+
+    JobList:
+      type: array
+      items:
+        $ref: "#/components/schemas/JobSummary"
+
+    JobSummary:
+      type: object
+      required:
+        - EmpAddID
+        - JobCode
+        - JobName
+      properties:
+        EmpAddID:
+          type: string
+          description: Job requisition ID (e.g. C20260814001).
+        JobCode:
+          type: string
+          description: Standardized job code (e.g. PT4B001).
+        JobName:
+          type: string
+          description: Job title.
+        Education:
+          type: [string, "null"]
+          description: Minimum education requirement.
+        Experience:
+          type: [string, "null"]
+          description: Required work experience.
+        AreaName:
+          type: [string, "null"]
+          description: Area name / code (e.g. TW, WJ).
+        NeedNum:
+          type: [integer, "null"]
+          description: Required headcount.
+        ModifyDate:
+          type: [string, "null"]
+          description: Last modification date (YYYY-MM-DD).
+        AddJobPublisGuid:
+          type: [string, "null"]
+          description: Job publishing GUID.
+        ApplyID:
+          type: [string, "null"]
+          description: Application ID if applied.
+        JobPlaceName:
+          type: [string, "null"]
+          description: Workplace location details.
+
+    JobDetailResponse:
+      type: object
+      required:
+        - JobDetails
+      properties:
+        JobDetails:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobDetail"
+        RelatedJob:
+          type: array
+          items:
+            $ref: "#/components/schemas/JobDetail"
+
+    JobDetail:
+      type: object
+      required:
+        - EmpAddID
+        - JobCode
+        - JobName
+      properties:
+        EmpAddID:
+          type: string
+          description: Job requisition ID.
+        JobCode:
+          type: string
+          description: Standardized job code.
+        JobName:
+          type: string
+          description: Job title.
+        Education:
+          type: [string, "null"]
+          description: Education requirement.
+        JobExperience:
+          type: [string, "null"]
+          description: Experience requirement.
+        JobPlace:
+          type: [string, "null"]
+          description: Specific work place location.
+        NeedNum:
+          type: [integer, "null"]
+          description: Headcount needed.
+        BeginDate:
+          type: [string, "null"]
+          description: Posting / begin date.
+        JobResponsibility:
+          type: [string, "null"]
+          description: Detailed job responsibilities.
+        JobSkill:
+          type: [string, "null"]
+          description: Required job skills.
+        LanguageAbility:
+          type: [string, "null"]
+          description: Language requirements.
+        MainJob:
+          type: [integer, "null"]
+          description: Main job indicator flag.
+        AreaName:
+          type: [string, "null"]
+          description: Area name.
+        ApplyID:
+          type: [string, "null"]
+          description: Application ID.
