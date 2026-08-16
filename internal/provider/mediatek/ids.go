@@ -1,4 +1,4 @@
-package mtk
+package mediatek
 
 // FilterOption is a human-readable label and the opaque value accepted by
 // MediaTek's public search API.

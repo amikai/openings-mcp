@@ -1,4 +1,4 @@
-package mtk
+package mediatek
 
 import (
 	_ "embed"
