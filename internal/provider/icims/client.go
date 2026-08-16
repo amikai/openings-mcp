@@ -3,12 +3,10 @@
 package icims
 
 import (
-	"bytes"
 	"cmp"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"slices"
@@ -275,12 +273,8 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	}
 	defer resp.Body.Close()
 
-	// Read body for both success and the statuses we parse (404/410).
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 8<<20))
-	if err != nil {
-		return nil, resp.StatusCode, fmt.Errorf("read body: %w", err)
-	}
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
+	// Parse body for both success and the statuses we inspect (404/410).
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, resp.StatusCode, fmt.Errorf("parse html: %w", err)
 	}

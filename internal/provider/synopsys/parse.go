@@ -1,11 +1,9 @@
 package synopsys
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io"
-	"regexp"
 	"strconv"
 	"strings"
 
@@ -59,8 +57,6 @@ func parseJobCard(li *goquery.Selection) (Job, bool) {
 	return job, job.JobID != ""
 }
 
-var jsonLDRe = regexp.MustCompile(`(?s)<script[^>]+application/ld\+json[^>]*>(.*?)</script>`)
-
 // jobPostingLD is the JSON-LD JobPosting subset the detail parser reads.
 // @type is any because JSON-LD allows both a string and a list of strings.
 type jobPostingLD struct {
@@ -91,7 +87,7 @@ func isJobPostingType(t any) bool {
 }
 
 func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
-	body, err := io.ReadAll(r)
+	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, err
 	}
@@ -100,9 +96,9 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 	// Pages may carry other JSON-LD blocks (Organization, WebSite) before
 	// the posting, so select by @type instead of taking the first block.
 	var ld *jobPostingLD
-	for _, m := range jsonLDRe.FindAllSubmatch(body, -1) {
+	for _, s := range doc.Find(`script[type="application/ld+json"]`).EachIter() {
 		var cand jobPostingLD
-		if json.Unmarshal(m[1], &cand) != nil {
+		if json.Unmarshal([]byte(s.Text()), &cand) != nil {
 			continue
 		}
 		if isJobPostingType(cand.Type) && cand.Title != "" {
@@ -121,7 +117,7 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 		}
 	}
 
-	category, hireType, remoteEligible, description := parseAtsDesc(body)
+	category, hireType, remoteEligible, description := parseAtsDesc(doc)
 
 	return &JobDetailResponse{
 		Title:          ld.Title,
@@ -135,12 +131,7 @@ func parseJobDetail(r io.Reader) (*JobDetailResponse, error) {
 	}, nil
 }
 
-func parseAtsDesc(body []byte) (category, hireType, remoteEligible, description string) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
-	if err != nil {
-		return "", "", "", ""
-	}
-
+func parseAtsDesc(doc *goquery.Document) (category, hireType, remoteEligible, description string) {
 	// xq -q "div.ats-description" --html
 	atsDesc := doc.Find("div.ats-description").First()
 	if atsDesc.Length() == 0 {

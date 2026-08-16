@@ -242,14 +242,13 @@ func parseDetailPage(r io.Reader) (*JobDetail, error) {
 	}
 
 	var ld *jobPostingLD
-	doc.Find(`script[type="application/ld+json"]`).EachWithBreak(func(_ int, s *goquery.Selection) bool {
+	for _, s := range doc.Find(`script[type="application/ld+json"]`).EachIter() {
 		var candidate jobPostingLD
 		if json.Unmarshal([]byte(s.Text()), &candidate) == nil && candidate.Type == "JobPosting" {
 			ld = &candidate
-			return false
+			break
 		}
-		return true
-	})
+	}
 	if ld == nil {
 		return nil, fmt.Errorf("no JobPosting JSON-LD block in page")
 	}

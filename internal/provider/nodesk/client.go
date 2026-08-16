@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -206,20 +205,17 @@ func (c *Client) query(ctx context.Context, params url.Values, out *searchRespon
 	}
 	defer resp.Body.Close()
 
-	raw, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("read response: %w", err)
-	}
+	dec := json.NewDecoder(resp.Body)
 	if resp.StatusCode != http.StatusOK {
 		var apiErr struct {
 			Message string `json:"message"`
 		}
-		if json.Unmarshal(raw, &apiErr) == nil && apiErr.Message != "" {
+		if dec.Decode(&apiErr) == nil && apiErr.Message != "" {
 			return fmt.Errorf("algolia HTTP %d: %s", resp.StatusCode, apiErr.Message)
 		}
 		return fmt.Errorf("algolia HTTP %d", resp.StatusCode)
 	}
-	if err := json.Unmarshal(raw, out); err != nil {
+	if err := dec.Decode(out); err != nil {
 		return fmt.Errorf("parse search response: %w", err)
 	}
 	return nil

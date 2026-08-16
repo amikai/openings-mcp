@@ -3,7 +3,6 @@ package join
 import (
 	_ "embed"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -67,8 +66,7 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc(graphqlPath, func(w http.ResponseWriter, r *http.Request) {
 		var body mockGraphQLBody
 		defer r.Body.Close()
-		raw, _ := io.ReadAll(r.Body)
-		_ = json.Unmarshal(raw, &body)
+		_ = json.NewDecoder(r.Body).Decode(&body)
 
 		w.Header().Set("Content-Type", "application/json")
 		switch {

@@ -238,7 +238,7 @@ func (c *Client) Detail(ctx context.Context, opportunityID string) (*Opportunity
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 16<<20))
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("detail: read body: %w", err)
 	}
@@ -279,7 +279,7 @@ func (c *Client) postJSON(ctx context.Context, path string, body, out any) error
 		return ErrCompanyNotFound
 	}
 	if resp.StatusCode != http.StatusOK {
-		data, _ := io.ReadAll(io.LimitReader(resp.Body, 4<<10))
+		data, _ := io.ReadAll(resp.Body)
 		return fmt.Errorf("HTTP %d: %s", resp.StatusCode, bytes.TrimSpace(data))
 	}
 	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {

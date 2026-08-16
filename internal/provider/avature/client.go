@@ -1,12 +1,10 @@
 package avature
 
 import (
-	"bytes"
 	"cmp"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -200,11 +198,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	}
 	defer resp.Body.Close()
 
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 8<<20))
-	if err != nil {
-		return nil, resp.StatusCode, resp.Request.URL, fmt.Errorf("read body: %w", err)
-	}
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, resp.StatusCode, resp.Request.URL, fmt.Errorf("parse html: %w", err)
 	}

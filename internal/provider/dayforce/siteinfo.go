@@ -1,7 +1,6 @@
 package dayforce
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -64,15 +63,11 @@ func (c *BoardClient) SiteInfo(ctx context.Context, ns, xref, culture string) (*
 		return nil, fmt.Errorf("fetch dayforce site-info page: unexpected status %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read dayforce site-info page: %w", err)
-	}
-	return parseSiteInfo(body)
+	return parseSiteInfo(resp.Body)
 }
 
-func parseSiteInfo(html []byte) (*SiteInfo, error) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(html))
+func parseSiteInfo(r io.Reader) (*SiteInfo, error) {
+	doc, err := goquery.NewDocumentFromReader(r)
 	if err != nil {
 		return nil, fmt.Errorf("parse dayforce site-info page: %w", err)
 	}
