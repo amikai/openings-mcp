@@ -205,7 +205,6 @@ Datacor	greenhouse|Datacor|https://job-boards.greenhouse.io/datacor	bamboohr|Dat
 DeepRoute.ai	workable|Deeproute.ai|https://apply.workable.com/deeproute-dot-a-i/	mokahr|DeepRoute.ai|https://app.mokahr.com/social-recruitment/deeproute/143885
 Deepintent	greenhouse|Deepintent|https://job-boards.greenhouse.io/deepintent	bamboohr|DeepIntent (deepintent)|https://deepintent.bamboohr.com/careers
 Deeproute.ai	workable|Deeproute.ai|https://apply.workable.com/deeproute-dot-a-i/	mokahr|DeepRoute.ai|https://app.mokahr.com/social-recruitment/deeproute/143885
-Delinea	ashby|Delinea|https://jobs.ashbyhq.com/delinea	workday|Delinea|https://centrify.wd1.myworkdayjobs.com/en-US/external
 Deloitte	herp|デロイトトーマツウェブサービス株式会社|https://herp.careers/careers/companies/deloitte	smartrecruiters|Deloitte|https://jobs.smartrecruiters.com/Deloitte6
 Deluxe	workday|Deluxe (CAN)|https://deluxe.wd5.myworkdayjobs.com/en-US/USA_CAN	workday|Deluxe|https://bydeluxe.wd5.myworkdayjobs.com/en-US/Deluxe_External
 Deluxe Holiday Homes	recruitee|Deluxe Holiday Homes|https://deluxeholidayhomes.recruitee.com	workable|Deluxe Holiday Homes|https://apply.workable.com/deluxe-holiday-homes/
@@ -1008,7 +1007,6 @@ datacor	greenhouse|Datacor|https://job-boards.greenhouse.io/datacor	bamboohr|Dat
 dcrp	herp|電通クリエイティブピクチャーズ|https://herp.careers/careers/companies/dcrp	hrmos|電通クリエイティブピクチャーズ|https://hrmos.co/pages/dcrp/jobs
 dearone	herp|株式会社DearOne|https://herp.careers/careers/companies/dearone	hrmos|株式会社DearOne|https://hrmos.co/pages/dearone/jobs
 deepintent	greenhouse|Deepintent|https://job-boards.greenhouse.io/deepintent	bamboohr|DeepIntent (deepintent)|https://deepintent.bamboohr.com/careers
-delinea	ashby|Delinea|https://jobs.ashbyhq.com/delinea	workday|Delinea|https://centrify.wd1.myworkdayjobs.com/en-US/external
 deloitte	herp|デロイトトーマツウェブサービス株式会社|https://herp.careers/careers/companies/deloitte	smartrecruiters|Deloitte|https://jobs.smartrecruiters.com/Deloitte6
 deluxe	workday|Deluxe (CAN)|https://deluxe.wd5.myworkdayjobs.com/en-US/USA_CAN	workday|Deluxe|https://bydeluxe.wd5.myworkdayjobs.com/en-US/Deluxe_External
 deluxe-holiday-homes	recruitee|Deluxe Holiday Homes|https://deluxeholidayhomes.recruitee.com	workable|Deluxe Holiday Homes|https://apply.workable.com/deluxe-holiday-homes/
