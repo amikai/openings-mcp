@@ -2836,7 +2836,5 @@
   board: "weave"
 - company: "Weave (workweave)"
   board: "workweave"
-- company: "Zero RFI (zero)"
+- company: "Zero RFI"
   board: "zero"
-- company: "ZeroRFI (zerorfi)"
-  board: "zerorfi"
