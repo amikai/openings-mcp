@@ -7,7 +7,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"slices"
@@ -275,7 +274,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	defer resp.Body.Close()
 
 	// Parse body for both success and the statuses we inspect (404/410).
-	doc, err := goquery.NewDocumentFromReader(io.LimitReader(resp.Body, 8<<20))
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, resp.StatusCode, fmt.Errorf("parse html: %w", err)
 	}

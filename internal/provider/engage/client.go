@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -151,7 +150,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 		return nil, 0, err
 	}
 	defer resp.Body.Close()
-	doc, err := goquery.NewDocumentFromReader(io.LimitReader(resp.Body, 8<<20))
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, resp.StatusCode, fmt.Errorf("parse html: %w", err)
 	}
@@ -167,7 +166,7 @@ func (c *Client) getJSON(ctx context.Context, rawURL string, dest any) (int, err
 	if resp.StatusCode != http.StatusOK {
 		return resp.StatusCode, nil
 	}
-	if err := json.NewDecoder(io.LimitReader(resp.Body, 8<<20)).Decode(dest); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(dest); err != nil {
 		return resp.StatusCode, fmt.Errorf("decode response: %w", err)
 	}
 	return resp.StatusCode, nil

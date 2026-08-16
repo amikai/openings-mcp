@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -199,7 +198,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	}
 	defer resp.Body.Close()
 
-	doc, err := goquery.NewDocumentFromReader(io.LimitReader(resp.Body, 8<<20))
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
 	if err != nil {
 		return nil, resp.StatusCode, resp.Request.URL, fmt.Errorf("parse html: %w", err)
 	}
