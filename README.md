@@ -34,7 +34,8 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[HRMOS 採用](https://hrmos.co)** (Japan),
   **[MokaHR](https://www.mokahr.com)** (China),
   **[BambooHR](https://www.bamboohr.com)**,
-  and **[ADP MyJobs](https://myjobs.adp.com)**
+  **[ADP MyJobs](https://myjobs.adp.com)**,
+  and **[ADP Workforce Now](https://workforcenow.adp.com)**
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms
   except Eightfold, SAP SuccessFactors, and JOIN, which support roster companies only.

@@ -1,6 +1,7 @@
 .PHONY: validate-openapi hurl-fmt hurl-lint hurl-test
 
 OPENAPI_SPECS := \
+	internal/provider/adp_wfn/openapi.yaml \
 	internal/provider/amazon/openapi.yaml \
 	internal/provider/apple/openapi.yaml \
 	internal/provider/ashby/openapi.yaml \

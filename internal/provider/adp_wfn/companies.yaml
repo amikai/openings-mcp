@@ -1,0 +1,59 @@
+# Curated ADP Workforce Now career centers. Every entry was live-verified:
+# the tenant cid returns HTTP 200 with at least one open posting under the
+# locale recorded here, and the company name was cross-checked against at
+# least two independent public sources (career-center welcome text, the
+# tenant's own website, its LinkedIn page) before being written down.
+#
+# slug is ours, not ADP's. The registry builds its did-you-mean suggestions
+# from slugs and never from names, so a cid or an opaque ADP client_id here
+# would make these companies unsuggestible to anyone who mistypes a name.
+#
+# client_id is ADP's own readable tenant slug. It is not used to address the
+# API — which accepts nothing but cid — and is recorded because it is the
+# input the legacy careers-URL resolver takes, which matters for growing this
+# roster later.
+#
+# locale is required. Naming the wrong one returns an empty board rather than
+# an error, so it is pinned per tenant rather than defaulted.
+- company: American School for the Deaf
+  slug: american-school-for-the-deaf
+  cid: 55a9d987-168e-4cd9-9f4d-bc3c10fb6e90
+  cc_id: '19000101_000001'
+  client_id: asd-1817
+  locale: en_US
+- company: Bingemans
+  slug: bingemans
+  cid: 5a312740-8c7b-44b7-80ad-50a35fbb25d3
+  cc_id: '19000101_000001'
+  client_id: 1euxj
+  # The only en_CA tenant on this roster. Its board returns zero rows under
+  # en_US, which is why locale is stored rather than assumed.
+  locale: en_CA
+- company: MetLife Legal Plans
+  slug: metlife-legal-plans
+  cid: 269ead05-4042-4cc5-b325-75a73a6e0439
+  cc_id: '19000101_000001'
+  client_id: hyattlegal
+  locale: en_US
+# ADP records this tenant as "Applied Water Managemen" (truncated), an
+# affiliate's legal name. The website (nsuwater.com), the LinkedIn page, and
+# the career-center welcome text all name Natural Systems Utilities, so the
+# trading name is used here.
+- company: Natural Systems Utilities
+  slug: natural-systems-utilities
+  cid: fb30d7bb-6b35-4ece-97a2-d094abe83a7f
+  cc_id: '19000101_000001'
+  client_id: awminc
+  locale: en_US
+- company: Novae Corporation
+  slug: novae
+  cid: d16ba13d-474e-4326-b628-74c87f0b289a
+  cc_id: '19000101_000001'
+  client_id: novae
+  locale: en_US
+- company: On-Site Health & Safety
+  slug: on-site-health-safety
+  cid: 284521e1-407f-4b01-862b-9b67eff6cd18
+  cc_id: '19000101_000001'
+  client_id: xip39
+  locale: en_US

@@ -38,7 +38,8 @@ var adpMyJobsCareersURLRE = regexp.MustCompile(
 // board, Store or Brand or Compensation Range on another — so [Adapter.Filters]
 // reports them per company and [SearchParams.Location] is not supported: a
 // board that files its jobs by store cannot answer a free-text place.
-// Workforce Now (workforcenow.adp.com) is out of scope (future adp_wfn).
+// Workforce Now (workforcenow.adp.com) is a separate surface served by
+// [ADPWFNAdapter]; see docs/adr/0001-separate-adp-provider-packages.md.
 type ADPMyJobsAdapter struct {
 	hc          *http.Client
 	careerBase  string
