@@ -22,7 +22,7 @@ type facetFilter struct {
 
 type JobsRequest struct {
 	Keywords       string
-	Location       *location
+	Location       *Location
 	Page           int
 	RecordsPerPage int
 	SortCriteria   int // 0=Most Relevant, 13=Most Recent
@@ -30,10 +30,10 @@ type JobsRequest struct {
 	FacetFilters   []facetFilter
 }
 
-// location filters search results to a geocoded place. Free-text alone does
+// Location filters search results to a geocoded place. Free-text alone does
 // nothing on this API; all four fields must be sent together, resolved via
-// Client.resolveLocation. Build one from a locationSuggestion with asFilter.
-type location struct {
+// Client.ResolveLocation. Build one from a LocationSuggestion with AsFilter.
+type Location struct {
 	Display   string // human-readable label, cosmetic only
 	Latitude  float64
 	Longitude float64
@@ -41,9 +41,9 @@ type location struct {
 	Path      string // suggestion's "lp" field, dash-separated ancestor IDs
 }
 
-// locationSuggestion is one geocoded candidate returned by
-// Client.resolveLocation for a partial place name typed by the user.
-type locationSuggestion struct {
+// LocationSuggestion is one geocoded candidate returned by
+// Client.ResolveLocation for a partial place name typed by the user.
+type LocationSuggestion struct {
 	ID           int     `json:"id"`
 	Value        string  `json:"value"`
 	Latitude     float64 `json:"lat"`
@@ -57,10 +57,10 @@ type locationSuggestion struct {
 	PostalCode   string  `json:"pc"`
 }
 
-// asFilter converts a suggestion into the location filter accepted by
+// AsFilter converts a suggestion into the location filter accepted by
 // JobsRequest.
-func (s locationSuggestion) asFilter() *location {
-	return &location{
+func (s LocationSuggestion) AsFilter() *Location {
+	return &Location{
 		Display:   s.Value,
 		Latitude:  s.Latitude,
 		Longitude: s.Longitude,
@@ -81,7 +81,14 @@ type Job struct {
 }
 
 func (j Job) URL() string {
-	return "https://careers.synopsys.com/job/" + j.City + "/" + j.Slug + "/" + orgID + "/" + j.JobID
+	return JobURL(j.City, j.Slug, j.JobID)
+}
+
+// JobURL returns the public posting URL for the city, slug, and numeric job
+// ID carried by a search result. It always points at the live careers site:
+// the URL is for a human to open, not for this client to fetch.
+func JobURL(city, slug, jobID string) string {
+	return defaultBaseURL + "/job/" + city + "/" + slug + "/" + orgID + "/" + jobID
 }
 
 type JobsResponse struct {

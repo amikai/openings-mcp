@@ -79,13 +79,13 @@ func main() {
 	codesCmd := &ff.Command{
 		Name:      "codes",
 		Usage:     "foxconn codes [--format text|json]",
-		ShortHelp: "list the valid --workplace and --talent-zone filter codes (static, no network)",
+		ShortHelp: "list the valid --workplace and --talent-zone filter codes",
 		Flags:     codesFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("codes takes no positional arguments, got %v", args)
 			}
-			return runCodes(*format)
+			return runCodes(ctx, *timeout, *format)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, codesCmd)
@@ -291,29 +291,47 @@ func printSection(label string, opt foxconn.OptNilString) {
 
 // codesJSON is the --format json shape for the codes subcommand.
 type codesJSON struct {
-	WorkplaceCodes  []foxconn.Code `json:"workplaceCodes"`
-	TalentZoneCodes []foxconn.Code `json:"talentZoneCodes"`
+	WorkplaceCodes  []foxconn.WorkplaceCode  `json:"workplaceCodes"`
+	TalentZoneCodes []foxconn.TalentZoneCode `json:"talentZoneCodes"`
 }
 
-// runCodes prints the static workplace and talent-zone filter enums
-// embedded in the CLI (internal/provider/foxconn/codes.go). It makes no
-// network call.
-func runCodes(format string) error {
+// runCodes fetches the workplace and talent-zone filter enums from the two
+// Labels reference endpoints. They were once hand-transcribed into the
+// binary; reading them live keeps this CLI and the MCP tools quoting one set
+// of codes — the board's own — rather than two that can disagree.
+func runCodes(ctx context.Context, timeout time.Duration, format string) error {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	client, err := foxconn.NewClient(apiBaseURL)
+	if err != nil {
+		return err
+	}
+
+	workplaces, err := client.ListWorkplaceCodes(ctx)
+	if err != nil {
+		return err
+	}
+	talentZones, err := client.ListTalentZoneCodes(ctx)
+	if err != nil {
+		return err
+	}
+
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
 		return enc.Encode(codesJSON{
-			WorkplaceCodes:  foxconn.WorkplaceCodes,
-			TalentZoneCodes: foxconn.TalentZoneCodes,
+			WorkplaceCodes:  workplaces,
+			TalentZoneCodes: talentZones,
 		})
 	}
 
 	fmt.Println("Workplace codes (--workplace):")
-	for _, c := range foxconn.WorkplaceCodes {
+	for _, c := range workplaces {
 		fmt.Printf("  %-12s %s\n", c.Code, c.Name)
 	}
 	fmt.Println("\nTalent-zone codes (--talent-zone):")
-	for _, c := range foxconn.TalentZoneCodes {
+	for _, c := range talentZones {
 		fmt.Printf("  %-12s %s\n", c.Code, c.Name)
 	}
 	return nil

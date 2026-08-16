@@ -20,7 +20,7 @@ const (
 	searchPath   = "/api/trpc/job.getJobs"
 )
 
-var jobIDRE = regexp.MustCompile(`^MTK[0-9]+$`)
+var jobIDRE = regexp.MustCompile(`^[A-Z]{3,4}[0-9]+$`)
 
 // Client accesses MediaTek's public careers site.
 type Client struct {
@@ -148,7 +148,7 @@ func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResult, 
 // JobDetail returns the HTML detail page for a stable ID returned by Search.
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetail, error) {
 	if !jobIDRE.MatchString(jobID) {
-		return nil, fmt.Errorf("invalid job id %q: expected MTK followed by digits", jobID)
+		return nil, fmt.Errorf("invalid job id %q: expected company prefix followed by digits", jobID)
 	}
 	u, err := url.JoinPath(c.baseURL, "en", "jobs", jobID)
 	if err != nil {

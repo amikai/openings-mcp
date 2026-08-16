@@ -30,3 +30,21 @@ func (UnimplementedHandler) GetJobVacancy(ctx context.Context, params GetJobVaca
 func (UnimplementedHandler) ListJobVacancies(ctx context.Context, params ListJobVacanciesParams) (r JobVacancyList, _ error) {
 	return r, ht.ErrNotImplemented
 }
+
+// ListTalentZoneCodes implements listTalentZoneCodes operation.
+//
+// List talent zone codes.
+//
+// GET /hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes
+func (UnimplementedHandler) ListTalentZoneCodes(ctx context.Context) (r TalentZoneCodeList, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListWorkplaceCodes implements listWorkplaceCodes operation.
+//
+// List workplace location codes.
+//
+// GET /hh_recruit_tw_api/portal_api/Labels/Workplace/Codes
+func (UnimplementedHandler) ListWorkplaceCodes(ctx context.Context) (r WorkplaceCodeList, _ error) {
+	return r, ht.ErrNotImplemented
+}

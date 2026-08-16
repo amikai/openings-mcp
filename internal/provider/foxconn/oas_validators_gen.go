@@ -81,3 +81,19 @@ func (s JobVacancyList) Validate() error {
 	}
 	return nil
 }
+
+func (s TalentZoneCodeList) Validate() error {
+	alias := ([]TalentZoneCode)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}
+
+func (s WorkplaceCodeList) Validate() error {
+	alias := ([]WorkplaceCode)(s)
+	if alias == nil {
+		return errors.New("nil is invalid value")
+	}
+	return nil
+}

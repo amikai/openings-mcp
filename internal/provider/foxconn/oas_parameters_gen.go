@@ -84,11 +84,11 @@ func decodeGetJobVacancyParams(args [1]string, argsEscaped bool, r *http.Request
 // ListJobVacanciesParams is parameters of listJobVacancies operation.
 type ListJobVacanciesParams struct {
 	// Location filter, e.g. TA (Taiwan), CH (China), VM (Vietnam). Full enum is the Labels/Workplace/Codes
-	// reference data (codes.go). An unknown value yields HTTP 200 with an empty array, not a 404.
+	// endpoint below. An unknown value yields HTTP 200 with an empty array, not a 404.
 	WorkplaceCode OptString `json:",omitempty,omitzero"`
 	// Recruitment-track filter, e.g. MA (新幹班/management associate), TALENTS (一般招募), INTERN,
-	// PT, DR (身障友善). Full enum is the Labels/TalentZone/Codes reference data (codes.go). An
-	// unknown value yields HTTP 200 with an empty array, not a 404.
+	// PT, DR (身障友善). Full enum is the Labels/TalentZone/Codes endpoint below. An unknown value
+	// yields HTTP 200 with an empty array, not a 404.
 	TalentZoneCode OptString `json:",omitempty,omitzero"`
 	// Case-insensitive free-text search across the title AND body text (not the title alone). Accepts
 	// URL-encoded Chinese. A keyword with zero matches yields HTTP 200 with an empty array.

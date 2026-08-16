@@ -86,6 +86,12 @@ Context management:
 - Search results are paginated; fetch additional pages rather than broadening the query.
 - After filtering, fetch details when both hold: the user's criteria include something summaries can't answer (tech stack, remote policy, overtime culture, education requirements written in the posting body, etc.), and the filtered set is small enough to fetch economically (roughly 5-10 postings). If either condition fails, present summaries and let the user decide whether to go deeper.`
 
+// envVarPrefix binds every flag to an environment variable: --log-level reads
+// OPENINGS_MCP_LOG_LEVEL, and so on. An explicit flag wins over the
+// environment, and a value the flag's type can't parse is a startup error
+// rather than a silent fallback to the default.
+const envVarPrefix = "OPENINGS_MCP"
+
 func main() {
 	os.Exit(run())
 }
@@ -117,7 +123,7 @@ func run() int {
 		ShortHelp: "MCP server exposing job-search tools for job boards and company careers sites",
 		Flags:     fs,
 	}
-	if err := cmd.Parse(os.Args[1:]); err != nil {
+	if err := cmd.Parse(os.Args[1:], ff.WithEnvVarPrefix(envVarPrefix)); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(cmd))
 		if errors.Is(err, ff.ErrHelp) {
 			return 0
@@ -229,8 +235,14 @@ func (f *httpFlag) String() string {
 }
 
 // Set takes "true"/"false" from the valueless form and anything else as the
-// address to listen on.
+// address to listen on. An empty value is rejected rather than read as
+// either: on the command line --http= is a typo, and from the environment an
+// exported-but-empty OPENINGS_MCP_HTTP means "unset", so binding it to an
+// empty address would start a listener nobody asked for.
 func (f *httpFlag) Set(value string) error {
+	if value == "" {
+		return errors.New(`empty value: use --http for ` + defaultHTTPAddr + `, or --http=ADDR`)
+	}
 	if enabled, err := strconv.ParseBool(value); err == nil {
 		f.enabled, f.addr = enabled, defaultHTTPAddr
 		return nil

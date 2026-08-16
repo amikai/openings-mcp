@@ -24,7 +24,7 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Second)
 	defer cancel()
 
-	c := synopsys.NewClient(http.DefaultClient)
+	c := synopsys.NewClient(synopsys.Config{HTTPClient: http.DefaultClient})
 
 	results, err := c.Jobs(ctx, &synopsys.JobsRequest{
 		Keywords:       keyword,

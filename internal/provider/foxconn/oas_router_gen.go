@@ -49,54 +49,30 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/hh_recruit_tw_api/portal_api/JobVacancies"
+		case '/': // Prefix: "/hh_recruit_tw_api/portal_api/"
 
-			if l := len("/hh_recruit_tw_api/portal_api/JobVacancies"); len(elem) >= l && elem[0:l] == "/hh_recruit_tw_api/portal_api/JobVacancies" {
+			if l := len("/hh_recruit_tw_api/portal_api/"); len(elem) >= l && elem[0:l] == "/hh_recruit_tw_api/portal_api/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch r.Method {
-				case "GET":
-					s.handleListJobVacanciesRequest([0]string{}, elemIsEscaped, w, r)
-				default:
-					s.notAllowed(w, r, notAllowedParams{
-						allowedMethods: "GET",
-						allowedHeaders: nil,
-						acceptPost:     "",
-						acceptPatch:    "",
-					})
-				}
-
-				return
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
+			case 'J': // Prefix: "JobVacancies"
 
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+				if l := len("JobVacancies"); len(elem) >= l && elem[0:l] == "JobVacancies" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Leaf parameter, slashes are prohibited
-				idx := strings.IndexByte(elem, '/')
-				if idx >= 0 {
-					break
-				}
-				args[0] = elem
-				elem = ""
-
 				if len(elem) == 0 {
-					// Leaf node.
 					switch r.Method {
 					case "GET":
-						s.handleGetJobVacancyRequest([1]string{
-							args[0],
-						}, elemIsEscaped, w, r)
+						s.handleListJobVacanciesRequest([0]string{}, elemIsEscaped, w, r)
 					default:
 						s.notAllowed(w, r, notAllowedParams{
 							allowedMethods: "GET",
@@ -107,6 +83,108 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 					}
 
 					return
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleGetJobVacancyRequest([1]string{
+								args[0],
+							}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+
+				}
+
+			case 'L': // Prefix: "Labels/"
+
+				if l := len("Labels/"); len(elem) >= l && elem[0:l] == "Labels/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'T': // Prefix: "TalentZone/Codes"
+
+					if l := len("TalentZone/Codes"); len(elem) >= l && elem[0:l] == "TalentZone/Codes" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleListTalentZoneCodesRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+
+				case 'W': // Prefix: "Workplace/Codes"
+
+					if l := len("Workplace/Codes"); len(elem) >= l && elem[0:l] == "Workplace/Codes" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleListWorkplaceCodesRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+
 				}
 
 			}
@@ -197,62 +275,140 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 			break
 		}
 		switch elem[0] {
-		case '/': // Prefix: "/hh_recruit_tw_api/portal_api/JobVacancies"
+		case '/': // Prefix: "/hh_recruit_tw_api/portal_api/"
 
-			if l := len("/hh_recruit_tw_api/portal_api/JobVacancies"); len(elem) >= l && elem[0:l] == "/hh_recruit_tw_api/portal_api/JobVacancies" {
+			if l := len("/hh_recruit_tw_api/portal_api/"); len(elem) >= l && elem[0:l] == "/hh_recruit_tw_api/portal_api/" {
 				elem = elem[l:]
 			} else {
 				break
 			}
 
 			if len(elem) == 0 {
-				switch method {
-				case "GET":
-					r.name = ListJobVacanciesOperation
-					r.summary = "Search job vacancies (server-side filters, no pagination)."
-					r.operationID = "listJobVacancies"
-					r.operationGroup = ""
-					r.pathPattern = "/hh_recruit_tw_api/portal_api/JobVacancies"
-					r.args = args
-					r.count = 0
-					return r, true
-				default:
-					return
-				}
+				break
 			}
 			switch elem[0] {
-			case '/': // Prefix: "/"
+			case 'J': // Prefix: "JobVacancies"
 
-				if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+				if l := len("JobVacancies"); len(elem) >= l && elem[0:l] == "JobVacancies" {
 					elem = elem[l:]
 				} else {
 					break
 				}
 
-				// Param: "id"
-				// Leaf parameter, slashes are prohibited
-				idx := strings.IndexByte(elem, '/')
-				if idx >= 0 {
-					break
-				}
-				args[0] = elem
-				elem = ""
-
 				if len(elem) == 0 {
-					// Leaf node.
 					switch method {
 					case "GET":
-						r.name = GetJobVacancyOperation
-						r.summary = "Get one job vacancy by its opaque id."
-						r.operationID = "getJobVacancy"
+						r.name = ListJobVacanciesOperation
+						r.summary = "Search job vacancies (server-side filters, no pagination)."
+						r.operationID = "listJobVacancies"
 						r.operationGroup = ""
-						r.pathPattern = "/hh_recruit_tw_api/portal_api/JobVacancies/{id}"
+						r.pathPattern = "/hh_recruit_tw_api/portal_api/JobVacancies"
 						r.args = args
-						r.count = 1
+						r.count = 0
 						return r, true
 					default:
 						return
 					}
+				}
+				switch elem[0] {
+				case '/': // Prefix: "/"
+
+					if l := len("/"); len(elem) >= l && elem[0:l] == "/" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					// Param: "id"
+					// Leaf parameter, slashes are prohibited
+					idx := strings.IndexByte(elem, '/')
+					if idx >= 0 {
+						break
+					}
+					args[0] = elem
+					elem = ""
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = GetJobVacancyOperation
+							r.summary = "Get one job vacancy by its opaque id."
+							r.operationID = "getJobVacancy"
+							r.operationGroup = ""
+							r.pathPattern = "/hh_recruit_tw_api/portal_api/JobVacancies/{id}"
+							r.args = args
+							r.count = 1
+							return r, true
+						default:
+							return
+						}
+					}
+
+				}
+
+			case 'L': // Prefix: "Labels/"
+
+				if l := len("Labels/"); len(elem) >= l && elem[0:l] == "Labels/" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					break
+				}
+				switch elem[0] {
+				case 'T': // Prefix: "TalentZone/Codes"
+
+					if l := len("TalentZone/Codes"); len(elem) >= l && elem[0:l] == "TalentZone/Codes" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = ListTalentZoneCodesOperation
+							r.summary = "List talent zone codes."
+							r.operationID = "listTalentZoneCodes"
+							r.operationGroup = ""
+							r.pathPattern = "/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+				case 'W': // Prefix: "Workplace/Codes"
+
+					if l := len("Workplace/Codes"); len(elem) >= l && elem[0:l] == "Workplace/Codes" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = ListWorkplaceCodesOperation
+							r.summary = "List workplace location codes."
+							r.operationID = "listWorkplaceCodes"
+							r.operationGroup = ""
+							r.pathPattern = "/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
 				}
 
 			}

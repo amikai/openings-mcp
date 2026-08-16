@@ -87,7 +87,7 @@ func TestJobDetailRejectsInvalidID(t *testing.T) {
 	c := NewClient("https://careers.mediatek.com", nil)
 	for _, id := range []string{"", "123", "MTK-1", "MTK123/4"} {
 		_, err := c.JobDetail(t.Context(), id)
-		assert.ErrorContains(t, err, "expected MTK followed by digits")
+		assert.ErrorContains(t, err, "expected company prefix followed by digits")
 	}
 }
 

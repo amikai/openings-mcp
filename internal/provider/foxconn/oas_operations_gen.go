@@ -6,6 +6,8 @@ package foxconn
 type OperationName = string
 
 const (
-	GetJobVacancyOperation    OperationName = "GetJobVacancy"
-	ListJobVacanciesOperation OperationName = "ListJobVacancies"
+	GetJobVacancyOperation       OperationName = "GetJobVacancy"
+	ListJobVacanciesOperation    OperationName = "ListJobVacancies"
+	ListTalentZoneCodesOperation OperationName = "ListTalentZoneCodes"
+	ListWorkplaceCodesOperation  OperationName = "ListWorkplaceCodes"
 )

@@ -3,40 +3,14 @@ package synopsys
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func newMockServer(t *testing.T) *httptest.Server {
-	t.Helper()
-	mux := http.NewServeMux()
-	mux.HandleFunc("/search-jobs/results", serveTestdata("testdata/jobs_rsp.json"))
-	mux.HandleFunc("/job/", serveTestdata("testdata/job_detail_rsp.html"))
-	return httptest.NewServer(mux)
-}
-
-func serveTestdata(path string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		data, err := os.ReadFile(path)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if strings.HasSuffix(path, ".json") {
-			w.Header().Set("Content-Type", "application/json")
-		} else {
-			w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		}
-		w.Write(data)
-	}
-}
-
 func TestJobs(t *testing.T) {
-	srv := newMockServer(t)
+	srv := NewMockServer()
 	defer srv.Close()
 	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
@@ -72,12 +46,34 @@ func TestJobsErrorsWhenHasJobsButNoCards(t *testing.T) {
 }
 
 func TestJobDetail(t *testing.T) {
-	srv := newMockServer(t)
+	srv := NewMockServer()
 	defer srv.Close()
 	c := &Client{httpClient: srv.Client(), baseURL: srv.URL}
 
-	got, err := c.JobDetail(t.Context(), "bengaluru", "staff-software-engineer", "93498496944")
+	got, err := c.JobDetail(t.Context(), MockCity, MockSlug, MockJobID)
 	require.NoError(t, err)
 
 	assert.Equal(t, wantJobDetail, got)
+}
+
+func TestResolveLocation(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+	c := NewClient(Config{BaseURL: srv.URL, HTTPClient: srv.Client()})
+
+	got, err := c.ResolveLocation(t.Context(), MockLocationTerm)
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+	assert.Equal(t, "Bengaluru, Karnataka, India", got[0].Value)
+
+	// An unrecognized place is HTTP 200 with an empty array, not an error.
+	got, err = c.ResolveLocation(t.Context(), "not a place")
+	require.NoError(t, err)
+	assert.Empty(t, got)
+}
+
+func TestJobURL(t *testing.T) {
+	assert.Equal(t,
+		"https://careers.synopsys.com/job/bengaluru/staff-software-engineer/44408/93498496944",
+		Job{City: MockCity, Slug: MockSlug, JobID: MockJobID}.URL())
 }

@@ -21,6 +21,12 @@ var mockJobDetailRsp []byte
 //go:embed testdata/job_not_found_rsp.json
 var mockJobNotFoundRsp []byte
 
+//go:embed testdata/workplace_codes_rsp.json
+var mockWorkplaceCodesRsp []byte
+
+//go:embed testdata/talent_zone_codes_rsp.json
+var mockTalentZoneCodesRsp []byte
+
 // MockDetailID is the opaque detail id captured in job_detail_rsp.json.
 const MockDetailID = "08de75d7bd7611a790b20d5b47c2f1bb"
 
@@ -58,6 +64,9 @@ func NewMockServer() *httptest.Server {
 		w.WriteHeader(http.StatusNotFound)
 		w.Write(mockJobNotFoundRsp)
 	})
+
+	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes", serveMockJSON(mockWorkplaceCodesRsp))
+	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes", serveMockJSON(mockTalentZoneCodesRsp))
 
 	return httptest.NewServer(mux)
 }

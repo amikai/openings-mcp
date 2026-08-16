@@ -34,6 +34,30 @@ info:
       keyword can match jobs whose `job_name` does not contain it. Accepts
       URL-encoded Chinese.
 
+    * **zh-TW only; there is no English surface.** Every display string —
+      the Labels `name`s, `loc_name`, `job_type_name`, the desc_* bodies —
+      comes back in Traditional Chinese, including for jobs located abroad
+      (`workplaceCode=AM` returns `loc_name: "美國"`, not "USA"). Verified
+      2026-08-16 that none of `Accept-Language`, `?lang=`, `?locale=`,
+      `?language=`, `?culture=`, or a `lang` cookie changes it, and that no
+      sibling English portal exists (`isite-web-en` and `hh_recruit_en_api`
+      both 404) — this is the Taiwan portal and it is monolingual. Only
+      `job_name` is mixed, because employers type some titles in English
+      ("FAE") and some in Chinese. Callers needing English must translate.
+
+    * **`workplaceCode` is not ISO 3166.** The values look like alpha-2
+      country codes and three of them do coincide (PH, HK, JP), but the
+      rest are ad-hoc abbreviations of the English name: TA (Taiwan, not
+      TW), CH (China, not CN), VM (Vietnam, not VN), AM (America, not US),
+      BZ (Brazil, not BR), MC (Mexico, not MX), ZK (Czechia, not CZ).
+      Several collide with a different ISO country — CH is Switzerland, AM
+      is Armenia, BZ is Belize, MC is Monaco — and ID/IND are inverted
+      relative to ISO: here ID is India and IND is Indonesia, where ISO has
+      ID for Indonesia and IND (alpha-3) for India. Combined with the
+      no-404 behavior below, an ISO code guessed instead of looked up is
+      not an error, just an empty board. Verified against the live enum
+      2026-08-16.
+
     * **No 404 on a bad filter.** An unknown/invalid `workplaceCode` or
       `talentZoneCode`, and a keyword with zero matches, all return HTTP
       200 with an empty array `[]` — not an error. An empty result is
@@ -56,9 +80,15 @@ info:
       `traceId` is per-request and unstable — never assert its value.
 
     * The two Labels/*/Codes reference endpoints (workplace and
-      talent-zone enums) are intentionally NOT modeled here. They change
-      rarely and are hand-transcribed into Go as static reference data
-      (see codes.go), the same way a curated roster is.
+      talent-zone enums) are modeled below and fetched at runtime. They
+      were once hand-transcribed into Go as static reference data on the
+      grounds that they change rarely, and they do: the transcription still
+      matched both endpoints exactly when checked on 2026-08-16. They are
+      fetched anyway because the talent-zone list is keyed by dated
+      recruitment campaigns (e.g. Y221209-01), so the copy is one campaign
+      away from disagreeing with the board, and because a second source of
+      truth let the CLI and the MCP tools answer the same question
+      differently. Both endpoints are cheap and unauthenticated.
 
     * Response content type is `application/json; charset=utf-8`; the
       generated decoder strips the charset parameter before matching.
@@ -81,9 +111,8 @@ paths:
           name: workplaceCode
           description: >
             Location filter, e.g. TA (Taiwan), CH (China), VM (Vietnam).
-            Full enum is the Labels/Workplace/Codes reference data
-            (codes.go). An unknown value yields HTTP 200 with an empty
-            array, not a 404.
+            Full enum is the Labels/Workplace/Codes endpoint below. An
+            unknown value yields HTTP 200 with an empty array, not a 404.
           required: false
           schema:
             type: string
@@ -92,8 +121,8 @@ paths:
           description: >
             Recruitment-track filter, e.g. MA (新幹班/management associate),
             TALENTS (一般招募), INTERN, PT, DR (身障友善). Full enum is the
-            Labels/TalentZone/Codes reference data (codes.go). An unknown
-            value yields HTTP 200 with an empty array, not a 404.
+            Labels/TalentZone/Codes endpoint below. An unknown value
+            yields HTTP 200 with an empty array, not a 404.
           required: false
           schema:
             type: string
@@ -150,6 +179,32 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+
+  /hh_recruit_tw_api/portal_api/Labels/Workplace/Codes:
+    get:
+      operationId: listWorkplaceCodes
+      summary: List workplace location codes.
+      tags: [filters]
+      responses:
+        "200":
+          description: List of workplace codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkplaceCodeList"
+
+  /hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes:
+    get:
+      operationId: listTalentZoneCodes
+      summary: List talent zone codes.
+      tags: [filters]
+      responses:
+        "200":
+          description: List of talent zone codes.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TalentZoneCodeList"
 
 components:
   schemas:
@@ -316,10 +371,50 @@ components:
           type: string
         title:
           type: string
-          example: Not Found
         status:
           type: integer
-          example: 404
         traceId:
           type: string
           description: Per-request and unstable — never assert its value.
+
+    WorkplaceCodeList:
+      type: array
+      items:
+        $ref: "#/components/schemas/WorkplaceCode"
+
+    WorkplaceCode:
+      type: object
+      required: [code, name]
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        seq:
+          type: [integer, "null"]
+
+    TalentZoneCodeList:
+      type: array
+      items:
+        $ref: "#/components/schemas/TalentZoneCode"
+
+    TalentZoneCode:
+      type: object
+      required: [code, name]
+      properties:
+        id:
+          type: [string, "null"]
+        code:
+          type: string
+        name:
+          type: string
+        seq:
+          type: [integer, "null"]
+        parent_id:
+          type: [string, "null"]
+        parent_code:
+          type: [string, "null"]
+        parent_name:
+          type: [string, "null"]
+        parent_seq:
+          type: [integer, "null"]

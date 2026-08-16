@@ -148,3 +148,31 @@ func TestGetJobVacancyNotFound(t *testing.T) {
 	assert.Equal(t, NewOptInt(404), got.Status)
 	assert.Equal(t, NewOptString("Not Found"), got.Title)
 }
+
+func TestListWorkplaceCodes(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+
+	codes, err := client.ListWorkplaceCodes(t.Context())
+	require.NoError(t, err)
+	assert.NotEmpty(t, codes)
+	assert.Equal(t, "TA", codes[0].Code)
+	assert.Equal(t, "台灣", codes[0].Name)
+}
+
+func TestListTalentZoneCodes(t *testing.T) {
+	srv := NewMockServer()
+	defer srv.Close()
+
+	client, err := NewClient(srv.URL)
+	require.NoError(t, err)
+
+	codes, err := client.ListTalentZoneCodes(t.Context())
+	require.NoError(t, err)
+	assert.NotEmpty(t, codes)
+	assert.Equal(t, "IAI_KS", codes[0].Code)
+	assert.Equal(t, "高雄軟體研發中心專區", codes[0].Name)
+}
