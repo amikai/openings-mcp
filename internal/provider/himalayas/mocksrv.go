@@ -7,22 +7,22 @@ import (
 )
 
 //go:embed testdata/browse_rsp.json
-var mockBrowseRsp []byte
+var _mockBrowseRsp []byte
 
 //go:embed testdata/search_rsp.json
-var mockSearchRsp []byte
+var _mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var mockSearchFilteredRsp []byte
+var _mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_company_rsp.json
-var mockSearchCompanyRsp []byte
+var _mockSearchCompanyRsp []byte
 
 //go:embed testdata/search_invalid_country_rsp.json
-var mockSearchInvalidCountryRsp []byte
+var _mockSearchInvalidCountryRsp []byte
 
 //go:embed testdata/search_unknown_company_rsp.json
-var mockSearchUnknownCompanyRsp []byte
+var _mockSearchUnknownCompanyRsp []byte
 
 // MockUnknownCompany is a company slug deliberately absent from Himalayas,
 // matching the quirk captured in testdata/search_unknown_company_rsp.json:
@@ -37,21 +37,21 @@ const MockUnknownCompany = "this-company-does-not-exist-xyz"
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/jobs/api", serveMockJSON(mockBrowseRsp))
+	mux.HandleFunc("/jobs/api", serveMockJSON(_mockBrowseRsp))
 
 	mux.HandleFunc("/jobs/api/search", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		switch {
 		case q.Get("country") == "Narnia":
-			serveMockError(w, mockSearchInvalidCountryRsp)
+			serveMockError(w, _mockSearchInvalidCountryRsp)
 		case q.Get("company") == MockUnknownCompany:
-			serveMockError(w, mockSearchUnknownCompanyRsp)
+			serveMockError(w, _mockSearchUnknownCompanyRsp)
 		case q.Get("company") == "leland":
-			serveMockJSON(mockSearchCompanyRsp)(w, r)
+			serveMockJSON(_mockSearchCompanyRsp)(w, r)
 		case q.Get("country") == "US":
-			serveMockJSON(mockSearchFilteredRsp)(w, r)
+			serveMockJSON(_mockSearchFilteredRsp)(w, r)
 		default:
-			serveMockJSON(mockSearchRsp)(w, r)
+			serveMockJSON(_mockSearchRsp)(w, r)
 		}
 	})
 

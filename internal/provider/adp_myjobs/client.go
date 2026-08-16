@@ -19,15 +19,15 @@ const (
 )
 
 const (
-	DefaultPageSize      = 100
-	DefaultPageSpacing   = 250 * time.Millisecond
-	listingPath          = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters"
-	customFiltersPath    = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters"
-	searchMetaPathPrefix = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-meta/"
-	careerSitePathPrefix = "/public/staffing/v1/career-site/"
-	defaultSelect        = "reqId,jobTitle,publishedJobTitle,type,jobDescription,jobQualifications,workLevelCode,clientRequisitionID,postingDate,requisitionLocations"
-	defaultOrderBy       = "postingDate desc"
-	defaultTZ            = "America/New_York"
+	DefaultPageSize       = 100
+	DefaultPageSpacing    = 250 * time.Millisecond
+	_listingPath          = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters"
+	_customFiltersPath    = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-custom-filters"
+	_searchMetaPathPrefix = "/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/search-meta/"
+	_careerSitePathPrefix = "/public/staffing/v1/career-site/"
+	_defaultSelect        = "reqId,jobTitle,publishedJobTitle,type,jobDescription,jobQualifications,workLevelCode,clientRequisitionID,postingDate,requisitionLocations"
+	_defaultOrderBy       = "postingDate desc"
+	_defaultTZ            = "America/New_York"
 )
 
 // Config configures a Client. Zero values pick production defaults.
@@ -139,7 +139,7 @@ func (c *Client) GetCareerSite(ctx context.Context, slug string) (*CareerSite, e
 	if slug == "" {
 		return nil, fmt.Errorf("adp_myjobs: empty slug")
 	}
-	u := c.careerSiteBase + careerSitePathPrefix + url.PathEscape(slug)
+	u := c.careerSiteBase + _careerSitePathPrefix + url.PathEscape(slug)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
@@ -177,8 +177,8 @@ func (c *Client) GetCustomFilters(ctx context.Context, slug string) (*CustomFilt
 		return nil, err
 	}
 	q := url.Values{}
-	q.Set("tz", defaultTZ)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.listingBase+customFiltersPath+"?"+encodeQuery(q), nil)
+	q.Set("tz", _defaultTZ)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.listingBase+_customFiltersPath+"?"+encodeQuery(q), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -261,7 +261,7 @@ func (c *Client) GetJobRequisition(ctx context.Context, slug, reqID string) (*Jo
 	if err != nil {
 		return nil, err
 	}
-	u := c.listingBase + searchMetaPathPrefix + url.PathEscape(reqID)
+	u := c.listingBase + _searchMetaPathPrefix + url.PathEscape(reqID)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {
 		return nil, err
@@ -324,18 +324,18 @@ func encodeQuery(q url.Values) string {
 
 func (c *Client) listOnce(ctx context.Context, slug string, sess session, p ListParams) (*ListResult, error) {
 	q := url.Values{}
-	q.Set("$orderby", defaultOrderBy)
-	q.Set("$select", defaultSelect)
+	q.Set("$orderby", _defaultOrderBy)
+	q.Set("$select", _defaultSelect)
 	q.Set("$top", strconv.Itoa(p.Top))
 	q.Set("$skip", strconv.Itoa(p.Skip))
-	q.Set("tz", defaultTZ)
+	q.Set("tz", _defaultTZ)
 	if s := strings.TrimSpace(p.Search); s != "" {
 		q.Set("$search", s)
 	}
 	if len(p.CustomFilters) > 0 {
 		q.Set("$filter", filterExpr(p.CustomFilters))
 	}
-	u := c.listingBase + listingPath + "?" + encodeQuery(q)
+	u := c.listingBase + _listingPath + "?" + encodeQuery(q)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
 	if err != nil {

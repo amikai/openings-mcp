@@ -12,7 +12,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const jobsPath = "/jobs/results"
+const _jobsPath = "/jobs/results"
 
 type Client struct {
 	httpClient *http.Client
@@ -71,7 +71,7 @@ func (c *Client) jobsRawURL(req *JobsRequest) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("parse url %q: %w", c.baseURL, err)
 	}
-	u = u.JoinPath(jobsPath)
+	u = u.JoinPath(_jobsPath)
 
 	q := u.Query()
 	if req.Query != "" {
@@ -121,7 +121,7 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	if jobID == "" {
 		return nil, errors.New("empty job id")
 	}
-	u, err := url.JoinPath(c.baseURL, jobsPath, jobID)
+	u, err := url.JoinPath(c.baseURL, _jobsPath, jobID)
 	if err != nil {
 		return nil, fmt.Errorf("build job detail url: %w", err)
 	}

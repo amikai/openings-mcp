@@ -17,9 +17,13 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/ultipro"
 )
 
-const pageSize = 20
+const _pageSize = 20
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("ultipro")
 	var (
 		company = rootFlags.StringLong("company", "", `curated company name, company code, or career-board URL, e.g. "TechnoServe", "TEC1006TESER", or a recruiting.ultipro.com/.../JobBoard/... URL`)
@@ -97,22 +101,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveCompany accepts a curated display name, a curated company code, or
@@ -171,7 +176,7 @@ type searchFlags struct {
 
 // locationTypeCodes maps the CLI's enum flag to the LoadSearchResults
 // fieldName-37 values (see openapi.yaml: 0=Hybrid, 1=On-site, 2=Remote).
-var locationTypeCodes = map[string]string{"hybrid": "0", "onsite": "1", "remote": "2"}
+var _locationTypeCodes = map[string]string{"hybrid": "0", "onsite": "1", "remote": "2"}
 
 func runSearch(ctx context.Context, f searchFlags) error {
 	name, site, err := resolveCompany(f.company)
@@ -189,8 +194,8 @@ func runSearch(ctx context.Context, f searchFlags) error {
 
 	req := ultipro.SearchRequest{
 		Query: f.keyword,
-		Top:   pageSize,
-		Skip:  (f.page - 1) * pageSize,
+		Top:   _pageSize,
+		Skip:  (f.page - 1) * _pageSize,
 	}
 	if f.location != "" {
 		id, err := resolveCatalogValue(ctx, client.Locations, f.location, "location")
@@ -207,7 +212,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		req.Filters = append(req.Filters, ultipro.SearchFilter{FieldName: 5, Values: []string{id}})
 	}
 	if f.locationType != "" {
-		req.Filters = append(req.Filters, ultipro.SearchFilter{FieldName: 37, Values: []string{locationTypeCodes[f.locationType]}})
+		req.Filters = append(req.Filters, ultipro.SearchFilter{FieldName: 37, Values: []string{_locationTypeCodes[f.locationType]}})
 	}
 
 	res, err := client.Search(ctx, req)

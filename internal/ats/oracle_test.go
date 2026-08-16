@@ -16,7 +16,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/oracle"
 )
 
-const oracleMayoKey = "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1"
+const _oracleMayoKey = "fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/CX_1"
 
 func testOracleAdapter(t *testing.T) (*OracleAdapter, *[]string) {
 	t.Helper()
@@ -54,7 +54,7 @@ func testOracleAdapter(t *testing.T) (*OracleAdapter, *[]string) {
 
 func oracleMayoSlug(t *testing.T) string {
 	t.Helper()
-	company, ok := oracle.CompaniesByKey[oracleMayoKey]
+	company, ok := oracle.CompaniesByKey[_oracleMayoKey]
 	require.True(t, ok)
 	return oracleCompanySlug(company)
 }

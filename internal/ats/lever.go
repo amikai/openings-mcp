@@ -23,6 +23,8 @@ type LeverAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*LeverAdapter)(nil)
+
 // leverCareersURLRE matches Lever board URLs and captures the organization
 // slug (first path segment), including the EU host.
 //
@@ -30,7 +32,7 @@ type LeverAdapter struct {
 //   - jobs.lever.co/acme
 //   - jobs.eu.lever.co/acme
 //   - jobs.lever.co/acme/00000000-0000
-var leverCareersURLRE = regexp.MustCompile(
+var _leverCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs(?:\.eu)?\.lever\.co/(?P<slug>[^/]+)`,
 )
 
@@ -55,7 +57,7 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 // ParseCareersURL recognizes Lever-hosted board URLs; the first path
 // segment is the organization, which is already this adapter's slug form.
 func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(leverCareersURLRE, u)
+	return matchCareersSlug(_leverCareersURLRE, u)
 }
 
 // CareersURL renders the roster company's public job board page.
@@ -129,7 +131,7 @@ func (a *LeverAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, e
 			return nil, err
 		}
 		cat := p.Categories.Value
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if cat.Team.Value != "" {
 			fields["team"] = []string{cat.Team.Value}
 		}

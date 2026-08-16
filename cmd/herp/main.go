@@ -17,9 +17,13 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/herp"
 )
 
-const baseURL = "https://herp.careers"
+const _baseURL = "https://herp.careers"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("herp")
 	var (
 		company = rootFlags.StringLong("company", "", "HERP Career company slug, e.g. notainc (see 'herp companies' for the curated list)")
@@ -82,22 +86,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or get) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func runCompanies(format string) error {
@@ -124,7 +129,7 @@ func fetchBoard(ctx context.Context, company string, timeout time.Duration) (*he
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := herp.NewClient(baseURL)
+	client, err := herp.NewClient(_baseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -190,9 +195,9 @@ func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 // linked to the HERP Hire career page instead.
 func jobURL(board *herp.CompanyBoard, id string) string {
 	if board.CompanyIsApplicationEnabled.Or(true) {
-		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", baseURL, board.CompanySlug, id)
+		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", _baseURL, board.CompanySlug, id)
 	}
-	return fmt.Sprintf("%s/v1/%s/%s", baseURL, board.CompanySlug, id)
+	return fmt.Sprintf("%s/v1/%s/%s", _baseURL, board.CompanySlug, id)
 }
 
 // searchFlags carries the parsed "search" subcommand flags into runSearch.

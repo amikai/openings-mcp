@@ -18,16 +18,20 @@ import (
 // Enum values mirror openapi.yaml's searchJobs parameters. The site silently
 // ignores unrecognized values, so the flags reject them up front.
 var (
-	targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
-	degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
-	employmentTypes = []string{"FULL_TIME", "PART_TIME", "TEMPORARY", "INTERN"}
-	companies       = []string{"DeepMind", "GFiber", "Google", "Verily Life Sciences", "Waymo", "Wing", "YouTube"}
-	sortOrders      = []string{"relevance", "date"}
+	_targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
+	_degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
+	_employmentTypes = []string{"FULL_TIME", "PART_TIME", "TEMPORARY", "INTERN"}
+	_companies       = []string{"DeepMind", "GFiber", "Google", "Verily Life Sciences", "Waymo", "Wing", "YouTube"}
+	_sortOrders      = []string{"relevance", "date"}
 )
 
 // main issues a single JobsRequest built entirely from flags, then fetches
 // JobDetail for the first ten jobs the search returned.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("google")
 	var (
 		baseURL        = fs.StringLong("base-url", "https://www.google.com/about/careers/applications", "Google Careers site base URL")
@@ -35,21 +39,21 @@ func main() {
 		query          = fs.StringLong("query", "", "free-text search query")
 		location       = fs.StringLong("location", "", "location filter (city, region, or country)")
 		hasRemote      = fs.BoolLong("has-remote", "only jobs marked Remote eligible")
-		targetLevel    = fs.StringEnumLong("target-level", usageWithChoices("Experience level", targetLevels), withUnset(targetLevels)...)
+		targetLevel    = fs.StringEnumLong("target-level", usageWithChoices("Experience level", _targetLevels), withUnset(_targetLevels)...)
 		skills         = fs.StringLong("skills", "", "free-text skills and qualifications filter")
-		degree         = fs.StringEnumLong("degree", usageWithChoices("Minimum education level", degrees), withUnset(degrees)...)
-		employmentType = fs.StringEnumLong("employment-type", usageWithChoices("Job type", employmentTypes), withUnset(employmentTypes)...)
-		company        = fs.StringEnumLong("company", usageWithChoices("Organization", companies), withUnset(companies)...)
-		sortBy         = fs.StringEnumLong("sort-by", usageWithChoices("Sort order", sortOrders), withUnset(sortOrders)...)
+		degree         = fs.StringEnumLong("degree", usageWithChoices("Minimum education level", _degrees), withUnset(_degrees)...)
+		employmentType = fs.StringEnumLong("employment-type", usageWithChoices("Job type", _employmentTypes), withUnset(_employmentTypes)...)
+		company        = fs.StringEnumLong("company", usageWithChoices("Organization", _companies), withUnset(_companies)...)
+		sortBy         = fs.StringEnumLong("sort-by", usageWithChoices("Sort order", _sortOrders), withUnset(_sortOrders)...)
 		page           = fs.IntLong("page", 1, "1-based page number; 20 results per page")
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	req := buildJobsRequest(searchFlags{
@@ -72,7 +76,7 @@ func main() {
 	search, err := client.Jobs(ctx, req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	jobs := jobsForDetail(search.Jobs)
@@ -81,7 +85,7 @@ func main() {
 		detail, err := client.JobDetail(ctx, job.ID)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.ID, err)
-			os.Exit(1)
+			return 1
 		}
 		details[job.ID] = detail
 	}
@@ -93,6 +97,7 @@ func main() {
 		jobs:    jobs,
 		details: details,
 	})
+	return 0
 }
 
 // searchFlags carries the parsed flag values into buildJobsRequest.

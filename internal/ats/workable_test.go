@@ -56,7 +56,7 @@ type workableSearchBody struct {
 	Worktype   []string            `json:"worktype"`
 }
 
-const workableTestFacetsJSON = `{
+const _workableTestFacetsJSON = `{
 	"locations": [
 		{"country": "Greece", "countryCode": "GR", "region": "Attica", "city": "Athens", "display": "Athens, Greece"},
 		{"country": "United States", "countryCode": "US", "display": "United States"}
@@ -80,7 +80,7 @@ func workableSearchServer(
 	var bodies []workableSearchBody
 	// Index every job by shortcode so detail enrichment can resolve bodies
 	// regardless of which query page produced the candidate.
-	byShortcode := map[string]workableTestJob{}
+	byShortcode := make(map[string]workableTestJob)
 	for _, jobs := range byQuery {
 		for _, j := range jobs {
 			byShortcode[j.shortcode] = j
@@ -90,7 +90,7 @@ func workableSearchServer(
 	mux.HandleFunc("/api/v3/accounts/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/jobs/filters") {
 			w.Header().Set("Content-Type", "application/json")
-			fmt.Fprint(w, workableTestFacetsJSON)
+			fmt.Fprint(w, _workableTestFacetsJSON)
 			return
 		}
 		var body workableSearchBody
@@ -111,7 +111,7 @@ func workableSearchServer(
 			}
 		}
 		start := min(offset, len(jobs))
-		end := min(start+workableUpstreamPageSize, len(jobs))
+		end := min(start+_workableUpstreamPageSize, len(jobs))
 		results := make([]map[string]any, 0, end-start)
 		for _, j := range jobs[start:end] {
 			row := map[string]any{
@@ -208,7 +208,7 @@ func TestWorkableRosterMirrorsProviderRoster(t *testing.T) {
 	require.NoError(t, err)
 	roster := a.Roster()
 	require.Len(t, roster, len(workable.Companies))
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, c := range roster {
 		assert.Equal(t, strings.ToLower(c.Slug), c.Slug, "slug %q must be lowercase", c.Slug)
 		require.Falsef(t, seen[c.Slug], "duplicate slug %q in roster", c.Slug)
@@ -485,13 +485,13 @@ func TestWorkableSearchRejectsUnboundedCandidateSet(t *testing.T) {
 		map[string][]workableTestJob{
 			"common": {{shortcode: "a", title: "Common Role", location: "Anywhere"}},
 		},
-		map[string]int{"common": maxWorkableCandidates + 1},
+		map[string]int{"common": _maxWorkableCandidates + 1},
 	)
 	a := newWorkableSearchAdapter(t, server.URL)
 
 	_, err := a.Search(t.Context(), "acme", SearchParams{Query: "common"})
 	require.ErrorContains(t, err, "search is too broad")
-	require.ErrorContains(t, err, strconv.Itoa(maxWorkableCandidates+1))
+	require.ErrorContains(t, err, strconv.Itoa(_maxWorkableCandidates+1))
 }
 
 func TestWorkableSearchPagination(t *testing.T) {
@@ -609,7 +609,7 @@ func TestWorkableCareersHostPatternRegistered(t *testing.T) {
 	// The registry only advertises careers-URL shapes for adapters listed
 	// in careersHostPatternsByAdapter; a missing entry silently degrades
 	// the "unrecognized careers URL" teaching error.
-	assert.Contains(t, careersHostPatternsByAdapter, "workable")
+	assert.Contains(t, _careersHostPatternsByAdapter, "workable")
 }
 
 func TestWorkableResolvesThroughRegistry(t *testing.T) {

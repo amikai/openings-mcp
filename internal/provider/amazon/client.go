@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	defaultResultLimit = 10
-	maxResultLimit     = 100
+	_defaultResultLimit = 10
+	_maxResultLimit     = 100
 )
 
 // ErrJobNotFound reports an Amazon posting ID that has no exact live match.
@@ -44,10 +44,10 @@ func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResult, 
 
 	limit := req.Limit
 	if limit == 0 {
-		limit = defaultResultLimit
+		limit = _defaultResultLimit
 	}
-	if limit < 1 || limit > maxResultLimit {
-		return nil, fmt.Errorf("limit must be between 1 and %d, got %d", maxResultLimit, limit)
+	if limit < 1 || limit > _maxResultLimit {
+		return nil, fmt.Errorf("limit must be between 1 and %d, got %d", _maxResultLimit, limit)
 	}
 
 	sort := req.Sort

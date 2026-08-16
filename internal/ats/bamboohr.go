@@ -25,7 +25,7 @@ var _ Adapter = (*BambooHRAdapter)(nil)
 // Examples (hostname):
 //   - concept2.bamboohr.com
 //   - acme.bamboohr.com
-var bambooHRCareersHostRE = regexp.MustCompile(
+var _bambooHRCareersHostRE = regexp.MustCompile(
 	`(?i)^(?P<slug>[^.]+)\.bamboohr\.com$`,
 )
 
@@ -44,9 +44,9 @@ type BambooHRAdapter struct {
 }
 
 const (
-	bambooHRDetailConcurrency = 8
+	_bambooHRDetailConcurrency = 8
 	// bambooHRBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://curtinmaritime.bamboohr.com").
-	bambooHRBaseURLTpl = "https://%s.bamboohr.com"
+	_bambooHRBaseURLTpl = "https://%s.bamboohr.com"
 )
 
 // NewBambooHRAdapter derives a redirect-blocking copy of hc: BambooHR
@@ -61,7 +61,7 @@ func NewBambooHRAdapter(hc *http.Client, dumpCache *DumpCache) *BambooHRAdapter 
 	return &BambooHRAdapter{
 		hc: &c,
 		baseURL: func(slug string) string {
-			return fmt.Sprintf(bambooHRBaseURLTpl, slug)
+			return fmt.Sprintf(_bambooHRBaseURLTpl, slug)
 		},
 		dumpCache: dumpCache,
 	}
@@ -77,7 +77,7 @@ func (a *BambooHRAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-var bambooHRReservedHosts = map[string]bool{
+var _bambooHRReservedHosts = map[string]bool{
 	"api":           true,
 	"app":           true,
 	"careers":       true,
@@ -93,12 +93,12 @@ var bambooHRReservedHosts = map[string]bool{
 
 // ParseCareersURL recognizes BambooHR subdomain careers pages.
 func (a *BambooHRAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	m := bambooHRCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
+	m := _bambooHRCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
 	if m == nil {
 		return "", false
 	}
-	slug := namedGroup(bambooHRCareersHostRE, m, "slug")
-	if slug == "" || bambooHRReservedHosts[slug] {
+	slug := namedGroup(_bambooHRCareersHostRE, m, "slug")
+	if slug == "" || _bambooHRReservedHosts[slug] {
 		return "", false
 	}
 	return slug, true
@@ -227,7 +227,7 @@ func (a *BambooHRAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob
 
 	jobs := make([]dumpJob, 0, len(rows))
 	for _, row := range rows {
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if v := row.DepartmentLabel.Or(""); v != "" {
 			fields["department"] = []string{v}
 		}
@@ -278,7 +278,7 @@ func (a *BambooHRAdapter) enrichDescriptions(
 		return err
 	}
 	g, gCtx := errgroup.WithContext(ctx)
-	g.SetLimit(bambooHRDetailConcurrency)
+	g.SetLimit(_bambooHRDetailConcurrency)
 	for i := range jobs {
 		i := i
 		g.Go(func() error {

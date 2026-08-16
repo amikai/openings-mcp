@@ -27,7 +27,7 @@ const DefaultCountryName = "taiwan"
 // python-jobspy but rejected live with BAD_USER_INPUT ("does not correspond
 // to a valid Indeed site") are omitted: Bangladesh, Bulgaria, Croatia,
 // Cyprus, Estonia, Latvia, Lithuania, Malta, Slovakia, Slovenia.
-var countries = map[string]Country{
+var _countries = map[string]Country{
 	"argentina":            {"ar", "AR"},
 	"australia":            {"au", "AU"},
 	"austria":              {"at", "AT"},
@@ -102,6 +102,6 @@ var countries = map[string]Country{
 // "United States" all resolve to the same entry). Matching is
 // case-insensitive; an unknown name reports ok=false.
 func CountryByName(name string) (Country, bool) {
-	c, ok := countries[strings.ToLower(strings.TrimSpace(name))]
+	c, ok := _countries[strings.ToLower(strings.TrimSpace(name))]
 	return c, ok
 }

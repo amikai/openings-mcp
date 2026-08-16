@@ -8,19 +8,19 @@ import (
 )
 
 //go:embed testdata/search_rsp.json
-var mockSearchRsp []byte
+var _mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var mockSearchFilteredRsp []byte
+var _mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_invalid_sort_rsp.json
-var mockSearchInvalidSortRsp []byte
+var _mockSearchInvalidSortRsp []byte
 
 //go:embed testdata/detail_rsp.json
-var mockDetailRsp []byte
+var _mockDetailRsp []byte
 
 //go:embed testdata/detail_not_found_rsp.json
-var mockDetailNotFoundRsp []byte
+var _mockDetailNotFoundRsp []byte
 
 // MockJobSlug is the slug served by NewMockServer's detail endpoint, matching
 // testdata/detail_rsp.json. It is a fully remote job, so it exercises the
@@ -42,20 +42,20 @@ func NewMockServer() *httptest.Server {
 		q := r.URL.Query()
 		switch {
 		case q.Get("sort") != "" && q.Get("sort") != "date" && q.Get("sort") != "salary":
-			serveMockJSON(w, http.StatusBadRequest, mockSearchInvalidSortRsp)
+			serveMockJSON(w, http.StatusBadRequest, _mockSearchInvalidSortRsp)
 		case q.Get("work_arrangement") == "remote" && q.Get("country") == "Germany":
-			serveMockJSON(w, http.StatusOK, mockSearchFilteredRsp)
+			serveMockJSON(w, http.StatusOK, _mockSearchFilteredRsp)
 		default:
-			serveMockJSON(w, http.StatusOK, mockSearchRsp)
+			serveMockJSON(w, http.StatusOK, _mockSearchRsp)
 		}
 	})
 
 	mux.HandleFunc("/api/v2/jobs/", func(w http.ResponseWriter, r *http.Request) {
 		switch strings.TrimPrefix(r.URL.Path, "/api/v2/jobs/") {
 		case MockJobSlug:
-			serveMockJSON(w, http.StatusOK, mockDetailRsp)
+			serveMockJSON(w, http.StatusOK, _mockDetailRsp)
 		default:
-			serveMockJSON(w, http.StatusNotFound, mockDetailNotFoundRsp)
+			serveMockJSON(w, http.StatusNotFound, _mockDetailNotFoundRsp)
 		}
 	})
 

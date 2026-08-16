@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public Teamtailor career site.
 // Host is the career site's lowercase hostname and the provider's tenant key.
@@ -24,11 +24,11 @@ type Company struct {
 }
 
 // careersURLTpl formats a Teamtailor jobs page URL (e.g. "https://career.teamtailor.com/jobs").
-const careersURLTpl = "https://%s/jobs"
+const _careersURLTpl = "https://%s/jobs"
 
 // CareersURL returns the company's human-facing Teamtailor jobs page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Host)
+	return fmt.Sprintf(_careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed Teamtailor career site, sorted by company
@@ -39,7 +39,7 @@ var Companies = mustLoadCompanies()
 var CompaniesByHost = buildHostIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("teamtailor: load companies.yaml: %v", err))
 	}

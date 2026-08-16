@@ -13,7 +13,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/recruitee"
 )
 
-const remoteLocation = "remote"
+const _remoteLocation = "remote"
 
 func testRecruiteeAdapter(t *testing.T) (*RecruiteeAdapter, string) {
 	t.Helper()
@@ -66,7 +66,7 @@ func TestRecruiteeSearchAll(t *testing.T) {
 	require.NoError(t, err)
 	// bunq mock has 58 offers (let's check total returned in Search page 1 which is limited to pageSize=20)
 	assert.Greater(t, res.TotalCount, 0)
-	assert.Len(t, res.Jobs, min(pageSize, res.TotalCount))
+	assert.Len(t, res.Jobs, min(_pageSize, res.TotalCount))
 	for _, j := range res.Jobs {
 		assert.NotEmpty(t, j.JobID)
 		assert.NotEmpty(t, j.Title)
@@ -126,7 +126,7 @@ func TestRecruiteeUnknownLocationIsNotRemote(t *testing.T) {
 	a := NewRecruiteeAdapter(&http.Client{Timeout: 5 * time.Second}, nil)
 	a.baseURL = func(string) string { return srv.URL }
 
-	remote, err := a.Search(t.Context(), "minimal", SearchParams{Location: remoteLocation})
+	remote, err := a.Search(t.Context(), "minimal", SearchParams{Location: _remoteLocation})
 	require.NoError(t, err)
 	assert.Zero(t, remote.TotalCount)
 	assert.Empty(t, remote.Jobs)

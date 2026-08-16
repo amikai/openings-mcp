@@ -21,11 +21,11 @@ func newTestServer(t *testing.T, wantIncludeComp bool) *httptest.Server {
 		assert.Equal(t, http.MethodGet, r.Method)
 		if wantIncludeComp {
 			assert.Equal(t, "true", r.URL.Query().Get("includeCompensation"))
-			serveMockJSON(mockBoardCompRsp)(w, r)
+			serveMockJSON(_mockBoardCompRsp)(w, r)
 			return
 		}
 		assert.Empty(t, r.URL.Query().Get("includeCompensation"))
-		serveMockJSON(mockBoardRsp)(w, r)
+		serveMockJSON(_mockBoardRsp)(w, r)
 	})
 	return httptest.NewServer(mux)
 }

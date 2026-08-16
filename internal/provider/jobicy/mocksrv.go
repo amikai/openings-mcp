@@ -7,22 +7,22 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var mockJobsFilteredRsp []byte
+var _mockJobsFilteredRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.json
-var mockJobsEmptyRsp []byte
+var _mockJobsEmptyRsp []byte
 
 //go:embed testdata/jobs_invalid_industry_rsp.json
-var mockJobsInvalidIndustryRsp []byte
+var _mockJobsInvalidIndustryRsp []byte
 
 //go:embed testdata/locations_rsp.json
-var mockLocationsRsp []byte
+var _mockLocationsRsp []byte
 
 //go:embed testdata/industries_rsp.json
-var mockIndustriesRsp []byte
+var _mockIndustriesRsp []byte
 
 // NewMockServer returns an httptest.Server serving canned Jobicy API
 // fixture responses, so tests never hit the live feed. It mirrors the real
@@ -34,17 +34,17 @@ func NewMockServer() *httptest.Server {
 		q := r.URL.Query()
 		switch {
 		case q.Get("get") == "locations":
-			serveMockJSON(w, http.StatusOK, mockLocationsRsp)
+			serveMockJSON(w, http.StatusOK, _mockLocationsRsp)
 		case q.Get("get") == "industries":
-			serveMockJSON(w, http.StatusOK, mockIndustriesRsp)
+			serveMockJSON(w, http.StatusOK, _mockIndustriesRsp)
 		case q.Get("industry") == "not-a-real-industry":
-			serveMockJSON(w, http.StatusBadRequest, mockJobsInvalidIndustryRsp)
+			serveMockJSON(w, http.StatusBadRequest, _mockJobsInvalidIndustryRsp)
 		case q.Get("tag") == "zzzznomatchzzz":
-			serveMockJSON(w, http.StatusNotFound, mockJobsEmptyRsp)
+			serveMockJSON(w, http.StatusNotFound, _mockJobsEmptyRsp)
 		case q.Get("geo") == "usa" && q.Get("industry") == "dev" && q.Get("tag") == "golang":
-			serveMockJSON(w, http.StatusOK, mockJobsFilteredRsp)
+			serveMockJSON(w, http.StatusOK, _mockJobsFilteredRsp)
 		default:
-			serveMockJSON(w, http.StatusOK, mockJobsRsp)
+			serveMockJSON(w, http.StatusOK, _mockJobsRsp)
 		}
 	})
 	return httptest.NewServer(mux)

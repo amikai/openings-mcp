@@ -9,16 +9,16 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 // Real response captured by testdata/issue_94_req.hurl — 104's company-keyword
 // mode (https://github.com/amikai/openings-mcp/issues/94).
 //
 //go:embed testdata/issue_94_rsp.json
-var mockCompanyKeywordRsp []byte
+var _mockCompanyKeywordRsp []byte
 
 // MockErrorKeyword and MockNotFoundJobCode trigger upstream-error responses
 // from the mock server so tests can exercise the non-200 paths: searching
@@ -48,17 +48,17 @@ func NewMockServer() *httptest.Server {
 			return
 		}
 		if r.URL.Query().Get("keyword") == MockCompanyKeyword && r.URL.Query().Get("excludeCompanyKeyword") != "true" {
-			serveMockJSON(mockCompanyKeywordRsp)(w, r)
+			serveMockJSON(_mockCompanyKeywordRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockJobsRsp)(w, r)
+		serveMockJSON(_mockJobsRsp)(w, r)
 	})
 	mux.HandleFunc("/job/ajax/content/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasSuffix(r.URL.Path, "/"+MockNotFoundJobCode) {
 			serveMockError(w, http.StatusNotFound, "job not found")
 			return
 		}
-		serveMockJSON(mockJobDetailRsp)(w, r)
+		serveMockJSON(_mockJobDetailRsp)(w, r)
 	})
 	return httptest.NewServer(mux)
 }

@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	jobNoPattern = regexp.MustCompile(`^([A-Z0-9]{5,10})\s+`)
-	pagePattern  = regexp.MustCompile(`[?&]page=(\d+)`)
+	_jobNoPattern = regexp.MustCompile(`^([A-Z0-9]{5,10})\s+`)
+	_pagePattern  = regexp.MustCompile(`[?&]page=(\d+)`)
 )
 
 func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
@@ -31,7 +31,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 		}
 
 		jobNo := ""
-		if m := jobNoPattern.FindStringSubmatch(title); len(m) > 1 {
+		if m := _jobNoPattern.FindStringSubmatch(title); len(m) > 1 {
 			jobNo = m[1]
 		}
 
@@ -85,7 +85,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 
 		if lastLink := doc.Find(".pagination li.PagedList-skipToLast a, .w3-pagination li.PagedList-skipToLast a"); lastLink.Length() > 0 {
 			if href, exists := lastLink.Attr("href"); exists {
-				if m := pagePattern.FindStringSubmatch(href); len(m) > 1 {
+				if m := _pagePattern.FindStringSubmatch(href); len(m) > 1 {
 					if tp, err := strconv.Atoi(m[1]); err == nil {
 						totalPages = tp
 					}
@@ -95,7 +95,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 			// Find the highest page link if skipToLast is absent
 			for _, s := range doc.Find(".pagination a[href*=\"page=\"], .w3-pagination a[href*=\"page=\"]").EachIter() {
 				if href, exists := s.Attr("href"); exists {
-					if m := pagePattern.FindStringSubmatch(href); len(m) > 1 {
+					if m := _pagePattern.FindStringSubmatch(href); len(m) > 1 {
 						if tp, err := strconv.Atoi(m[1]); err == nil && tp > totalPages {
 							totalPages = tp
 						}
@@ -166,7 +166,7 @@ func parseDetailHTML(r io.Reader, id string, baseURL string) (*JobDetail, error)
 	}
 
 	jobNo := ""
-	if m := jobNoPattern.FindStringSubmatch(title); len(m) > 1 {
+	if m := _jobNoPattern.FindStringSubmatch(title); len(m) > 1 {
 		jobNo = m[1]
 	}
 

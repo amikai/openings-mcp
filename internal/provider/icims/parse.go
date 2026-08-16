@@ -12,10 +12,10 @@ import (
 )
 
 // pageOfPattern matches "Page 1 of 31" inside paging controls.
-var pageOfPattern = regexp.MustCompile(`(?i)Page\s+(\d+)\s+of\s+(\d+)`)
+var _pageOfPattern = regexp.MustCompile(`(?i)Page\s+(\d+)\s+of\s+(\d+)`)
 
 // jobHrefPattern extracts id and slug from /jobs/{id}/{slug}/job links.
-var jobHrefPattern = regexp.MustCompile(`(?i)/jobs/(\d+)/([^/?#]+)/job`)
+var _jobHrefPattern = regexp.MustCompile(`(?i)/jobs/(\d+)/([^/?#]+)/job`)
 
 // SelectOption is one entry from a portal search-form <select>. Value is the
 // encoded token the server expects (e.g. "12781-12827-Austin" for a location,
@@ -183,13 +183,13 @@ func LooksLikeLocationValue(s string) bool {
 func parseJobCard(card *goquery.Selection) (Job, bool) {
 	link := card.Find("a.iCIMS_Anchor").FilterFunction(func(_ int, s *goquery.Selection) bool {
 		href, _ := s.Attr("href")
-		return jobHrefPattern.MatchString(href)
+		return _jobHrefPattern.MatchString(href)
 	}).First()
 	if link.Length() == 0 {
 		// Fallback: any anchor into /jobs/{id}/.../job
 		for _, s := range card.Find("a[href]").EachIter() {
 			href, _ := s.Attr("href")
-			if jobHrefPattern.MatchString(href) {
+			if _jobHrefPattern.MatchString(href) {
 				link = s
 				break
 			}
@@ -266,7 +266,7 @@ func extractCardPostedAt(card *goquery.Selection) string {
 }
 
 func jobIDAndSlugFromHref(href string) (id, slug string) {
-	m := jobHrefPattern.FindStringSubmatch(href)
+	m := _jobHrefPattern.FindStringSubmatch(href)
 	if m == nil {
 		return "", ""
 	}
@@ -279,14 +279,14 @@ func parseTotalPages(doc *goquery.Document) int {
 	if text == "" {
 		text = strings.TrimSpace(doc.Find(".iCIMS_Paging").Text())
 	}
-	if m := pageOfPattern.FindStringSubmatch(text); m != nil {
+	if m := _pageOfPattern.FindStringSubmatch(text); m != nil {
 		n, err := strconv.Atoi(m[2])
 		if err == nil && n > 0 {
 			return n
 		}
 	}
 	// Fall back to scanning full page text once.
-	if m := pageOfPattern.FindStringSubmatch(doc.Text()); m != nil {
+	if m := _pageOfPattern.FindStringSubmatch(doc.Text()); m != nil {
 		n, err := strconv.Atoi(m[2])
 		if err == nil && n > 0 {
 			return n

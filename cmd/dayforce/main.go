@@ -20,13 +20,17 @@ import (
 
 // apiBaseURL is the Dayforce candidate portal origin — the single server
 // in the provider's openapi.yaml.
-const apiBaseURL = "https://jobs.dayforcehcm.com"
+const _apiBaseURL = "https://jobs.dayforcehcm.com"
 
 // pageSize is the fixed upstream page size; --page is converted to
 // paginationStart against this constant.
-const pageSize = 25
+const _pageSize = 25
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("dayforce")
 	var (
 		company = rootFlags.StringLong("company", "", "curated dayforce company slug, e.g. \"pca\" (see the companies subcommand)")
@@ -100,22 +104,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // normalizeCompany requires --company to be a curated company, matching
@@ -214,7 +219,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := dayforce.NewBoardClient(apiBaseURL, nil)
+	client, err := dayforce.NewBoardClient(_apiBaseURL, nil)
 	if err != nil {
 		return err
 	}
@@ -223,7 +228,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		ClientNamespace: company.Namespace,
 		JobBoardCode:    company.JobBoardCode,
 		CultureCode:     company.Culture(),
-		PaginationStart: dayforce.NewOptInt((f.page - 1) * pageSize),
+		PaginationStart: dayforce.NewOptInt((f.page - 1) * _pageSize),
 	}
 	if f.keyword != "" {
 		req.SearchText = dayforce.NewOptString(f.keyword)
@@ -284,7 +289,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := dayforce.NewBoardClient(apiBaseURL, nil)
+	client, err := dayforce.NewBoardClient(_apiBaseURL, nil)
 	if err != nil {
 		return err
 	}

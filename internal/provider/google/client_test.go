@@ -21,7 +21,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &JobsResponse{Jobs: wantJobs}
+	want := &JobsResponse{Jobs: _wantJobs}
 	assert.Equal(t, want, got)
 }
 
@@ -33,5 +33,5 @@ func TestJobDetail(t *testing.T) {
 	got, err := c.JobDetail(t.Context(), "106863362666570438")
 	require.NoError(t, err)
 
-	assert.Equal(t, wantDetail, got)
+	assert.Equal(t, _wantDetail, got)
 }

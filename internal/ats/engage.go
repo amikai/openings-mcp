@@ -36,11 +36,11 @@ type EngageAdapter struct {
 // Examples (hostname + escaped path):
 //   - en-gage.net/nova_career/
 //   - en-gage.net/nova_career/work_17046487/
-var engageCareersURLRE = regexp.MustCompile(`(?i)^en-gage\.net/(?P<slug>[a-z0-9][a-z0-9_-]*)(?:/|$)`)
+var _engageCareersURLRE = regexp.MustCompile(`(?i)^en-gage\.net/(?P<slug>[a-z0-9][a-z0-9_-]*)(?:/|$)`)
 
 // engageReservedPaths are en-gage.net first segments that belong to the site
 // itself rather than to a tenant, so a URL under them is not a careers URL.
-var engageReservedPaths = map[string]bool{
+var _engageReservedPaths = map[string]bool{
 	"user":           true,
 	"api":            true,
 	"apply":          true,
@@ -71,12 +71,12 @@ func (a *EngageAdapter) Roster() []CompanyInfo {
 // one request settles whether a slug resolves. Site-owned paths (/user/,
 // /search/, sitemaps) are rejected, since they are not tenants.
 func (a *EngageAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(engageCareersURLRE, u)
+	slug, ok := matchCareersSlug(_engageCareersURLRE, u)
 	if !ok {
 		return "", false
 	}
 	slug = strings.ToLower(slug)
-	if engageReservedPaths[slug] || strings.HasPrefix(slug, "sitemap") {
+	if _engageReservedPaths[slug] || strings.HasPrefix(slug, "sitemap") {
 		return "", false
 	}
 	return slug, true
@@ -217,11 +217,11 @@ func engageFields(j engage.Job) map[string][]string {
 // title or location line to mean remote work. The board has no structured
 // remote field, so matching this text is the only way location:"remote" can
 // hit anything.
-var engageRemoteMarkers = []string{"リモート", "在宅", "テレワーク", "remote"}
+var _engageRemoteMarkers = []string{"リモート", "在宅", "テレワーク", "remote"}
 
 func engageIsRemote(j engage.Job) bool {
 	text := strings.ToLower(j.Title + " " + j.Area)
-	for _, m := range engageRemoteMarkers {
+	for _, m := range _engageRemoteMarkers {
 		if strings.Contains(text, strings.ToLower(m)) {
 			return true
 		}
@@ -267,7 +267,7 @@ func engageSalaries(salaries []engage.Salary) string {
 // engageSalaryLine renders one baseSalary entry. The JSON-LD carries the
 // bounds as strings and frequently omits the upper one.
 func engageSalaryLine(s engage.Salary) string {
-	label := engageSalaryPeriods[strings.ToUpper(s.UnitText)]
+	label := _engageSalaryPeriods[strings.ToUpper(s.UnitText)]
 	if label == "" {
 		label = "給与"
 	}
@@ -290,7 +290,7 @@ func engageSalaryLine(s engage.Salary) string {
 
 // engageSalaryPeriods maps schema.org pay periods to the label Japanese
 // postings use.
-var engageSalaryPeriods = map[string]string{
+var _engageSalaryPeriods = map[string]string{
 	"YEAR":  "年収",
 	"MONTH": "月給",
 	"WEEK":  "週給",
@@ -308,15 +308,15 @@ func engageFullAddress(l engage.Location) string {
 
 // engageTagRE strips the markup engage embeds in the JSON-LD description,
 // which is an HTML fragment rather than plain text.
-var engageTagRE = regexp.MustCompile(`(?s)<[^>]*>`)
+var _engageTagRE = regexp.MustCompile(`(?s)<[^>]*>`)
 
 // engageBlockTagRE matches the tags that end a visual line, so removing markup
 // does not run separate paragraphs together.
-var engageBlockTagRE = regexp.MustCompile(`(?i)<(?:br\s*/?|/p|/div|/li|/h[1-6])>`)
+var _engageBlockTagRE = regexp.MustCompile(`(?i)<(?:br\s*/?|/p|/div|/li|/h[1-6])>`)
 
 func engagePlainText(html string) string {
-	s := engageBlockTagRE.ReplaceAllString(html, "\n")
-	s = engageTagRE.ReplaceAllString(s, "")
+	s := _engageBlockTagRE.ReplaceAllString(html, "\n")
+	s = _engageTagRE.ReplaceAllString(s, "")
 	s = strings.ReplaceAll(s, "&nbsp;", " ")
 	s = strings.ReplaceAll(s, "&amp;", "&")
 	s = strings.ReplaceAll(s, "&lt;", "<")

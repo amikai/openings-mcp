@@ -13,7 +13,7 @@ import (
 // openapi.yaml's SearchJobs parameters: label enums instead of the site's
 // numeric form-field IDs, which the converter maps back via the provider's
 // lookup tables.
-var tsmcSearchInputRawSchema = []byte(`{
+var _tsmcSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -69,7 +69,7 @@ var tsmcSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var tsmcSearchInputSchema = mustSchema(tsmcSearchInputRawSchema)
+var _tsmcSearchInputSchema = mustSchema(_tsmcSearchInputRawSchema)
 
 type tsmcSearchInput struct {
 	Keyword        string `json:"keyword"`  // required
@@ -207,7 +207,7 @@ func RegisterTsmc(s *mcp.Server, c *tsmc.Client) {
 		Name:        "tsmc_search_jobs",
 		Description: "Search jobs on the TSMC careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search TSMC jobs", ReadOnlyHint: true},
-		InputSchema: tsmcSearchInputSchema,
+		InputSchema: _tsmcSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *tsmcSearchInput) (*mcp.CallToolResult, *tsmcSearchOutput, error) {
 		req, err := tsmcMCPToHTTPRequest(in)
 		if err != nil {

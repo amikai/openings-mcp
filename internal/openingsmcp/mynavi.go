@@ -7,7 +7,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-var mynaviSearchInputRawSchema = []byte(`{
+var _mynaviSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -32,7 +32,7 @@ var mynaviSearchInputRawSchema = []byte(`{
 // mynaviSearchInputSchema is hand-written JSON kept aligned with the
 // mynavi package's path-token DSL (kw/min/pg); min_salary's enum mirrors
 // mynavi.MinSalaries.
-var mynaviSearchInputSchema = mustSchema(mynaviSearchInputRawSchema)
+var _mynaviSearchInputSchema = mustSchema(_mynaviSearchInputRawSchema)
 
 type mynaviSearchInput struct {
 	Keyword   string `json:"keyword,omitempty"`
@@ -167,7 +167,7 @@ func RegisterMynavi(s *mcp.Server, c *mynavi.Client) {
 		Name:        "mynavi_search_jobs",
 		Description: "Search jobs on マイナビ転職 (Mynavi Tenshoku), a major Japanese job board for mid-career hires. Listings are in Japanese.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Mynavi Tenshoku jobs", ReadOnlyHint: true},
-		InputSchema: mynaviSearchInputSchema,
+		InputSchema: _mynaviSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *mynaviSearchInput) (*mcp.CallToolResult, *mynaviSearchOutput, error) {
 		res, err := c.Jobs(ctx, mynaviMCPToHTTPRequest(in))
 		if err != nil {

@@ -25,7 +25,7 @@ var _ Adapter = (*TeamtailorAdapter)(nil)
 //   - career.teamtailor.com
 //   - acme.na.teamtailor.com
 //   - acme.au.teamtailor.com
-var teamtailorCareersHostRE = regexp.MustCompile(
+var _teamtailorCareersHostRE = regexp.MustCompile(
 	`(?i)^[a-z0-9.-]+\.teamtailor\.com$`,
 )
 
@@ -39,12 +39,12 @@ type TeamtailorAdapter struct {
 }
 
 // teamtailorBaseURLTpl formats a portal host into a base URL (e.g. "https://company.teamtailor.com").
-const teamtailorBaseURLTpl = "https://%s"
+const _teamtailorBaseURLTpl = "https://%s"
 
 func NewTeamtailorAdapter(hc *http.Client, dumpCache *DumpCache) *TeamtailorAdapter {
 	return &TeamtailorAdapter{
 		hc:        hc,
-		baseURL:   func(host string) string { return fmt.Sprintf(teamtailorBaseURLTpl, host) },
+		baseURL:   func(host string) string { return fmt.Sprintf(_teamtailorBaseURLTpl, host) },
 		dumpCache: dumpCache,
 	}
 }
@@ -59,7 +59,7 @@ func (a *TeamtailorAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-var teamtailorReservedHosts = map[string]bool{
+var _teamtailorReservedHosts = map[string]bool{
 	"api":          true,
 	"app":          true,
 	"assets":       true,
@@ -76,12 +76,12 @@ func isTeamtailorCareerHost(host string) bool {
 	if _, ok := teamtailor.CompaniesByHost[host]; ok {
 		return true
 	}
-	if !teamtailorCareersHostRE.MatchString(host) {
+	if !_teamtailorCareersHostRE.MatchString(host) {
 		return false
 	}
 	prefix, _ := strings.CutSuffix(host, ".teamtailor.com")
 	first, _, _ := strings.Cut(prefix, ".")
-	return !teamtailorReservedHosts[first]
+	return !_teamtailorReservedHosts[first]
 }
 
 // ParseCareersURL recognizes every non-reserved Teamtailor-hosted career site

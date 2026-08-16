@@ -15,7 +15,7 @@ import (
 // invisible. Search input needs a hand-written schema because filters is
 // an open map whose keys are tenant-specific and only known at runtime via
 // get_filters_by_company.
-var companySearchInputRawSchema = []byte(`{
+var _companySearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"company": {
@@ -55,7 +55,7 @@ var companySearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var companySearchInputSchema = mustSchema(companySearchInputRawSchema)
+var _companySearchInputSchema = mustSchema(_companySearchInputRawSchema)
 
 type companySearchInput struct {
 	Company  string              `json:"company"`
@@ -232,7 +232,7 @@ func RegisterCompany(s *mcp.Server, reg *ats.Registry) {
 		Name:        "search_jobs_by_company",
 		Description: "Search official job postings for a specific company.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search jobs by company", ReadOnlyHint: true},
-		InputSchema: companySearchInputSchema,
+		InputSchema: _companySearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *companySearchInput) (*mcp.CallToolResult, *companySearchOutput, error) {
 		adapter, slug, err := resolveCompany(reg, in.Company, "")
 		if err != nil {

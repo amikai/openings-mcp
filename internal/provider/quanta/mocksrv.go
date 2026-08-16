@@ -7,7 +7,7 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 // NewMockServer returns an httptest.Server serving the canned jobs dump
 // fixture, so tests never hit the live board. The fixture was captured
@@ -19,7 +19,7 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/QuantaRecruit/Home/QueryJob", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.Write(mockJobsRsp)
+		w.Write(_mockJobsRsp)
 	})
 	return httptest.NewServer(mux)
 }

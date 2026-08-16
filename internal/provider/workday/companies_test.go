@@ -21,7 +21,7 @@ func TestBuildTenantIndexFirstRowWins(t *testing.T) {
 }
 
 func TestCompaniesByTenantMatchesFirstCompanyRow(t *testing.T) {
-	seen := map[string]Company{}
+	seen := make(map[string]Company)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.Tenant)
 		if _, ok := seen[slug]; !ok {

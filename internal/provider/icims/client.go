@@ -25,8 +25,8 @@ var ErrJobNotFound = errors.New("icims: job not found")
 var ErrCompanyNotFound = errors.New("icims: company not found")
 
 const (
-	searchPath = "/jobs/search"
-	userAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+	_searchPath = "/jobs/search"
+	_userAgent  = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 )
 
 // Client talks to one iCIMS career-portal origin.
@@ -172,7 +172,7 @@ func normalizeLocationValues(locations []string) []string {
 // position-type values must already be encoded option values — free text is
 // resolved in Search.
 func (c *Client) doSearch(ctx context.Context, req *SearchRequest) (*SearchResponse, error) {
-	u, err := url.Parse(c.baseURL + searchPath)
+	u, err := url.Parse(c.baseURL + _searchPath)
 	if err != nil {
 		return nil, fmt.Errorf("parse base url %q: %w", c.baseURL, err)
 	}
@@ -263,7 +263,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	if err != nil {
 		return nil, 0, err
 	}
-	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("User-Agent", _userAgent)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 

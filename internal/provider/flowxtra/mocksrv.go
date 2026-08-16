@@ -8,19 +8,19 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var mockJobsFilteredRsp []byte
+var _mockJobsFilteredRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_not_found_rsp.json
-var mockJobDetailNotFoundRsp []byte
+var _mockJobDetailNotFoundRsp []byte
 
 // mockDetailHasID is the has_id pinned by testdata/job_detail_rsp.json.
-const mockDetailHasID = "M88PB"
+const _mockDetailHasID = "M88PB"
 
 // NewMockServer returns an httptest.Server serving canned Flowxtra API
 // fixture responses, all captured live on 2026-07-26 (see
@@ -34,20 +34,20 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/central/jobs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.URL.Query().Get("search-key") != "" {
-			w.Write(mockJobsFilteredRsp)
+			w.Write(_mockJobsFilteredRsp)
 			return
 		}
-		w.Write(mockJobsRsp)
+		w.Write(_mockJobsRsp)
 	})
 	mux.HandleFunc("/candidate/jobs/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		hasID := strings.TrimPrefix(r.URL.Path, "/candidate/jobs/")
-		if hasID != mockDetailHasID {
+		if hasID != _mockDetailHasID {
 			w.WriteHeader(http.StatusNotFound)
-			w.Write(mockJobDetailNotFoundRsp)
+			w.Write(_mockJobDetailNotFoundRsp)
 			return
 		}
-		w.Write(mockJobDetailRsp)
+		w.Write(_mockJobDetailRsp)
 	})
 	return httptest.NewServer(mux)
 }

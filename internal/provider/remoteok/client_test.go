@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var wantJob = Job{
+var _wantJob = Job{
 	ID:          "1134996",
 	Slug:        "remote-patient-access-scheduler-centralized-scheduling-ft-8-30a-5p-orchestrate-consulting-group-1134996",
 	Epoch:       NewOptInt64(1784311668),
@@ -51,7 +51,7 @@ func TestGetJobs(t *testing.T) {
 
 	job, ok := feed[1].GetJob()
 	require.True(t, ok, "element 1 must be a job")
-	assert.Equal(t, wantJob, job)
+	assert.Equal(t, _wantJob, job)
 
 	last, ok := feed[6].GetJob()
 	require.True(t, ok)
@@ -67,7 +67,7 @@ func TestGetJobsTags(t *testing.T) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, []string{"golang,react"}, r.URL.Query()["tags"])
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(mockJobsTagsRsp)
+		w.Write(_mockJobsTagsRsp)
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()

@@ -14,7 +14,7 @@ import (
 // openapi.yaml's JobSearchRequest/JobSearchFilters: a flat property list
 // instead of the query/sort_by/filters nesting. Enum values are the API's
 // own slugs, which the converter casts back to the generated types.
-var cakeSearchInputRawSchema = []byte(`{
+var _cakeSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -64,7 +64,7 @@ var cakeSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var cakeSearchInputSchema = mustSchema(cakeSearchInputRawSchema)
+var _cakeSearchInputSchema = mustSchema(_cakeSearchInputRawSchema)
 
 type cakeSearchInput struct {
 	Keyword   string   `json:"keyword"`  // required
@@ -220,7 +220,7 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 		Name:        "cake_search_jobs",
 		Description: "Search jobs on Cake.me (formerly CakeResume), a Taiwan-focused job board.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Cake.me jobs", ReadOnlyHint: true},
-		InputSchema: cakeSearchInputSchema,
+		InputSchema: _cakeSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeSearchInput) (*mcp.CallToolResult, *cakeSearchOutput, error) {
 		req, err := cakeMCPToHTTPRequest(in)
 		if err != nil {

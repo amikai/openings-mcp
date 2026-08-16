@@ -22,7 +22,7 @@ type CareersSite struct {
 // Examples (hostname + escaped path):
 //   - recruiting.ultipro.com/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24/
 //   - recruiting2.ultipro.com/SAL1002/JobBoard/bcc2e2d1-d94c-2041-4126-28086417eb0a/OpportunityDetail?opportunityId=...
-var careersURLRE = regexp.MustCompile(
+var _careersURLRE = regexp.MustCompile(
 	`(?i)^(?P<host>recruiting\d*\.ultipro\.com)/(?P<code>[^/]+)/JobBoard/(?P<board>[0-9a-fA-F-]{36})`,
 )
 
@@ -30,12 +30,12 @@ var careersURLRE = regexp.MustCompile(
 // extracts its parts.
 func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 	host := strings.ToLower(u.Hostname())
-	m := careersURLRE.FindStringSubmatch(host + u.EscapedPath())
+	m := _careersURLRE.FindStringSubmatch(host + u.EscapedPath())
 	if m == nil {
 		return CareersSite{}, false
 	}
-	code := m[careersURLRE.SubexpIndex("code")]
-	board := m[careersURLRE.SubexpIndex("board")]
+	code := m[_careersURLRE.SubexpIndex("code")]
+	board := m[_careersURLRE.SubexpIndex("board")]
 	if code == "" {
 		return CareersSite{}, false
 	}

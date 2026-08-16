@@ -45,7 +45,7 @@ type Registry struct {
 // careersHostPatternsByAdapter maps each known adapter name to the
 // careers-page URL shape it recognizes, so the "unrecognized careers URL"
 // error only advertises hosts the registry actually has an adapter for.
-var careersHostPatternsByAdapter = map[string]string{
+var _careersHostPatternsByAdapter = map[string]string{
 	"workday":         "<tenant>.<wd*>.myworkdayjobs.com/<site>",
 	"adp_myjobs":      "myjobs.adp.com/<slug>",
 	"avature":         "<tenant>.avature.net/<portal> (custom-domain portals via roster only)",
@@ -274,7 +274,7 @@ func (r *Registry) candidates(key string) []registryEntry {
 func (r *Registry) careersHostPatterns() []string {
 	patterns := make([]string, 0, len(r.adapters))
 	for _, a := range r.adapters {
-		if p, ok := careersHostPatternsByAdapter[a.Name()]; ok {
+		if p, ok := _careersHostPatternsByAdapter[a.Name()]; ok {
 			patterns = append(patterns, p)
 		}
 	}

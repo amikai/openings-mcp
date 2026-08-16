@@ -11,7 +11,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 )
 
-const cliTestCountryCode = "TWN"
+const _cliTestCountryCode = "TWN"
 
 func TestRunSearchValidation(t *testing.T) {
 	tests := []struct {
@@ -19,10 +19,10 @@ func TestRunSearchValidation(t *testing.T) {
 		want  string
 		flags searchFlags
 	}{
-		{name: "keyword", flags: searchFlags{country: cliTestCountryCode, page: 1}, want: "--keyword is required"},
+		{name: "keyword", flags: searchFlags{country: _cliTestCountryCode, page: 1}, want: "--keyword is required"},
 		{name: "country or location", flags: searchFlags{keyword: "camera", page: 1}, want: "--country or --location is required"},
-		{name: "page", flags: searchFlags{keyword: "sensor", country: cliTestCountryCode}, want: "--page must be >= 1"},
-		{name: "team", flags: searchFlags{keyword: "sensor", country: cliTestCountryCode, page: 1, teams: []string{"HRDWR"}}, want: "team filter must be TEAM/SUBTEAM"},
+		{name: "page", flags: searchFlags{keyword: "sensor", country: _cliTestCountryCode}, want: "--page must be >= 1"},
+		{name: "team", flags: searchFlags{keyword: "sensor", country: _cliTestCountryCode, page: 1, teams: []string{"HRDWR"}}, want: "team filter must be TEAM/SUBTEAM"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -62,7 +62,7 @@ func TestWriteSearch(t *testing.T) {
 	require.NoError(t, err)
 	response, err := client.SearchJobs(t.Context(), apple.SearchRequest{
 		Keyword:     "software engineer",
-		CountryCode: cliTestCountryCode,
+		CountryCode: _cliTestCountryCode,
 	})
 	require.NoError(t, err)
 

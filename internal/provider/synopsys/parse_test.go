@@ -11,10 +11,10 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var htmlTagRe = regexp.MustCompile(`<[^>]+>`)
+var _htmlTagRe = regexp.MustCompile(`<[^>]+>`)
 
 func stripHTML(s string) string {
-	s = htmlTagRe.ReplaceAllString(s, "")
+	s = _htmlTagRe.ReplaceAllString(s, "")
 	s = strings.ReplaceAll(s, "&lt;", "<")
 	s = strings.ReplaceAll(s, "&gt;", ">")
 	s = strings.ReplaceAll(s, "&amp;", "&")
@@ -48,7 +48,7 @@ func TestParseJobsResponse(t *testing.T) {
 	assert.Equal(t, want, got)
 }
 
-var wantJobDetail = &JobDetailResponse{
+var _wantJobDetail = &JobDetailResponse{
 	Title:          "Staff Software Engineer",
 	DatePosted:     "2026-4-1",
 	Locations:      []string{"Bengaluru, India"},
@@ -120,7 +120,7 @@ func TestParseJobDetailResponse(t *testing.T) {
 	got, err := parseJobDetail(f)
 	require.NoError(t, err)
 
-	assert.Equal(t, wantJobDetail, got)
+	assert.Equal(t, _wantJobDetail, got)
 }
 
 // Pages can carry several JSON-LD blocks; parsing must pick the JobPosting

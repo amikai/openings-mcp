@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public SuccessFactors Career
 // Site Builder tenant. Host is the career site's own custom domain (e.g.
@@ -25,11 +25,11 @@ type Company struct {
 }
 
 // careersURLTpl formats a SuccessFactors job search page URL (e.g. "https://jobs.sap.com/search/").
-const careersURLTpl = "https://%s/search/"
+const _careersURLTpl = "https://%s/search/"
 
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Host)
+	return fmt.Sprintf(_careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed SuccessFactors career site, sorted by
@@ -40,7 +40,7 @@ var Companies = mustLoadCompanies()
 var CompaniesByHost = buildHostIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("successfactors: load companies.yaml: %v", err))
 	}

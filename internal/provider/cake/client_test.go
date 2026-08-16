@@ -25,12 +25,12 @@ func newMockServer(t *testing.T) *httptest.Server {
 		}
 		assert.JSONEq(t, `{"query":"Golang","sort_by":"popularity","filters":{}}`, string(body))
 
-		serveMockJSON(mockJobsRsp)(w, r)
+		serveMockJSON(_mockJobsRsp)(w, r)
 	})
 
 	mux.HandleFunc("/api/client/v1/jobs/senior-golang-web-backend-engineer-taoyuan", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		serveMockJSON(mockJobDetailRsp)(w, r)
+		serveMockJSON(_mockJobDetailRsp)(w, r)
 	})
 
 	return httptest.NewServer(mux)
@@ -58,7 +58,7 @@ func TestSearchJobs(t *testing.T) {
 		got.Data[i].Page.Reset()
 	}
 
-	assert.Equal(t, wantSearch, got)
+	assert.Equal(t, _wantSearch, got)
 }
 
 func TestGetJobDetail(t *testing.T) {
@@ -73,10 +73,10 @@ func TestGetJobDetail(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	assert.Equal(t, wantDetail, got)
+	assert.Equal(t, _wantDetail, got)
 }
 
-var wantSearch = &JobSearchResponse{
+var _wantSearch = &JobSearchResponse{
 	TotalEntries: NewNilInt(360),
 	TotalPages:   NewNilInt(18),
 	PerPage:      NewNilInt(20),
@@ -433,7 +433,7 @@ Design, build, and maintain backend services for B2C Insurance/IoT/Shopping/Poin
 	},
 }
 
-var wantDetail = &JobDetail{
+var _wantDetail = &JobDetail{
 	ID:       NewNilInt(46590),
 	Path:     NewNilString("senior-golang-web-backend-engineer-taoyuan"),
 	PagePath: NewNilString("lctech_"),

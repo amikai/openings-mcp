@@ -15,10 +15,10 @@ import (
 // anyone who decompiles the app or inspects its traffic — which is how
 // python-jobspy's constant.py (and this client) got it. See API.md's
 // Key Behaviors for why this is not a value to invent or rotate yourself.
-const mobileAppKey = "161092c2017b5bbab13edb12461a62d5a833871e7cad6d9d475304573de67ac8"
+const _mobileAppKey = "161092c2017b5bbab13edb12461a62d5a833871e7cad6d9d475304573de67ac8"
 
-const userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Indeed App 193.1"
-const appInfo = "appv=193.1; appid=com.indeed.jobsearch; osv=16.6.1; os=ios; dtype=phone"
+const _userAgent = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_6_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148 Indeed App 193.1"
+const _appInfo = "appv=193.1; appid=com.indeed.jobsearch; osv=16.6.1; os=ios; dtype=phone"
 
 type countryCtxKey struct{}
 
@@ -56,9 +56,9 @@ func (t *indeedTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Set("content-type", "application/json")
 	req.Header.Set("accept", "application/json")
 	req.Header.Set("indeed-locale", "en-US")
-	req.Header.Set("user-agent", userAgent)
-	req.Header.Set("indeed-app-info", appInfo)
-	req.Header.Set("indeed-api-key", mobileAppKey)
+	req.Header.Set("user-agent", _userAgent)
+	req.Header.Set("indeed-app-info", _appInfo)
+	req.Header.Set("indeed-api-key", _mobileAppKey)
 	if co, ok := req.Context().Value(countryCtxKey{}).(string); ok && co != "" {
 		req.Header.Set("indeed-co", co)
 	}
@@ -173,7 +173,7 @@ func searchFilters(r *JobsRequest) []JobSearchFilterInput {
 			keys = append(keys, r.JobType)
 		}
 		if r.Remote {
-			keys = append(keys, remoteAttributeKey)
+			keys = append(keys, _remoteAttributeKey)
 		}
 		return []JobSearchFilterInput{{
 			Composite: &CompositeFilterInput{

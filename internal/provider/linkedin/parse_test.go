@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var wantJobs = []Job{
+var _wantJobs = []Job{
 	{ID: "4422697744", Title: "Software Engineer", Company: "BoostDraft", CompanyURL: "https://www.linkedin.com/company/boostdraft", Location: "Taiwan", PostedDate: "2026-06-03", Remote: false},
 	{ID: "4430577683", Title: "Software Engineer, Apps, Pixel", Company: "Google", CompanyURL: "https://www.linkedin.com/company/google", Location: "Banqiao District, New Taipei City, Taiwan", PostedDate: "2026-06-22", Remote: false},
 	{ID: "4435540496", Title: "Software Engineer", Company: "Mphasis", CompanyURL: "https://in.linkedin.com/company/mphasis", Location: "Taipei, Taipei City, Taiwan", PostedDate: "2026-07-01", Remote: false},
@@ -33,7 +33,7 @@ func TestParseSearchHTML(t *testing.T) {
 
 	got, err := parseJobsHTML(doc)
 	require.NoError(t, err)
-	assert.Equal(t, wantJobs, got)
+	assert.Equal(t, _wantJobs, got)
 }
 
 // A zero-result search returns an essentially empty fragment (observed live:
@@ -95,7 +95,7 @@ func TestParseSearchHTMLRemote(t *testing.T) {
 // below): the real posting's description is a very large bilingual blob and
 // pinning it verbatim would make this test brittle to content edits on
 // LinkedIn's side rather than to parsing logic.
-var wantDetail = &JobDetailResponse{
+var _wantDetail = &JobDetailResponse{
 	ID:             "4422697744",
 	Title:          "Software Engineer",
 	Company:        "BoostDraft",
@@ -123,7 +123,7 @@ func TestParseDetailHTML(t *testing.T) {
 	description := got.Description
 	got.Description = ""
 
-	assert.Equal(t, wantDetail, got)
+	assert.Equal(t, _wantDetail, got)
 	assert.Contains(t, description, "BoostDraft is a software engineering company")
 	assert.Contains(t, description, "Fluent in coding with C#")
 }

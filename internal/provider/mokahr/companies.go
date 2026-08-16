@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization hosting a public MokaHR careers site
 // (internal/provider/mokahr/companies.yaml). Every entry was verified against
@@ -46,7 +46,7 @@ var CompaniesBySlug = buildSlugIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("mokahr: parse companies.yaml: %v", err))
 	}
 	for _, c := range cs {

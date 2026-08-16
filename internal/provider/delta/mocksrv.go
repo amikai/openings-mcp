@@ -7,25 +7,25 @@ import (
 )
 
 //go:embed testdata/areas_rsp.json
-var mockAreasRsp []byte
+var _mockAreasRsp []byte
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_area_filtered_rsp.json
-var mockJobsAreaFilteredRsp []byte
+var _mockJobsAreaFilteredRsp []byte
 
 //go:embed testdata/jobs_keyword_filtered_rsp.json
-var mockJobsKeywordFilteredRsp []byte
+var _mockJobsKeywordFilteredRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.json
-var mockJobsEmptyRsp []byte
+var _mockJobsEmptyRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_notfound_rsp.json
-var mockJobDetailNotFoundRsp []byte
+var _mockJobDetailNotFoundRsp []byte
 
 // NewMockServer returns an httptest.Server serving canned Delta Electronics
 // careers fixture responses, so tests never hit the live site.
@@ -35,7 +35,7 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/OAGateWay/RWSV2/api/Index/GetAreaList", func(w http.ResponseWriter, r *http.Request) {
-		serveMockJSON(mockAreasRsp)(w, r)
+		serveMockJSON(_mockAreasRsp)(w, r)
 	})
 
 	mux.HandleFunc("/OAGateWay/RWSV2/api/Index/SearchJobList", func(w http.ResponseWriter, r *http.Request) {
@@ -43,27 +43,27 @@ func NewMockServer() *httptest.Server {
 		keyword := r.URL.Query().Get("AddJobName")
 
 		if keyword == "NONEXISTENT_KEYWORD_XYZ" {
-			serveMockJSON(mockJobsEmptyRsp)(w, r)
+			serveMockJSON(_mockJobsEmptyRsp)(w, r)
 			return
 		}
 		if keyword == "軟體" {
-			serveMockJSON(mockJobsKeywordFilteredRsp)(w, r)
+			serveMockJSON(_mockJobsKeywordFilteredRsp)(w, r)
 			return
 		}
 		if areaID == "A" {
-			serveMockJSON(mockJobsAreaFilteredRsp)(w, r)
+			serveMockJSON(_mockJobsAreaFilteredRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockJobsRsp)(w, r)
+		serveMockJSON(_mockJobsRsp)(w, r)
 	})
 
 	mux.HandleFunc("/OAGateWay/RWSV2/api/JobDetails/GetJobDetails", func(w http.ResponseWriter, r *http.Request) {
 		empAddID := r.URL.Query().Get("EmpAddID")
 		if empAddID == "C20260814001" {
-			serveMockJSON(mockJobDetailRsp)(w, r)
+			serveMockJSON(_mockJobDetailRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockJobDetailNotFoundRsp)(w, r)
+		serveMockJSON(_mockJobDetailNotFoundRsp)(w, r)
 	})
 
 	return httptest.NewServer(mux)

@@ -7,22 +7,22 @@ import (
 )
 
 //go:embed testdata/postings_rsp.json
-var mockPostingsRsp []byte
+var _mockPostingsRsp []byte
 
 //go:embed testdata/postings_filtered_rsp.json
-var mockPostingsFilteredRsp []byte
+var _mockPostingsFilteredRsp []byte
 
 //go:embed testdata/postings_unknown_company_rsp.json
-var mockPostingsUnknownCompanyRsp []byte
+var _mockPostingsUnknownCompanyRsp []byte
 
 //go:embed testdata/posting_detail_rsp.json
-var mockPostingDetailRsp []byte
+var _mockPostingDetailRsp []byte
 
 //go:embed testdata/posting_not_found_rsp.json
-var mockPostingNotFoundRsp []byte
+var _mockPostingNotFoundRsp []byte
 
 //go:embed testdata/departments_rsp.json
-var mockDepartmentsRsp []byte
+var _mockDepartmentsRsp []byte
 
 // MockUnknownCompany is a companyIdentifier deliberately absent from any
 // roster, matching the quirk captured in testdata/postings_unknown_company_rsp.json:
@@ -38,23 +38,23 @@ func NewMockServer() *httptest.Server {
 
 	mux.HandleFunc("/v1/companies/equinox/postings", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("q") == "trainer" {
-			serveMockJSON(mockPostingsFilteredRsp)(w, r)
+			serveMockJSON(_mockPostingsFilteredRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockPostingsRsp)(w, r)
+		serveMockJSON(_mockPostingsRsp)(w, r)
 	})
 
-	mux.HandleFunc("/v1/companies/"+MockUnknownCompany+"/postings", serveMockJSON(mockPostingsUnknownCompanyRsp))
+	mux.HandleFunc("/v1/companies/"+MockUnknownCompany+"/postings", serveMockJSON(_mockPostingsUnknownCompanyRsp))
 
-	mux.HandleFunc("/v1/companies/equinox/postings/744000137225639", serveMockJSON(mockPostingDetailRsp))
+	mux.HandleFunc("/v1/companies/equinox/postings/744000137225639", serveMockJSON(_mockPostingDetailRsp))
 
 	mux.HandleFunc("/v1/companies/equinox/postings/000000000000", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write(mockPostingNotFoundRsp)
+		w.Write(_mockPostingNotFoundRsp)
 	})
 
-	mux.HandleFunc("/v1/companies/equinox/departments", serveMockJSON(mockDepartmentsRsp))
+	mux.HandleFunc("/v1/companies/equinox/departments", serveMockJSON(_mockDepartmentsRsp))
 
 	return httptest.NewServer(mux)
 }

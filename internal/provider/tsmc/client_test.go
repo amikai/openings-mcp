@@ -22,7 +22,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	want := &JobsResponse{Total: 22, Jobs: wantJobs}
+	want := &JobsResponse{Total: 22, Jobs: _wantJobs}
 	assert.Equal(t, want, got)
 }
 
@@ -34,7 +34,7 @@ func TestJobDetail(t *testing.T) {
 	got, err := c.JobDetail(t.Context(), "21826")
 	require.NoError(t, err)
 
-	assert.Equal(t, wantDetail, got)
+	assert.Equal(t, _wantDetail, got)
 }
 
 func TestJobDetailRejectsEmptyID(t *testing.T) {

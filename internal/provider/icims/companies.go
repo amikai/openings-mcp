@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public iCIMS career portal.
 // Host is the portal hostname (e.g. "careers-peraton.icims.com").
@@ -24,11 +24,11 @@ type Company struct {
 }
 
 // careersURLTpl formats an iCIMS job search page URL (e.g. "https://careers-peraton.icims.com/jobs/search?ss=1").
-const careersURLTpl = "https://%s/jobs/search?ss=1"
+const _careersURLTpl = "https://%s/jobs/search?ss=1"
 
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Host)
+	return fmt.Sprintf(_careersURLTpl, c.Host)
 }
 
 // Companies holds every confirmed iCIMS career portal, sorted by company name.
@@ -38,7 +38,7 @@ var Companies = mustLoadCompanies()
 var CompaniesByHost = buildHostIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("icims: load companies.yaml: %v", err))
 	}

@@ -12,12 +12,12 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // slugRE matches an engage tenant slug, the single path segment in
 // en-gage.net/{slug}/. Slugs use lowercase letters, digits, hyphens and
 // underscores, and may start with a digit (e.g. "2918").
-var slugRE = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
+var _slugRE = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
 
 // Company is a confirmed organization listed on en-gage.net. Slug is the
 // path segment in en-gage.net/{slug}/ and the provider's tenant key. Name is
@@ -41,7 +41,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("engage: load companies.yaml: %v", err))
 	}
@@ -80,7 +80,7 @@ func validateCompany(c Company) error {
 		return errors.New("company name is required")
 	case c.Slug == "":
 		return fmt.Errorf("company %q: slug is required", c.Name)
-	case !slugRE.MatchString(c.Slug):
+	case !_slugRE.MatchString(c.Slug):
 		return fmt.Errorf("company %q: invalid slug %q", c.Name, c.Slug)
 	}
 	return nil

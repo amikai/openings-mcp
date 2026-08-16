@@ -11,7 +11,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/apple"
 )
 
-var appleSearchInputRawSchema = []byte(`{
+var _appleSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -70,12 +70,12 @@ var appleSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var appleSearchInputSchema = mustSchema(appleSearchInputRawSchema)
+var _appleSearchInputSchema = mustSchema(_appleSearchInputRawSchema)
 
 const (
-	appleSearchToolName  = "apple_search_jobs"
-	appleDetailToolName  = "apple_get_job_detail"
-	appleFiltersToolName = "apple_get_search_filters"
+	_appleSearchToolName  = "apple_search_jobs"
+	_appleDetailToolName  = "apple_get_job_detail"
+	_appleFiltersToolName = "apple_get_search_filters"
 )
 
 type appleSearchInput struct {
@@ -245,10 +245,10 @@ func appleLocationLabel(name, country string) string {
 // RegisterApple registers the Apple Careers search and job-detail tools.
 func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        appleSearchToolName,
+		Name:        _appleSearchToolName,
 		Description: "Search jobs on the Apple careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Apple Careers jobs", ReadOnlyHint: true},
-		InputSchema: appleSearchInputSchema,
+		InputSchema: _appleSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *appleSearchInput) (*mcp.CallToolResult, *appleSearchOutput, error) {
 		request, err := appleMCPToHTTPRequest(input)
 		if err != nil {
@@ -262,7 +262,7 @@ func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        appleFiltersToolName,
+		Name:        _appleFiltersToolName,
 		Description: "Get Apple Careers' current search filter values. Call before filtered apple_search_jobs queries.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Apple search filters", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *struct{}) (*mcp.CallToolResult, *appleFiltersOutput, error) {
@@ -274,7 +274,7 @@ func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        appleDetailToolName,
+		Name:        _appleDetailToolName,
 		Description: "Get the full job description and requirements for an Apple job by job ID.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Apple job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *appleDetailInput) (*mcp.CallToolResult, *appleDetailOutput, error) {

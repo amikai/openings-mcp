@@ -7,13 +7,13 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_tags_rsp.json
-var mockJobsTagsRsp []byte
+var _mockJobsTagsRsp []byte
 
 //go:embed testdata/jobs_tags_empty_rsp.json
-var mockJobsTagsEmptyRsp []byte
+var _mockJobsTagsEmptyRsp []byte
 
 // MockUnknownTag makes the mock server answer with the legal element
 // alone, the way the real feed responds to a tag no job carries.
@@ -30,11 +30,11 @@ func NewMockServer() *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		switch r.URL.Query().Get("tags") {
 		case "":
-			w.Write(mockJobsRsp)
+			w.Write(_mockJobsRsp)
 		case MockUnknownTag:
-			w.Write(mockJobsTagsEmptyRsp)
+			w.Write(_mockJobsTagsEmptyRsp)
 		default:
-			w.Write(mockJobsTagsRsp)
+			w.Write(_mockJobsTagsRsp)
 		}
 	})
 	return httptest.NewServer(mux)

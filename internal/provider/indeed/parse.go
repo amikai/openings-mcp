@@ -74,7 +74,7 @@ func jobTypesFromAttributes(attrs []struct{ Key, Label string }) []string {
 	}
 	out := make([]string, 0, len(attrs))
 	for _, a := range attrs {
-		if _, ok := employmentTypeAttrKeys[a.Key]; ok {
+		if _, ok := _employmentTypeAttrKeys[a.Key]; ok {
 			out = append(out, a.Label)
 		}
 	}

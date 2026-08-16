@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // RosterCompany is a confirmed organization hosting a public Workable careers
 // page (internal/provider/workable/companies.yaml). Every entry was verified
@@ -24,13 +24,13 @@ type RosterCompany struct {
 }
 
 // careersURLTpl formats a Workable careers page URL (e.g. "https://apply.workable.com/blueground/").
-const careersURLTpl = "https://apply.workable.com/%s/"
+const _careersURLTpl = "https://apply.workable.com/%s/"
 
 // CareersURL returns the company's human-facing careers page, e.g.
 // https://apply.workable.com/blueground/. API calls instead pass Account
 // directly as the account parameter.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Account)
+	return fmt.Sprintf(_careersURLTpl, c.Account)
 }
 
 // Companies holds every confirmed Workable company, sorted by company name.
@@ -45,7 +45,7 @@ var CompaniesByAccount = buildAccountIndex(Companies)
 // recover from.
 func mustLoadCompanies() []RosterCompany {
 	var cs []RosterCompany
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("workable: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b RosterCompany) int { return strings.Compare(a.Name, b.Name) })

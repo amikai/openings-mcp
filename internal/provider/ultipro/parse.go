@@ -7,7 +7,7 @@ import (
 
 // candidateOpportunityDetailMarker precedes the embedded posting object on
 // OpportunityDetail's HTML page: `new US.Opportunity.CandidateOpportunityDetail({...})`.
-const candidateOpportunityDetailMarker = "CandidateOpportunityDetail("
+const _candidateOpportunityDetailMarker = "CandidateOpportunityDetail("
 
 // extractOpportunityDetail finds and decodes the JSON object literal
 // embedded after candidateOpportunityDetailMarker. It returns
@@ -18,20 +18,20 @@ const candidateOpportunityDetailMarker = "CandidateOpportunityDetail("
 // distinct error: an upstream template change or a parser bug should
 // surface as a fetch failure, not get mistaken for a bad job id.
 func extractOpportunityDetail(html []byte) (*OpportunityDetail, error) {
-	start := indexAfter(html, candidateOpportunityDetailMarker)
+	start := indexAfter(html, _candidateOpportunityDetailMarker)
 	if start < 0 {
 		return nil, ErrJobNotFound
 	}
 	end := balancedObjectEnd(html, start)
 	if end < 0 {
-		return nil, fmt.Errorf("unbalanced %s object", candidateOpportunityDetailMarker)
+		return nil, fmt.Errorf("unbalanced %s object", _candidateOpportunityDetailMarker)
 	}
 	var detail OpportunityDetail
 	if err := json.Unmarshal(html[start:end], &detail); err != nil {
-		return nil, fmt.Errorf("decode %s object: %w", candidateOpportunityDetailMarker, err)
+		return nil, fmt.Errorf("decode %s object: %w", _candidateOpportunityDetailMarker, err)
 	}
 	if detail.ID == "" || detail.Title == "" {
-		return nil, fmt.Errorf("%s object missing required id/title", candidateOpportunityDetailMarker)
+		return nil, fmt.Errorf("%s object missing required id/title", _candidateOpportunityDetailMarker)
 	}
 	return &detail, nil
 }

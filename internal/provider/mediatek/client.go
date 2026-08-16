@@ -15,12 +15,12 @@ import (
 )
 
 const (
-	defaultLimit = 6
-	maxLimit     = 100
-	searchPath   = "/api/trpc/job.getJobs"
+	_defaultLimit = 6
+	_maxLimit     = 100
+	_searchPath   = "/api/trpc/job.getJobs"
 )
 
-var jobIDRE = regexp.MustCompile(`^[A-Z]{3,4}[0-9]+$`)
+var _jobIDRE = regexp.MustCompile(`^[A-Z]{3,4}[0-9]+$`)
 
 // Client accesses MediaTek's public careers site.
 type Client struct {
@@ -105,10 +105,10 @@ func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResult, 
 	}
 	limit := req.Limit
 	if limit == 0 {
-		limit = defaultLimit
+		limit = _defaultLimit
 	}
-	if limit < 1 || limit > maxLimit {
-		return nil, fmt.Errorf("limit must be between 1 and %d, got %d", maxLimit, limit)
+	if limit < 1 || limit > _maxLimit {
+		return nil, fmt.Errorf("limit must be between 1 and %d, got %d", _maxLimit, limit)
 	}
 
 	input := searchInput{
@@ -147,7 +147,7 @@ func (c *Client) Search(ctx context.Context, req SearchRequest) (*SearchResult, 
 
 // JobDetail returns the HTML detail page for a stable ID returned by Search.
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetail, error) {
-	if !jobIDRE.MatchString(jobID) {
+	if !_jobIDRE.MatchString(jobID) {
 		return nil, fmt.Errorf("invalid job id %q: expected company prefix followed by digits", jobID)
 	}
 	u, err := url.JoinPath(c.baseURL, "en", "jobs", jobID)
@@ -277,7 +277,7 @@ func (c *Client) searchURL(input searchInput) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	u.Path = strings.TrimRight(u.Path, "/") + searchPath
+	u.Path = strings.TrimRight(u.Path, "/") + _searchPath
 	q := u.Query()
 	q.Set("input", string(b))
 	u.RawQuery = q.Encode()

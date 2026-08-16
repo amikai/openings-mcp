@@ -19,6 +19,10 @@ import (
 // main issues a single SearchJobs request built entirely from flags, then
 // fetches GetJobDetail for every job the search returned.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("cake")
 	var (
 		timeout        = fs.DurationLong("timeout", 60*time.Second, "request timeout")
@@ -46,10 +50,10 @@ func main() {
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	f := searchFlags{
@@ -77,7 +81,7 @@ func main() {
 	req, err := buildSearchRequest(f)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), *timeout)
@@ -86,12 +90,12 @@ func main() {
 	client, err := cake.NewClient("https://api.cake.me")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 	search, err := client.SearchJobs(ctx, &req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	details := make(map[string]*cake.JobDetail, len(search.Data))
@@ -99,12 +103,13 @@ func main() {
 		detail, err := client.GetJobDetail(ctx, cake.GetJobDetailParams{Path: job.Path})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "job detail %s: %v\n", job.Path, err)
-			os.Exit(1)
+			return 1
 		}
 		details[job.Path] = detail
 	}
 
 	writeReport(os.Stdout, f.keyword, search, details)
+	return 0
 }
 
 // searchFlags carries the parsed flag values into buildSearchRequest.

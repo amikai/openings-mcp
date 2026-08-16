@@ -19,6 +19,10 @@ import (
 // main issues a single JobsRequest built entirely from flags, then fetches
 // JobDetail for every job the search returned.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("tsmc")
 	var (
 		baseURL        = fs.StringLong("base-url", "https://careers.tsmc.com", "TSMC careers site base URL")
@@ -34,10 +38,10 @@ func main() {
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	req := buildJobsRequest(searchFlags{
@@ -58,7 +62,7 @@ func main() {
 	search, err := client.Jobs(ctx, req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	fmt.Printf("TSMC Jobs Report\n")
@@ -96,6 +100,7 @@ func main() {
 		}
 		fmt.Println()
 	}
+	return 0
 }
 
 // searchFlags carries the parsed flag values into buildJobsRequest.

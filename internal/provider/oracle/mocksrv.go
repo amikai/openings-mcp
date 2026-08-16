@@ -9,22 +9,22 @@ import (
 )
 
 //go:embed testdata/careers_page_rsp.html
-var mockCareersPageResponse []byte
+var _mockCareersPageResponse []byte
 
 //go:embed testdata/search_rsp.json
-var mockSearchResponse []byte
+var _mockSearchResponse []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var mockFilteredSearchResponse []byte
+var _mockFilteredSearchResponse []byte
 
 //go:embed testdata/search_facets_rsp.json
-var mockFacetSearchResponse []byte
+var _mockFacetSearchResponse []byte
 
 //go:embed testdata/job_detail_rsp.json
-var mockJobDetailResponse []byte
+var _mockJobDetailResponse []byte
 
 //go:embed testdata/job_detail_not_found_rsp.json
-var mockJobDetailNotFoundResponse []byte
+var _mockJobDetailNotFoundResponse []byte
 
 // NewMockServer returns an httptest.Server that mimics the Oracle Recruiting
 // Cloud Candidate Experience API with captured public response fixtures. The
@@ -35,7 +35,7 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/hcmUI/CandidateExperience/en/sites/Mayo-US/jobs", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		page := bytes.ReplaceAll(
-			mockCareersPageResponse,
+			_mockCareersPageResponse,
 			[]byte("https://fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com:443"),
 			[]byte(server.URL),
 		)
@@ -45,19 +45,19 @@ func NewMockServer() *httptest.Server {
 		finder := r.URL.Query().Get("finder")
 		switch {
 		case strings.Contains(finder, `keyword="analyst"`):
-			serveMockJSON(mockFilteredSearchResponse)(w, r)
+			serveMockJSON(_mockFilteredSearchResponse)(w, r)
 		case strings.Contains(finder, "facetsList=TITLES;LOCATIONS;CATEGORIES;WORKPLACE_TYPES;POSTING_DATES;WORK_LOCATIONS;ORGANIZATIONS"):
-			serveMockJSON(mockFacetSearchResponse)(w, r)
+			serveMockJSON(_mockFacetSearchResponse)(w, r)
 		default:
-			serveMockJSON(mockSearchResponse)(w, r)
+			serveMockJSON(_mockSearchResponse)(w, r)
 		}
 	})
 	mux.HandleFunc("/hcmRestApi/resources/latest/recruitingCEJobRequisitionDetails", func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Query().Get("finder"), `Id="999999999999"`) {
-			serveMockJSON(mockJobDetailNotFoundResponse)(w, r)
+			serveMockJSON(_mockJobDetailNotFoundResponse)(w, r)
 			return
 		}
-		serveMockJSON(mockJobDetailResponse)(w, r)
+		serveMockJSON(_mockJobDetailResponse)(w, r)
 	})
 	server = httptest.NewServer(mux)
 	return server

@@ -25,7 +25,7 @@ var _ Adapter = (*ADPMyJobsAdapter)(nil)
 // Examples (host + path):
 //   - myjobs.adp.com/guitarcenterexternal
 //   - myjobs.adp.com/guitarcenterexternal/cx/job/123
-var adpMyJobsCareersURLRE = regexp.MustCompile(
+var _adpMyJobsCareersURLRE = regexp.MustCompile(
 	`(?i)^myjobs\.adp\.com/(?P<slug>[^/]+)`,
 )
 
@@ -74,7 +74,7 @@ func (a *ADPMyJobsAdapter) Roster() []CompanyInfo {
 
 // ParseCareersURL recognizes myjobs.adp.com/{slug}/... boards only.
 func (a *ADPMyJobsAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(adpMyJobsCareersURLRE, u)
+	slug, ok := matchCareersSlug(_adpMyJobsCareersURLRE, u)
 	if !ok {
 		return "", false
 	}
@@ -98,7 +98,7 @@ func (a *ADPMyJobsAdapter) Search(ctx context.Context, slug string, p SearchPara
 	slug = strings.ToLower(slug)
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	skip := pageIndex * pageSize
+	skip := pageIndex * _pageSize
 
 	// Every board files its jobs by its own dimensions, and several file them
 	// by store rather than by place, so there is nothing a free-text location
@@ -132,7 +132,7 @@ func (a *ADPMyJobsAdapter) Search(ctx context.Context, slug string, p SearchPara
 		Search:        search,
 		CustomFilters: customFilters,
 		Skip:          skip,
-		Top:           pageSize,
+		Top:           _pageSize,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("adp_myjobs: search %q: %w", slug, err)
@@ -264,9 +264,9 @@ func (a *ADPMyJobsAdapter) facets(ctx context.Context, slug string) (*adpFacets,
 
 func buildADPFacets(catalog *adp_myjobs.CustomFilterCatalog) *adpFacets {
 	f := &adpFacets{
-		fields: map[string]string{},
-		labels: map[string][]string{},
-		values: map[string]map[string]string{},
+		fields: make(map[string]string),
+		labels: make(map[string][]string),
+		values: make(map[string]map[string]string),
 	}
 	for _, category := range catalog.FilterList {
 		if strings.TrimSpace(category.Category) == "" || len(category.FilterList) == 0 {

@@ -7,16 +7,16 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_content_rsp.json
-var mockJobsContentRsp []byte
+var _mockJobsContentRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_full_rsp.json
-var mockJobDetailFullRsp []byte
+var _mockJobDetailFullRsp []byte
 
 // MockNonRosterBoard is a board token deliberately absent from
 // companies.yaml, so ats-layer tests can exercise non-roster behavior.
@@ -33,21 +33,21 @@ func NewMockServer() *httptest.Server {
 
 	mux.HandleFunc("/boards/safariai/jobs", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("content") == "true" {
-			serveMockJSON(mockJobsContentRsp)(w, r)
+			serveMockJSON(_mockJobsContentRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockJobsRsp)(w, r)
+		serveMockJSON(_mockJobsRsp)(w, r)
 	})
 
 	mux.HandleFunc("/boards/anthropic/jobs/4461450008", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("questions") == "true" {
-			serveMockJSON(mockJobDetailFullRsp)(w, r)
+			serveMockJSON(_mockJobDetailFullRsp)(w, r)
 			return
 		}
-		serveMockJSON(mockJobDetailRsp)(w, r)
+		serveMockJSON(_mockJobDetailRsp)(w, r)
 	})
 
-	mux.HandleFunc("/boards/"+MockNonRosterBoard+"/jobs/4461450008", serveMockJSON(mockJobDetailRsp))
+	mux.HandleFunc("/boards/"+MockNonRosterBoard+"/jobs/4461450008", serveMockJSON(_mockJobDetailRsp))
 
 	mux.HandleFunc("/boards/doesnotexist/jobs", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)

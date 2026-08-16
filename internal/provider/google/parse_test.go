@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var wantJobs = []Job{
+var _wantJobs = []Job{
 	{
 		ID: "106863362666570438", Title: "Software Engineer, GPU System Software", Company: "Google", Location: "Taipei, Taiwan",
 		ExperienceLevel: "Mid",
@@ -193,7 +193,7 @@ var wantJobs = []Job{
 	},
 }
 
-var wantDetail = &JobDetailResponse{
+var _wantDetail = &JobDetailResponse{
 	ID:       "106863362666570438",
 	Title:    "Software Engineer, GPU System Software",
 	Company:  "Google",
@@ -249,7 +249,7 @@ func TestParseSearchHTML(t *testing.T) {
 
 	got, err := parseJobsHTML(doc)
 	require.NoError(t, err)
-	assert.Equal(t, wantJobs, got)
+	assert.Equal(t, _wantJobs, got)
 }
 
 // A genuine no-results page keeps the "N jobs matched" counter (span.SWhIm)
@@ -336,5 +336,5 @@ func TestParseDetailHTML(t *testing.T) {
 	got, ok := parseJobDetailHTML(doc, id)
 	require.True(t, ok)
 
-	assert.Equal(t, *wantDetail, *got)
+	assert.Equal(t, *_wantDetail, *got)
 }

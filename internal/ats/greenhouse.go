@@ -26,6 +26,8 @@ type GreenhouseAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*GreenhouseAdapter)(nil)
+
 // greenhouseCareersURLRE matches Greenhouse board URLs and captures the
 // board token (first path segment), including EU data-residency hosts.
 //
@@ -33,7 +35,7 @@ type GreenhouseAdapter struct {
 //   - job-boards.greenhouse.io/acme
 //   - boards.greenhouse.io/acme/jobs/123
 //   - job-boards.eu.greenhouse.io/acme
-var greenhouseCareersURLRE = regexp.MustCompile(
+var _greenhouseCareersURLRE = regexp.MustCompile(
 	`(?i)^(?:job-boards|boards)(?:\.eu)?\.greenhouse\.io/(?P<slug>[^/]+)`,
 )
 
@@ -58,7 +60,7 @@ func (a *GreenhouseAdapter) Roster() []CompanyInfo {
 // ParseCareersURL recognizes Greenhouse-hosted board URLs; the first path
 // segment is the board token, which is already this adapter's slug form.
 func (a *GreenhouseAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(greenhouseCareersURLRE, u)
+	return matchCareersSlug(_greenhouseCareersURLRE, u)
 }
 
 // CareersURL renders the roster company's public job board page.
@@ -164,7 +166,7 @@ func (a *GreenhouseAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJ
 		}
 		// A job can sit in several departments/offices; keep them all so
 		// filters match secondary values and get_filters lists them.
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if len(depts) > 0 {
 			fields["department"] = depts
 		}

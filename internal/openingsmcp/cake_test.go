@@ -513,7 +513,7 @@ func TestCakeSearchJobsMissingRequiredE2E(t *testing.T) {
 	}{
 		{"no keyword", map[string]any{"location": "台灣"}, `validating "arguments": validating root: required: missing properties: ["keyword"]`},
 		{"no location", map[string]any{"keyword": "Golang"}, `validating "arguments": validating root: required: missing properties: ["location"]`},
-		{"empty args", map[string]any{}, `validating "arguments": validating root: required: missing properties: ["keyword" "location"]`},
+		{"empty args", make(map[string]any), `validating "arguments": validating root: required: missing properties: ["keyword" "location"]`},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

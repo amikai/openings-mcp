@@ -17,11 +17,15 @@ import (
 
 // apiBaseURL is Himalayas' public site origin — the single production
 // server in the provider's openapi.yaml (paths carry the /jobs/api prefix).
-const apiBaseURL = "https://himalayas.app"
+const _apiBaseURL = "https://himalayas.app"
 
-var sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
+var _sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("himalayas")
 	var (
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
@@ -62,7 +66,7 @@ func main() {
 		employmentType   = searchFS.StringLong("employment-type", "", "comma-separated employment type filters: Full Time, Part Time, Contractor, Temporary, Intern, Volunteer, Other")
 		company          = searchFS.StringLong("company", "", "canonical Himalayas company slug (himalayas.app/companies/<slug>); comma-separated values allowed")
 		timezone         = searchFS.StringLong("timezone", "", "timezone filter, e.g. UTC-5 or UTC+05:30")
-		sortOrder        = searchFS.StringEnumLong("sort", "sort order", sortValues...)
+		sortOrder        = searchFS.StringEnumLong("sort", "sort order", _sortValues...)
 		page             = searchFS.IntLong("page", 1, "1-based results page (fixed 20 jobs per page)")
 	)
 	searchCmd := &ff.Command{
@@ -95,22 +99,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (browse or search) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // jobSummaryJSON is the --format json shape for one job: the compact
@@ -237,7 +242,7 @@ func runBrowse(ctx context.Context, f browseFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(apiBaseURL)
+	client, err := himalayas.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -285,7 +290,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(apiBaseURL)
+	client, err := himalayas.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}

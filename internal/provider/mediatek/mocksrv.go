@@ -9,19 +9,19 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsResponse []byte
+var _mockJobsResponse []byte
 
 //go:embed testdata/jobs_keyword_rsp.json
-var mockKeywordResponse []byte
+var _mockKeywordResponse []byte
 
 //go:embed testdata/jobs_empty_rsp.json
-var mockEmptyResponse []byte
+var _mockEmptyResponse []byte
 
 //go:embed testdata/job_detail_rsp.html
-var mockDetailResponse []byte
+var _mockDetailResponse []byte
 
 //go:embed testdata/job_detail_not_found_rsp.html
-var mockNotFoundDetailResponse []byte
+var _mockNotFoundDetailResponse []byte
 
 // NewMockServer returns a fixture-replaying MediaTek careers server. The
 // caller owns the server and must close it.
@@ -51,11 +51,11 @@ func NewMockServer() *httptest.Server {
 		var fixture []byte
 		switch {
 		case len(envelope.JSON.JobQueryInfo.Keywords) == 1 && envelope.JSON.JobQueryInfo.Keywords[0] == "AI":
-			fixture = mockKeywordResponse
+			fixture = _mockKeywordResponse
 		case len(envelope.JSON.JobQueryInfo.Keywords) == 1 && envelope.JSON.JobQueryInfo.Keywords[0] == "__mtk_no_such_job_20260720__":
-			fixture = mockEmptyResponse
+			fixture = _mockEmptyResponse
 		case len(envelope.JSON.Filters.Categorys) == 1 && envelope.JSON.Filters.Categorys[0] == "9020" && len(envelope.JSON.Filters.Locations) == 1 && envelope.JSON.Filters.Locations[0] == "0000009256":
-			fixture = mockJobsResponse
+			fixture = _mockJobsResponse
 		default:
 			http.Error(w, "unknown fixture", http.StatusBadRequest)
 			return
@@ -64,10 +64,10 @@ func NewMockServer() *httptest.Server {
 	})
 	mux.HandleFunc("/en/jobs/", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/en/jobs/MTK120220511000" {
-			serveMockHTML(w, http.StatusOK, mockDetailResponse)
+			serveMockHTML(w, http.StatusOK, _mockDetailResponse)
 			return
 		}
-		serveMockHTML(w, http.StatusInternalServerError, mockNotFoundDetailResponse)
+		serveMockHTML(w, http.StatusInternalServerError, _mockNotFoundDetailResponse)
 	})
 	return httptest.NewServer(mux)
 }

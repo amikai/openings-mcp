@@ -20,13 +20,13 @@ const MockSecondSlug = "churchmutual"
 const MockUnknownSlug = "this-company-does-not-exist-xyz-openings-mcp"
 
 //go:embed testdata/career_site_guitarcenterexternal.json
-var mockCareerSiteGC []byte
+var _mockCareerSiteGC []byte
 
 //go:embed testdata/career_site_churchmutual.json
-var mockCareerSiteCM []byte
+var _mockCareerSiteCM []byte
 
 //go:embed testdata/career_site_unknown_rsp.json
-var mockCareerSiteUnknown []byte
+var _mockCareerSiteUnknown []byte
 
 // mockBoard is the tiny board the mock server filters over.
 func mockBoard() []JobRequisition {
@@ -93,7 +93,7 @@ func mockBoard() []JobRequisition {
 
 // mockCustomFilterRE matches one "FIELDn eq 'value'" clause, the only $filter
 // shape upstream honors. Clauses are ANDed with "&&"; see [CustomFilter].
-var mockCustomFilterRE = regexp.MustCompile(`^(FIELD[0-9]+) eq '(.*)'$`)
+var _mockCustomFilterRE = regexp.MustCompile(`^(FIELD[0-9]+) eq '(.*)'$`)
 
 // mockFacets is the catalog the mock board files its jobs under. FIELD1 is
 // deliberately not "location": the slot codes are positional, so nothing may
@@ -147,11 +147,11 @@ func NewMockServer() *httptest.Server {
 		slug = strings.Trim(slug, "/")
 		switch strings.ToLower(slug) {
 		case MockSlug:
-			serveJSON(w, http.StatusOK, mockCareerSiteGC)
+			serveJSON(w, http.StatusOK, _mockCareerSiteGC)
 		case MockSecondSlug:
-			serveJSON(w, http.StatusOK, mockCareerSiteCM)
+			serveJSON(w, http.StatusOK, _mockCareerSiteCM)
 		default:
-			serveJSON(w, http.StatusBadRequest, mockCareerSiteUnknown)
+			serveJSON(w, http.StatusBadRequest, _mockCareerSiteUnknown)
 		}
 	})
 	mux.HandleFunc("/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters", func(w http.ResponseWriter, r *http.Request) {
@@ -208,14 +208,14 @@ func filterMockBySearch(jobs []JobRequisition, needle string) []JobRequisition {
 // filterMockByCustomFilters applies every clause it recognizes. A clause naming
 // an unconfigured slot code is ignored, which is what upstream does.
 func filterMockByCustomFilters(jobs []JobRequisition, filter string) []JobRequisition {
-	configured := map[string]bool{}
+	configured := make(map[string]bool)
 	for _, c := range mockFacets().FilterList {
 		configured[c.Category] = true
 	}
 	byJob := mockJobFacets()
 
 	for _, clause := range strings.Split(filter, " && ") {
-		m := mockCustomFilterRE.FindStringSubmatch(strings.TrimSpace(clause))
+		m := _mockCustomFilterRE.FindStringSubmatch(strings.TrimSpace(clause))
 		if m == nil || !configured[m[1]] {
 			continue
 		}

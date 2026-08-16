@@ -24,11 +24,13 @@ type JoinAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*JoinAdapter)(nil)
+
 // joinCareersURLRE matches join.com company page URLs and captures the
 // slug (first path segment after /companies/).
 //
 // Example (hostname + escaped path): join.com/companies/routinelabs
-var joinCareersURLRE = regexp.MustCompile(`(?i)^join\.com/companies/(?P<slug>[^/]+)`)
+var _joinCareersURLRE = regexp.MustCompile(`(?i)^join\.com/companies/(?P<slug>[^/]+)`)
 
 func NewJoinAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) *JoinAdapter {
 	return &JoinAdapter{client: join.NewClient(baseURL, hc), dumpCache: dumpCache}
@@ -50,7 +52,7 @@ func (a *JoinAdapter) Roster() []CompanyInfo {
 // context to make one with, so it only matches slugs already in the
 // curated roster.
 func (a *JoinAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(joinCareersURLRE, u)
+	slug, ok := matchCareersSlug(_joinCareersURLRE, u)
 	if !ok {
 		return "", false
 	}
@@ -142,7 +144,7 @@ func (a *JoinAdapter) fetchDumpJobs(ctx context.Context, c join.RosterCompany) (
 	}
 	out := make([]dumpJob, 0, len(jobs))
 	for _, j := range jobs {
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if j.Category != "" {
 			fields["category"] = []string{j.Category}
 		}

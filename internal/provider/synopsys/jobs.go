@@ -9,7 +9,7 @@ import (
 // orgID is Synopsys's company ID on the TalentBrew ATS platform (a multi-tenant
 // system shared across many employers' career sites). It identifies which
 // company's job data to query and is fixed, not user-supplied.
-const orgID = "44408"
+const _orgID = "44408"
 
 type facetFilter struct {
 	ID        string
@@ -88,7 +88,7 @@ func (j Job) URL() string {
 // ID carried by a search result. It always points at the live careers site:
 // the URL is for a human to open, not for this client to fetch.
 func JobURL(city, slug, jobID string) string {
-	return defaultBaseURL + "/job/" + city + "/" + slug + "/" + orgID + "/" + jobID
+	return _defaultBaseURL + "/job/" + city + "/" + slug + "/" + _orgID + "/" + jobID
 }
 
 type JobsResponse struct {

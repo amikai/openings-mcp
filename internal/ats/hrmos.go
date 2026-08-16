@@ -17,7 +17,7 @@ import (
 // sg-tag-location chip against (case-insensitive). Every tenant observed
 // yields false today — this documents a known gap rather than scanning
 // free JD prose, which this repo's soft-filter policy rejects.
-var hrmosRemoteMarkers = []string{"リモート", "フルリモート", "在宅", "テレワーク", "remote"}
+var _hrmosRemoteMarkers = []string{"リモート", "フルリモート", "在宅", "テレワーク", "remote"}
 
 // HrmosAdapter serves HRMOS 採用 (hrmos.co)-hosted companies. HRMOS has no
 // server-side keyword search (?word=/?keyword=/?q= are byte-identical), so
@@ -28,12 +28,14 @@ type HrmosAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*HrmosAdapter)(nil)
+
 // hrmosCareersURLRE matches hrmos.co tenant URLs and captures the slug: it
 // matches /pages/{slug}, /pages/{slug}/jobs, and /pages/{slug}/jobs/{id}
 // alike since only the prefix is anchored.
 //
 // Example (hostname + escaped path): hrmos.co/pages/moneyforward/jobs
-var hrmosCareersURLRE = regexp.MustCompile(`(?i)^hrmos\.co/pages/(?P<slug>[^/]+)`)
+var _hrmosCareersURLRE = regexp.MustCompile(`(?i)^hrmos\.co/pages/(?P<slug>[^/]+)`)
 
 func NewHrmosAdapter(baseURL string, hc *http.Client, dumpCache *DumpCache) *HrmosAdapter {
 	return &HrmosAdapter{client: hrmos.NewClient(baseURL, hc), dumpCache: dumpCache}
@@ -54,7 +56,7 @@ func (a *HrmosAdapter) Roster() []CompanyInfo {
 // [Adapter.Search] and [Adapter.Detail] need, so no companyId lookup gates
 // it (the Workday shape, not the join.com one).
 func (a *HrmosAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(hrmosCareersURLRE, u)
+	return matchCareersSlug(_hrmosCareersURLRE, u)
 }
 
 // CareersURL renders any tenant's jobs page, roster or not, for the same
@@ -205,7 +207,7 @@ func hrmosPostedAt(raw string) string {
 // decision documented on [HrmosAdapter]).
 func hrmosIsRemote(location string) bool {
 	loc := strings.ToLower(location)
-	for _, marker := range hrmosRemoteMarkers {
+	for _, marker := range _hrmosRemoteMarkers {
 		if strings.Contains(loc, strings.ToLower(marker)) {
 			return true
 		}

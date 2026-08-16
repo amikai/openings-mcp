@@ -12,11 +12,11 @@ import (
 // job id in its final path segment. Social-share links never match: they
 // carry the posting URL percent-encoded inside a query string, so the
 // literal "/JobDetail/" segment does not appear.
-var jobDetailPathRE = regexp.MustCompile(`/JobDetail/[^/?#]+/(\d+)(?:[?#]|$)`)
+var _jobDetailPathRE = regexp.MustCompile(`/JobDetail/[^/?#]+/(\d+)(?:[?#]|$)`)
 
 var (
-	totalOfRE      = regexp.MustCompile(`of\s+([\d,]+)`)
-	totalResultsRE = regexp.MustCompile(`([\d,]+)\s+results?`)
+	_totalOfRE      = regexp.MustCompile(`of\s+([\d,]+)`)
+	_totalResultsRE = regexp.MustCompile(`([\d,]+)\s+results?`)
 )
 
 func parseSearchHTML(doc *goquery.Document) *SearchResponse {
@@ -28,10 +28,10 @@ func parseSearchHTML(doc *goquery.Document) *SearchResponse {
 	// Item markup varies by portal theme, so anchor on JobDetail links and
 	// dedupe by id: the title link precedes any Apply link for the same
 	// posting in document order.
-	index := map[string]int{}
+	index := make(map[string]int)
 	for _, a := range doc.Find("a[href]").EachIter() {
 		href, _ := a.Attr("href")
-		m := jobDetailPathRE.FindStringSubmatch(href)
+		m := _jobDetailPathRE.FindStringSubmatch(href)
 		if m == nil {
 			continue
 		}
@@ -65,11 +65,11 @@ func parseTotal(doc *goquery.Document) int {
 		return -1
 	}
 	text := normSpace(legend.Text())
-	if m := totalOfRE.FindStringSubmatch(text); m != nil {
+	if m := _totalOfRE.FindStringSubmatch(text); m != nil {
 		return atoiCommas(m[1])
 	}
 	for _, s := range []string{text, legend.AttrOr("aria-label", "")} {
-		if m := totalResultsRE.FindStringSubmatch(s); m != nil {
+		if m := _totalResultsRE.FindStringSubmatch(s); m != nil {
 			return atoiCommas(m[1])
 		}
 	}
@@ -124,7 +124,7 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 
 	// Metadata fields. Portals duplicate the section for mobile and
 	// desktop, so dedupe by label keeping the first occurrence.
-	seen := map[string]bool{}
+	seen := make(map[string]bool)
 	for _, f := range doc.Find(".article__content__view__field").EachIter() {
 		label := normSpace(f.Find(".article__content__view__field__label").First().Text())
 		if label == "" || seen[strings.ToLower(label)] {

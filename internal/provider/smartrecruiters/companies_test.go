@@ -20,7 +20,7 @@ func TestBuildIdentifierIndexFirstRowWins(t *testing.T) {
 }
 
 func TestCompaniesByIdentifierMatchesFirstCompanyRow(t *testing.T) {
-	seen := map[string]RosterCompany{}
+	seen := make(map[string]RosterCompany)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.CompanyIdentifier)
 		if _, ok := seen[slug]; !ok {
@@ -38,7 +38,7 @@ func TestCompaniesByIdentifierMatchesFirstCompanyRow(t *testing.T) {
 // (same company harvested twice under different display names) is a data
 // bug, not something buildIdentifierIndex should silently paper over.
 func TestNoDuplicateIdentifiers(t *testing.T) {
-	seen := map[string]string{}
+	seen := make(map[string]string)
 	for _, c := range Companies {
 		slug := strings.ToLower(c.CompanyIdentifier)
 		if prev, ok := seen[slug]; ok {

@@ -12,7 +12,7 @@ import (
 // googleSearchInputRawSchema is hand-written JSON kept aligned with
 // openapi.yaml's searchJobs parameters. The spec marks every query parameter
 // optional; keyword and location are required here so searches stay scoped.
-var googleSearchInputRawSchema = []byte(`{
+var _googleSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -70,7 +70,7 @@ var googleSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var googleSearchInputSchema = mustSchema(googleSearchInputRawSchema)
+var _googleSearchInputSchema = mustSchema(_googleSearchInputRawSchema)
 
 type googleSearchInput struct {
 	Keyword        string `json:"keyword"`  // required
@@ -122,26 +122,26 @@ type googleDetailOutput struct {
 // unlike job104/cake there's no generated Validate() to call; the site
 // itself silently ignores unrecognized values instead of erroring, so
 // openingsmcp validates against these sets to fail fast like the other providers.
-var googleTargetLevels = map[string]bool{
+var _googleTargetLevels = map[string]bool{
 	"EARLY": true, "MID": true, "ADVANCED": true,
 	"INTERN_AND_APPRENTICE": true, "DIRECTOR_PLUS": true,
 }
 
-var googleDegrees = map[string]bool{
+var _googleDegrees = map[string]bool{
 	"PURSUING_DEGREE": true, "ASSOCIATE": true, "BACHELORS": true,
 	"MASTERS": true, "PHD": true,
 }
 
-var googleEmploymentTypes = map[string]bool{
+var _googleEmploymentTypes = map[string]bool{
 	"FULL_TIME": true, "PART_TIME": true, "TEMPORARY": true, "INTERN": true,
 }
 
-var googleCompanies = map[string]bool{
+var _googleCompanies = map[string]bool{
 	"DeepMind": true, "GFiber": true, "Google": true,
 	"Verily Life Sciences": true, "Waymo": true, "Wing": true, "YouTube": true,
 }
 
-var googleSortBys = map[string]bool{"relevance": true, "date": true}
+var _googleSortBys = map[string]bool{"relevance": true, "date": true}
 
 func googleMCPToHTTPRequest(in *googleSearchInput) (*google.JobsRequest, error) {
 	var req google.JobsRequest
@@ -159,32 +159,32 @@ func googleMCPToHTTPRequest(in *googleSearchInput) (*google.JobsRequest, error) 
 
 	req.HasRemote = in.HasRemote
 	if in.TargetLevel != "" {
-		if !googleTargetLevels[in.TargetLevel] {
+		if !_googleTargetLevels[in.TargetLevel] {
 			return nil, fmt.Errorf("invalid target_level %q", in.TargetLevel)
 		}
 		req.TargetLevels = []string{in.TargetLevel}
 	}
 	req.Skills = in.Skills
 	if in.Degree != "" {
-		if !googleDegrees[in.Degree] {
+		if !_googleDegrees[in.Degree] {
 			return nil, fmt.Errorf("invalid degree %q", in.Degree)
 		}
 		req.Degrees = []string{in.Degree}
 	}
 	if in.EmploymentType != "" {
-		if !googleEmploymentTypes[in.EmploymentType] {
+		if !_googleEmploymentTypes[in.EmploymentType] {
 			return nil, fmt.Errorf("invalid employment_type %q", in.EmploymentType)
 		}
 		req.EmploymentType = []string{in.EmploymentType}
 	}
 	if in.Company != "" {
-		if !googleCompanies[in.Company] {
+		if !_googleCompanies[in.Company] {
 			return nil, fmt.Errorf("invalid company %q", in.Company)
 		}
 		req.Companies = []string{in.Company}
 	}
 	if in.SortBy != "" {
-		if !googleSortBys[in.SortBy] {
+		if !_googleSortBys[in.SortBy] {
 			return nil, fmt.Errorf("invalid sort_by %q", in.SortBy)
 		}
 		req.SortBy = in.SortBy
@@ -239,7 +239,7 @@ func RegisterGoogle(s *mcp.Server, c *google.Client) {
 		Name:        "google_search_jobs",
 		Description: "Search jobs on the Google Careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Google Careers jobs", ReadOnlyHint: true},
-		InputSchema: googleSearchInputSchema,
+		InputSchema: _googleSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *googleSearchInput) (*mcp.CallToolResult, *googleSearchOutput, error) {
 		req, err := googleMCPToHTTPRequest(in)
 		if err != nil {

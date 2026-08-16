@@ -19,9 +19,13 @@ import (
 
 // apiBaseURL is Realtek's recruitment site origin — the single production
 // server in the provider's openapi.yaml.
-const apiBaseURL = "https://recruit.realtek.com"
+const _apiBaseURL = "https://recruit.realtek.com"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("realtek")
 	timeout := rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 	format := rootFlags.StringEnumLong("format", "output format", "text", "json")
@@ -111,22 +115,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (search, detail, types, or locations) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // jobSummaryJSON is the --format json shape for one search result.
@@ -192,7 +197,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(apiBaseURL)
+	client, err := realtek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -244,7 +249,7 @@ func runDetail(ctx context.Context, timeout time.Duration, jobOppID, format stri
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(apiBaseURL)
+	client, err := realtek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -285,7 +290,7 @@ func runTypes(ctx context.Context, timeout time.Duration, format string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(apiBaseURL)
+	client, err := realtek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -311,7 +316,7 @@ func runLocations(ctx context.Context, timeout time.Duration, format string) err
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(apiBaseURL)
+	client, err := realtek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}

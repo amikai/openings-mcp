@@ -8,31 +8,31 @@ import (
 )
 
 //go:embed testdata/search_rsp.html
-var mockSearchRsp []byte
+var _mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.html
-var mockSearchFilteredRsp []byte
+var _mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_offset_rsp.html
-var mockSearchOffsetRsp []byte
+var _mockSearchOffsetRsp []byte
 
 //go:embed testdata/search_no_results_rsp.html
-var mockSearchNoResultsRsp []byte
+var _mockSearchNoResultsRsp []byte
 
 //go:embed testdata/search_no_legend_rsp.html
-var mockSearchNoLegendRsp []byte
+var _mockSearchNoLegendRsp []byte
 
 //go:embed testdata/search_jobs_theme_rsp.html
-var mockSearchJobsThemeRsp []byte
+var _mockSearchJobsThemeRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_fields_rsp.html
-var mockJobDetailFieldsRsp []byte
+var _mockJobDetailFieldsRsp []byte
 
 //go:embed testdata/job_detail_not_found_rsp.html
-var mockJobDetailNotFoundRsp []byte
+var _mockJobDetailNotFoundRsp []byte
 
 // NewMockServer returns an httptest.Server that replays captured Avature
 // portal HTML under /careers (Bloomberg captures, plus the Koch detail as
@@ -44,23 +44,23 @@ func NewMockServer() *httptest.Server {
 		q := r.URL.Query()
 		switch {
 		case q.Get("search") == "zzzznonexistentkeyword12345":
-			serveHTML(mockSearchNoResultsRsp)(w, r)
+			serveHTML(_mockSearchNoResultsRsp)(w, r)
 		case q.Get("search") == "engineer":
-			serveHTML(mockSearchFilteredRsp)(w, r)
+			serveHTML(_mockSearchFilteredRsp)(w, r)
 		case q.Get("jobOffset") == "12":
-			serveHTML(mockSearchOffsetRsp)(w, r)
+			serveHTML(_mockSearchOffsetRsp)(w, r)
 		default:
-			serveHTML(mockSearchRsp)(w, r)
+			serveHTML(_mockSearchRsp)(w, r)
 		}
 	})
-	mux.HandleFunc("/nolegend/SearchJobs", serveHTML(mockSearchNoLegendRsp))
-	mux.HandleFunc("/jobs-theme/SearchJobs", serveHTML(mockSearchJobsThemeRsp))
+	mux.HandleFunc("/nolegend/SearchJobs", serveHTML(_mockSearchNoLegendRsp))
+	mux.HandleFunc("/jobs-theme/SearchJobs", serveHTML(_mockSearchJobsThemeRsp))
 	mux.HandleFunc("/careers/JobDetail/", func(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case strings.HasSuffix(r.URL.Path, "/20873"):
-			serveHTML(mockJobDetailRsp)(w, r)
+			serveHTML(_mockJobDetailRsp)(w, r)
 		case strings.HasSuffix(r.URL.Path, "/161128"):
-			serveHTML(mockJobDetailFieldsRsp)(w, r)
+			serveHTML(_mockJobDetailFieldsRsp)(w, r)
 		default:
 			// Live portals 302 unknown ids to <base>/Error.
 			http.Redirect(w, r, "/careers/Error", http.StatusFound)
@@ -69,7 +69,7 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/careers/Error", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusNotFound)
-		_, _ = w.Write(mockJobDetailNotFoundRsp)
+		_, _ = w.Write(_mockJobDetailNotFoundRsp)
 	})
 	return httptest.NewServer(mux)
 }

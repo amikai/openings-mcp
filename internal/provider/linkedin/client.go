@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	jobsPath      = "/jobs-guest/jobs/api/seeMoreJobPostings/search"
-	jobDetailPath = "/jobs/view"
+	_jobsPath      = "/jobs-guest/jobs/api/seeMoreJobPostings/search"
+	_jobDetailPath = "/jobs/view"
 )
 
 // Workplace type (f_WT). Only WorkplaceRemote was exercised against the live
@@ -111,7 +111,7 @@ func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("parse url %q: %w", c.baseURL, err)
 	}
-	u = u.JoinPath(jobsPath)
+	u = u.JoinPath(_jobsPath)
 
 	q := u.Query()
 	if r.Keywords != "" {
@@ -167,7 +167,7 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 		return nil, errors.New("empty job id")
 	}
 	c.warmSession(ctx)
-	u, err := url.JoinPath(c.baseURL, jobDetailPath, jobID)
+	u, err := url.JoinPath(c.baseURL, _jobDetailPath, jobID)
 	if err != nil {
 		return nil, fmt.Errorf("build job detail url: %w", err)
 	}

@@ -24,13 +24,15 @@ type RipplingAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*RipplingAdapter)(nil)
+
 // ripplingCareersURLRE matches Rippling board URLs and captures the board
 // slug (first path segment).
 //
 // Examples (hostname + escaped path):
 //   - ats.rippling.com/pythian/jobs
 //   - ats.rippling.com/boom-supersonic/jobs/144f31c4-...
-var ripplingCareersURLRE = regexp.MustCompile(
+var _ripplingCareersURLRE = regexp.MustCompile(
 	`(?i)^ats\.rippling\.com/(?P<slug>[^/]+)`,
 )
 
@@ -56,7 +58,7 @@ func (a *RipplingAdapter) Roster() []CompanyInfo {
 // segment is the board slug. Rippling mints lowercase slugs and its API is
 // case-sensitive, so the captured segment is lowercased before use.
 func (a *RipplingAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(ripplingCareersURLRE, u)
+	slug, ok := matchCareersSlug(_ripplingCareersURLRE, u)
 	return strings.ToLower(slug), ok
 }
 
@@ -154,7 +156,7 @@ func (a *RipplingAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob
 			continue
 		}
 		byID[e.UUID.Value] = len(jobs)
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		dept := e.Department.Value.Label.Value
 		if dept != "" {
 			fields["department"] = []string{dept}

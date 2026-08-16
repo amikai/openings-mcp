@@ -117,7 +117,7 @@ func TestDayforceSearch(t *testing.T) {
 	assert.Equal(t, 352, res.TotalCount)
 	assert.Equal(t, 1, res.Page)
 	assert.Equal(t, totalPages(352), res.TotalPages)
-	require.Len(t, res.Jobs, pageSize)
+	require.Len(t, res.Jobs, _pageSize)
 
 	job := res.Jobs[0]
 	assert.Equal(t, "62333", job.JobID)
@@ -134,8 +134,8 @@ func TestDayforceSearchPage2(t *testing.T) {
 
 	page1, err := a.Search(t.Context(), "pca", SearchParams{Page: 1})
 	require.NoError(t, err)
-	require.Len(t, page1.Jobs, pageSize)
-	assert.Equal(t, "60828", page1.Jobs[pageSize-1].JobID)
+	require.Len(t, page1.Jobs, _pageSize)
+	assert.Equal(t, "60828", page1.Jobs[_pageSize-1].JobID)
 
 	page2, err := a.Search(t.Context(), "pca", SearchParams{Page: 2})
 	require.NoError(t, err)

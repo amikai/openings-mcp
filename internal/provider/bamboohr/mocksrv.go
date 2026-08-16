@@ -29,42 +29,42 @@ const MockJobID = "201"
 const MockNullsJobID = "167"
 
 //go:embed testdata/list_rsp.json
-var mockListRsp []byte
+var _mockListRsp []byte
 
 //go:embed testdata/list_variety_rsp.json
-var mockListVarietyRsp []byte
+var _mockListVarietyRsp []byte
 
 //go:embed testdata/list_empty_rsp.json
-var mockListEmptyRsp []byte
+var _mockListEmptyRsp []byte
 
 //go:embed testdata/detail_rsp.json
-var mockDetailRsp []byte
+var _mockDetailRsp []byte
 
 //go:embed testdata/detail_nulls_rsp.json
-var mockDetailNullsRsp []byte
+var _mockDetailNullsRsp []byte
 
 //go:embed testdata/detail_not_found_rsp.json
-var mockDetailNotFoundRsp []byte
+var _mockDetailNotFoundRsp []byte
 
 // NewMockServer returns a fixture-replaying BambooHR careers site for the
 // MockSlug tenant. Both fixture details are served so tests can pick either
 // variant; unknown job ids get the captured 404 body. The caller owns the
 // server and must close it.
 func NewMockServer() *httptest.Server {
-	return newTenantServer(mockListRsp)
+	return newTenantServer(_mockListRsp)
 }
 
 // NewVarietyMockServer returns a fixture-replaying careers site for the
 // MockVarietySlug tenant, whose board exercises the list feed's value
 // variety.
 func NewVarietyMockServer() *httptest.Server {
-	return newTenantServer(mockListVarietyRsp)
+	return newTenantServer(_mockListVarietyRsp)
 }
 
 // NewEmptyMockServer returns a fixture-replaying careers site for a tenant
 // whose board has no public postings (HTTP 200, totalCount 0).
 func NewEmptyMockServer() *httptest.Server {
-	return newTenantServer(mockListEmptyRsp)
+	return newTenantServer(_mockListEmptyRsp)
 }
 
 // NewRedirectMockServer replays the unknown-tenant behavior: every path
@@ -79,9 +79,9 @@ func NewRedirectMockServer() *httptest.Server {
 func newTenantServer(listRsp []byte) *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/careers/list", serveMockJSON(http.StatusOK, listRsp))
-	mux.HandleFunc("/careers/"+MockJobID+"/detail", serveMockJSON(http.StatusOK, mockDetailRsp))
-	mux.HandleFunc("/careers/"+MockNullsJobID+"/detail", serveMockJSON(http.StatusOK, mockDetailNullsRsp))
-	mux.HandleFunc("/careers/", serveMockJSON(http.StatusNotFound, mockDetailNotFoundRsp))
+	mux.HandleFunc("/careers/"+MockJobID+"/detail", serveMockJSON(http.StatusOK, _mockDetailRsp))
+	mux.HandleFunc("/careers/"+MockNullsJobID+"/detail", serveMockJSON(http.StatusOK, _mockDetailNullsRsp))
+	mux.HandleFunc("/careers/", serveMockJSON(http.StatusNotFound, _mockDetailNotFoundRsp))
 	return httptest.NewServer(mux)
 }
 

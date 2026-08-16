@@ -31,22 +31,22 @@ var _ Adapter = (*MokaHRAdapter)(nil)
 //   - app.mokahr.com/social-recruitment/high-flyer/140576
 //   - app.mokahr.com/social-recruitment/high-flyer/140576#/job/7dcd6fde-...
 //   - app.mokahr.com/campus_apply/moka/118263
-var mokaHRCareersURLRE = regexp.MustCompile(
+var _mokaHRCareersURLRE = regexp.MustCompile(
 	`(?i)^app\.mokahr\.com/(?:social-recruitment|campus[_-](?:apply|recruitment))/(?P<slug>[^/]+/[0-9]+)`,
 )
 
 const (
 	// mokaHRDumpPageSize is the largest page MokaHR serves; 60 is rejected.
-	mokaHRDumpPageSize = 50
+	_mokaHRDumpPageSize = 50
 	// maxMokaHRCandidates bounds the local-search path. The largest roster
 	// board is around 1300 postings, so real tenants fit; anything past this
 	// is told to narrow with the server-side filters instead.
-	maxMokaHRCandidates = 2000
+	_maxMokaHRCandidates = 2000
 	// mokaHRDumpConcurrency parallelizes the full-board read. The first page
 	// reports the total, so every later offset is known at once and their
 	// requests do not have to queue behind each other; on the slowest roster
 	// tenant that is the difference between ~17s and ~4s.
-	mokaHRDumpConcurrency = 8
+	_mokaHRDumpConcurrency = 8
 )
 
 // MokaHRAdapter serves MokaHR-hosted careers sites. Structured filters
@@ -67,7 +67,7 @@ func NewMokaHRAdapter(baseURL string, hc *http.Client) (*MokaHRAdapter, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &MokaHRAdapter{client: c, dumpPageSize: mokaHRDumpPageSize}, nil
+	return &MokaHRAdapter{client: c, dumpPageSize: _mokaHRDumpPageSize}, nil
 }
 
 func (a *MokaHRAdapter) Name() string { return "mokahr" }
@@ -84,7 +84,7 @@ func (a *MokaHRAdapter) Roster() []CompanyInfo {
 // "<org>/<siteId>" is already the slug form the roster uses, so a curated
 // company's own URL resolves to its roster entry.
 func (a *MokaHRAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(mokaHRCareersURLRE, u)
+	slug, ok := matchCareersSlug(_mokaHRCareersURLRE, u)
 	if !ok {
 		return "", false
 	}
@@ -167,11 +167,11 @@ func (a *MokaHRAdapter) searchMokaHRPage(
 ) (*SearchResult, error) {
 	page := clampPage(requestedPage)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/pageSize {
+	if pageIndex > math.MaxInt/_pageSize {
 		return nil, fmt.Errorf("mokahr: page %d is too large; retry with a smaller page", page)
 	}
-	req.Limit = mokahr.NewOptInt(pageSize)
-	req.Offset = mokahr.NewOptInt(pageIndex * pageSize)
+	req.Limit = mokahr.NewOptInt(_pageSize)
+	req.Offset = mokahr.NewOptInt(pageIndex * _pageSize)
 	req.NeedStat = mokahr.NewOptBool(true)
 	list, err := a.client.ListJobs(ctx, req)
 	if err != nil {
@@ -205,7 +205,7 @@ func (a *MokaHRAdapter) searchMokaHRDump(
 	if err != nil {
 		return nil, err
 	}
-	jobs := make([]dumpJob, 0, len(pages)*cmp.Or(a.dumpPageSize, mokaHRDumpPageSize))
+	jobs := make([]dumpJob, 0, len(pages)*cmp.Or(a.dumpPageSize, _mokaHRDumpPageSize))
 	located := false
 	for _, page := range pages {
 		for _, j := range page {
@@ -233,7 +233,7 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 	site mokaHRSite,
 	req mokahr.ListJobsRequest,
 ) ([][]mokahr.Job, error) {
-	pageSize := cmp.Or(a.dumpPageSize, mokaHRDumpPageSize)
+	pageSize := cmp.Or(a.dumpPageSize, _mokaHRDumpPageSize)
 	req.Limit = mokahr.NewOptInt(pageSize)
 	req.NeedStat = mokahr.NewOptBool(true)
 	req.Offset = mokahr.NewOptInt(0)
@@ -242,7 +242,7 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 		return nil, mokaHRError(site, err)
 	}
 	total, hasTotal := first.JobStats.Value.Total.Get()
-	if hasTotal && total > maxMokaHRCandidates {
+	if hasTotal && total > _maxMokaHRCandidates {
 		return nil, mokaHRTooBroad(site, total)
 	}
 	// MokaHR answers with min(limit, remaining), so a short page is the last
@@ -267,7 +267,7 @@ func (a *MokaHRAdapter) readMokaHRBoard(
 	}
 
 	g, gCtx := errgroup.WithContext(ctx)
-	g.SetLimit(mokaHRDumpConcurrency)
+	g.SetLimit(_mokaHRDumpConcurrency)
 	for i := range len(pages) {
 		if i == 0 {
 			continue
@@ -298,7 +298,7 @@ func (a *MokaHRAdapter) Filters(ctx context.Context, slug string) (FilterSet, er
 	if err != nil {
 		return nil, err
 	}
-	fs := FilterSet{}
+	fs := make(FilterSet)
 	if len(facets.cityLabels) > 0 {
 		fs["city"] = slices.Clone(facets.cityLabels)
 	}
@@ -358,7 +358,7 @@ func (a *MokaHRAdapter) walkMokaHRBoard(
 	pages := [][]mokahr.Job{firstPage}
 	read := len(firstPage)
 	for offset := pageSize; ; offset += pageSize {
-		if read > maxMokaHRCandidates {
+		if read > _maxMokaHRCandidates {
 			return nil, mokaHRTooBroad(site, read)
 		}
 		req.Offset = mokahr.NewOptInt(offset)
@@ -443,11 +443,11 @@ func (a *MokaHRAdapter) facets(ctx context.Context, site mokaHRSite) (*mokaHRFac
 		return nil, mokaHRError(site, err)
 	}
 	f := &mokaHRFacets{
-		cityIDs:        map[string][]int{},
-		categoryIDs:    map[string][]int{},
-		cityByLocation: map[int]string{},
-		provinceByLoc:  map[int]string{},
-		provinceIDs:    map[string][]int{},
+		cityIDs:        make(map[string][]int),
+		categoryIDs:    make(map[string][]int),
+		cityByLocation: make(map[int]string),
+		provinceByLoc:  make(map[int]string),
+		provinceIDs:    make(map[string][]int),
 	}
 	system := aggs.SystemFieldsAggregations.Value
 	// A city covers several districts, so its filter value maps to every
@@ -555,7 +555,7 @@ func mokaHRSummary(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) JobSumma
 
 func mokaHRDumpJob(site mokaHRSite, facets *mokaHRFacets, j mokahr.Job) dumpJob {
 	summary := mokaHRSummary(site, facets, j)
-	fields := map[string][]string{}
+	fields := make(map[string][]string)
 	if cities := mokaHRCities(facets, j.Locations.Or(nil)); len(cities) > 0 {
 		fields["city"] = cities
 	}
@@ -648,10 +648,10 @@ func mokaHRDescription(html string) string {
 
 // mokaHRTimeLayouts are MokaHR's zone-less wall-clock stamps: seconds
 // precision on createdAt/publishedAt, minutes on openedAt.
-var mokaHRTimeLayouts = []string{"2006-01-02T15:04:05", "2006-01-02T15:04"}
+var _mokaHRTimeLayouts = []string{"2006-01-02T15:04:05", "2006-01-02T15:04"}
 
 func mokaHRParseTime(s string) (time.Time, bool) {
-	for _, layout := range mokaHRTimeLayouts {
+	for _, layout := range _mokaHRTimeLayouts {
 		if t, err := time.Parse(layout, s); err == nil {
 			return t, true
 		}

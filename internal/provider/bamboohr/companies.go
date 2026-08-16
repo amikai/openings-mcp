@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public BambooHR hosted careers
 // site. Slug is the site's subdomain and the provider's tenant key. Every
@@ -26,11 +26,11 @@ type Company struct {
 }
 
 // careersURLTpl formats a BambooHR careers page URL (e.g. "https://curtinmaritime.bamboohr.com/careers").
-const careersURLTpl = "https://%s.bamboohr.com/careers"
+const _careersURLTpl = "https://%s.bamboohr.com/careers"
 
 // CareersURL returns the company's human-facing BambooHR careers page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Slug)
+	return fmt.Sprintf(_careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed BambooHR careers site, sorted by company
@@ -41,7 +41,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("bamboohr: load companies.yaml: %v", err))
 	}

@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const testCountryCode = "TWN"
+const _testCountryCode = "TWN"
 
 func TestSearchJobs(t *testing.T) {
 	srv := NewMockServer()
@@ -57,7 +57,7 @@ func TestSearchJobsFiltered(t *testing.T) {
 func TestSearchAPIRequestFilters(t *testing.T) {
 	request, err := searchAPIRequest(SearchRequest{
 		Keyword:     "go",
-		CountryCode: testCountryCode,
+		CountryCode: _testCountryCode,
 		HomeOffice:  true,
 	})
 	require.NoError(t, err)
@@ -65,7 +65,7 @@ func TestSearchAPIRequestFilters(t *testing.T) {
 	require.True(t, ok)
 	assert.True(t, homeOffice)
 
-	request, err = searchAPIRequest(SearchRequest{Keyword: "go", CountryCode: testCountryCode})
+	request, err = searchAPIRequest(SearchRequest{Keyword: "go", CountryCode: _testCountryCode})
 	require.NoError(t, err)
 	_, ok = request.Filters.HomeOffice.Get()
 	assert.False(t, ok, "homeOffice must be omitted unless requested, matching the site")
@@ -78,7 +78,7 @@ func TestSearchAPIRequestFilters(t *testing.T) {
 func TestSearchAPIRequestMultipleLocations(t *testing.T) {
 	request, err := searchAPIRequest(SearchRequest{
 		Keyword:     "go",
-		CountryCode: testCountryCode,
+		CountryCode: _testCountryCode,
 		Locations:   []string{"TPEI", "state953"},
 	})
 	require.NoError(t, err)
@@ -103,7 +103,7 @@ func TestSearchJobsMultipleLocationsWithoutCountry(t *testing.T) {
 	require.NoError(t, err)
 
 	response, err := client.SearchJobs(t.Context(), SearchRequest{
-		Keyword:   mockMultiLocationKeyword,
+		Keyword:   _mockMultiLocationKeyword,
 		Locations: []string{"TPEI", "NTC9"},
 	})
 	require.NoError(t, err, "Locations alone, without CountryCode, must reach the search endpoint")
@@ -119,18 +119,18 @@ func TestSearchJobsValidation(t *testing.T) {
 		want    string
 		request SearchRequest
 	}{
-		{name: "missing keyword", request: SearchRequest{CountryCode: testCountryCode}, want: "keyword is required"},
+		{name: "missing keyword", request: SearchRequest{CountryCode: _testCountryCode}, want: "keyword is required"},
 		{name: "missing location", request: SearchRequest{Keyword: "go"}, want: "at least one of country code or locations is required"},
 		{name: "short country", request: SearchRequest{Keyword: "go", CountryCode: "TW"}, want: "three ascii letters"},
 		{name: "non-ascii country", request: SearchRequest{Keyword: "go", CountryCode: "台灣"}, want: "three ascii letters"},
 		{name: "invalid location code", request: SearchRequest{Keyword: "go", Locations: []string{"tpei!"}}, want: "location code must contain only ascii letters and digits"},
-		{name: "negative page", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Page: -1}, want: "page must be >= 1"},
-		{name: "invalid sort", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Sort: Sort("oldest")}, want: "invalid sort"},
-		{name: "blank keyword filter", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Keywords: []string{" "}}, want: "keyword filters must not be blank"},
-		{name: "blank team code", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Teams: []TeamFilter{{SubTeamCode: "AF"}}}, want: "team code must not be blank"},
-		{name: "invalid sub-team code", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Teams: []TeamFilter{{TeamCode: "SFTWR", SubTeamCode: "A-F"}}}, want: "sub-team code must contain only ascii letters and digits"},
-		{name: "invalid product code", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Products: []string{"iPhone 17"}}, want: "product code must contain only ascii letters and digits"},
-		{name: "invalid language code", request: SearchRequest{Keyword: "go", CountryCode: testCountryCode, Languages: []string{"zh-TW"}}, want: "language code must contain only ascii letters and underscores"},
+		{name: "negative page", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Page: -1}, want: "page must be >= 1"},
+		{name: "invalid sort", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Sort: Sort("oldest")}, want: "invalid sort"},
+		{name: "blank keyword filter", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Keywords: []string{" "}}, want: "keyword filters must not be blank"},
+		{name: "blank team code", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Teams: []TeamFilter{{SubTeamCode: "AF"}}}, want: "team code must not be blank"},
+		{name: "invalid sub-team code", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Teams: []TeamFilter{{TeamCode: "SFTWR", SubTeamCode: "A-F"}}}, want: "sub-team code must contain only ascii letters and digits"},
+		{name: "invalid product code", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Products: []string{"iPhone 17"}}, want: "product code must contain only ascii letters and digits"},
+		{name: "invalid language code", request: SearchRequest{Keyword: "go", CountryCode: _testCountryCode, Languages: []string{"zh-TW"}}, want: "language code must contain only ascii letters and underscores"},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

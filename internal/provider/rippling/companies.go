@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization hosting a public Rippling job board,
 // drawn from a curated list (internal/provider/rippling/companies.yaml).
@@ -26,13 +26,13 @@ type Company struct {
 }
 
 // careersURLTpl formats a Rippling job board page URL (e.g. "https://ats.rippling.com/pythian/jobs").
-const careersURLTpl = "https://ats.rippling.com/%s/jobs"
+const _careersURLTpl = "https://ats.rippling.com/%s/jobs"
 
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://ats.rippling.com/pythian/jobs. API calls instead pass BoardSlug
 // directly as the board_slug parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.BoardSlug)
+	return fmt.Sprintf(_careersURLTpl, c.BoardSlug)
 }
 
 // Companies holds every confirmed Rippling board, sorted by company name.
@@ -47,7 +47,7 @@ var CompaniesByBoardSlug = buildBoardSlugIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("rippling: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })

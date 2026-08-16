@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // RosterCompany is a confirmed organization hosting a public Eightfold
 // career site, drawn from a curated list
@@ -27,11 +27,11 @@ type RosterCompany struct {
 }
 
 // careersURLTpl formats an Eightfold career site URL (e.g. "https://nutanix.eightfold.ai/careers").
-const careersURLTpl = "https://%s.eightfold.ai/careers"
+const _careersURLTpl = "https://%s.eightfold.ai/careers"
 
 // CareersURL returns the company's human-facing career site.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Tenant)
+	return fmt.Sprintf(_careersURLTpl, c.Tenant)
 }
 
 // Companies holds every confirmed Eightfold company, sorted by company
@@ -47,7 +47,7 @@ var CompaniesByTenant = buildTenantIndex(Companies)
 // recover from.
 func mustLoadCompanies() []RosterCompany {
 	var cs []RosterCompany
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("eightfold: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b RosterCompany) int { return strings.Compare(a.Name, b.Name) })

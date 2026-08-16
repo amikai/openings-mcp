@@ -15,12 +15,16 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 )
 
-const defaultBaseURL = "https://hrmos.co"
+const _defaultBaseURL = "https://hrmos.co"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("hrmos")
 	var (
-		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "HRMOS 採用 base URL")
+		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "HRMOS 採用 base URL")
 		company = rootFlags.StringLong("company", "", "HRMOS tenant slug, e.g. moneyforward (see 'hrmos companies' for the curated list; any live tenant slug also works)")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
@@ -90,22 +94,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveSlug accepts either a curated roster slug or an arbitrary live

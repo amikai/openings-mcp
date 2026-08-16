@@ -87,7 +87,7 @@ func TestCheckProbesDetailOnFirstJob(t *testing.T) {
 
 	r := c.do(t.Context(), time.Minute)
 
-	assert.Equal(t, statusOK, r.Status)
+	assert.Equal(t, _statusOK, r.Status)
 	assert.Equal(t, 42, r.Jobs)
 	assert.Empty(t, r.Detail)
 	assert.Equal(t, 1, fake.detailCalls)
@@ -104,7 +104,7 @@ func TestCheckReportsDetailFailure(t *testing.T) {
 
 	r := c.do(t.Context(), time.Minute)
 
-	assert.Equal(t, statusDetailError, r.Status)
+	assert.Equal(t, _statusDetailError, r.Status)
 	assert.Equal(t, 42, r.Jobs)
 	assert.Contains(t, r.Detail, "job-1")
 	assert.Contains(t, r.Detail, "unrecognized detail page")
@@ -116,7 +116,7 @@ func TestCheckSkipsDetailWhenZeroJobs(t *testing.T) {
 
 	r := c.do(t.Context(), time.Minute)
 
-	assert.Equal(t, statusOK, r.Status)
+	assert.Equal(t, _statusOK, r.Status)
 	assert.Zero(t, r.Jobs)
 	assert.Zero(t, fake.detailCalls)
 }
@@ -130,7 +130,7 @@ func TestCheckReportsUnprobeablePage(t *testing.T) {
 
 	r := c.do(t.Context(), time.Minute)
 
-	assert.Equal(t, statusDetailError, r.Status)
+	assert.Equal(t, _statusDetailError, r.Status)
 	assert.Equal(t, 42, r.Jobs)
 	assert.NotEmpty(t, r.Detail)
 	assert.Zero(t, fake.detailCalls)
@@ -142,16 +142,16 @@ func TestCheckSkipsDetailWhenSearchFails(t *testing.T) {
 
 	r := c.do(t.Context(), time.Minute)
 
-	assert.Equal(t, statusError, r.Status)
+	assert.Equal(t, _statusError, r.Status)
 	assert.Zero(t, fake.detailCalls)
 }
 
 func TestTallyCountsDetailErrorAsError(t *testing.T) {
 	ok, errs, zero := tally([]result{
-		{Status: statusOK, Jobs: 3},
-		{Status: statusOK, Jobs: 0},
-		{Status: statusDetailError, Jobs: 7},
-		{Status: statusError},
+		{Status: _statusOK, Jobs: 3},
+		{Status: _statusOK, Jobs: 0},
+		{Status: _statusDetailError, Jobs: 7},
+		{Status: _statusError},
 	})
 	assert.Equal(t, 2, ok)
 	assert.Equal(t, 2, errs)

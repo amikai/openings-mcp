@@ -10,7 +10,7 @@ import (
 
 // pageSize is the fixed page size for every adapter. Workday caps limit at
 // 20 on at least one tenant, so 20 is the largest safe uniform value.
-const pageSize = 20
+const _pageSize = 20
 
 // Adapter is one ATS's implementation of the unified search interface.
 // Methods address a company by slug: either one declared by [Adapter.Roster]
@@ -110,7 +110,7 @@ type JobDetail struct {
 // totals.
 func clampPage(p int) int { return max(p, 1) }
 
-func totalPages(total int) int { return (total + pageSize - 1) / pageSize }
+func totalPages(total int) int { return (total + _pageSize - 1) / _pageSize }
 
 // isoDate renders the unified PostedAt format for upstreams that provide a
 // real timestamp.

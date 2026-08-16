@@ -7,31 +7,31 @@ import (
 )
 
 //go:embed testdata/jobs_p1_rsp.html
-var mockJobsP1Rsp []byte
+var _mockJobsP1Rsp []byte
 
 //go:embed testdata/jobs_p2_rsp.html
-var mockJobsP2Rsp []byte
+var _mockJobsP2Rsp []byte
 
 //go:embed testdata/jobs_p3_rsp.html
-var mockJobsP3Rsp []byte
+var _mockJobsP3Rsp []byte
 
 //go:embed testdata/jobs_p4_rsp.html
-var mockJobsP4Rsp []byte
+var _mockJobsP4Rsp []byte
 
 //go:embed testdata/jobs_small_rsp.html
-var mockJobsSmallRsp []byte
+var _mockJobsSmallRsp []byte
 
 //go:embed testdata/jobs_nofacets_rsp.html
-var mockJobsNofacetsRsp []byte
+var _mockJobsNofacetsRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_salary_rsp.html
-var mockJobDetailSalaryRsp []byte
+var _mockJobDetailSalaryRsp []byte
 
 //go:embed testdata/job_detail_shinsotsu_rsp.html
-var mockJobDetailShinsotsuRsp []byte
+var _mockJobDetailShinsotsuRsp []byte
 
 // Mock tenant slugs and job IDs, matching the captured fixtures.
 const (
@@ -60,9 +60,9 @@ func NewMockServer() *httptest.Server {
 		case MockSlugPaged:
 			serveMockJobsPage(w, r)
 		case MockSlugSmall:
-			serveMockHTML(w, mockJobsSmallRsp)
+			serveMockHTML(w, _mockJobsSmallRsp)
 		case MockSlugNoFacets:
-			serveMockHTML(w, mockJobsNofacetsRsp)
+			serveMockHTML(w, _mockJobsNofacetsRsp)
 		default:
 			http.NotFound(w, r)
 		}
@@ -71,11 +71,11 @@ func NewMockServer() *httptest.Server {
 		slug, id := r.PathValue("slug"), r.PathValue("id")
 		switch {
 		case slug == MockSlugPaged && id == MockJobID:
-			serveMockHTML(w, mockJobDetailRsp)
+			serveMockHTML(w, _mockJobDetailRsp)
 		case slug == MockSlugSmall && id == MockJobIDSalary:
-			serveMockHTML(w, mockJobDetailSalaryRsp)
+			serveMockHTML(w, _mockJobDetailSalaryRsp)
 		case slug == MockSlugShinsotsu && id == MockJobIDShinsotsu:
-			serveMockHTML(w, mockJobDetailShinsotsuRsp)
+			serveMockHTML(w, _mockJobDetailShinsotsuRsp)
 		default:
 			http.NotFound(w, r)
 		}
@@ -87,13 +87,13 @@ func NewMockServer() *httptest.Server {
 func serveMockJobsPage(w http.ResponseWriter, r *http.Request) {
 	switch r.URL.Query().Get("page") {
 	case "", "1":
-		serveMockHTML(w, mockJobsP1Rsp)
+		serveMockHTML(w, _mockJobsP1Rsp)
 	case "2":
-		serveMockHTML(w, mockJobsP2Rsp)
+		serveMockHTML(w, _mockJobsP2Rsp)
 	case "3":
-		serveMockHTML(w, mockJobsP3Rsp)
+		serveMockHTML(w, _mockJobsP3Rsp)
 	default:
-		serveMockHTML(w, mockJobsP4Rsp)
+		serveMockHTML(w, _mockJobsP4Rsp)
 	}
 }
 

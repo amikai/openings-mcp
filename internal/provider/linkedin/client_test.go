@@ -21,7 +21,7 @@ func TestJobs(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	assert.Equal(t, &JobsResponse{Jobs: wantJobs}, got)
+	assert.Equal(t, &JobsResponse{Jobs: _wantJobs}, got)
 }
 
 func TestJobDetail(t *testing.T) {
@@ -35,7 +35,7 @@ func TestJobDetail(t *testing.T) {
 	description := got.Description
 	got.Description = ""
 
-	assert.Equal(t, wantDetail, got)
+	assert.Equal(t, _wantDetail, got)
 	assert.Contains(t, description, "BoostDraft is a software engineering company")
 }
 
@@ -56,7 +56,7 @@ func TestJobDetailWarmsColdSession(t *testing.T) {
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Write(mockJobDetailRsp)
+		w.Write(_mockJobDetailRsp)
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()

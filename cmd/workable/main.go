@@ -20,9 +20,13 @@ import (
 // apiBaseURL is the origin behind Workable-hosted careers pages — the single
 // production server in the provider's openapi.yaml (paths carry the
 // /api/v3 and /api/v2 prefixes).
-const apiBaseURL = "https://apply.workable.com"
+const _apiBaseURL = "https://apply.workable.com"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("workable")
 	var (
 		company = rootFlags.StringLong("company", "", `Workable account subdomain from the careers URL, e.g. "blueground" in apply.workable.com/blueground`)
@@ -123,22 +127,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, get, or filters) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // normalizeCompany requires --company to be a curated company — same policy
@@ -285,7 +290,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -368,7 +373,7 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -437,7 +442,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(apiBaseURL)
+	client, err := workable.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}

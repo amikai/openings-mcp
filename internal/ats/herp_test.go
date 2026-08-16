@@ -16,12 +16,12 @@ import (
 // Postings from testdata/company_rsp.json, picked for the property each one
 // pins.
 const (
-	herpFullRemoteJobID = "ZluM2laebsdh" // FULL_REMOTEWORK, インサイドセールス, 東京都中央区 + 京都府
-	herpHybridJobID     = "KJeVI46CBl58" // HYBRID_REMOTEWORK, コンサルティング role
-	herpNoRemoteJobID   = "MGp32NANKleO" // no jobRemoteworkType at all
-	herpBodyOnlyJobID   = "WZPIQQCxEKFO" // mentions コンサルティング only in its body
-	herpSparseJobID     = "zCbE82jVP-8s" // company_sparse_rsp.json: no location of any kind
-	herpOptOutJobID     = "FfCSxynEKKev" // company_media_optout_rsp.json: open, but no media apply action
+	_herpFullRemoteJobID = "ZluM2laebsdh" // FULL_REMOTEWORK, インサイドセールス, 東京都中央区 + 京都府
+	_herpHybridJobID     = "KJeVI46CBl58" // HYBRID_REMOTEWORK, コンサルティング role
+	_herpNoRemoteJobID   = "MGp32NANKleO" // no jobRemoteworkType at all
+	_herpBodyOnlyJobID   = "WZPIQQCxEKFO" // mentions コンサルティング only in its body
+	_herpSparseJobID     = "zCbE82jVP-8s" // company_sparse_rsp.json: no location of any kind
+	_herpOptOutJobID     = "FfCSxynEKKev" // company_media_optout_rsp.json: open, but no media apply action
 )
 
 func testHerpAdapter(t *testing.T) *HerpAdapter {
@@ -69,7 +69,7 @@ func TestHerpParseCareersURL(t *testing.T) {
 		{name: "career board", rawURL: "https://herp.careers/careers/companies/notainc", wantSlug: "notainc", wantOK: true},
 		{
 			name:     "job page",
-			rawURL:   "https://herp.careers/careers/companies/notainc/jobs/" + herpFullRemoteJobID,
+			rawURL:   "https://herp.careers/careers/companies/notainc/jobs/" + _herpFullRemoteJobID,
 			wantSlug: "notainc",
 			wantOK:   true,
 		},
@@ -100,7 +100,7 @@ func TestHerpCareersHostPatternRegistered(t *testing.T) {
 	// The registry only advertises careers-URL shapes for adapters listed
 	// in careersHostPatternsByAdapter; a missing entry silently degrades
 	// the "unrecognized careers URL" teaching error.
-	assert.Contains(t, careersHostPatternsByAdapter, "herp")
+	assert.Contains(t, _careersHostPatternsByAdapter, "herp")
 }
 
 func TestHerpSearchAll(t *testing.T) {
@@ -109,7 +109,7 @@ func TestHerpSearchAll(t *testing.T) {
 	require.NoError(t, err)
 
 	assert.Equal(t, 51, res.TotalCount)
-	assert.Len(t, res.Jobs, pageSize)
+	assert.Len(t, res.Jobs, _pageSize)
 	for _, j := range res.Jobs {
 		assert.NotEmpty(t, j.JobID)
 		assert.NotEmpty(t, j.Title)
@@ -143,7 +143,7 @@ func TestHerpSearchFilters(t *testing.T) {
 	})
 	require.NoError(t, err)
 	assert.Equal(t, 4, byRole.TotalCount)
-	assert.Contains(t, jobIDs(byRole.Jobs), herpFullRemoteJobID)
+	assert.Contains(t, jobIDs(byRole.Jobs), _herpFullRemoteJobID)
 
 	byPrefecture, err := a.Search(t.Context(), herp.MockSlug, SearchParams{
 		Filters: FilterSet{"prefecture": {"京都府"}},
@@ -170,17 +170,17 @@ func TestHerpRemoteSearchCoversHybrid(t *testing.T) {
 	// "remote" is the broad cut: full remote and hybrid both answer to it,
 	// because hybrid outnumbers full remote on Japanese boards and silently
 	// hiding it would be the worse default.
-	remote := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: remoteLocation})
-	assert.Contains(t, remote, herpFullRemoteJobID)
-	assert.Contains(t, remote, herpHybridJobID)
-	assert.NotContains(t, remote, herpNoRemoteJobID)
+	remote := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: _remoteLocation})
+	assert.Contains(t, remote, _herpFullRemoteJobID)
+	assert.Contains(t, remote, _herpHybridJobID)
+	assert.NotContains(t, remote, _herpNoRemoteJobID)
 
 	// workplaceType is the precise cut.
 	full := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{
 		Filters: FilterSet{"workplaceType": {"Remote"}},
 	})
-	assert.Contains(t, full, herpFullRemoteJobID)
-	assert.NotContains(t, full, herpHybridJobID)
+	assert.Contains(t, full, _herpFullRemoteJobID)
+	assert.NotContains(t, full, _herpHybridJobID)
 }
 
 func TestHerpLocationAcceptsRomanizedPrefecture(t *testing.T) {
@@ -190,7 +190,7 @@ func TestHerpLocationAcceptsRomanizedPrefecture(t *testing.T) {
 	// indexes the romanized prefecture — otherwise an English location
 	// search returns nothing at all, with no error to explain why.
 	tokyo := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: "tokyo"})
-	assert.Contains(t, tokyo, herpFullRemoteJobID)
+	assert.Contains(t, tokyo, _herpFullRemoteJobID)
 
 	japanese := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: "東京都"})
 	assert.ElementsMatch(t, japanese, tokyo)
@@ -198,7 +198,7 @@ func TestHerpLocationAcceptsRomanizedPrefecture(t *testing.T) {
 	// A value offered as a city filter also works as a location, so the two
 	// discovery paths agree.
 	byCity := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: "中央区"})
-	assert.Contains(t, byCity, herpFullRemoteJobID)
+	assert.Contains(t, byCity, _herpFullRemoteJobID)
 }
 
 func TestHerpJobRolesMapToOrganizationUnit(t *testing.T) {
@@ -210,17 +210,17 @@ func TestHerpJobRolesMapToOrganizationUnit(t *testing.T) {
 	require.NoError(t, err)
 
 	ids := jobIDs(res.Jobs)
-	require.Contains(t, ids, herpHybridJobID)
-	require.Contains(t, ids, herpBodyOnlyJobID)
-	assert.Less(t, slices.Index(ids, herpHybridJobID), slices.Index(ids, herpBodyOnlyJobID))
+	require.Contains(t, ids, _herpHybridJobID)
+	require.Contains(t, ids, _herpBodyOnlyJobID)
+	assert.Less(t, slices.Index(ids, _herpHybridJobID), slices.Index(ids, _herpBodyOnlyJobID))
 }
 
 func TestHerpDetail(t *testing.T) {
 	a := testHerpAdapter(t)
-	d, err := a.Detail(t.Context(), herp.MockSlug, herpFullRemoteJobID)
+	d, err := a.Detail(t.Context(), herp.MockSlug, _herpFullRemoteJobID)
 	require.NoError(t, err)
 
-	assert.Equal(t, herpFullRemoteJobID, d.JobID)
+	assert.Equal(t, _herpFullRemoteJobID, d.JobID)
 	assert.Equal(t, "100｜インサイドセールス", d.Title)
 	assert.Equal(t, "株式会社Helpfeel", d.Company)
 	assert.Equal(t, "2026-02-03", d.PostedAt)
@@ -251,9 +251,9 @@ func TestHerpMediaOptOutLinksToApplicableSurface(t *testing.T) {
 		assert.Contains(t, j.URL, "/v1/"+herp.MockMediaOptOutSlug+"/"+j.JobID)
 	}
 
-	d, err := a.Detail(t.Context(), herp.MockMediaOptOutSlug, herpOptOutJobID)
+	d, err := a.Detail(t.Context(), herp.MockMediaOptOutSlug, _herpOptOutJobID)
 	require.NoError(t, err)
-	assert.Contains(t, d.URL, "/v1/"+herp.MockMediaOptOutSlug+"/"+herpOptOutJobID)
+	assert.Contains(t, d.URL, "/v1/"+herp.MockMediaOptOutSlug+"/"+_herpOptOutJobID)
 
 	// The company opting out of media applications says nothing about whether
 	// this posting is open; isApplicable does.
@@ -264,7 +264,7 @@ func TestHerpFounderBadgeIsScopedToThisCompany(t *testing.T) {
 	a := testHerpAdapter(t)
 
 	// The inside founder keeps the badge.
-	d, err := a.Detail(t.Context(), herp.MockSlug, herpFullRemoteJobID)
+	d, err := a.Detail(t.Context(), herp.MockSlug, _herpFullRemoteJobID)
 	require.NoError(t, err)
 	assert.Contains(t, d.Description, "経営陣: 永田 周一（創業者）")
 
@@ -288,7 +288,7 @@ func TestHerpFreeTextLocationStaysSearchable(t *testing.T) {
 	// only in the free-text location. Losing it would make a perfectly
 	// reasonable city search return nothing.
 	ids := herpAllJobIDs(t, a, herp.MockSlug, SearchParams{Location: "上京区"})
-	assert.Contains(t, ids, herpFullRemoteJobID)
+	assert.Contains(t, ids, _herpFullRemoteJobID)
 
 	// The concise structured form is still what gets displayed.
 	res, err := a.Search(t.Context(), herp.MockSlug, SearchParams{Location: "上京区"})
@@ -311,7 +311,7 @@ func TestHerpCompanyNotListed(t *testing.T) {
 
 func TestHerpPostingWithoutAnyLocation(t *testing.T) {
 	a := testHerpAdapter(t)
-	d, err := a.Detail(t.Context(), herp.MockSparseSlug, herpSparseJobID)
+	d, err := a.Detail(t.Context(), herp.MockSparseSlug, _herpSparseJobID)
 	require.NoError(t, err)
 
 	// No structured location, no free text, no remote type: the location

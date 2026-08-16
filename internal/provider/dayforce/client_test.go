@@ -244,7 +244,7 @@ func TestSearchWithHeaderButNoCookieIsForbidden(t *testing.T) {
 		ClientNamespace: "pca",
 		JobBoardCode:    "CANDIDATEPORTAL",
 		CultureCode:     "en-US",
-	}, SearchJobPostingsParams{ClientNamespace: "pca", XCSRFTOKEN: mockCSRFToken})
+	}, SearchJobPostingsParams{ClientNamespace: "pca", XCSRFTOKEN: _mockCSRFToken})
 	require.NoError(t, err)
 
 	_, ok := res.(*SearchJobPostingsForbidden)

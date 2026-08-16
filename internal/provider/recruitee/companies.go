@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public Recruitee career site.
 // Slug is the career site's subdomain and the provider's tenant key.
@@ -24,11 +24,11 @@ type Company struct {
 }
 
 // careersURLTpl formats a Recruitee jobs page URL (e.g. "https://mous.recruitee.com").
-const careersURLTpl = "https://%s.recruitee.com"
+const _careersURLTpl = "https://%s.recruitee.com"
 
 // CareersURL returns the company's human-facing Recruitee jobs page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Slug)
+	return fmt.Sprintf(_careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed Recruitee career site, sorted by company
@@ -39,7 +39,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("recruitee: load companies.yaml: %v", err))
 	}

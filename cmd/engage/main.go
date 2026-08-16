@@ -21,9 +21,13 @@ import (
 
 // apiBaseURL is en-gage.net's own origin — every tenant is hosted at
 // en-gage.net/<slug>/.
-const apiBaseURL = "https://en-gage.net"
+const _apiBaseURL = "https://en-gage.net"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("engage")
 	var (
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
@@ -83,22 +87,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // normalizeSlug requires slug to be a curated company — same policy as
@@ -179,7 +184,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := engage.NewClient(apiBaseURL, nil)
+	client := engage.NewClient(_apiBaseURL, nil)
 	board, err := client.Board(ctx, slug)
 	if err != nil {
 		return err
@@ -242,7 +247,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := engage.NewClient(apiBaseURL, nil)
+	client := engage.NewClient(_apiBaseURL, nil)
 	detail, err := client.Job(ctx, slug, f.workID)
 	if err != nil {
 		return err

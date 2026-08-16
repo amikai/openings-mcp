@@ -9,33 +9,33 @@ import (
 )
 
 //go:embed testdata/search_rsp.json
-var mockSearchRsp []byte
+var _mockSearchRsp []byte
 
 //go:embed testdata/search_all_rsp.json
-var mockSearchAllRsp []byte
+var _mockSearchAllRsp []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var mockSearchFilteredRsp []byte
+var _mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_no_results_rsp.json
-var mockSearchNoResultsRsp []byte
+var _mockSearchNoResultsRsp []byte
 
 //go:embed testdata/facets_rsp.json
-var mockFacetsRsp []byte
+var _mockFacetsRsp []byte
 
 //go:embed testdata/search_missing_referer_rsp.json
-var mockMissingRefererRsp []byte
+var _mockMissingRefererRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_notfound_rsp.html
-var mockJobDetailNotFoundRsp []byte
+var _mockJobDetailNotFoundRsp []byte
 
 // filteredFacetFilters is the exact facetFilters value the filtered
 // fixture was captured with; the mock only serves that fixture for a
 // byte-identical encoding, so a client encoding regression fails tests.
-const filteredFacetFilters = `["searchFilter:remote-jobs/engineering","applicantLocationRegions:Remote - Europe"]`
+const _filteredFacetFilters = `["searchFilter:remote-jobs/engineering","applicantLocationRegions:Remote - Europe"]`
 
 // NewMockServer returns an httptest.Server that mimics both NoDesk hosts
 // with canned fixture captures — the Algolia query endpoint (dispatched
@@ -47,7 +47,7 @@ func NewMockServer() *httptest.Server {
 
 	mux.HandleFunc("POST /1/indexes/jobPosts/query", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Referer") == "" {
-			serveJSON(w, http.StatusForbidden, mockMissingRefererRsp)
+			serveJSON(w, http.StatusForbidden, _mockMissingRefererRsp)
 			return
 		}
 		var q struct {
@@ -65,30 +65,30 @@ func NewMockServer() *httptest.Server {
 
 		switch {
 		case params.Has("facets"):
-			serveJSON(w, http.StatusOK, mockFacetsRsp)
+			serveJSON(w, http.StatusOK, _mockFacetsRsp)
 		case params.Has("facetFilters"):
-			if params.Get("facetFilters") != filteredFacetFilters {
+			if params.Get("facetFilters") != _filteredFacetFilters {
 				http.Error(w, "unexpected facetFilters encoding: "+params.Get("facetFilters"), http.StatusBadRequest)
 				return
 			}
-			serveJSON(w, http.StatusOK, mockSearchFilteredRsp)
+			serveJSON(w, http.StatusOK, _mockSearchFilteredRsp)
 		case params.Get("query") == "golang":
-			serveJSON(w, http.StatusOK, mockSearchRsp)
+			serveJSON(w, http.StatusOK, _mockSearchRsp)
 		case params.Get("query") == "":
-			serveJSON(w, http.StatusOK, mockSearchAllRsp)
+			serveJSON(w, http.StatusOK, _mockSearchAllRsp)
 		default:
-			serveJSON(w, http.StatusOK, mockSearchNoResultsRsp)
+			serveJSON(w, http.StatusOK, _mockSearchNoResultsRsp)
 		}
 	})
 
 	mux.HandleFunc("GET /remote-jobs/sticker-mule-software-engineer/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		w.Write(mockJobDetailRsp)
+		w.Write(_mockJobDetailRsp)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write(mockJobDetailNotFoundRsp)
+		w.Write(_mockJobDetailNotFoundRsp)
 	})
 
 	return httptest.NewServer(mux)

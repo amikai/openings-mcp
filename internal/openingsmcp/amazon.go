@@ -11,7 +11,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 )
 
-var amazonSearchInputRawSchema = []byte(`{
+var _amazonSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -67,7 +67,7 @@ var amazonSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var amazonSearchInputSchema = mustSchema(amazonSearchInputRawSchema)
+var _amazonSearchInputSchema = mustSchema(_amazonSearchInputRawSchema)
 
 type amazonSearchInput struct {
 	Keyword          string `json:"keyword,omitempty"`
@@ -233,7 +233,7 @@ func RegisterAmazon(server *mcp.Server, client *amazon.Client) {
 		Name:        "amazon_search_jobs",
 		Description: "Search official job postings on Amazon Jobs.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Amazon jobs", ReadOnlyHint: true},
-		InputSchema: amazonSearchInputSchema,
+		InputSchema: _amazonSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *amazonSearchInput) (*mcp.CallToolResult, *amazonSearchOutput, error) {
 		request, err := amazonMCPToSearchRequest(input)
 		if err != nil {

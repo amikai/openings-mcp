@@ -75,10 +75,10 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 	}
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/pageSize {
+	if pageIndex > math.MaxInt/_pageSize {
 		return nil, fmt.Errorf("workday: page %d is too large; retry with a smaller page", page)
 	}
-	offset := pageIndex * pageSize
+	offset := pageIndex * _pageSize
 	// Trim before deciding whether location filtering is requested: a
 	// whitespace location would otherwise substring-match every facet label.
 	location := strings.TrimSpace(p.Location)
@@ -95,7 +95,7 @@ func (a *WorkdayAdapter) Search(ctx context.Context, slug string, p SearchParams
 	}
 	rsp, err := client.SearchJobs(ctx, &workday.JobsRequest{
 		AppliedFacets: applied,
-		Limit:         pageSize,
+		Limit:         _pageSize,
 		Offset:        offset,
 		SearchText:    p.Query,
 	})

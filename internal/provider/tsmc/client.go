@@ -15,9 +15,9 @@ import (
 )
 
 const (
-	defaultPerPage = 10
-	jobsPath       = "/zh_TW/careers/SearchJobs/"
-	jobDetailPath  = "/zh_TW/careers/JobDetail"
+	_defaultPerPage = 10
+	_jobsPath       = "/zh_TW/careers/SearchJobs/"
+	_jobDetailPath  = "/zh_TW/careers/JobDetail"
 )
 
 // Query parameter field IDs.
@@ -150,7 +150,7 @@ func (c *Client) jobsURL(p *JobsRequest) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	u = u.JoinPath(jobsPath)
+	u = u.JoinPath(_jobsPath)
 	if p.Keyword != "" {
 		// The keyword is free text; JoinPath would treat "/" as a segment
 		// separator and clean "..", so append it as one escaped segment.
@@ -170,7 +170,7 @@ func (c *Client) jobsURL(p *JobsRequest) (string, error) {
 
 	perPage := p.PerPage
 	if perPage <= 0 {
-		perPage = defaultPerPage
+		perPage = _defaultPerPage
 	}
 	q.Set("jobRecordsPerPage", strconv.Itoa(perPage))
 
@@ -206,7 +206,7 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	if err != nil {
 		return nil, err
 	}
-	doc, err := c.getHTML(ctx, rawURL, c.baseURL+jobsPath)
+	doc, err := c.getHTML(ctx, rawURL, c.baseURL+_jobsPath)
 	if err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
@@ -222,8 +222,8 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailRespons
 	if jobID == "" {
 		return nil, errors.New("job detail: empty job id")
 	}
-	u := c.baseURL + jobDetailPath + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
-	doc, err := c.getHTML(ctx, u, c.baseURL+jobsPath)
+	u := c.baseURL + _jobDetailPath + "?jobId=" + url.QueryEscape(jobID) + "&source=External+Career+Site"
+	doc, err := c.getHTML(ctx, u, c.baseURL+_jobsPath)
 	if err != nil {
 		return nil, fmt.Errorf("job detail %q: %w", jobID, err)
 	}

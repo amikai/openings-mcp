@@ -18,14 +18,18 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://jobs.apple.com"
-	jsonFormat     = "json"
+	_defaultBaseURL = "https://jobs.apple.com"
+	_jsonFormat     = "json"
 )
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("apple")
 	var (
-		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Apple Jobs API base URL")
+		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Apple Jobs API base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)
@@ -119,20 +123,21 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (search, detail, or filters) is required")
-		os.Exit(1)
+		return 1
 	}
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 type searchFlags struct {
@@ -204,7 +209,7 @@ func teamFilters(values []string) ([]apple.TeamFilter, error) {
 }
 
 func writeSearch(out io.Writer, format string, page int, response *apple.SearchResponse) error {
-	if format == jsonFormat {
+	if format == _jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {
@@ -253,7 +258,7 @@ func runFilters(ctx context.Context, flags filterFlags, out io.Writer) error {
 }
 
 func writeFilters(out io.Writer, format string, teams *apple.TeamsResponse) error {
-	if format == jsonFormat {
+	if format == _jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(map[string]any{"teams": teams.Res, "products": apple.Products}); err != nil {
@@ -302,7 +307,7 @@ func runDetail(ctx context.Context, flags detailFlags, out io.Writer) error {
 }
 
 func writeDetail(out io.Writer, format string, response *apple.JobDetailResponse) error {
-	if format == jsonFormat {
+	if format == _jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {

@@ -29,11 +29,15 @@ import (
 
 // apiBaseURL is 4dayweek.io's site origin — the single production server in
 // the provider's openapi.yaml (paths carry the /api/v2 prefix).
-const apiBaseURL = "https://4dayweek.io"
+const _apiBaseURL = "https://4dayweek.io"
 
-var sortValues = []string{"date", "salary"}
+var _sortValues = []string{"date", "salary"}
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("fourdayweek")
 	var (
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
@@ -57,7 +61,7 @@ func main() {
 		salaryMin       = searchFS.IntLong("salary-min", 0, "minimum salary in USD whole dollars (responses report cents)")
 		salaryMax       = searchFS.IntLong("salary-max", 0, "maximum salary in USD whole dollars (responses report cents)")
 		postedAfter     = searchFS.IntLong("posted-after", 0, "posted within the last N days, 1-365 (0 = unset)")
-		sortOrder       = searchFS.StringEnumLong("sort", "sort order", sortValues...)
+		sortOrder       = searchFS.StringEnumLong("sort", "sort order", _sortValues...)
 		page            = searchFS.IntLong("page", 1, "1-based results page")
 		limit           = searchFS.IntLong("limit", 25, "page size, 1-100")
 	)
@@ -113,22 +117,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (search or detail) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // jobSummaryJSON is the --format json shape for one job: the compact fields
@@ -339,7 +344,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := fourdayweek.NewClient(apiBaseURL)
+	client, err := fourdayweek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -413,7 +418,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := fourdayweek.NewClient(apiBaseURL)
+	client, err := fourdayweek.NewClient(_apiBaseURL)
 	if err != nil {
 		return err
 	}

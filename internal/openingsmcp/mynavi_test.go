@@ -150,7 +150,7 @@ func TestMynaviSearchJobsE2E(t *testing.T) {
 	require.True(t, ok)
 
 	var wantSchema map[string]any
-	require.NoError(t, json.Unmarshal(mynaviSearchInputRawSchema, &wantSchema))
+	require.NoError(t, json.Unmarshal(_mynaviSearchInputRawSchema, &wantSchema))
 	assert.Equal(t, wantSchema, schema)
 
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{

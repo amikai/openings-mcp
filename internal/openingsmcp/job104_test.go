@@ -235,7 +235,7 @@ func TestJob104SearchJobsMissingRequiredE2E(t *testing.T) {
 	}{
 		{"no keyword", map[string]any{"area": "Taipei"}, `validating "arguments": validating root: required: missing properties: ["keyword"]`},
 		{"no area", map[string]any{"keyword": "Golang"}, `validating "arguments": validating root: required: missing properties: ["area"]`},
-		{"empty args", map[string]any{}, `validating "arguments": validating root: required: missing properties: ["keyword" "area"]`},
+		{"empty args", make(map[string]any), `validating "arguments": validating root: required: missing properties: ["keyword" "area"]`},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -389,7 +389,7 @@ func TestJob104SalaryTypeLabels(t *testing.T) {
 		{0, ""},
 	}
 	for _, tc := range cases {
-		assert.Equal(t, tc.want, job104SalaryTypeLabels[tc.s10], "s10=%d", tc.s10)
+		assert.Equal(t, tc.want, _job104SalaryTypeLabels[tc.s10], "s10=%d", tc.s10)
 	}
 }
 

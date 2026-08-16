@@ -18,9 +18,13 @@ import (
 // apiBaseURL is join.com's own origin, host to both the public GraphQL
 // endpoint and the SSR pages this client scrapes for detail (see
 // internal/provider/join/API.md).
-const apiBaseURL = "https://join.com"
+const _apiBaseURL = "https://join.com"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("join")
 	var (
 		company = rootFlags.StringLong("company", "", "confirmed join.com company slug, e.g. routinelabs (see 'join companies' for the full list)")
@@ -86,22 +90,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or get) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // normalizeCompany requires --company to be a curated company and returns
@@ -215,7 +220,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := join.NewClient(apiBaseURL, nil)
+	client := join.NewClient(_apiBaseURL, nil)
 	jobs, err := client.Jobs(ctx, c.CompanyID)
 	if err != nil {
 		return err
@@ -268,7 +273,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := join.NewClient(apiBaseURL, nil)
+	client := join.NewClient(_apiBaseURL, nil)
 	d, err := client.JobDetail(ctx, c.Slug, f.idParam)
 	if err != nil {
 		if errors.Is(err, join.ErrNotFound) {

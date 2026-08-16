@@ -13,16 +13,16 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // defaultCultureCode is used when a roster row omits culture_code, matching
 // [BoardClient]'s culture pinning: an unsupported culture returns 200 with
 // an empty board rather than an error, so it must be pinned explicitly.
-const defaultCultureCode = "en-US"
+const _defaultCultureCode = "en-US"
 
 // candidatePortalBoardCode is the default job board code most tenants serve;
 // it does not appear in a Slug, since it needs no board disambiguation.
-const candidatePortalBoardCode = "CANDIDATEPORTAL"
+const _candidatePortalBoardCode = "CANDIDATEPORTAL"
 
 // Company is a confirmed Dayforce tenant board. A tenant can carry several
 // boards under distinct job_board_code/job_board_id pairs — see the
@@ -38,7 +38,7 @@ type Company struct {
 
 // Culture returns c.CultureCode, defaulting to en-US when unset.
 func (c Company) Culture() string {
-	return cmp.Or(c.CultureCode, defaultCultureCode)
+	return cmp.Or(c.CultureCode, _defaultCultureCode)
 }
 
 // Slug is the roster-side Search key. A default CANDIDATEPORTAL board is
@@ -47,7 +47,7 @@ func (c Company) Culture() string {
 // a careers URL outside the roster is minted as "ns/board[/culture]" so
 // those three fields can travel without a YAML row.
 func (c Company) Slug() string {
-	if strings.EqualFold(c.JobBoardCode, candidatePortalBoardCode) {
+	if strings.EqualFold(c.JobBoardCode, _candidatePortalBoardCode) {
 		return c.Namespace
 	}
 	return c.Namespace + "-" + strings.ToLower(c.JobBoardCode)
@@ -60,7 +60,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("dayforce: load companies.yaml: %v", err))
 	}

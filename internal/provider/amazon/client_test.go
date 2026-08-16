@@ -43,7 +43,7 @@ func TestSearchEncodesFilters(t *testing.T) {
 		assert.Equal(t, "recent", query.Get("sort"))
 		assert.Equal(t, "20", query.Get("offset"))
 		assert.Equal(t, "2", query.Get("result_limit"))
-		serveMockJSON(mockFilteredJobsResponse)(w, r)
+		serveMockJSON(_mockFilteredJobsResponse)(w, r)
 	})
 	server := httptest.NewServer(mux)
 	t.Cleanup(server.Close)

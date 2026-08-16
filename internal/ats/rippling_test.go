@@ -16,7 +16,7 @@ import (
 // mockRipplingBoard is the board slug the provider mock server serves a
 // dump for: 33 captured entries collapsing to 12 jobs (see the provider's
 // testdata/jobs_rsp.json).
-const mockRipplingBoard = "pythian"
+const _mockRipplingBoard = "pythian"
 
 func testRipplingAdapter(t *testing.T) *RipplingAdapter {
 	t.Helper()
@@ -61,7 +61,7 @@ func TestRipplingParseCareersURL(t *testing.T) {
 // locations merged.
 func TestRipplingSearchAll(t *testing.T) {
 	a := testRipplingAdapter(t)
-	res, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{})
+	res, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{})
 	require.NoError(t, err)
 	require.Equal(t, 12, res.TotalCount)
 	byID := make(map[string]JobSummary)
@@ -79,7 +79,7 @@ func TestRipplingSearchAll(t *testing.T) {
 		"a multi-location job must merge every duplicate entry's location")
 
 	// 12 jobs < pageSize, so page 2 is empty but the envelope stays sane.
-	page2, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{Page: 2})
+	page2, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{Page: 2})
 	require.NoError(t, err)
 	assert.Empty(t, page2.Jobs)
 	assert.Equal(t, 2, page2.Page)
@@ -88,7 +88,7 @@ func TestRipplingSearchAll(t *testing.T) {
 
 func TestRipplingSearchQueryMatchesTitle(t *testing.T) {
 	a := testRipplingAdapter(t)
-	res, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{Query: "engineer"})
+	res, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{Query: "engineer"})
 	require.NoError(t, err)
 	assert.Equal(t, 5, res.TotalCount)
 	for _, j := range res.Jobs {
@@ -102,25 +102,25 @@ func TestRipplingSearchQueryMatchesOrgUnit(t *testing.T) {
 	// both title jobs sit in that department, so the org-unit tier is the
 	// only extra reach — but a query for the department name alone must
 	// still match its jobs.
-	res, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{Query: "managed services"})
+	res, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{Query: "managed services"})
 	require.NoError(t, err)
 	assert.Equal(t, 10, res.TotalCount, "query hitting only the department name should match")
 }
 
 func TestRipplingSearchLocation(t *testing.T) {
 	a := testRipplingAdapter(t)
-	remote, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{Location: "remote"})
+	remote, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{Location: "remote"})
 	require.NoError(t, err)
 	assert.Equal(t, 2, remote.TotalCount, `Location "remote" should fall back to location-text match`)
 
-	canada, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{Location: "canada"})
+	canada, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{Location: "canada"})
 	require.NoError(t, err)
 	assert.Equal(t, 2, canada.TotalCount, `Location "canada" should fuzzy-match merged locations`)
 }
 
 func TestRipplingSearchFilterDepartment(t *testing.T) {
 	a := testRipplingAdapter(t)
-	res, err := a.Search(t.Context(), mockRipplingBoard, SearchParams{
+	res, err := a.Search(t.Context(), _mockRipplingBoard, SearchParams{
 		Filters: map[string][]string{"department": {"Sales"}},
 	})
 	require.NoError(t, err)
@@ -129,14 +129,14 @@ func TestRipplingSearchFilterDepartment(t *testing.T) {
 
 func TestRipplingFilters(t *testing.T) {
 	a := testRipplingAdapter(t)
-	fs, err := a.Filters(t.Context(), mockRipplingBoard)
+	fs, err := a.Filters(t.Context(), _mockRipplingBoard)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"Managed Services", "Sales"}, fs["department"])
 }
 
 func TestRipplingDetail(t *testing.T) {
 	a := testRipplingAdapter(t)
-	d, err := a.Detail(t.Context(), mockRipplingBoard, "144f31c4-38a4-4666-97b4-2c88a3f123da")
+	d, err := a.Detail(t.Context(), _mockRipplingBoard, "144f31c4-38a4-4666-97b4-2c88a3f123da")
 	require.NoError(t, err)
 	assert.Equal(t, "DevOps Engineer", d.Title)
 	assert.Equal(t, "Pythian", d.Company)
@@ -151,7 +151,7 @@ func TestRipplingDetail(t *testing.T) {
 
 func TestRipplingDetailNotFound(t *testing.T) {
 	a := testRipplingAdapter(t)
-	_, err := a.Detail(t.Context(), mockRipplingBoard, "1b2c3d4e-5f60-4789-8abc-def012345678")
+	_, err := a.Detail(t.Context(), _mockRipplingBoard, "1b2c3d4e-5f60-4789-8abc-def012345678")
 	assert.Error(t, err, "want error for unknown job id")
 }
 

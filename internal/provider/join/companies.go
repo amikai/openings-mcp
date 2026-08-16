@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // RosterCompany is a confirmed organization hosting a public join.com
 // career page, drawn from a curated list
@@ -29,12 +29,12 @@ type RosterCompany struct {
 }
 
 // careersURLTpl formats a Join career page URL (e.g. "https://join.com/companies/routinelabs").
-const careersURLTpl = "https://join.com/companies/%s"
+const _careersURLTpl = "https://join.com/companies/%s"
 
 // CareersURL returns the company's human-facing career page, e.g.
 // https://join.com/companies/routinelabs.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Slug)
+	return fmt.Sprintf(_careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed join.com company, sorted by company name.
@@ -49,7 +49,7 @@ var CompaniesBySlug = buildSlugIndex(Companies)
 // recover from.
 func mustLoadCompanies() []RosterCompany {
 	var cs []RosterCompany
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("join: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b RosterCompany) int { return strings.Compare(a.Name, b.Name) })

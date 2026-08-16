@@ -10,7 +10,7 @@ import (
 )
 
 func TestParseSearchHTMLFixture(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockSearchRsp)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockSearchRsp)))
 	require.NoError(t, err)
 
 	res, err := parseSearchHTML(doc)
@@ -86,7 +86,7 @@ func TestLooksLikeLocationValue(t *testing.T) {
 }
 
 func TestParseSearchPostedFixture(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockSearchPostedRsp)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockSearchPostedRsp)))
 	require.NoError(t, err)
 
 	res, err := parseSearchHTML(doc)
@@ -99,7 +99,7 @@ func TestParseSearchPostedFixture(t *testing.T) {
 }
 
 func TestParseSearchNoResults(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockSearchNoResultsRsp)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockSearchNoResultsRsp)))
 	require.NoError(t, err)
 
 	res, err := parseSearchHTML(doc)
@@ -110,7 +110,7 @@ func TestParseSearchNoResults(t *testing.T) {
 }
 
 func TestParseJobDetailFixture(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockJobDetailRsp)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockJobDetailRsp)))
 	require.NoError(t, err)
 
 	d, ok := parseJobDetailHTML(doc, "1977")
@@ -139,7 +139,7 @@ func TestParseJobDetailMultipleLocations(t *testing.T) {
 }
 
 func TestParseJobDetailNotFoundBody(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockJobDetailNotFoundRsp)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockJobDetailNotFoundRsp)))
 	require.NoError(t, err)
 
 	_, ok := parseJobDetailHTML(doc, "999999999")

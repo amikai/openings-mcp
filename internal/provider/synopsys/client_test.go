@@ -53,7 +53,7 @@ func TestJobDetail(t *testing.T) {
 	got, err := c.JobDetail(t.Context(), MockCity, MockSlug, MockJobID)
 	require.NoError(t, err)
 
-	assert.Equal(t, wantJobDetail, got)
+	assert.Equal(t, _wantJobDetail, got)
 }
 
 func TestResolveLocation(t *testing.T) {

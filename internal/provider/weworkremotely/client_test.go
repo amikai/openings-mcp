@@ -21,9 +21,9 @@ func testClient(t *testing.T) *Client {
 func testClientWithFailingCategory(t *testing.T, failSlug string) *Client {
 	t.Helper()
 	fixtures := map[string][]byte{
-		"remote-full-stack-programming-jobs": mockFullStackRsp,
-		"remote-design-jobs":                 mockDesignRsp,
-		"remote-back-end-programming-jobs":   mockBackEndRsp,
+		"remote-full-stack-programming-jobs": _mockFullStackRsp,
+		"remote-design-jobs":                 _mockDesignRsp,
+		"remote-back-end-programming-jobs":   _mockBackEndRsp,
 	}
 
 	mux := http.NewServeMux()
@@ -36,7 +36,7 @@ func testClientWithFailingCategory(t *testing.T, failSlug string) *Client {
 		}
 		body, ok := fixtures[cat.Slug]
 		if !ok {
-			body = []byte(emptyFeed)
+			body = []byte(_emptyFeed)
 		}
 		mux.HandleFunc("/categories/"+cat.Slug+".rss", serveRSS(body))
 	}
@@ -246,7 +246,7 @@ func TestClient_Detail_notFoundMentionsPartialFailure(t *testing.T) {
 	if err == nil {
 		t.Fatal("expected an error for an unknown job ID")
 	}
-	if !strings.Contains(err.Error(), "some category feeds failed") {
+	if !strings.Contains(err.Error(), "some category feeds could not be fetched") {
 		t.Errorf("error %q does not mention the underlying category failure", err)
 	}
 }

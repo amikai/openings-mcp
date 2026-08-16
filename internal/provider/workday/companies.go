@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed Workday CXS tenant for a public company, drawn from
 // a curated S&P 500 list (internal/provider/workday/companies.yaml). It's
@@ -33,19 +33,19 @@ type Company struct {
 // baseURLTpl formats a Workday CXS API base URL.
 // Parameters: 1: Tenant (e.g. "3m"), 2: Instance (e.g. "wd1"), 3: Tenant (e.g. "3m"), 4: Site (e.g. "Search" or "3M").
 // Example: "https://3m.wd1.myworkdayjobs.com/wday/cxs/3m/Search"
-const baseURLTpl = "https://%s.%s.myworkdayjobs.com/wday/cxs/%s/%s"
+const _baseURLTpl = "https://%s.%s.myworkdayjobs.com/wday/cxs/%s/%s"
 
 // careersURLTpl formats a human-facing Workday career site URL.
 // Parameters: 1: Tenant (e.g. "3m"), 2: Instance (e.g. "wd1"), 3: Site (e.g. "3M").
 // Example: "https://3m.wd1.myworkdayjobs.com/en-US/3M"
-const careersURLTpl = "https://%s.%s.myworkdayjobs.com/en-US/%s"
+const _careersURLTpl = "https://%s.%s.myworkdayjobs.com/en-US/%s"
 
 // BaseURL builds this company's Workday CXS base URL, e.g.
 // https://3m.wd1.myworkdayjobs.com/wday/cxs/3m/Search — the same
 // {tenant}.{instance}.myworkdayjobs.com/wday/cxs/{tenant}/{site} shape
 // documented on PublicSiteURL in path.go.
 func (c Company) BaseURL() string {
-	return fmt.Sprintf(baseURLTpl, c.Tenant, c.Instance, c.Tenant, c.Site)
+	return fmt.Sprintf(_baseURLTpl, c.Tenant, c.Instance, c.Tenant, c.Site)
 }
 
 // CareersURL returns the company's human-facing career site, e.g.
@@ -55,7 +55,7 @@ func (c Company) BaseURL() string {
 // careers_url.go), which a locale-less URL would trip for a site as short
 // as Johnson & Johnson's "JJ".
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(careersURLTpl, c.Tenant, c.Instance, c.Site)
+	return fmt.Sprintf(_careersURLTpl, c.Tenant, c.Instance, c.Site)
 }
 
 // Companies holds every confirmed Workday tenant, sorted by company name.
@@ -70,7 +70,7 @@ var CompaniesByTenant = buildTenantIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("workday: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })

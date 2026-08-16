@@ -10,22 +10,22 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var mockJobsRsp []byte
+var _mockJobsRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.json
-var mockJobsEmptyRsp []byte
+var _mockJobsEmptyRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var mockJobDetailRsp []byte
+var _mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_notfound_rsp.html
-var mockJobDetailNotFoundRsp []byte
+var _mockJobDetailNotFoundRsp []byte
 
 //go:embed testdata/job_detail_remote_rsp.html
-var mockJobDetailRemoteRsp []byte
+var _mockJobDetailRemoteRsp []byte
 
 //go:embed testdata/company_rsp.html
-var mockCompanyRsp []byte
+var _mockCompanyRsp []byte
 
 // MockCompanyID is the companyId the mock server serves mockJobsRsp for
 // (routinelabs' real id — the fixture is captured live traffic, not
@@ -63,7 +63,7 @@ type mockGraphQLBody struct {
 // Close it.
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc(graphqlPath, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(_graphqlPath, func(w http.ResponseWriter, r *http.Request) {
 		var body mockGraphQLBody
 		defer r.Body.Close()
 		_ = json.NewDecoder(r.Body).Decode(&body)
@@ -71,22 +71,22 @@ func NewMockServer() *httptest.Server {
 		w.Header().Set("Content-Type", "application/json")
 		switch {
 		case strings.Contains(string(body.Variables), strconv.Itoa(MockCompanyID)):
-			_, _ = w.Write(mockJobsRsp)
+			_, _ = w.Write(_mockJobsRsp)
 		default:
 			// Any other companyId (including MockEmptyCompanyID and any
 			// real roster id besides MockCompanyID) gets the empty dump —
 			// mirroring live behavior where an id the mock has no
 			// specific fixture for is indistinguishable from a real
 			// company with zero open jobs (see API.md).
-			_, _ = w.Write(mockJobsEmptyRsp)
+			_, _ = w.Write(_mockJobsEmptyRsp)
 		}
 	})
-	mux.HandleFunc("/companies/"+MockJobSlug+"/"+MockJobIdParam, serveMockHTML(mockJobDetailRsp))
-	mux.HandleFunc("/companies/"+MockRemoteJobSlug+"/"+MockRemoteJobIdParam, serveMockHTML(mockJobDetailRemoteRsp))
-	mux.HandleFunc("/companies/"+MockJobSlug, serveMockHTML(mockCompanyRsp))
+	mux.HandleFunc("/companies/"+MockJobSlug+"/"+MockJobIdParam, serveMockHTML(_mockJobDetailRsp))
+	mux.HandleFunc("/companies/"+MockRemoteJobSlug+"/"+MockRemoteJobIdParam, serveMockHTML(_mockJobDetailRemoteRsp))
+	mux.HandleFunc("/companies/"+MockJobSlug, serveMockHTML(_mockCompanyRsp))
 	mux.HandleFunc("/companies/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		_, _ = w.Write(mockJobDetailNotFoundRsp)
+		_, _ = w.Write(_mockJobDetailNotFoundRsp)
 	})
 	return httptest.NewServer(mux)
 }

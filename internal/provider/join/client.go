@@ -11,20 +11,20 @@ import (
 )
 
 const (
-	graphqlPath = "/candidate-api/graphql"
+	_graphqlPath = "/candidate-api/graphql"
 	// dumpPageSize is generous enough to cover a curated company's whole
 	// board in one call for the common case; Jobs still loops on
 	// pageInfo.pageCount rather than assuming a single call always
 	// suffices (see API.md's Pagination note — no per-request cap was
 	// observed, but nothing guarantees one doesn't exist).
-	dumpPageSize = 100
+	_dumpPageSize = 100
 )
 
 // ErrNotFound is returned by JobDetail for a nonexistent job or company
 // slug (upstream 404) and by ResolveCompany for a nonexistent slug.
 var ErrNotFound = errors.New("join: not found")
 
-var userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+var _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 // Client talks to join.com's public candidate-facing surfaces: the
 // unauthenticated GraphQL search endpoint and the SSR HTML pages scraped
@@ -44,7 +44,7 @@ func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
 		baseURL:    baseURL,
 		httpClient: httpClient,
-		gql:        graphql.NewClient(baseURL+graphqlPath, httpClient),
+		gql:        graphql.NewClient(baseURL+_graphqlPath, httpClient),
 	}
 }
 
@@ -55,7 +55,7 @@ func (c *Client) Jobs(ctx context.Context, companyID int) ([]Job, error) {
 	var all []Job
 	page := 1
 	for {
-		wire, err := GetCompanyJobs(ctx, c.gql, companyID, page, dumpPageSize)
+		wire, err := GetCompanyJobs(ctx, c.gql, companyID, page, _dumpPageSize)
 		if err != nil {
 			return nil, fmt.Errorf("join: list jobs for company %d: %w", companyID, err)
 		}
@@ -131,7 +131,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 		return nil, err
 	}
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("User-Agent", _userAgent)
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
 		return nil, err

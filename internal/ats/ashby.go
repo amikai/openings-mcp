@@ -22,6 +22,8 @@ type AshbyAdapter struct {
 	dumpCache *DumpCache
 }
 
+var _ Adapter = (*AshbyAdapter)(nil)
+
 // ashbyCareersURLRE matches Ashby board URLs and captures the organization
 // slug (first path segment; URL-decoded — org names may contain spaces).
 //
@@ -29,7 +31,7 @@ type AshbyAdapter struct {
 //   - jobs.ashbyhq.com/acme
 //   - jobs.ashbyhq.com/Acme%20Inc
 //   - jobs.ashbyhq.com/acme/application/job-id
-var ashbyCareersURLRE = regexp.MustCompile(
+var _ashbyCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.ashbyhq\.com/(?P<slug>[^/]+)`,
 )
 
@@ -55,7 +57,7 @@ func (a *AshbyAdapter) Roster() []CompanyInfo {
 // segment is the organization name, which is already this adapter's slug
 // form (URL-decoded — Ashby org names may contain spaces).
 func (a *AshbyAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(ashbyCareersURLRE, u)
+	return matchCareersSlug(_ashbyCareersURLRE, u)
 }
 
 // CareersURL renders the roster company's public job board page.
@@ -148,7 +150,7 @@ func (a *AshbyAdapter) fetchDump(ctx context.Context, slug string) ([]dumpJob, e
 		if !j.IsListed.Value {
 			continue
 		}
-		fields := map[string][]string{}
+		fields := make(map[string][]string)
 		if j.Department.Value != "" {
 			fields["department"] = []string{j.Department.Value}
 		}

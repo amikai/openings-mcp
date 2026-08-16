@@ -21,6 +21,10 @@ import (
 // fetches full JobDetail for the first -fetch-details results (default 0,
 // i.e. none) via a second call per job.
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	fs := ff.NewFlagSet("indeed")
 	var (
 		apiURL      = fs.StringLong("api-url", "https://apis.indeed.com/graphql", "Indeed GraphQL API URL")
@@ -40,10 +44,10 @@ func main() {
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Flags(fs))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	radiusMiles := *radius
@@ -69,7 +73,7 @@ func main() {
 	search, err := client.Jobs(ctx, req)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		return 1
 	}
 
 	jobs := jobsForDetail(search.Jobs, *fetchDetail)
@@ -88,6 +92,7 @@ func main() {
 		search:   search,
 		details:  details,
 	})
+	return 0
 }
 
 func jobsForDetail(jobs []indeed.Job, n int) []indeed.Job {

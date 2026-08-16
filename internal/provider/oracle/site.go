@@ -14,7 +14,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const discoveryUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+const _discoveryUserAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 // ErrJobNotFound indicates that Oracle returned an empty detail collection.
 var ErrJobNotFound = errors.New("oracle: job not found")
@@ -58,7 +58,7 @@ func DiscoverSite(ctx context.Context, rawURL string, httpClient *http.Client) (
 	}
 	req.Header.Set("Accept", "text/html,application/xhtml+xml")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
-	req.Header.Set("User-Agent", discoveryUserAgent)
+	req.Header.Set("User-Agent", _discoveryUserAgent)
 
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -178,7 +178,7 @@ type facetDefinition struct {
 	selected  string
 }
 
-var facetDefinitions = map[Facet]facetDefinition{
+var _facetDefinitions = map[Facet]facetDefinition{
 	FacetTitle:         {listToken: "TITLES", selected: "selectedTitlesFacet"},
 	FacetLocation:      {listToken: "LOCATIONS", selected: "selectedLocationsFacet"},
 	FacetCategory:      {listToken: "CATEGORIES", selected: "selectedCategoriesFacet"},
@@ -188,7 +188,7 @@ var facetDefinitions = map[Facet]facetDefinition{
 	FacetWorkplaceType: {listToken: "WORKPLACE_TYPES", selected: "selectedWorkplaceTypesFacet"},
 }
 
-var allFacets = []Facet{
+var _allFacets = []Facet{
 	FacetTitle,
 	FacetLocation,
 	FacetCategory,
@@ -200,13 +200,13 @@ var allFacets = []Facet{
 
 // AllFacets returns the standard facets in stable Oracle request order.
 func AllFacets() []Facet {
-	return append([]Facet(nil), allFacets...)
+	return append([]Facet(nil), _allFacets...)
 }
 
 // ParseFacet parses a CLI/API facet name.
 func ParseFacet(value string) (Facet, error) {
 	facet := Facet(strings.ToLower(strings.TrimSpace(value)))
-	if _, ok := facetDefinitions[facet]; !ok {
+	if _, ok := _facetDefinitions[facet]; !ok {
 		return "", fmt.Errorf("unknown facet %q", value)
 	}
 	return facet, nil
@@ -323,7 +323,7 @@ func (c *SiteClient) Site() Site {
 	return c.site
 }
 
-const siteSearchFields = "TotalJobsCount,Limit,Offset;" +
+const _siteSearchFields = "TotalJobsCount,Limit,Offset;" +
 	"requisitionList:Id,Title,PostedDate,PrimaryLocation,WorkplaceType,WorkplaceTypeCode;" +
 	"requisitionList.secondaryLocations:Name;" +
 	"titlesFacet:Id,Name,TotalCount;locationsFacet:Id,Name,TotalCount;" +
@@ -331,7 +331,7 @@ const siteSearchFields = "TotalJobsCount,Limit,Offset;" +
 	"workLocationsFacet:Id,Name,TotalCount;organizationsFacet:Id,Name,TotalCount;" +
 	"workplaceTypesFacet:Id,Name,TotalCount"
 
-const siteDetailFields = "Id,Title,ExternalPostedStartDate,PrimaryLocation,WorkplaceType," +
+const _siteDetailFields = "Id,Title,ExternalPostedStartDate,PrimaryLocation,WorkplaceType," +
 	"ExternalDescriptionStr,CorporateDescriptionStr,ExternalResponsibilitiesStr," +
 	"ExternalQualificationsStr;secondaryLocations:Name"
 
@@ -351,7 +351,7 @@ func (c *SiteClient) Search(ctx context.Context, request SearchRequest) (*Search
 	language := languageOrDefault(c.site.Language)
 	response, err := c.api.SearchJobs(ctx, SearchJobsParams{
 		OnlyData:       SearchJobsOnlyDataTrue,
-		Fields:         NewOptString(siteSearchFields),
+		Fields:         NewOptString(_siteSearchFields),
 		Finder:         finder,
 		AcceptLanguage: NewOptString(language),
 		OraIrcLanguage: NewOptString(language),
@@ -405,7 +405,7 @@ func (c *SiteClient) Detail(ctx context.Context, id string) (*Job, error) {
 	language := languageOrDefault(c.site.Language)
 	response, err := c.api.GetJobDetail(ctx, GetJobDetailParams{
 		OnlyData:       GetJobDetailOnlyDataTrue,
-		Fields:         NewOptString(siteDetailFields),
+		Fields:         NewOptString(_siteDetailFields),
 		Finder:         fmt.Sprintf(`ById;Id="%s",siteNumber=%s`, escapeFinderString(id), c.site.SiteNumber),
 		AcceptLanguage: NewOptString(language),
 		OraIrcLanguage: NewOptString(language),
@@ -440,7 +440,7 @@ func (c *SiteClient) searchFinder(request SearchRequest) (string, error) {
 	facetTokens := make([]string, 0, len(request.Facets))
 	seenFacets := make(map[Facet]bool, len(request.Facets))
 	for _, facet := range request.Facets {
-		definition, ok := facetDefinitions[facet]
+		definition, ok := _facetDefinitions[facet]
 		if !ok {
 			return "", fmt.Errorf("oracle: unknown facet %q", facet)
 		}
@@ -464,12 +464,12 @@ func (c *SiteClient) searchFinder(request SearchRequest) (string, error) {
 	if request.Keyword != "" {
 		parts = append(parts, `keyword="`+escapeFinderString(request.Keyword)+`"`)
 	}
-	for _, facet := range allFacets {
+	for _, facet := range _allFacets {
 		values := request.Filters[facet]
 		if len(values) == 0 {
 			continue
 		}
-		definition := facetDefinitions[facet]
+		definition := _facetDefinitions[facet]
 		clean := make([]string, 0, len(values))
 		for _, value := range values {
 			value = strings.TrimSpace(value)
@@ -481,7 +481,7 @@ func (c *SiteClient) searchFinder(request SearchRequest) (string, error) {
 		parts = append(parts, definition.selected+"="+strings.Join(clean, ";"))
 	}
 	for facet := range request.Filters {
-		if _, ok := facetDefinitions[facet]; !ok {
+		if _, ok := _facetDefinitions[facet]; !ok {
 			return "", fmt.Errorf("oracle: unknown facet filter %q", facet)
 		}
 	}

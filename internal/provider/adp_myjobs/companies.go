@@ -11,7 +11,7 @@ import (
 )
 
 //go:embed companies.yaml
-var companiesYAML []byte
+var _companiesYAML []byte
 
 // Company is a confirmed organization with a public ADP MyJobs career site.
 // Slug is the myjobs.adp.com path segment and the provider's tenant key.
@@ -32,7 +32,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(companiesYAML)
+	cs, err := loadCompanies(_companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("adp_myjobs: load companies.yaml: %v", err))
 	}

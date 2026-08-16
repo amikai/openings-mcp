@@ -10,7 +10,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-var totalRE = regexp.MustCompile(`\d+\s*-\s*\d+\s*of\s*(\d+)`)
+var _totalRE = regexp.MustCompile(`\d+\s*-\s*\d+\s*of\s*(\d+)`)
 
 // parseSearchHTML parses job cards and total count from a search results page.
 // The results panel wraps both job cards and the "no matching jobs" notice,
@@ -22,7 +22,7 @@ func parseSearchHTML(doc *goquery.Document) ([]Job, int, error) {
 	}
 
 	var total int
-	if m := totalRE.FindStringSubmatch(doc.Text()); m != nil {
+	if m := _totalRE.FindStringSubmatch(doc.Text()); m != nil {
 		total, _ = strconv.Atoi(m[1])
 	}
 

@@ -19,11 +19,11 @@ func newMockServer(t *testing.T) *httptest.Server {
 		assert.Equal(t, "6001001000", r.URL.Query().Get("area"))
 		assert.Equal(t, "1,3", r.URL.Query().Get("jobexp"))
 		assert.Equal(t, "13", r.URL.Query().Get("order"))
-		serveMockJSON(mockJobsRsp)(w, r)
+		serveMockJSON(_mockJobsRsp)(w, r)
 	})
 	mux.HandleFunc("/job/ajax/content/", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
-		serveMockJSON(mockJobDetailRsp)(w, r)
+		serveMockJSON(_mockJobDetailRsp)(w, r)
 	})
 	return httptest.NewServer(mux)
 }

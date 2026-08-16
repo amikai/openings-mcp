@@ -7,19 +7,19 @@ import (
 )
 
 //go:embed testdata/search_rsp.json
-var mockSearchRsp []byte
+var _mockSearchRsp []byte
 
 //go:embed testdata/search_query_rsp.json
-var mockSearchQueryRsp []byte
+var _mockSearchQueryRsp []byte
 
 //go:embed testdata/search_filter_rsp.json
-var mockSearchFilterRsp []byte
+var _mockSearchFilterRsp []byte
 
 //go:embed testdata/position_details_rsp.json
-var mockPositionDetailsRsp []byte
+var _mockPositionDetailsRsp []byte
 
 //go:embed testdata/position_details_not_found_rsp.json
-var mockPositionNotFoundRsp []byte
+var _mockPositionNotFoundRsp []byte
 
 // MockDomain is the tenant domain every fixture was captured against (see
 // testdata/*.hurl). NewMockServer only answers this domain.
@@ -41,11 +41,11 @@ func NewMockServer() *httptest.Server {
 		q := r.URL.Query()
 		switch {
 		case q.Get("filter_businessarea") == "technology":
-			serveMockJSON(mockSearchFilterRsp)(w, r)
+			serveMockJSON(_mockSearchFilterRsp)(w, r)
 		case q.Get("query") == "engineer" && q.Get("location") == "New York":
-			serveMockJSON(mockSearchQueryRsp)(w, r)
+			serveMockJSON(_mockSearchQueryRsp)(w, r)
 		default:
-			serveMockJSON(mockSearchRsp)(w, r)
+			serveMockJSON(_mockSearchRsp)(w, r)
 		}
 	})
 
@@ -53,10 +53,10 @@ func NewMockServer() *httptest.Server {
 		if r.URL.Query().Get("position_id") == "1" {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNotFound)
-			w.Write(mockPositionNotFoundRsp)
+			w.Write(_mockPositionNotFoundRsp)
 			return
 		}
-		serveMockJSON(mockPositionDetailsRsp)(w, r)
+		serveMockJSON(_mockPositionDetailsRsp)(w, r)
 	})
 
 	return httptest.NewServer(mux)

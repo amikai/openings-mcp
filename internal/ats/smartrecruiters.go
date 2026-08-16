@@ -26,13 +26,13 @@ var _ Adapter = (*SmartRecruitersAdapter)(nil)
 //   - jobs.smartrecruiters.com/Equinox
 //   - jobs.smartrecruiters.com/Equinox/744000137225639-female-locker-room-associate-houston
 //   - jobs.smartrecruiters.com/SomeUnknownCo
-var smartRecruitersCareersURLRE = regexp.MustCompile(
+var _smartRecruitersCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.smartrecruiters\.com/(?P<slug>[^/]+)`,
 )
 
 const (
-	smartRecruitersCandidatePageSize = 100
-	maxSmartRecruitersCandidates     = 2000
+	_smartRecruitersCandidatePageSize = 100
+	_maxSmartRecruitersCandidates     = 2000
 )
 
 // SmartRecruitersAdapter serves SmartRecruiters-hosted companies via the
@@ -69,7 +69,7 @@ func (a *SmartRecruitersAdapter) Roster() []CompanyInfo {
 // the list endpoint answers HTTP 200 with zero results — so a typo'd URL
 // degrades to an empty search, mirroring the raw API.
 func (a *SmartRecruitersAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	id, ok := matchCareersSlug(smartRecruitersCareersURLRE, u)
+	id, ok := matchCareersSlug(_smartRecruitersCareersURLRE, u)
 	if !ok {
 		return "", false
 	}
@@ -127,11 +127,11 @@ func (a *SmartRecruitersAdapter) searchSmartRecruitersPage(
 ) (*SearchResult, error) {
 	page := clampPage(requestedPage)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/pageSize {
+	if pageIndex > math.MaxInt/_pageSize {
 		return nil, fmt.Errorf("smartrecruiters: page %d is too large; retry with a smaller page", page)
 	}
-	params.Limit = smartrecruiters.NewOptInt(pageSize)
-	params.Offset = smartrecruiters.NewOptInt(pageIndex * pageSize)
+	params.Limit = smartrecruiters.NewOptInt(_pageSize)
+	params.Offset = smartrecruiters.NewOptInt(pageIndex * _pageSize)
 	rsp, err := a.client.ListPostings(ctx, params)
 	if err != nil {
 		return nil, fmt.Errorf("smartrecruiters: search %q: %w", slug, err)
@@ -160,7 +160,7 @@ func (a *SmartRecruitersAdapter) searchSmartRecruitersCandidates(
 	if err != nil {
 		return nil, err
 	}
-	if first.TotalFound > maxSmartRecruitersCandidates {
+	if first.TotalFound > _maxSmartRecruitersCandidates {
 		return nil, fmt.Errorf("smartrecruiters: search is too broad (%d candidates); add a more specific query, location, department, or location_type filter", first.TotalFound)
 	}
 	items, err := a.collectSmartRecruitersCandidates(ctx, slug, seed, base, first)
@@ -186,7 +186,7 @@ func (a *SmartRecruitersAdapter) chooseSmartRecruitersCandidates(
 	if seed == "" {
 		seed = location
 	}
-	first, err := a.listSmartRecruitersCandidates(ctx, slug, seed, 0, smartRecruitersCandidatePageSize, base)
+	first, err := a.listSmartRecruitersCandidates(ctx, slug, seed, 0, _smartRecruitersCandidatePageSize, base)
 	if err != nil {
 		return "", nil, err
 	}
@@ -194,7 +194,7 @@ func (a *SmartRecruitersAdapter) chooseSmartRecruitersCandidates(
 	if query == "" || first.TotalFound == 0 || !hasDistinctLocation {
 		return seed, first, nil
 	}
-	locationFirst, err := a.listSmartRecruitersCandidates(ctx, slug, location, 0, smartRecruitersCandidatePageSize, base)
+	locationFirst, err := a.listSmartRecruitersCandidates(ctx, slug, location, 0, _smartRecruitersCandidatePageSize, base)
 	if err != nil {
 		return "", nil, err
 	}
@@ -232,7 +232,7 @@ func (a *SmartRecruitersAdapter) collectSmartRecruitersCandidates(
 			return nil, fmt.Errorf("smartrecruiters: collect candidates for %q: %w", slug, err)
 		}
 		offset := len(items)
-		limit := min(smartRecruitersCandidatePageSize, first.TotalFound-offset)
+		limit := min(_smartRecruitersCandidatePageSize, first.TotalFound-offset)
 		rsp, err := a.listSmartRecruitersCandidates(ctx, slug, query, offset, limit, base)
 		if err != nil {
 			return nil, err
@@ -286,7 +286,7 @@ func smartRecruitersDumpJob(identifier string, item smartrecruiters.PostingItem)
 
 // smartRecruitersLocationTypes maps the location_type filter's display
 // values to the API's locationType enum.
-var smartRecruitersLocationTypes = map[string]smartrecruiters.ListPostingsLocationTypeItem{
+var _smartRecruitersLocationTypes = map[string]smartrecruiters.ListPostingsLocationTypeItem{
 	"remote": smartrecruiters.ListPostingsLocationTypeItemREMOTE,
 	"hybrid": smartrecruiters.ListPostingsLocationTypeItemHYBRID,
 	"onsite": smartrecruiters.ListPostingsLocationTypeItemONSITE,
@@ -307,7 +307,7 @@ func (a *SmartRecruitersAdapter) applyFilters(ctx context.Context, slug string, 
 			params.Department = smartrecruiters.NewOptString(strings.Join(ids, ","))
 		case "location_type":
 			for _, v := range values {
-				lt, ok := smartRecruitersLocationTypes[strings.ToLower(strings.TrimSpace(v))]
+				lt, ok := _smartRecruitersLocationTypes[strings.ToLower(strings.TrimSpace(v))]
 				if !ok {
 					return fmt.Errorf("filter value %q not found for %q; available: Hybrid, Onsite, Remote", v, key)
 				}

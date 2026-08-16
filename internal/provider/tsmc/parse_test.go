@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var wantJobs = []Job{
+var _wantJobs = []Job{
 	{ID: "21826", Slug: "R-D-Advanced-Packaging-Integration-Engineer", Title: "R&D Advanced Packaging Integration Engineer", Location: "台灣", CareerArea: "研究發展", EmploymentType: "正職", Posted: "2026/05/28"},
 	{ID: "19509", Slug: "TSMC-R-D-Process-Engineer-FLM-Forward-Looking-Module", Title: "TSMC R&D Process Engineer / FLM (Forward Looking Module)", Location: "台灣", CareerArea: "研究發展", EmploymentType: "正職", Posted: "2026/03/17"},
 	{ID: "302", Slug: "A10-RD-Device-Engineer", Title: "A10 RD Device Engineer", Location: "台灣", CareerArea: "研究發展", EmploymentType: "正職", Posted: "2026/03/17"},
@@ -23,7 +23,7 @@ var wantJobs = []Job{
 	{ID: "6154", Slug: "R-D-Module-Engineer", Title: "R&D Module Engineer", Location: "台灣", CareerArea: "研究發展", EmploymentType: "正職", Posted: "2026/03/17"},
 }
 
-var wantDetail = &JobDetailResponse{
+var _wantDetail = &JobDetailResponse{
 	ID:             "21826",
 	Slug:           "R-D-Advanced-Packaging-Integration-Engineer",
 	Title:          "R&D Advanced Packaging Integration Engineer",
@@ -53,7 +53,7 @@ func TestParseSearchHTML(t *testing.T) {
 	gotJobs, gotTotal, err := parseSearchHTML(doc)
 	require.NoError(t, err)
 	assert.Equal(t, 22, gotTotal)
-	assert.Equal(t, wantJobs, gotJobs)
+	assert.Equal(t, _wantJobs, gotJobs)
 }
 
 // A bot challenge or redesigned page returns HTTP 200 without the results
@@ -76,5 +76,5 @@ func TestParseDetailHTML(t *testing.T) {
 	got, ok := parseDetailHTML(doc)
 	require.True(t, ok)
 
-	assert.Equal(t, *wantDetail, got)
+	assert.Equal(t, *_wantDetail, got)
 }

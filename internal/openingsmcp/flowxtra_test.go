@@ -51,7 +51,7 @@ func TestFlowxtraSearchJobsE2E(t *testing.T) {
 	// A bare call (no arguments) lists the newest postings board-wide.
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
 		Name:      "flowxtra_search_jobs",
-		Arguments: map[string]any{},
+		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
 	assert.False(t, callRes.IsError)

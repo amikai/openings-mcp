@@ -16,9 +16,13 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/teamtailor"
 )
 
-const formatJSON = "json"
+const _formatJSON = "json"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("teamtailor")
 	var (
 		host    = rootFlags.StringLong("host", "", "curated Teamtailor career-site host, e.g. career.teamtailor.com")
@@ -81,20 +85,21 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, or get) is required")
-		os.Exit(1)
+		return 1
 	}
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func normalizeHost(host string) (string, error) {
@@ -110,7 +115,7 @@ func normalizeHost(host string) (string, error) {
 }
 
 func runCompanies(format string) error {
-	if format == formatJSON {
+	if format == _formatJSON {
 		return writeJSON(teamtailor.Companies)
 	}
 	for _, c := range teamtailor.Companies {
@@ -219,7 +224,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		jobs = append(jobs, summarize(j))
 	}
 
-	if f.format == formatJSON {
+	if f.format == _formatJSON {
 		return writeJSON(searchResultJSON{Total: len(jobs), Jobs: jobs})
 	}
 
@@ -272,7 +277,7 @@ func runGet(ctx context.Context, f getFlags) error {
 			Company:        feed.Title,
 			Description:    description,
 		}
-		if f.format == formatJSON {
+		if f.format == _formatJSON {
 			return writeJSON(detail)
 		}
 		fmt.Println(detail.Title)

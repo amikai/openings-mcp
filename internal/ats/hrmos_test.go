@@ -65,7 +65,7 @@ func TestHrmosSearchFilterEngineer(t *testing.T) {
 
 	dump, err := hrmos.NewClient(srv.URL, hc).AllJobs(t.Context(), hrmos.MockSlugPaged)
 	require.NoError(t, err)
-	want := map[string]bool{}
+	want := make(map[string]bool)
 	for _, j := range dump.Jobs {
 		if slices.Contains(j.Chips, "エンジニア") {
 			want[j.ID] = true

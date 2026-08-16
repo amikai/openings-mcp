@@ -22,9 +22,13 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 )
 
-const formatJSON = "json"
+const _formatJSON = "json"
 
 func main() {
+	os.Exit(run())
+}
+
+func run() int {
 	rootFlags := ff.NewFlagSet("mokahr")
 	var (
 		company = rootFlags.StringLong("company", "", `curated roster company name or "<org>/<site>" slug from the careers URL, e.g. "high-flyer/140576"`)
@@ -67,14 +71,16 @@ func main() {
 		Usage:    "location id from 'filters' output; repeatable, ORed",
 		Value:    ffval.NewList(&locationIDs),
 	}); err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "err:", err)
+		return 1
 	}
 	if _, err := searchFS.AddFlag(ff.FlagConfig{
 		LongName: "zhineng-id",
 		Usage:    "职能 (job-function) id from 'filters' output; repeatable, ORed",
 		Value:    ffval.NewList(&zhinengIDs),
 	}); err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, "err:", err)
+		return 1
 	}
 	searchCmd := &ff.Command{
 		Name:      "search",
@@ -133,22 +139,23 @@ func main() {
 	if err := rootCmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd.GetSelected()))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if rootCmd.GetSelected() == rootCmd {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(rootCmd))
 		fmt.Fprintln(os.Stderr, "err: a subcommand (companies, search, get, or filters) is required")
-		os.Exit(1)
+		return 1
 	}
 
 	if err := rootCmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 // resolveCompany accepts a roster company name (case-insensitive) or an
@@ -177,7 +184,7 @@ func resolveCompany(company string) (mokahr.Company, error) {
 // (internal/provider/mokahr/companies.yaml), sorted by company name. It
 // makes no network call.
 func runCompanies(format string) error {
-	if format == formatJSON {
+	if format == _formatJSON {
 		return writeJSON(mokahr.Companies)
 	}
 	for _, c := range mokahr.Companies {
@@ -308,7 +315,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	}
 	total := res.JobStats.Value.Total.Or(len(jobs))
 
-	if f.format == formatJSON {
+	if f.format == _formatJSON {
 		return writeJSON(searchResultJSON{Total: total, Jobs: jobs})
 	}
 
@@ -362,7 +369,7 @@ func runGet(ctx context.Context, f getFlags) error {
 // printDetail renders one full posting. JSON mode encodes the generated
 // JobDetail as-is — detail is for seeing the whole record.
 func printDetail(d *mokahr.JobDetail, c mokahr.Company, format string) error {
-	if format == formatJSON {
+	if format == _formatJSON {
 		return writeJSON(d)
 	}
 
@@ -430,7 +437,7 @@ func runFilters(ctx context.Context, f filtersFlags) error {
 		return err
 	}
 
-	if f.format == formatJSON {
+	if f.format == _formatJSON {
 		return writeJSON(aggs)
 	}
 

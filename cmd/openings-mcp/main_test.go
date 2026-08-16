@@ -33,12 +33,12 @@ import (
 // production rosters. Run with:
 //
 //	go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update
-var update = flag.Bool("update", false, "regenerate the collision-report golden file")
+var _update = flag.Bool("update", false, "regenerate the collision-report golden file")
 
 // collisionGoldenPath is the golden file TestCompanyCollisionReport compares
 // against. NewRegistry no longer fails on a cross-adapter slug or name
 // collision, so this report is what keeps new ones visible.
-const collisionGoldenPath = "testdata/company_collisions.txt"
+const _collisionGoldenPath = "testdata/company_collisions.txt"
 
 type writeCloser struct {
 	io.Writer
@@ -49,7 +49,7 @@ func (writeCloser) Close() error { return nil }
 // Flags must beat the environment, and an unparseable env value must fail
 // startup rather than silently falling back to the default.
 func TestFlagsBeatEnvVars(t *testing.T) {
-	const envKey = envVarPrefix + "_ENABLE_COMMAND_LOGGING"
+	const envKey = _envVarPrefix + "_ENABLE_COMMAND_LOGGING"
 
 	for _, tc := range []struct {
 		name    string
@@ -75,7 +75,7 @@ func TestFlagsBeatEnvVars(t *testing.T) {
 			got := fs.BoolLong("enable-command-logging", "usage")
 			cmd := &ff.Command{Name: "openings-mcp", Flags: fs}
 
-			err := cmd.Parse(tc.args, ff.WithEnvVarPrefix(envVarPrefix))
+			err := cmd.Parse(tc.args, ff.WithEnvVarPrefix(_envVarPrefix))
 			if tc.wantErr {
 				require.Error(t, err)
 				return
@@ -238,12 +238,12 @@ func assertCompanyAndIndeedSchemas(t *testing.T, got map[string]*mcp.Tool) {
 }
 
 func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
-	assert.Contains(t, serverInstructions, "A company name by itself is not a source selection.")
-	assert.Contains(t, serverInstructions, "recognized public careers-page URLs from the career systems this server supports")
-	assert.Contains(t, serverInstructions, "some career systems accept URLs only for companies already in the curated roster")
-	assert.NotContains(t, serverInstructions, "Eightfold")
-	assert.NotContains(t, serverInstructions, "SuccessFactors")
-	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
+	assert.Contains(t, _serverInstructions, "A company name by itself is not a source selection.")
+	assert.Contains(t, _serverInstructions, "recognized public careers-page URLs from the career systems this server supports")
+	assert.Contains(t, _serverInstructions, "some career systems accept URLs only for companies already in the curated roster")
+	assert.NotContains(t, _serverInstructions, "Eightfold")
+	assert.NotContains(t, _serverInstructions, "SuccessFactors")
+	assert.NotContains(t, _serverInstructions, "When the user names a site or company, use that provider's tools.")
 }
 
 // TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
@@ -255,7 +255,7 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
 
-	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
+	assert.Contains(t, _serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
 
 	ctx := t.Context()
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
@@ -434,7 +434,7 @@ func TestATSCareersURLRoundTripsThroughRegistry(t *testing.T) {
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
 
-	wantNoURL := map[string]bool{}
+	wantNoURL := make(map[string]bool)
 
 	var gotNoURL []string
 	for _, a := range adapters {
@@ -484,8 +484,8 @@ func TestCompanyCollisionReport(t *testing.T) {
 	registry, err := ats.NewRegistry(adapters...)
 	require.NoError(t, err)
 
-	findings := map[string][]ats.CompanyCandidate{}
-	probed := map[string]bool{}
+	findings := make(map[string][]ats.CompanyCandidate)
+	probed := make(map[string]bool)
 	for _, a := range adapters {
 		for _, c := range a.Roster() {
 			for _, probe := range []string{c.Slug, c.Name} {
@@ -519,17 +519,17 @@ func TestCompanyCollisionReport(t *testing.T) {
 	}
 	got := b.String()
 
-	if *update {
-		require.NoError(t, os.WriteFile(collisionGoldenPath, []byte(got), 0o644))
+	if *_update {
+		require.NoError(t, os.WriteFile(_collisionGoldenPath, []byte(got), 0o644))
 		return
 	}
 
-	want, err := os.ReadFile(collisionGoldenPath)
+	want, err := os.ReadFile(_collisionGoldenPath)
 	require.NoError(t, err)
 	if got != string(want) {
 		t.Errorf(
 			"%s is stale; regenerate with `go test ./cmd/openings-mcp -run TestCompanyCollisionReport -update`.\n\nExpected content:\n%s",
-			collisionGoldenPath, got,
+			_collisionGoldenPath, got,
 		)
 	}
 }
@@ -544,7 +544,7 @@ func TestHTTPFlagRejectsEmptyValue(t *testing.T) {
 
 	require.NoError(t, f.Set("true"))
 	assert.True(t, f.enabled)
-	assert.Equal(t, defaultHTTPAddr, f.addr)
+	assert.Equal(t, _defaultHTTPAddr, f.addr)
 
 	require.NoError(t, f.Set(":9000"))
 	assert.True(t, f.enabled)
@@ -552,12 +552,12 @@ func TestHTTPFlagRejectsEmptyValue(t *testing.T) {
 }
 
 func TestHTTPFlagEmptyEnvIsAStartupError(t *testing.T) {
-	t.Setenv(envVarPrefix+"_HTTP", "")
+	t.Setenv(_envVarPrefix+"_HTTP", "")
 
 	fs := ff.NewFlagSet("openings-mcp")
-	_, err := fs.AddFlag(ff.FlagConfig{LongName: "http", Value: &httpFlag{addr: defaultHTTPAddr}, NoPlaceholder: true})
+	_, err := fs.AddFlag(ff.FlagConfig{LongName: "http", Value: &httpFlag{addr: _defaultHTTPAddr}, NoPlaceholder: true})
 	require.NoError(t, err)
 	cmd := &ff.Command{Name: "openings-mcp", Flags: fs}
 
-	require.ErrorContains(t, cmd.Parse(nil, ff.WithEnvVarPrefix(envVarPrefix)), "empty value")
+	require.ErrorContains(t, cmd.Parse(nil, ff.WithEnvVarPrefix(_envVarPrefix)), "empty value")
 }

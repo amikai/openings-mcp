@@ -153,5 +153,5 @@ func TestADPFilterKeyNormalizesLabels(t *testing.T) {
 }
 
 func TestADPMyJobsHostPatternRegistered(t *testing.T) {
-	assert.Contains(t, careersHostPatternsByAdapter, "adp_myjobs")
+	assert.Contains(t, _careersHostPatternsByAdapter, "adp_myjobs")
 }

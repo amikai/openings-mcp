@@ -30,7 +30,7 @@ import (
 )
 
 // providerOrder fixes the --provider default and the report's grouping order.
-var providerOrder = []string{
+var _providerOrder = []string{
 	"adp_myjobs",
 	"ashby",
 	"avature",
@@ -62,9 +62,9 @@ var providerOrder = []string{
 // on a sampled job failed — usually a detail-template divergence the
 // search path never exercises. Detail carries the error message either way.
 const (
-	statusOK          = "OK"
-	statusError       = "ERROR"
-	statusDetailError = "DETAIL_ERROR"
+	_statusOK          = "OK"
+	_statusError       = "ERROR"
+	_statusDetailError = "DETAIL_ERROR"
 )
 
 // check is one roster entry to verify against its adapter.
@@ -87,12 +87,16 @@ type result struct {
 }
 
 func main() {
+	os.Exit(runMain())
+}
+
+func runMain() int {
 	fs := ff.NewFlagSet("verify-companies")
 	var (
 		providers = fs.StringLong(
 			"provider",
-			strings.Join(providerOrder, ","),
-			"comma-separated subset of "+strings.Join(providerOrder, ","),
+			strings.Join(_providerOrder, ","),
+			"comma-separated subset of "+strings.Join(_providerOrder, ","),
 		)
 		timeout     = fs.DurationLong("timeout", 300*time.Second, "per-request timeout")
 		concurrency = fs.IntLong("concurrency", 8, "number of concurrent checks")
@@ -114,19 +118,20 @@ func main() {
 	if err := cmd.Parse(os.Args[1:]); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(cmd))
 		if errors.Is(err, ff.ErrHelp) {
-			os.Exit(0)
+			return 0
 		}
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 
 	if err := cmd.Run(context.Background()); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
-		os.Exit(1)
+		return 1
 	}
 	if errorCount > 0 {
-		os.Exit(1)
+		return 1
 	}
+	return 0
 }
 
 func run(ctx context.Context, providerList string, timeout time.Duration, concurrency int, format string) (errs int, err error) {
@@ -156,16 +161,16 @@ func run(ctx context.Context, providerList string, timeout time.Duration, concur
 // parseProviders validates the --provider list and returns it in
 // providerOrder so the report grouping is stable regardless of input order.
 func parseProviders(list string) ([]string, error) {
-	selected := map[string]bool{}
+	selected := make(map[string]bool)
 	for name := range strings.SplitSeq(list, ",") {
 		name = strings.ToLower(strings.TrimSpace(name))
-		if !slices.Contains(providerOrder, name) {
-			return nil, fmt.Errorf("unknown provider %q (want any of %s)", name, strings.Join(providerOrder, ", "))
+		if !slices.Contains(_providerOrder, name) {
+			return nil, fmt.Errorf("unknown provider %q (want any of %s)", name, strings.Join(_providerOrder, ", "))
 		}
 		selected[name] = true
 	}
 	var names []string
-	for _, name := range providerOrder {
+	for _, name := range _providerOrder {
 		if selected[name] {
 			names = append(names, name)
 		}
@@ -293,21 +298,21 @@ func (c check) do(ctx context.Context, timeout time.Duration) result {
 
 	res, err := c.search(ctx, timeout)
 	if err != nil {
-		r.Status, r.Detail = statusError, err.Error()
+		r.Status, r.Detail = _statusError, err.Error()
 		return r
 	}
-	r.Status = statusOK
+	r.Status = _statusOK
 	r.Jobs = res.TotalCount
 
 	switch {
 	case len(res.Jobs) > 0:
 		jobID := res.Jobs[0].JobID
 		if err := c.probeDetail(ctx, timeout, jobID); err != nil {
-			r.Status = statusDetailError
+			r.Status = _statusDetailError
 			r.Detail = fmt.Sprintf("detail %s: %s", jobID, err)
 		}
 	case res.TotalCount > 0:
-		r.Status = statusDetailError
+		r.Status = _statusDetailError
 		r.Detail = fmt.Sprintf("search reported %d jobs but page 1 carried no probeable job", res.TotalCount)
 	}
 	return r
@@ -333,10 +338,10 @@ func printText(results []result) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
 	for _, r := range results {
 		jobs, detail := "", r.Detail
-		if r.Status != statusError {
+		if r.Status != _statusError {
 			jobs = strconv.Itoa(r.Jobs)
 		}
-		if r.Status == statusOK {
+		if r.Status == _statusOK {
 			detail = ""
 		}
 		fmt.Fprintf(w, "%s\t%s\t%s\t%s\t%s\t%s\n", r.Status, r.Provider, r.Company, r.Slug, jobs, detail)
@@ -364,7 +369,7 @@ func printJSON(results []result) error {
 // is live but currently lists no jobs.
 func tally(results []result) (ok, errs, zero int) {
 	for _, r := range results {
-		if r.Status == statusOK {
+		if r.Status == _statusOK {
 			ok++
 			if r.Jobs == 0 {
 				zero++
