@@ -242,17 +242,17 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 
 	var paras []string
 	// PaidJob (hosted ads) and jix_robotjob-inner (aggregated r* ads).
-	doc.Find("div.PaidJob p, div.jix_robotjob-inner p").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find("div.PaidJob p, div.jix_robotjob-inner p").EachIter() {
 		t := strings.TrimSpace(s.Text())
 		if t != "" {
 			paras = append(paras, t)
 		}
-	})
+	}
 	if body := strings.Join(paras, "\n\n"); len(body) > len(d.Description) {
 		d.Description = body
 	}
 
-	doc.Find(".jix-info p").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find(".jix-info p").EachIter() {
 		label := strings.ToLower(strings.TrimSpace(s.Find("b").First().Text()))
 		val := strings.TrimSpace(strings.TrimPrefix(s.Text(), s.Find("b").First().Text()))
 		val = strings.TrimSpace(val)
@@ -265,7 +265,7 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 			// Only when the page literally labels a deadline — do not invent ASAP.
 			d.ApplyDeadline = val
 		}
-	})
+	}
 
 	if d.Tid == "" || !reJobID.MatchString(d.Tid) {
 		if extracted := tidFromURL(d.URL); extracted != "" {
@@ -283,13 +283,13 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 // metaProperties reads Open Graph (and other) meta tags via goquery.
 func metaProperties(doc *goquery.Document) map[string]string {
 	out := make(map[string]string)
-	doc.Find("meta[property]").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find("meta[property]").EachIter() {
 		prop, _ := s.Attr("property")
 		content, _ := s.Attr("content")
 		if prop != "" && content != "" {
 			out[prop] = content
 		}
-	})
+	}
 	return out
 }
 

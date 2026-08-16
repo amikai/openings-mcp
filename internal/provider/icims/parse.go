@@ -34,17 +34,17 @@ type SelectOption struct {
 func parseSearchHTML(doc *goquery.Document) (*SearchResponse, error) {
 	var jobs []Job
 	seen := make(map[string]struct{})
-	doc.Find("li.iCIMS_JobCardItem").Each(func(_ int, card *goquery.Selection) {
+	for _, card := range doc.Find("li.iCIMS_JobCardItem").EachIter() {
 		job, ok := parseJobCard(card)
 		if !ok {
-			return
+			continue
 		}
 		if _, dup := seen[job.ID]; dup {
-			return
+			continue
 		}
 		seen[job.ID] = struct{}{}
 		jobs = append(jobs, job)
-	})
+	}
 
 	totalPages := parseTotalPages(doc)
 	if len(jobs) == 0 && totalPages == 0 && !looksLikeSearchPage(doc) {
@@ -72,18 +72,18 @@ func parseSelectOptions(doc *goquery.Document, selector string) []SelectOption {
 		return nil
 	}
 	var out []SelectOption
-	sel.Find("option").Each(func(_ int, opt *goquery.Selection) {
+	for _, opt := range sel.Find("option").EachIter() {
 		value, _ := opt.Attr("value")
 		value = strings.TrimSpace(value)
 		if value == "" || strings.EqualFold(value, "zipRadius") {
-			return
+			continue
 		}
 		label := strings.Join(strings.Fields(opt.Text()), " ")
 		if label == "" {
 			label = value
 		}
 		out = append(out, SelectOption{Value: value, Label: label})
-	})
+	}
 	return out
 }
 
@@ -187,14 +187,13 @@ func parseJobCard(card *goquery.Selection) (Job, bool) {
 	}).First()
 	if link.Length() == 0 {
 		// Fallback: any anchor into /jobs/{id}/.../job
-		card.Find("a[href]").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+		for _, s := range card.Find("a[href]").EachIter() {
 			href, _ := s.Attr("href")
 			if jobHrefPattern.MatchString(href) {
 				link = s
-				return false
+				break
 			}
-			return true
-		})
+		}
 	}
 	if link.Length() == 0 {
 		return Job{}, false
@@ -225,45 +224,45 @@ func parseJobCard(card *goquery.Selection) (Job, bool) {
 
 func extractCardLocation(card *goquery.Selection) string {
 	// Prefer the sr-only "Location" / "Job Locations" label's following span.
-	var loc string
-	card.Find("span.sr-only.field-label").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+	for _, s := range card.Find("span.sr-only.field-label").EachIter() {
 		label := strings.ToLower(strings.TrimSpace(s.Text()))
 		if !strings.Contains(label, "location") {
-			return true
+			continue
 		}
 		// Next sibling span holds the value.
 		next := s.NextFiltered("span")
 		if next.Length() == 0 {
 			next = s.Parent().Find("span").Not(".sr-only").First()
 		}
-		loc = strings.TrimSpace(next.Text())
-		return loc == ""
-	})
-	return loc
+		if loc := strings.TrimSpace(next.Text()); loc != "" {
+			return loc
+		}
+	}
+	return ""
 }
 
 // extractCardPostedAt reads the card's posted date. The span following the
 // sr-only "… Posted Date" label shows relative text ("3 weeks ago") but
 // carries the absolute timestamp in its title attribute; prefer the latter.
 func extractCardPostedAt(card *goquery.Selection) string {
-	var posted string
-	card.Find("span.sr-only.field-label").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+	for _, s := range card.Find("span.sr-only.field-label").EachIter() {
 		label := strings.ToLower(strings.TrimSpace(s.Text()))
 		if !strings.Contains(label, "posted date") {
-			return true
+			continue
 		}
 		next := s.NextFiltered("span")
 		if next.Length() == 0 {
-			return true
+			continue
 		}
+		posted := strings.Join(strings.Fields(next.Text()), " ")
 		if title, ok := next.Attr("title"); ok && strings.TrimSpace(title) != "" {
 			posted = strings.TrimSpace(title)
-		} else {
-			posted = strings.Join(strings.Fields(next.Text()), " ")
 		}
-		return posted == ""
-	})
-	return posted
+		if posted != "" {
+			return posted
+		}
+	}
+	return ""
 }
 
 func jobIDAndSlugFromHref(href string) (id, slug string) {
@@ -342,15 +341,15 @@ func parseJobDetailFromPortalHTML(doc *goquery.Document, id string) (*JobDetailR
 	}
 
 	var descParts []string
-	doc.Find(".iCIMS_Expandable_Text").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find(".iCIMS_Expandable_Text").EachIter() {
 		html, err := s.Html()
 		if err != nil {
-			return
+			continue
 		}
 		if t := strings.TrimSpace(html); t != "" {
 			descParts = append(descParts, t)
 		}
-	})
+	}
 	if len(descParts) == 0 {
 		return nil, false
 	}
@@ -368,25 +367,22 @@ func parseJobDetailFromPortalHTML(doc *goquery.Document, id string) (*JobDetailR
 }
 
 func findJobPosting(doc *goquery.Document) map[string]any {
-	var found map[string]any
-	doc.Find(`script[type="application/ld+json"]`).EachWithBreak(func(_ int, s *goquery.Selection) bool {
+	for _, s := range doc.Find(`script[type="application/ld+json"]`).EachIter() {
 		raw := strings.TrimSpace(s.Text())
 		if raw == "" {
-			return true
+			continue
 		}
 		var data any
 		if err := json.Unmarshal([]byte(raw), &data); err != nil {
-			return true
+			continue
 		}
 		for _, candidate := range iterLDDicts(data) {
 			if typeIs(candidate["@type"], "JobPosting") {
-				found = candidate
-				return false
+				return candidate
 			}
 		}
-		return true
-	})
-	return found
+	}
+	return nil
 }
 
 func iterLDDicts(node any) []map[string]any {

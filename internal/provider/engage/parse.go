@@ -30,8 +30,8 @@ func parseBoard(doc *goquery.Document) (*Board, error) {
 	}
 
 	var categories []Category
-	lists.Each(func(_ int, list *goquery.Selection) {
-		list.Children().Each(func(_ int, s *goquery.Selection) {
+	for _, list := range lists.EachIter() {
+		for _, s := range list.Children().EachIter() {
 			switch {
 			case s.Is("dt.category"):
 				categories = append(categories, Category{Name: normSpace(s.Text())})
@@ -42,8 +42,8 @@ func parseBoard(doc *goquery.Document) (*Board, error) {
 					cur.Jobs = append(cur.Jobs, job)
 				}
 			}
-		})
-	})
+		}
+	}
 
 	total := 0
 	for i := range categories {
@@ -259,33 +259,31 @@ func parseDetailHeadline(doc *goquery.Document) (title, company string) {
 // parseDetailCompany reads the employer from the company table, the fallback
 // for a page whose h1 carries no company half.
 func parseDetailCompany(doc *goquery.Document) string {
-	var name string
-	doc.Find("th").EachWithBreak(func(_ int, th *goquery.Selection) bool {
+	for _, th := range doc.Find("th").EachIter() {
 		if normSpace(th.Text()) != "会社名" {
-			return true
+			continue
 		}
-		name = normSpace(th.Next().Text())
-		return false
-	})
-	return name
+		return normSpace(th.Next().Text())
+	}
+	return ""
 }
 
 func parseSections(doc *goquery.Document) []Section {
 	var sections []Section
-	doc.Find("dl.dataSet").Each(func(_ int, dl *goquery.Selection) {
+	for _, dl := range doc.Find("dl.dataSet").EachIter() {
 		h2 := dl.Find("h2.item").First()
 		if h2.Length() == 0 {
-			return
+			continue
 		}
 		text := normSpace(dl.Find("dd.data").First().Text())
 		if text == "" {
-			return
+			continue
 		}
 		sections = append(sections, Section{
 			Heading: normSpace(h2.Text()),
 			Text:    text,
 		})
-	})
+	}
 	return sections
 }
 

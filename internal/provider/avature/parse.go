@@ -29,11 +29,11 @@ func parseSearchHTML(doc *goquery.Document) *SearchResponse {
 	// dedupe by id: the title link precedes any Apply link for the same
 	// posting in document order.
 	index := map[string]int{}
-	doc.Find("a[href]").Each(func(_ int, a *goquery.Selection) {
+	for _, a := range doc.Find("a[href]").EachIter() {
 		href, _ := a.Attr("href")
 		m := jobDetailPathRE.FindStringSubmatch(href)
 		if m == nil {
-			return
+			continue
 		}
 		id, title := m[1], normSpace(a.Text())
 		if i, ok := index[id]; ok {
@@ -42,7 +42,7 @@ func parseSearchHTML(doc *goquery.Document) *SearchResponse {
 			if res.Jobs[i].Title == "" {
 				res.Jobs[i].Title = title
 			}
-			return
+			continue
 		}
 		index[id] = len(res.Jobs)
 		res.Jobs = append(res.Jobs, Job{
@@ -51,7 +51,7 @@ func parseSearchHTML(doc *goquery.Document) *SearchResponse {
 			Location: itemLocation(a),
 			URL:      href,
 		})
-	})
+	}
 	return res
 }
 
@@ -89,24 +89,26 @@ func itemLocation(a *goquery.Selection) string {
 	}
 	// Koch-style label/value card fields ("Location:" / "Atlanta, Georgia").
 	loc := ""
-	item.Find(".article__content__field").EachWithBreak(func(_ int, f *goquery.Selection) bool {
+	for _, f := range item.Find(".article__content__field").EachIter() {
 		if !strings.Contains(strings.ToLower(f.Find(".article__content__field__label").Text()), "location") {
-			return true
+			continue
 		}
 		loc = normSpace(f.Find(".article__content__field__value").Text())
-		return false
-	})
+		break
+	}
 	if loc != "" {
 		return loc
 	}
 	// Deloitte-style subtitle list ("<strong>Location:</strong> <span>Zaventem</span>").
-	item.Find("strong").EachWithBreak(func(_ int, s *goquery.Selection) bool {
+	for _, s := range item.Find("strong").EachIter() {
 		if !strings.Contains(strings.ToLower(s.Text()), "location") {
-			return true
+			continue
 		}
 		loc = normSpace(s.NextFiltered("span").First().Text())
-		return loc == ""
-	})
+		if loc != "" {
+			break
+		}
+	}
 	if loc != "" {
 		return loc
 	}
@@ -123,38 +125,38 @@ func parseJobDetailHTML(doc *goquery.Document, id string) (*JobDetailResponse, b
 	// Metadata fields. Portals duplicate the section for mobile and
 	// desktop, so dedupe by label keeping the first occurrence.
 	seen := map[string]bool{}
-	doc.Find(".article__content__view__field").Each(func(_ int, f *goquery.Selection) {
+	for _, f := range doc.Find(".article__content__view__field").EachIter() {
 		label := normSpace(f.Find(".article__content__view__field__label").First().Text())
 		if label == "" || seen[strings.ToLower(label)] {
-			return
+			continue
 		}
 		seen[strings.ToLower(label)] = true
 		d.Fields = append(d.Fields, Field{
 			Label: label,
 			Value: normSpace(f.Find(".article__content__view__field__value").First().Text()),
 		})
-	})
+	}
 
 	// Description: every details section's content minus the label/value
 	// fields captured above. Some themes put the body in a rich-text field,
 	// others directly in the section content — removing labeled fields
 	// keeps both.
 	var parts []string
-	doc.Find("article.article--details").Each(func(_ int, sec *goquery.Selection) {
-		sec.Find(".article__content__view__field").Each(func(_ int, f *goquery.Selection) {
+	for _, sec := range doc.Find("article.article--details").EachIter() {
+		for _, f := range sec.Find(".article__content__view__field").EachIter() {
 			if f.Find(".article__content__view__field__label").Length() > 0 {
 				f.Remove()
 			}
-		})
-		sec.Find(".article__content").Each(func(_ int, c *goquery.Selection) {
+		}
+		for _, c := range sec.Find(".article__content").EachIter() {
 			if normSpace(c.Text()) == "" {
-				return
+				continue
 			}
 			if h, err := c.Html(); err == nil {
 				parts = append(parts, h)
 			}
-		})
-	})
+		}
+	}
 	d.DescriptionHTML = strings.Join(parts, "\n")
 
 	return d, d.Title != "" && (len(d.Fields) > 0 || d.DescriptionHTML != "")
