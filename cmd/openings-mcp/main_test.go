@@ -21,9 +21,11 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/job104"
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 	"github.com/amikai/openings-mcp/internal/provider/linkedin"
+	"github.com/amikai/openings-mcp/internal/provider/mynavi"
 	"github.com/amikai/openings-mcp/internal/provider/nvidia"
 	"github.com/amikai/openings-mcp/internal/provider/tsmc"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+	"github.com/peterbourgon/ff/v4"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -45,6 +47,46 @@ type writeCloser struct {
 
 func (writeCloser) Close() error { return nil }
 
+// Flags must beat the environment, and an unparseable env value must fail
+// startup rather than silently falling back to the default.
+func TestFlagsBeatEnvVars(t *testing.T) {
+	const envKey = envVarPrefix + "_ENABLE_COMMAND_LOGGING"
+
+	for _, tc := range []struct {
+		name    string
+		args    []string
+		env     string
+		want    bool
+		wantErr bool
+	}{
+		{name: "unset", want: false},
+		{name: "flag only", args: []string{"--enable-command-logging"}, want: true},
+		{name: "env true", env: "true", want: true},
+		{name: "env 1", env: "1", want: true},
+		{name: "env false", env: "false", want: false},
+		{name: "flag false overrides env true", args: []string{"--enable-command-logging=false"}, env: "true", want: false},
+		{name: "flag true overrides env false", args: []string{"--enable-command-logging"}, env: "false", want: true},
+		{name: "unparseable env fails", env: "on", wantErr: true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if tc.env != "" {
+				t.Setenv(envKey, tc.env)
+			}
+			fs := ff.NewFlagSet("openings-mcp")
+			got := fs.BoolLong("enable-command-logging", "usage")
+			cmd := &ff.Command{Name: "openings-mcp", Flags: fs}
+
+			err := cmd.Parse(tc.args, ff.WithEnvVarPrefix(envVarPrefix))
+			if tc.wantErr {
+				require.Error(t, err)
+				return
+			}
+			require.NoError(t, err)
+			assert.Equal(t, tc.want, *got)
+		})
+	}
+}
+
 func TestServerListsJobTools(t *testing.T) {
 	ctx := t.Context()
 	cAmazon, err := amazon.NewClient("https://www.amazon.jobs", amazon.WithClient(http.DefaultClient))
@@ -62,6 +104,8 @@ func TestServerListsJobTools(t *testing.T) {
 	cLinkedin := linkedin.NewClient("https://www.linkedin.com", http.DefaultClient)
 	cIndeed := indeed.NewClient("https://apis.indeed.com/graphql", http.DefaultClient)
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", http.DefaultClient)
+	cMynavi := mynavi.NewClient("https://tenshoku.mynavi.jp", http.DefaultClient)
+
 	registry, err := newATSRegistry(http.DefaultClient, http.DefaultClient, nil)
 	require.NoError(t, err)
 	server := newServer(&providerClients{
@@ -75,6 +119,7 @@ func TestServerListsJobTools(t *testing.T) {
 		linkedin: cLinkedin,
 		indeed:   cIndeed,
 		jobindex: cJobindex,
+		mynavi:   cMynavi,
 	}, registry, slog.New(slog.NewTextHandler(io.Discard, nil)))
 	client := mcp.NewClient(&mcp.Implementation{Name: "smoke", Version: "v0"}, nil)
 	serverTransport, clientTransport := mcp.NewInMemoryTransports()
@@ -118,17 +163,37 @@ func TestServerListsJobTools(t *testing.T) {
 		"get_filters_by_company",
 		"get_job_detail_by_company",
 	} {
-		tool := got[name]
-		require.NotNil(t, tool, name)
-		assert.NotEmpty(t, tool.Description, name)
-		assert.NotNil(t, tool.InputSchema, name)
-		assert.NotNil(t, tool.OutputSchema, name)
-		require.NotNil(t, tool.Annotations, name)
-		assert.NotEmpty(t, tool.Annotations.Title, name)
-		assert.True(t, tool.Annotations.ReadOnlyHint, name)
+		assertToolContract(t, got, name)
 	}
 
+	assertCompanyAndIndeedSchemas(t, got)
+
+}
+
+// assertToolContract holds every registered tool to the same baseline: hosts
+// route on the description and annotations, and gate write-confirmation
+// prompts on ReadOnlyHint, so a tool missing any of them misbehaves in the
+// client rather than failing here.
+func assertToolContract(t *testing.T, got map[string]*mcp.Tool, name string) {
+	t.Helper()
+
+	tool := got[name]
+	require.NotNil(t, tool, name)
+	assert.NotEmpty(t, tool.Description, name)
+	assert.NotNil(t, tool.InputSchema, name)
+	assert.NotNil(t, tool.OutputSchema, name)
+	require.NotNil(t, tool.Annotations, name)
+	assert.NotEmpty(t, tool.Annotations.Title, name)
+	assert.True(t, tool.Annotations.ReadOnlyHint, name)
+}
+
+// assertCompanyAndIndeedSchemas pins the schema details the server
+// instructions promise the host LLM; they hold in both tool sets.
+func assertCompanyAndIndeedSchemas(t *testing.T, got map[string]*mcp.Tool) {
+	t.Helper()
+
 	companyTool := got["search_jobs_by_company"]
+	require.NotNil(t, companyTool)
 	assert.Equal(t, "Search official job postings for a specific company.", companyTool.Description)
 	assert.Equal(t, "Get company-specific filters when a job search needs narrowing beyond query and location.", got["get_filters_by_company"].Description)
 
@@ -163,6 +228,7 @@ func TestServerListsJobTools(t *testing.T) {
 	assert.NotContains(t, companyOutputProperties, "next_cursor")
 
 	nvidiaTool := got["nvidia_search_jobs"]
+	require.NotNil(t, nvidiaTool)
 	nvidiaInput, ok := nvidiaTool.InputSchema.(map[string]any)
 	require.True(t, ok)
 	nvidiaProperties, ok := nvidiaInput["properties"].(map[string]any)
@@ -186,6 +252,7 @@ func TestServerListsJobTools(t *testing.T) {
 	assert.Contains(t, nvidiaExternalPath["description"], "nvidia_get_job_detail")
 
 	indeedTool := got["indeed_search_jobs"]
+	require.NotNil(t, indeedTool)
 	assert.Equal(t, "Search job postings on Indeed.", indeedTool.Description)
 	assert.Equal(t, "Get full details for an Indeed job posting.", got["indeed_get_job_detail"].Description)
 	indeedInput, ok := indeedTool.InputSchema.(map[string]any)
@@ -495,4 +562,32 @@ func TestCompanyCollisionReport(t *testing.T) {
 			collisionGoldenPath, got,
 		)
 	}
+}
+
+// --http carries an optional address, so its empty value is ambiguous: the
+// env binding makes an exported-but-empty OPENINGS_MCP_HTTP reach Set, and
+// reading that as an address would start a listener on nothing.
+func TestHTTPFlagRejectsEmptyValue(t *testing.T) {
+	var f httpFlag
+	require.Error(t, f.Set(""))
+	assert.False(t, f.enabled)
+
+	require.NoError(t, f.Set("true"))
+	assert.True(t, f.enabled)
+	assert.Equal(t, defaultHTTPAddr, f.addr)
+
+	require.NoError(t, f.Set(":9000"))
+	assert.True(t, f.enabled)
+	assert.Equal(t, ":9000", f.addr)
+}
+
+func TestHTTPFlagEmptyEnvIsAStartupError(t *testing.T) {
+	t.Setenv(envVarPrefix+"_HTTP", "")
+
+	fs := ff.NewFlagSet("openings-mcp")
+	_, err := fs.AddFlag(ff.FlagConfig{LongName: "http", Value: &httpFlag{addr: defaultHTTPAddr}, NoPlaceholder: true})
+	require.NoError(t, err)
+	cmd := &ff.Command{Name: "openings-mcp", Flags: fs}
+
+	require.ErrorContains(t, cmd.Parse(nil, ff.WithEnvVarPrefix(envVarPrefix)), "empty value")
 }

@@ -40,6 +40,18 @@ type Invoker interface {
 	//
 	// GET /hh_recruit_tw_api/portal_api/JobVacancies
 	ListJobVacancies(ctx context.Context, params ListJobVacanciesParams) (JobVacancyList, error)
+	// ListTalentZoneCodes invokes listTalentZoneCodes operation.
+	//
+	// List talent zone codes.
+	//
+	// GET /hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes
+	ListTalentZoneCodes(ctx context.Context) (TalentZoneCodeList, error)
+	// ListWorkplaceCodes invokes listWorkplaceCodes operation.
+	//
+	// List workplace location codes.
+	//
+	// GET /hh_recruit_tw_api/portal_api/Labels/Workplace/Codes
+	ListWorkplaceCodes(ctx context.Context) (WorkplaceCodeList, error)
 }
 
 // Client implements OAS client.
@@ -307,6 +319,166 @@ func (c *Client) sendListJobVacancies(ctx context.Context, params ListJobVacanci
 
 	stage = "DecodeResponse"
 	result, err := decodeListJobVacanciesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListTalentZoneCodes invokes listTalentZoneCodes operation.
+//
+// List talent zone codes.
+//
+// GET /hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes
+func (c *Client) ListTalentZoneCodes(ctx context.Context) (TalentZoneCodeList, error) {
+	res, err := c.sendListTalentZoneCodes(ctx)
+	return res, err
+}
+
+func (c *Client) sendListTalentZoneCodes(ctx context.Context) (res TalentZoneCodeList, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("listTalentZoneCodes"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListTalentZoneCodesOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListTalentZoneCodesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// ListWorkplaceCodes invokes listWorkplaceCodes operation.
+//
+// List workplace location codes.
+//
+// GET /hh_recruit_tw_api/portal_api/Labels/Workplace/Codes
+func (c *Client) ListWorkplaceCodes(ctx context.Context) (WorkplaceCodeList, error) {
+	res, err := c.sendListWorkplaceCodes(ctx)
+	return res, err
+}
+
+func (c *Client) sendListWorkplaceCodes(ctx context.Context) (res WorkplaceCodeList, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("listWorkplaceCodes"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, ListWorkplaceCodesOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeListWorkplaceCodesResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

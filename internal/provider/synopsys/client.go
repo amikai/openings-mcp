@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 )
 
 const defaultBaseURL = "https://careers.synopsys.com"
@@ -22,11 +23,23 @@ type Client struct {
 	baseURL    string
 }
 
-// NewClient uses [http.DefaultClient] when httpClient is nil.
-func NewClient(httpClient *http.Client) *Client {
+// Config holds configuration for a Synopsys Client.
+type Config struct {
+	BaseURL    string
+	HTTPClient *http.Client
+}
+
+// NewClient creates a new Synopsys client using the provided configuration.
+// If BaseURL is empty, defaultBaseURL is used.
+// If HTTPClient is nil, http.DefaultClient is used.
+func NewClient(conf Config) *Client {
+	baseURL := conf.BaseURL
+	if baseURL == "" {
+		baseURL = defaultBaseURL
+	}
 	return &Client{
-		httpClient: cmp.Or(httpClient, http.DefaultClient),
-		baseURL:    defaultBaseURL,
+		httpClient: cmp.Or(conf.HTTPClient, http.DefaultClient),
+		baseURL:    strings.TrimRight(baseURL, "/"),
 	}
 }
 
@@ -78,10 +91,10 @@ func (c *Client) Jobs(ctx context.Context, p *JobsRequest) (*JobsResponse, error
 	return result, nil
 }
 
-// resolveLocation geocodes a partial place name typed by the user. Its result
-// must be passed as JobsRequest.Location (via locationSuggestion.asFilter) for
+// ResolveLocation geocodes a partial place name typed by the user. Its result
+// must be passed as JobsRequest.Location (via LocationSuggestion.AsFilter) for
 // location filtering to have any effect on Jobs — see package docs.
-func (c *Client) resolveLocation(ctx context.Context, term string) ([]locationSuggestion, error) {
+func (c *Client) ResolveLocation(ctx context.Context, term string) ([]LocationSuggestion, error) {
 	q := url.Values{"term": {term}, "countryCodes": {""}, "lat": {""}, "lon": {""}}
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+"/search-jobs/locations?"+q.Encode())
 	if err != nil {
@@ -96,7 +109,7 @@ func (c *Client) resolveLocation(ctx context.Context, term string) ([]locationSu
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("resolve location: HTTP %d", resp.StatusCode)
 	}
-	var suggestions []locationSuggestion
+	var suggestions []LocationSuggestion
 	if err := json.NewDecoder(resp.Body).Decode(&suggestions); err != nil {
 		return nil, fmt.Errorf("resolve location: decode: %w", err)
 	}

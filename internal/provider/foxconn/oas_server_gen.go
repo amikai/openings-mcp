@@ -20,6 +20,18 @@ type Handler interface {
 	//
 	// GET /hh_recruit_tw_api/portal_api/JobVacancies
 	ListJobVacancies(ctx context.Context, params ListJobVacanciesParams) (JobVacancyList, error)
+	// ListTalentZoneCodes implements listTalentZoneCodes operation.
+	//
+	// List talent zone codes.
+	//
+	// GET /hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes
+	ListTalentZoneCodes(ctx context.Context) (TalentZoneCodeList, error)
+	// ListWorkplaceCodes implements listWorkplaceCodes operation.
+	//
+	// List workplace location codes.
+	//
+	// GET /hh_recruit_tw_api/portal_api/Labels/Workplace/Codes
+	ListWorkplaceCodes(ctx context.Context) (WorkplaceCodeList, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

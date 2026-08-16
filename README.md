@@ -38,12 +38,12 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   ATS platforms, all behind one company-search tool. A company outside the
   built-in roster works too: pass its careers-page URL on any of those platforms
   except Eightfold, SAP SuccessFactors, and JOIN, which support roster companies only.
-- **Dedicated big tech sites**: **[Amazon Jobs](https://www.amazon.jobs)**,
+- **Dedicated company career sites**: **[Amazon Jobs](https://www.amazon.jobs)**,
   **[Apple Careers](https://jobs.apple.com)**,
   **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
   **[Meta Careers](https://www.metacareers.com)**,
-  **[NVIDIA careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
-  **[TSMC careers](https://careers.tsmc.com)**.
+  **[NVIDIA Careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
+  **[TSMC Careers](https://careers.tsmc.com)**.
 
 ⚠️ Token use adds up fast when your client explores multiple postings or
 fetches full job details, so consider a cheaper model.

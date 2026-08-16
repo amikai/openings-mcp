@@ -942,3 +942,136 @@ func (s *ProblemDetails) SetTraceId(val OptString) {
 }
 
 func (*ProblemDetails) getJobVacancyRes() {}
+
+// Ref: #/components/schemas/TalentZoneCode
+type TalentZoneCode struct {
+	ID         OptNilString `json:"id"`
+	Code       string       `json:"code"`
+	Name       string       `json:"name"`
+	Seq        OptNilInt    `json:"seq"`
+	ParentID   OptNilString `json:"parent_id"`
+	ParentCode OptNilString `json:"parent_code"`
+	ParentName OptNilString `json:"parent_name"`
+	ParentSeq  OptNilInt    `json:"parent_seq"`
+}
+
+// GetID returns the value of ID.
+func (s *TalentZoneCode) GetID() OptNilString {
+	return s.ID
+}
+
+// GetCode returns the value of Code.
+func (s *TalentZoneCode) GetCode() string {
+	return s.Code
+}
+
+// GetName returns the value of Name.
+func (s *TalentZoneCode) GetName() string {
+	return s.Name
+}
+
+// GetSeq returns the value of Seq.
+func (s *TalentZoneCode) GetSeq() OptNilInt {
+	return s.Seq
+}
+
+// GetParentID returns the value of ParentID.
+func (s *TalentZoneCode) GetParentID() OptNilString {
+	return s.ParentID
+}
+
+// GetParentCode returns the value of ParentCode.
+func (s *TalentZoneCode) GetParentCode() OptNilString {
+	return s.ParentCode
+}
+
+// GetParentName returns the value of ParentName.
+func (s *TalentZoneCode) GetParentName() OptNilString {
+	return s.ParentName
+}
+
+// GetParentSeq returns the value of ParentSeq.
+func (s *TalentZoneCode) GetParentSeq() OptNilInt {
+	return s.ParentSeq
+}
+
+// SetID sets the value of ID.
+func (s *TalentZoneCode) SetID(val OptNilString) {
+	s.ID = val
+}
+
+// SetCode sets the value of Code.
+func (s *TalentZoneCode) SetCode(val string) {
+	s.Code = val
+}
+
+// SetName sets the value of Name.
+func (s *TalentZoneCode) SetName(val string) {
+	s.Name = val
+}
+
+// SetSeq sets the value of Seq.
+func (s *TalentZoneCode) SetSeq(val OptNilInt) {
+	s.Seq = val
+}
+
+// SetParentID sets the value of ParentID.
+func (s *TalentZoneCode) SetParentID(val OptNilString) {
+	s.ParentID = val
+}
+
+// SetParentCode sets the value of ParentCode.
+func (s *TalentZoneCode) SetParentCode(val OptNilString) {
+	s.ParentCode = val
+}
+
+// SetParentName sets the value of ParentName.
+func (s *TalentZoneCode) SetParentName(val OptNilString) {
+	s.ParentName = val
+}
+
+// SetParentSeq sets the value of ParentSeq.
+func (s *TalentZoneCode) SetParentSeq(val OptNilInt) {
+	s.ParentSeq = val
+}
+
+type TalentZoneCodeList []TalentZoneCode
+
+// Ref: #/components/schemas/WorkplaceCode
+type WorkplaceCode struct {
+	Code string    `json:"code"`
+	Name string    `json:"name"`
+	Seq  OptNilInt `json:"seq"`
+}
+
+// GetCode returns the value of Code.
+func (s *WorkplaceCode) GetCode() string {
+	return s.Code
+}
+
+// GetName returns the value of Name.
+func (s *WorkplaceCode) GetName() string {
+	return s.Name
+}
+
+// GetSeq returns the value of Seq.
+func (s *WorkplaceCode) GetSeq() OptNilInt {
+	return s.Seq
+}
+
+// SetCode sets the value of Code.
+func (s *WorkplaceCode) SetCode(val string) {
+	s.Code = val
+}
+
+// SetName sets the value of Name.
+func (s *WorkplaceCode) SetName(val string) {
+	s.Name = val
+}
+
+// SetSeq sets the value of Seq.
+func (s *WorkplaceCode) SetSeq(val OptNilInt) {
+	s.Seq = val
+}
+
+type WorkplaceCodeList []WorkplaceCode
