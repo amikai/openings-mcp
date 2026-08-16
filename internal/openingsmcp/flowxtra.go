@@ -13,9 +13,9 @@ import (
 // flowxtraPageSize matches the package-wide pageSize convention in
 // internal/ats; the upstream API accepts larger pages but 20 keeps tool
 // results economical.
-const _flowxtraPageSize = 20
+const flowxtraPageSize = 20
 
-var _flowxtraSearchInputRawSchema = []byte(`{
+var flowxtraSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"query": {
@@ -45,7 +45,7 @@ var _flowxtraSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var _flowxtraSearchInputSchema = mustSchema(_flowxtraSearchInputRawSchema)
+var flowxtraSearchInputSchema = mustSchema(flowxtraSearchInputRawSchema)
 
 type flowxtraSearchInput struct {
 	Query     string `json:"query,omitempty"`
@@ -126,7 +126,7 @@ func flowxtraSalary(currency string, minSalary, maxSalary, salary flowxtra.NilFl
 
 func flowxtraMCPToHTTPRequest(in *flowxtraSearchInput) (flowxtra.ListJobsParams, error) {
 	params := flowxtra.ListJobsParams{
-		PerPage: flowxtra.NewOptInt(_flowxtraPageSize),
+		PerPage: flowxtra.NewOptInt(flowxtraPageSize),
 	}
 	if in.Query != "" {
 		params.SearchKey = flowxtra.NewOptString(in.Query)
@@ -215,7 +215,7 @@ func RegisterFlowxtra(s *mcp.Server, c *flowxtra.Client) {
 		Name:        "flowxtra_search_jobs",
 		Description: "Search live jobs across every company hosted on the Flowxtra ATS platform (board-wide, all narrowing server-side).",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Flowxtra jobs", ReadOnlyHint: true},
-		InputSchema: _flowxtraSearchInputSchema,
+		InputSchema: flowxtraSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *flowxtraSearchInput) (*mcp.CallToolResult, *flowxtraSearchOutput, error) {
 		params, err := flowxtraMCPToHTTPRequest(in)
 		if err != nil {

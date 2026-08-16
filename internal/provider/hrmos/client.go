@@ -18,7 +18,7 @@ var ErrNotFound = errors.New("hrmos: not found")
 // maxEmptyPageGuard bounds AllJobs's page loop independently of the pager's
 // advertised max page, in case a tenant's dump ever disagrees with its own
 // pager (fact 14 says the pager is otherwise the reliable stop condition).
-const _maxEmptyPageGuard = 1000
+const maxEmptyPageGuard = 1000
 
 type Client struct {
 	httpClient *http.Client
@@ -124,7 +124,7 @@ func (c *Client) AllJobs(ctx context.Context, slug string) (*JobsResponse, error
 		Facets:  first.Facets,
 		MaxPage: first.MaxPage,
 	}
-	for page := 2; page <= first.MaxPage && page <= _maxEmptyPageGuard; page++ {
+	for page := 2; page <= first.MaxPage && page <= maxEmptyPageGuard; page++ {
 		resp, err := c.Jobs(ctx, slug, page)
 		if err != nil {
 			return nil, err

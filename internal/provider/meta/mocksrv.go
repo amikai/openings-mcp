@@ -13,26 +13,26 @@ const (
 	// MockNotFoundJobID is a requisition ID with no posting.
 	MockNotFoundJobID = "999999999999999"
 	// mockFilteredOffice selects the filtered search fixture.
-	_mockFilteredOffice = "Singapore"
+	mockFilteredOffice = "Singapore"
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsResponse []byte
+var mockJobsResponse []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockFilteredJobsResponse []byte
+var mockFilteredJobsResponse []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailResponse []byte
+var mockJobDetailResponse []byte
 
 //go:embed testdata/job_detail_notfound_rsp.json
-var _mockJobDetailNotFoundResponse []byte
+var mockJobDetailNotFoundResponse []byte
 
 //go:embed testdata/filters_rsp.json
-var _mockFiltersResponse []byte
+var mockFiltersResponse []byte
 
 //go:embed testdata/locations_rsp.json
-var _mockLocationsResponse []byte
+var mockLocationsResponse []byte
 
 // NewMockServer returns an httptest.Server that replays captured Meta
 // Careers GraphQL responses, dispatching on doc_id and variables and
@@ -57,22 +57,22 @@ func NewMockServer() *httptest.Server {
 		variables := r.PostFormValue("variables")
 		var body []byte
 		switch r.PostFormValue("doc_id") {
-		case _searchDocID:
-			if strings.Contains(variables, _mockFilteredOffice) {
-				body = _mockFilteredJobsResponse
+		case searchDocID:
+			if strings.Contains(variables, mockFilteredOffice) {
+				body = mockFilteredJobsResponse
 			} else {
-				body = _mockJobsResponse
+				body = mockJobsResponse
 			}
-		case _detailDocID:
+		case detailDocID:
 			if strings.Contains(variables, MockJobID) {
-				body = _mockJobDetailResponse
+				body = mockJobDetailResponse
 			} else {
-				body = _mockJobDetailNotFoundResponse
+				body = mockJobDetailNotFoundResponse
 			}
-		case _filtersDocID:
-			body = _mockFiltersResponse
-		case _locationsDocID:
-			body = _mockLocationsResponse
+		case filtersDocID:
+			body = mockFiltersResponse
+		case locationsDocID:
+			body = mockLocationsResponse
 		default:
 			http.Error(w, "unknown doc_id", http.StatusBadRequest)
 			return

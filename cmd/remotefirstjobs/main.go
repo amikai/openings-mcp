@@ -29,7 +29,7 @@ import (
 
 // apiBaseURL is the single production server in the provider's
 // openapi.yaml (paths carry the /search-jobs suffix).
-const _apiBaseURL = "https://remotefirstjobs.com/api"
+const apiBaseURL = "https://remotefirstjobs.com/api"
 
 func main() {
 	os.Exit(run())
@@ -38,7 +38,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("remotefirstjobs")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _apiBaseURL, "RemoteFirstJobs API base URL")
+		baseURL = rootFlags.StringLong("base-url", apiBaseURL, "RemoteFirstJobs API base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

@@ -16,7 +16,7 @@ import (
 // mockMokaHRSlug is the careers site the provider mock server serves: two
 // captured pages of five postings each on a board that reports 35, then a
 // captured past-the-end page.
-const _mockMokaHRSlug = mokahr.MockOrgID + "/" + mokahr.MockSiteID
+const mockMokaHRSlug = mokahr.MockOrgID + "/" + mokahr.MockSiteID
 
 func testMokaHRAdapter(t *testing.T) *MokaHRAdapter {
 	t.Helper()
@@ -75,7 +75,7 @@ func TestMokaHRParseCareersURL(t *testing.T) {
 func TestMokaHRSearchAll(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{})
 	require.NoError(t, err)
 	assert.Equal(t, mokahr.MockTotal, res.TotalCount)
 	assert.Equal(t, 1, res.Page)
@@ -101,7 +101,7 @@ func TestMokaHRSearchAll(t *testing.T) {
 func TestMokaHRSearchQueryReadsDescriptions(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Query: "CLIP"})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Query: "CLIP"})
 	require.NoError(t, err)
 	require.Equal(t, 1, res.TotalCount)
 	assert.Equal(t, "多模态理解（数据/算法）研究员", res.Jobs[0].Title)
@@ -110,7 +110,7 @@ func TestMokaHRSearchQueryReadsDescriptions(t *testing.T) {
 func TestMokaHRSearchQueryRanksTitleHitsFirst(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Query: "研究员"})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Query: "研究员"})
 	require.NoError(t, err)
 	require.Equal(t, 4, res.TotalCount)
 	for _, j := range res.Jobs {
@@ -140,7 +140,7 @@ func TestMokaHRLocationResolvesUpstream(t *testing.T) {
 	// A district is not a facet value, so it stays a local text match.
 	_, ok = facets.locationIDsFor("Gongshu")
 	assert.False(t, ok)
-	district, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Location: "Gongshu"})
+	district, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Location: "Gongshu"})
 	require.NoError(t, err)
 	assert.Equal(t, 9, district.TotalCount)
 }
@@ -151,7 +151,7 @@ func TestMokaHRLocationResolvesUpstream(t *testing.T) {
 func TestMokaHRLocationRendersFromFacets(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Location: "Gongshu"})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Location: "Gongshu"})
 	require.NoError(t, err)
 	require.NotEmpty(t, res.Jobs)
 	for _, j := range res.Jobs {
@@ -165,7 +165,7 @@ func TestMokaHRLocationRendersFromFacets(t *testing.T) {
 func TestMokaHRSearchWalksEveryPage(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Query: "团队"})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Query: "团队"})
 	require.NoError(t, err)
 	// Every posting on both captured pages matches, so a single-page read
 	// would have found half of them.
@@ -207,7 +207,7 @@ func TestMokaHRLocationUnanswerable(t *testing.T) {
 func TestMokaHRFilters(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	fs, err := a.Filters(t.Context(), _mockMokaHRSlug)
+	fs, err := a.Filters(t.Context(), mockMokaHRSlug)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"Beijing", "Hangzhou", "Ulanqab"}, fs["city"])
 	// 职能 is a two-level tree; both levels are offered.
@@ -219,7 +219,7 @@ func TestMokaHRFilters(t *testing.T) {
 	// including a 职能 that only appears as a child of another.
 	for key, values := range fs {
 		for _, v := range values {
-			_, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Filters: FilterSet{key: {v}}})
+			_, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{key: {v}}})
 			require.NoErrorf(t, err, "%s=%q is offered but rejected", key, v)
 		}
 	}
@@ -228,12 +228,12 @@ func TestMokaHRFilters(t *testing.T) {
 func TestMokaHRFiltersRejectUnknownKeyAndValue(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Filters: FilterSet{"department": {"DeepSeek"}}})
+	_, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"department": {"DeepSeek"}}})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), `unknown filter key "department"`)
 	assert.Contains(t, err.Error(), "valid keys: category, city")
 
-	_, err = a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Filters: FilterSet{"city": {"Shenzhen"}}})
+	_, err = a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"city": {"Shenzhen"}}})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), `filter value "Shenzhen" not found for "city"`)
 	assert.Contains(t, err.Error(), "Beijing, Hangzhou, Ulanqab")
@@ -242,7 +242,7 @@ func TestMokaHRFiltersRejectUnknownKeyAndValue(t *testing.T) {
 func TestMokaHRDetail(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	d, err := a.Detail(t.Context(), _mockMokaHRSlug, mokahr.MockJobID)
+	d, err := a.Detail(t.Context(), mockMokaHRSlug, mokahr.MockJobID)
 	require.NoError(t, err)
 	assert.Equal(t, mokahr.MockJobID, d.JobID)
 	assert.Equal(t, "多模态理解（数据/算法）研究员", d.Title)
@@ -257,7 +257,7 @@ func TestMokaHRDetail(t *testing.T) {
 
 	// Detail resolves districts to cities the same way search does, so a
 	// posting does not change address between the two.
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{})
 	require.NoError(t, err)
 	require.Equal(t, mokahr.MockJobID, res.Jobs[0].JobID)
 	assert.Equal(t, res.Jobs[0].Location, d.Location)
@@ -266,7 +266,7 @@ func TestMokaHRDetail(t *testing.T) {
 func TestMokaHRDetailNotFound(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	_, err := a.Detail(t.Context(), _mockMokaHRSlug, mokahr.MockUnknownJobID)
+	_, err := a.Detail(t.Context(), mockMokaHRSlug, mokahr.MockUnknownJobID)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
 	assert.Contains(t, err.Error(), "job_id exactly as returned by the job search")
@@ -301,7 +301,7 @@ func TestMokaHRPageCount(t *testing.T) {
 		{"one past a page boundary", 51, 50, 2},
 		{"exact multiple", 100, 50, 2},
 		{"largest roster board", 1284, 50, 26},
-		{"at the candidate cap", _maxMokaHRCandidates, 50, 40},
+		{"at the candidate cap", maxMokaHRCandidates, 50, 40},
 		{"total upstream declined to report", -1, 50, 1},
 		{"page size lost", 35, 0, 1},
 	} {
@@ -341,19 +341,19 @@ func TestMokaHRResolveSite(t *testing.T) {
 func TestMokaHRSearchFiltersUpstream(t *testing.T) {
 	a := testMokaHRAdapter(t)
 
-	unfiltered, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{})
+	unfiltered, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{})
 	require.NoError(t, err)
 	require.Equal(t, mokahr.MockTotal, unfiltered.TotalCount)
 
 	// "Ulanqab" is the facet city whose ids the filtered capture was taken for.
-	res, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Filters: FilterSet{"city": {"Ulanqab"}}})
+	res, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"city": {"Ulanqab"}}})
 	require.NoError(t, err)
 	assert.Equal(t, 2, res.TotalCount, "the filter has to narrow the board upstream")
 	require.Len(t, res.Jobs, 2)
 	assert.Equal(t, "采购团队", res.Jobs[0].Title)
 
 	// A 职能 filter travels the same way.
-	byCategory, err := a.Search(t.Context(), _mockMokaHRSlug, SearchParams{Filters: FilterSet{"category": {"运维"}}})
+	byCategory, err := a.Search(t.Context(), mockMokaHRSlug, SearchParams{Filters: FilterSet{"category": {"运维"}}})
 	require.NoError(t, err)
 	assert.Equal(t, 2, byCategory.TotalCount)
 }

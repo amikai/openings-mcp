@@ -17,9 +17,9 @@ import (
 
 // apiBaseURL is Himalayas' public site origin — the single production
 // server in the provider's openapi.yaml (paths carry the /jobs/api prefix).
-const _apiBaseURL = "https://himalayas.app"
+const apiBaseURL = "https://himalayas.app"
 
-var _sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
+var sortValues = []string{"relevant", "recent", "salaryAsc", "salaryDesc", "nameAToZ", "nameZToA", "jobs"}
 
 func main() {
 	os.Exit(run())
@@ -66,7 +66,7 @@ func run() int {
 		employmentType   = searchFS.StringLong("employment-type", "", "comma-separated employment type filters: Full Time, Part Time, Contractor, Temporary, Intern, Volunteer, Other")
 		company          = searchFS.StringLong("company", "", "canonical Himalayas company slug (himalayas.app/companies/<slug>); comma-separated values allowed")
 		timezone         = searchFS.StringLong("timezone", "", "timezone filter, e.g. UTC-5 or UTC+05:30")
-		sortOrder        = searchFS.StringEnumLong("sort", "sort order", _sortValues...)
+		sortOrder        = searchFS.StringEnumLong("sort", "sort order", sortValues...)
 		page             = searchFS.IntLong("page", 1, "1-based results page (fixed 20 jobs per page)")
 	)
 	searchCmd := &ff.Command{
@@ -242,7 +242,7 @@ func runBrowse(ctx context.Context, f browseFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(_apiBaseURL)
+	client, err := himalayas.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -290,7 +290,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := himalayas.NewClient(_apiBaseURL)
+	client, err := himalayas.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

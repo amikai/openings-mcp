@@ -10,14 +10,14 @@ import (
 	"golang.org/x/net/html"
 )
 
-var _remoteKeywords = []string{"remote", "work from home", "wfh"}
+var remoteKeywords = []string{"remote", "work from home", "wfh"}
 
 // looksRemote is a heuristic, not a field LinkedIn provides: it's a plain
 // substring scan over whatever text we hand it. No match defaults to false.
 // A posting silent on remote work is assumed on-site, not unknown.
 func looksRemote(parts ...string) bool {
 	joined := strings.ToLower(strings.Join(parts, " "))
-	for _, kw := range _remoteKeywords {
+	for _, kw := range remoteKeywords {
 		if strings.Contains(joined, kw) {
 			return true
 		}
@@ -210,7 +210,7 @@ func parseCriteria(list *goquery.Selection, out map[string]string) {
 	}
 }
 
-var _applyURLPattern = regexp.MustCompile(`\?url=([^"]+)`)
+var applyURLPattern = regexp.MustCompile(`\?url=([^"]+)`)
 
 // parseApplyURL extracts the external ATS apply URL from
 // <code id="applyUrl"><!--"...?...&url=ENCODED"--></code>, present only for
@@ -224,7 +224,7 @@ func parseApplyURL(code *goquery.Selection) string {
 		if c.Type != html.CommentNode {
 			continue
 		}
-		m := _applyURLPattern.FindStringSubmatch(c.Data)
+		m := applyURLPattern.FindStringSubmatch(c.Data)
 		if m == nil {
 			continue
 		}

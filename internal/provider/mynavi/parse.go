@@ -14,7 +14,7 @@ import (
 	"golang.org/x/net/html/atom"
 )
 
-var _jobIDFromHrefPattern = regexp.MustCompile(`jobinfo-(\d+-\d+-\d+-\d+)`)
+var jobIDFromHrefPattern = regexp.MustCompile(`jobinfo-(\d+-\d+-\d+-\d+)`)
 
 // parseJobsHTML parses the total hit count and job cassettes out of a
 // /list/ results page. A page with no result counter is not a results page
@@ -51,7 +51,7 @@ func parseJobCard(card *goquery.Selection) (Job, bool) {
 	if a := card.Find("p.cassetteRecruit__copy a").First(); a.Length() > 0 {
 		job.Title = strings.TrimSpace(a.Text())
 		if href, ok := a.Attr("href"); ok {
-			if m := _jobIDFromHrefPattern.FindStringSubmatch(href); m != nil {
+			if m := jobIDFromHrefPattern.FindStringSubmatch(href); m != nil {
 				job.ID = m[1]
 			}
 		}
@@ -224,10 +224,10 @@ func htmlToText(s string) string {
 		appendNodeText(&sb, n)
 	}
 	text := strings.ReplaceAll(sb.String(), "&lt;br&gt;", "\n")
-	return strings.TrimSpace(_blankLinePattern.ReplaceAllString(text, "\n\n"))
+	return strings.TrimSpace(blankLinePattern.ReplaceAllString(text, "\n\n"))
 }
 
-var _blankLinePattern = regexp.MustCompile(`\n{3,}`)
+var blankLinePattern = regexp.MustCompile(`\n{3,}`)
 
 // appendNodeText flattens a node's text, inserting newlines around
 // block-level elements so a rich-text field reads as plain text.

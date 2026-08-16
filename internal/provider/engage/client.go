@@ -13,7 +13,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 // ErrBoardNotFound indicates the tenant slug does not exist (upstream 404 on
 // GET /<slug>/).
@@ -177,7 +177,7 @@ func (c *Client) do(ctx context.Context, rawURL, accept string) (*http.Response,
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Accept", accept)
 	return c.httpClient.Do(req)
 }

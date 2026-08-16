@@ -17,7 +17,7 @@ import (
 // treats it as a constant rather than bootstrapping it from HTML. A tenant
 // that ever ships a different one shows up as a decode failure naming this
 // constant, not as silently wrong data.
-const _aesIV = "de7c21ed8d6f50fe"
+const aesIV = "de7c21ed8d6f50fe"
 
 // envelope is MokaHR's obfuscated response wrapper. Necromancer is the AES
 // key for this very response — the site's own frontend decrypts exactly this
@@ -71,7 +71,7 @@ func deobfuscate(body []byte) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("decode response payload: %w", err)
 	}
-	plain, err := decryptCBC(ciphertext, []byte(env.Necromancer), []byte(_aesIV))
+	plain, err := decryptCBC(ciphertext, []byte(env.Necromancer), []byte(aesIV))
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +103,7 @@ func unpadPKCS7(b []byte, blockSize int) ([]byte, error) {
 	}
 	for _, c := range b[len(b)-pad:] {
 		if int(c) != pad {
-			return nil, fmt.Errorf("response padding is inconsistent; wrong key or IV %q", _aesIV)
+			return nil, fmt.Errorf("response padding is inconsistent; wrong key or IV %q", aesIV)
 		}
 	}
 	return b[:len(b)-pad], nil

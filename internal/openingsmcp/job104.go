@@ -9,7 +9,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-var _job104SearchInputRawSchema = []byte(`{
+var job104SearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -93,7 +93,7 @@ var _job104SearchInputRawSchema = []byte(`{
 // codes (the ids.go maps translate labels back to codes — enum labels here
 // must match those map keys). Descriptions carry semantics only, never
 // id=label tables.
-var _job104SearchInputSchema = mustSchema(_job104SearchInputRawSchema)
+var job104SearchInputSchema = mustSchema(job104SearchInputRawSchema)
 
 type job104SearchInput struct {
 	Keyword    string   `json:"keyword"` // required
@@ -250,7 +250,7 @@ type job104Pagination struct {
 
 // job104RoLabels and job104RemoteWorkLabels invert the ids.go request maps
 // for response conversion, keeping ids.go the single source of truth.
-var _job104RoLabels = func() map[job104.SearchJobsRo]string {
+var job104RoLabels = func() map[job104.SearchJobsRo]string {
 	m := make(map[job104.SearchJobsRo]string, len(job104.RoIDs))
 	for label, code := range job104.RoIDs {
 		m[code] = label
@@ -258,7 +258,7 @@ var _job104RoLabels = func() map[job104.SearchJobsRo]string {
 	return m
 }()
 
-var _job104RemoteWorkLabels = func() map[job104.SearchJobsRemoteWork]string {
+var job104RemoteWorkLabels = func() map[job104.SearchJobsRemoteWork]string {
 	m := make(map[job104.SearchJobsRemoteWork]string, len(job104.RemoteWorkIDs))
 	for label, code := range job104.RemoteWorkIDs {
 		m[code] = label
@@ -270,7 +270,7 @@ var _job104RemoteWorkLabels = func() map[job104.SearchJobsRemoteWork]string {
 // salaryType output label, per the code table on JobSummary.s10 in
 // openapi.yaml. There is no matching request parameter, so unlike the maps
 // above there is no ids.go map to invert.
-var _job104SalaryTypeLabels = map[int]string{
+var job104SalaryTypeLabels = map[int]string{
 	10: "Negotiable",      // 待遇面議
 	30: "Hourly",          // 時薪
 	40: "Daily",           // 日薪
@@ -323,12 +323,12 @@ func job104HTTPToMCPResponse(resp *job104.JobsResponse) *job104SearchOutput {
 			CompanyURL:    j.Link.Cust.Value,
 			SalaryHigh:    j.SalaryHigh.Value,
 			SalaryLow:     j.SalaryLow.Value,
-			SalaryType:    _job104SalaryTypeLabels[j.S10.Value],
+			SalaryType:    job104SalaryTypeLabels[j.S10.Value],
 			JobAddrNoDesc: j.JobAddrNoDesc.Value,
 			AppearDate:    j.AppearDate.Value,
 			ApplyCnt:      j.ApplyCnt.Value,
-			Remote:        _job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType.Value)],
-			JobType:       _job104RoLabels[job104.SearchJobsRo(j.JobRo.Value)],
+			Remote:        job104RemoteWorkLabels[job104.SearchJobsRemoteWork(j.RemoteWorkType.Value)],
+			JobType:       job104RoLabels[job104.SearchJobsRo(j.JobRo.Value)],
 			Experience:    job104ExperienceLabel(j.Period),
 		})
 	}
@@ -348,7 +348,7 @@ func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job1
 		Salary:         d.JobDetail.Salary.Or(""),
 		SalaryMin:      d.JobDetail.SalaryMin.Or(0),
 		SalaryMax:      d.JobDetail.SalaryMax.Or(0),
-		JobType:        _job104RoLabels[job104.SearchJobsRo(d.JobDetail.JobType.Or(0))],
+		JobType:        job104RoLabels[job104.SearchJobsRo(d.JobDetail.JobType.Or(0))],
 		AddressRegion:  d.JobDetail.AddressRegion.Or(""),
 		AddressDetail:  d.JobDetail.AddressDetail.Or(""),
 		WorkExp:        d.Condition.WorkExp.Or(""),
@@ -368,7 +368,7 @@ func job104HTTPToMCPDetail(resp *job104.JobDetailResponse, jobCode string) *job1
 		Employees:      d.Employees.Value,
 	}
 	if rw, ok := d.JobDetail.RemoteWork.Get(); ok {
-		out.Remote = _job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
+		out.Remote = job104RemoteWorkLabels[job104.SearchJobsRemoteWork(rw.Type.Or(0))]
 	}
 	if ar, ok := d.Condition.AcceptRole.Get(); ok {
 		for _, r := range ar.Role {
@@ -444,7 +444,7 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		Name:        "104_search_jobs",
 		Description: "Search jobs on 104 (Taiwan's largest job board).",
 		Annotations: &mcp.ToolAnnotations{Title: "Search 104 jobs", ReadOnlyHint: true},
-		InputSchema: _job104SearchInputSchema,
+		InputSchema: job104SearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104SearchInput) (*mcp.CallToolResult, *job104SearchOutput, error) {
 		params, err := job104MCPToHTTPRequest(in)
 		if err != nil {

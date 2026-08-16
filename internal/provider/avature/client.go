@@ -21,7 +21,7 @@ var ErrJobNotFound = errors.New("avature: job not found")
 // (HTTP 404 on SearchJobs).
 var ErrCompanyNotFound = errors.New("avature: company not found")
 
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 // Client talks to one Avature career portal.
 type Client struct {
@@ -188,7 +188,7 @@ func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document,
 	if err != nil {
 		return nil, 0, nil, err
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 

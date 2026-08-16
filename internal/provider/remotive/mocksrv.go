@@ -7,10 +7,10 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/categories_rsp.json
-var _mockCategoriesRsp []byte
+var mockCategoriesRsp []byte
 
 // NewMockServer returns an httptest.Server serving canned Remotive API
 // fixture responses, so tests never hit the live (and tightly
@@ -21,8 +21,8 @@ var _mockCategoriesRsp []byte
 // must Close it.
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/remote-jobs", serveMockJSON(_mockJobsRsp))
-	mux.HandleFunc("/remote-jobs/categories", serveMockJSON(_mockCategoriesRsp))
+	mux.HandleFunc("/remote-jobs", serveMockJSON(mockJobsRsp))
+	mux.HandleFunc("/remote-jobs/categories", serveMockJSON(mockCategoriesRsp))
 	return httptest.NewServer(mux)
 }
 

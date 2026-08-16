@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // Company is a confirmed organization hosting a public Greenhouse job
 // board, drawn from a curated list (internal/provider/greenhouse/companies.yaml).
@@ -24,13 +24,13 @@ type Company struct {
 }
 
 // careersURLTpl formats a Greenhouse job board page URL (e.g. "https://job-boards.greenhouse.io/anthropic").
-const _careersURLTpl = "https://job-boards.greenhouse.io/%s"
+const careersURLTpl = "https://job-boards.greenhouse.io/%s"
 
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://job-boards.greenhouse.io/anthropic. API calls instead pass
 // BoardToken directly as the board_token parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.BoardToken)
+	return fmt.Sprintf(careersURLTpl, c.BoardToken)
 }
 
 // Companies holds every confirmed Greenhouse board, sorted by company name.
@@ -45,7 +45,7 @@ var CompaniesByBoardToken = buildBoardTokenIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("greenhouse: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })

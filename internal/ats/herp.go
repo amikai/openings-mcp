@@ -35,8 +35,8 @@ type HerpAdapter struct {
 //   - herp.careers/careers/companies/notainc/jobs/i3jT6wNu2_Ym
 //   - herp.careers/v1/herpinc
 var (
-	_herpCareersURLRE     = regexp.MustCompile(`(?i)^herp\.careers/careers/companies/(?P<slug>[^/]+)`)
-	_herpHireCareersURLRE = regexp.MustCompile(`(?i)^herp\.careers/v1/(?P<slug>[^/]+)`)
+	herpCareersURLRE     = regexp.MustCompile(`(?i)^herp\.careers/careers/companies/(?P<slug>[^/]+)`)
+	herpHireCareersURLRE = regexp.MustCompile(`(?i)^herp\.careers/v1/(?P<slug>[^/]+)`)
 )
 
 func NewHerpAdapter(hc *http.Client, dumpCache *DumpCache) *HerpAdapter {
@@ -59,7 +59,7 @@ func (a *HerpAdapter) Roster() []CompanyInfo {
 // its tenant set is wider than HERP Career's — a tenant missing from the
 // media surfaces as the not-listed error from Search or Detail.
 func (a *HerpAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	for _, re := range []*regexp.Regexp{_herpCareersURLRE, _herpHireCareersURLRE} {
+	for _, re := range []*regexp.Regexp{herpCareersURLRE, herpHireCareersURLRE} {
 		if slug, ok := matchCareersSlug(re, u); ok {
 			return strings.ToLower(slug), true
 		}
@@ -221,7 +221,7 @@ type herpLocationText struct {
 // Note the missing third mode: a null jobRemoteworkType means the company
 // said nothing, not that the role is on-site, so herp never emits the
 // "On-site" value the other workplaceType adapters can.
-var _herpRemoteLabels = map[herp.JobJobRemoteworkType]struct{ ja, en, workplace string }{
+var herpRemoteLabels = map[herp.JobJobRemoteworkType]struct{ ja, en, workplace string }{
 	herp.JobJobRemoteworkTypeFULLREMOTEWORK:   {"フルリモート", "Remote", "Remote"},
 	herp.JobJobRemoteworkTypeHYBRIDREMOTEWORK: {"ハイブリッドリモート", "Hybrid remote", "Hybrid"},
 }
@@ -249,7 +249,7 @@ func herpLocation(j *herp.Job) herpLocationText {
 
 	aliases := make([]string, 0, len(out.prefectures)+2)
 	for _, l := range j.JobLocations {
-		aliases = appendDistinct(aliases, _herpPrefectureRomaji[l.PrefCode])
+		aliases = appendDistinct(aliases, herpPrefectureRomaji[l.PrefCode])
 	}
 	// The structured entries drive the concise display, but they routinely
 	// drop detail the company did write out: a posting can name 京都市上京区
@@ -257,7 +257,7 @@ func herpLocation(j *herp.Job) herpLocationText {
 	// whole upstream string so cities, stations, and addresses stay findable.
 	aliases = appendDistinct(aliases, strings.Join(strings.Fields(j.Location), " "))
 
-	if label, ok := _herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
+	if label, ok := herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
 		out.isRemote = true
 		parts = appendDistinct(parts, label.ja)
 		aliases = appendDistinct(aliases, label.en)
@@ -293,7 +293,7 @@ func herpFields(j *herp.Job, loc herpLocationText) map[string][]string {
 	// workplaceType is the shared key ashby, lever, and bamboohr already use,
 	// with bamboohr's normalized labels rather than this upstream's enum —
 	// the same dimension must not answer to two names across adapters.
-	if label, ok := _herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
+	if label, ok := herpRemoteLabels[j.JobRemoteworkType.Or("")]; ok {
 		setHerpField(fields, "workplaceType", []string{label.workplace})
 	}
 	return fields
@@ -529,7 +529,7 @@ func herpParseTime(s string) (time.Time, string) {
 // herpPrefectureRomaji maps the JIS prefecture code to its romanized name.
 // The upstream only ships Japanese place names; without these, an
 // English-language location search would silently match nothing.
-var _herpPrefectureRomaji = map[string]string{
+var herpPrefectureRomaji = map[string]string{
 	"01": "Hokkaido", "02": "Aomori", "03": "Iwate", "04": "Miyagi",
 	"05": "Akita", "06": "Yamagata", "07": "Fukushima", "08": "Ibaraki",
 	"09": "Tochigi", "10": "Gunma", "11": "Saitama", "12": "Chiba",

@@ -7,7 +7,7 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 // NewMockServer returns an httptest.Server that mimics Working Nomads's
 // exposed_jobs endpoint with a canned fixture response, so tests never
@@ -18,7 +18,7 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/api/exposed_jobs/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(_mockJobsRsp)
+		w.Write(mockJobsRsp)
 	})
 	return httptest.NewServer(mux)
 }

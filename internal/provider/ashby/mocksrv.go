@@ -21,13 +21,13 @@ const MockNullsBoardName = "weaviate"
 const MockNonRosterBoard = "somestartup"
 
 //go:embed testdata/board_rsp.json
-var _mockBoardRsp []byte
+var mockBoardRsp []byte
 
 //go:embed testdata/board_comp_rsp.json
-var _mockBoardCompRsp []byte
+var mockBoardCompRsp []byte
 
 //go:embed testdata/board_nulls_rsp.json
-var _mockBoardNullsRsp []byte
+var mockBoardNullsRsp []byte
 
 // NewMockServer returns an httptest.Server serving canned Ashby job-board
 // fixture responses captured from a real board (see testdata/board_req.hurl),
@@ -39,13 +39,13 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/posting-api/job-board/"+MockBoardName, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("includeCompensation") == "true" {
-			serveMockJSON(_mockBoardCompRsp)(w, r)
+			serveMockJSON(mockBoardCompRsp)(w, r)
 			return
 		}
-		serveMockJSON(_mockBoardRsp)(w, r)
+		serveMockJSON(mockBoardRsp)(w, r)
 	})
-	mux.HandleFunc("/posting-api/job-board/"+MockNullsBoardName, serveMockJSON(_mockBoardNullsRsp))
-	mux.HandleFunc("/posting-api/job-board/"+MockNonRosterBoard, serveMockJSON(_mockBoardRsp))
+	mux.HandleFunc("/posting-api/job-board/"+MockNullsBoardName, serveMockJSON(mockBoardNullsRsp))
+	mux.HandleFunc("/posting-api/job-board/"+MockNonRosterBoard, serveMockJSON(mockBoardRsp))
 	mux.HandleFunc("/posting-api/job-board/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(http.StatusNotFound)

@@ -14,7 +14,7 @@ import (
 )
 
 func TestParseSiteDocument(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(_mockCareersPageResponse)))
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(string(mockCareersPageResponse)))
 	require.NoError(t, err)
 	pageURL, err := url.Parse("https://fa-euwp-saasfaprod1.fa.ocs.oraclecloud.com/hcmUI/CandidateExperience/en/sites/Mayo-US/jobs")
 	require.NoError(t, err)

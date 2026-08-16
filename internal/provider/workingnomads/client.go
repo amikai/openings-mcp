@@ -109,7 +109,7 @@ type exposedJob struct {
 
 // jobIDPattern extracts the numeric id from a job URL, e.g.
 // "https://www.workingnomads.com/job/go/1734670/" -> "1734670".
-var _jobIDPattern = regexp.MustCompile(`/job/go/(\d+)/`)
+var jobIDPattern = regexp.MustCompile(`/job/go/(\d+)/`)
 
 func (e exposedJob) toJob() Job {
 	return Job{
@@ -130,7 +130,7 @@ func (e exposedJob) toJob() Job {
 // future format change degrades to a (still-unique, still-stable) opaque
 // ID rather than colliding entries.
 func jobID(rawURL string) string {
-	if m := _jobIDPattern.FindStringSubmatch(rawURL); m != nil {
+	if m := jobIDPattern.FindStringSubmatch(rawURL); m != nil {
 		return m[1]
 	}
 	return rawURL

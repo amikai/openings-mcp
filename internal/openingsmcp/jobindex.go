@@ -7,7 +7,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-var _jobindexSearchInputRawSchema = []byte(`{
+var jobindexSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -42,7 +42,7 @@ var _jobindexSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var _jobindexSearchInputSchema = mustSchema(_jobindexSearchInputRawSchema)
+var jobindexSearchInputSchema = mustSchema(jobindexSearchInputRawSchema)
 
 type jobindexSearchInput struct {
 	Keyword    string `json:"keyword"`
@@ -119,7 +119,7 @@ func RegisterJobindex(s *mcp.Server, c *jobindex.Client) {
 		Name:        "jobindex_search_jobs",
 		Description: "Search jobs on Jobindex (Denmark job board).",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Jobindex jobs", ReadOnlyHint: true},
-		InputSchema: _jobindexSearchInputSchema,
+		InputSchema: jobindexSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *jobindexSearchInput) (*mcp.CallToolResult, *jobindexSearchOutput, error) {
 		req, err := jobindexMCPToHTTPRequest(in)
 		if err != nil {

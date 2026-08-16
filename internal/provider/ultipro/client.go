@@ -28,7 +28,7 @@ var ErrCompanyNotFound = errors.New("ultipro: company not found")
 // no embedded CandidateOpportunityDetail payload (see openapi.yaml).
 var ErrJobNotFound = errors.New("ultipro: job not found")
 
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 // Client talks to one tenant board at baseURL (e.g.
 // "https://recruiting.ultipro.com/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24",
@@ -229,7 +229,7 @@ func (c *Client) Detail(ctx context.Context, opportunityID string) (*Opportunity
 	if err != nil {
 		return nil, fmt.Errorf("detail: %w", err)
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 
 	resp, err := c.httpClient.Do(req)
@@ -265,7 +265,7 @@ func (c *Client) postJSON(ctx context.Context, path string, body, out any) error
 	if err != nil {
 		return err
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
 	req.Header.Set("X-Requested-With", "XMLHttpRequest")
 

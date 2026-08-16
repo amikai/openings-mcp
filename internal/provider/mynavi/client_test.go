@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-var _wantFirstJob = Job{
+var wantFirstJob = Job{
 	ID:               "348855-1-29-1",
 	Title:            "【ITエンジニア】還元率80%超！フルリモOK☆初年度年収420万円～",
 	Company:          "ウィンヴォルブ株式会社",
@@ -41,7 +41,7 @@ func TestJobs(t *testing.T) {
 
 	assert.Equal(t, 2111, got.Total)
 	require.Len(t, got.Jobs, 50)
-	assert.Equal(t, _wantFirstJob, got.Jobs[0])
+	assert.Equal(t, wantFirstJob, got.Jobs[0])
 }
 
 func TestJobsZeroHits(t *testing.T) {

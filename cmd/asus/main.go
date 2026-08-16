@@ -15,7 +15,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/asus"
 )
 
-const _defaultBaseURL = "https://recruit.asus.com"
+const defaultBaseURL = "https://recruit.asus.com"
 
 func main() {
 	os.Exit(run())
@@ -23,7 +23,7 @@ func main() {
 
 func run() int {
 	rootFlags := ff.NewFlagSet("asus")
-	baseURL := rootFlags.StringLong("base-url", _defaultBaseURL, "ASUS Careers base URL")
+	baseURL := rootFlags.StringLong("base-url", defaultBaseURL, "ASUS Careers base URL")
 	timeout := rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 	format := rootFlags.StringEnumLong("format", "output format", "text", "json")
 	rootCmd := &ff.Command{

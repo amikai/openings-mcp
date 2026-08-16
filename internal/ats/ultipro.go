@@ -20,13 +20,13 @@ var _ Adapter = (*UltiProAdapter)(nil)
 // ultiproLocationTypeCodes maps the location_type filter's display values
 // to LoadSearchResults' fieldName-37 codes (verified live — see
 // internal/provider/ultipro/openapi.yaml).
-var _ultiproLocationTypeCodes = map[string]string{
+var ultiproLocationTypeCodes = map[string]string{
 	"hybrid": "0",
 	"onsite": "1",
 	"remote": "2",
 }
 
-var _ultiproLocationTypeLabels = []string{"Hybrid", "Onsite", "Remote"}
+var ultiproLocationTypeLabels = []string{"Hybrid", "Onsite", "Remote"}
 
 // UltiProAdapter serves UltiPro (UKG Pro Recruiting) career boards. Search
 // and its filter catalogs are server-side JSON; job detail is HTML with the
@@ -107,7 +107,7 @@ func (a *UltiProAdapter) Search(ctx context.Context, slug string, p SearchParams
 
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/_pageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("ultipro: page %d is too large; retry with a smaller page", page)
 	}
 
@@ -151,8 +151,8 @@ func (a *UltiProAdapter) Search(ctx context.Context, slug string, p SearchParams
 
 	res, err := client.Search(ctx, ultipro.SearchRequest{
 		Query:   p.Query,
-		Top:     _pageSize,
-		Skip:    pageIndex * _pageSize,
+		Top:     pageSize,
+		Skip:    pageIndex * pageSize,
 		Filters: filters,
 	})
 	if err != nil {
@@ -220,9 +220,9 @@ func (a *UltiProAdapter) buildFilters(ctx context.Context, client *ultipro.Clien
 		case "location_type":
 			codes := make([]string, 0, len(values))
 			for _, v := range values {
-				code, ok := _ultiproLocationTypeCodes[strings.ToLower(strings.TrimSpace(v))]
+				code, ok := ultiproLocationTypeCodes[strings.ToLower(strings.TrimSpace(v))]
 				if !ok {
-					return nil, fmt.Errorf("filter value %q not found for %q; available: %s", v, key, strings.Join(_ultiproLocationTypeLabels, ", "))
+					return nil, fmt.Errorf("filter value %q not found for %q; available: %s", v, key, strings.Join(ultiproLocationTypeLabels, ", "))
 				}
 				codes = append(codes, code)
 			}
@@ -350,7 +350,7 @@ func (a *UltiProAdapter) Filters(ctx context.Context, slug string) (FilterSet, e
 		return nil, fmt.Errorf("ultipro: filters %q: %w", slug, err)
 	}
 
-	fs := FilterSet{"location_type": _ultiproLocationTypeLabels}
+	fs := FilterSet{"location_type": ultiproLocationTypeLabels}
 	if len(categories) > 0 {
 		labels := make([]string, 0, len(categories))
 		for _, c := range categories {

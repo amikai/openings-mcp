@@ -18,7 +18,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/meta"
 )
 
-const _defaultBaseURL = "https://www.metacareers.com"
+const defaultBaseURL = "https://www.metacareers.com"
 
 func main() {
 	os.Exit(run())
@@ -27,7 +27,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("meta")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Meta Careers base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Meta Careers base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

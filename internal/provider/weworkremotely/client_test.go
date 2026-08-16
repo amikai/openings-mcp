@@ -21,9 +21,9 @@ func testClient(t *testing.T) *Client {
 func testClientWithFailingCategory(t *testing.T, failSlug string) *Client {
 	t.Helper()
 	fixtures := map[string][]byte{
-		"remote-full-stack-programming-jobs": _mockFullStackRsp,
-		"remote-design-jobs":                 _mockDesignRsp,
-		"remote-back-end-programming-jobs":   _mockBackEndRsp,
+		"remote-full-stack-programming-jobs": mockFullStackRsp,
+		"remote-design-jobs":                 mockDesignRsp,
+		"remote-back-end-programming-jobs":   mockBackEndRsp,
 	}
 
 	mux := http.NewServeMux()
@@ -36,7 +36,7 @@ func testClientWithFailingCategory(t *testing.T, failSlug string) *Client {
 		}
 		body, ok := fixtures[cat.Slug]
 		if !ok {
-			body = []byte(_emptyFeed)
+			body = []byte(emptyFeed)
 		}
 		mux.HandleFunc("/categories/"+cat.Slug+".rss", serveRSS(body))
 	}

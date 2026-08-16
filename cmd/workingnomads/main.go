@@ -25,7 +25,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/workingnomads"
 )
 
-const _defaultBaseURL = "https://www.workingnomads.com"
+const defaultBaseURL = "https://www.workingnomads.com"
 
 func main() {
 	os.Exit(run())
@@ -34,7 +34,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("workingnomads")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Working Nomads base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Working Nomads base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

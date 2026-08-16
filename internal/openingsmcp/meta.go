@@ -14,9 +14,9 @@ import (
 // tool caps the returned page itself so an unfiltered query can't dump all
 // matches (hundreds of jobs, tens of thousands of tokens) into one response.
 // The upper bound lives in metaSearchInputRawSchema's "limit" property.
-const _metaDefaultLimit = 20
+const metaDefaultLimit = 20
 
-var _metaSearchInputRawSchema = []byte(`{
+var metaSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -80,12 +80,12 @@ var _metaSearchInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var _metaSearchInputSchema = mustSchema(_metaSearchInputRawSchema)
+var metaSearchInputSchema = mustSchema(metaSearchInputRawSchema)
 
 const (
-	_metaSearchToolName  = "meta_search_jobs"
-	_metaDetailToolName  = "meta_get_job_detail"
-	_metaFiltersToolName = "meta_get_search_filters"
+	metaSearchToolName  = "meta_search_jobs"
+	metaDetailToolName  = "meta_get_job_detail"
+	metaFiltersToolName = "meta_get_search_filters"
 )
 
 type metaSearchInput struct {
@@ -257,21 +257,21 @@ func metaHTTPToMCPDetail(detail *meta.JobDetail) (*metaDetailOutput, error) {
 // RegisterMeta registers the Meta Careers search and job-detail tools.
 func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        _metaSearchToolName,
+		Name:        metaSearchToolName,
 		Description: "Search jobs on the Meta careers site.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Meta Careers jobs", ReadOnlyHint: true},
-		InputSchema: _metaSearchInputSchema,
+		InputSchema: metaSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaSearchInput) (*mcp.CallToolResult, *metaSearchOutput, error) {
 		response, err := client.SearchJobs(ctx, metaMCPToHTTPRequest(input))
 		if err != nil {
 			return errorResult(err), nil, nil
 		}
-		limit := cmp.Or(input.Limit, _metaDefaultLimit)
+		limit := cmp.Or(input.Limit, metaDefaultLimit)
 		return nil, metaHTTPToMCPResponse(response, limit, input.Offset), nil
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        _metaFiltersToolName,
+		Name:        metaFiltersToolName,
 		Description: "Get Meta Careers' current search filter values. Call before filtered meta_search_jobs queries.",
 		Annotations: &mcp.ToolAnnotations{Title: "List Meta Careers search filters", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *metaFiltersInput) (*mcp.CallToolResult, *metaFiltersOutput, error) {
@@ -283,7 +283,7 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	})
 
 	mcp.AddTool(server, &mcp.Tool{
-		Name:        _metaDetailToolName,
+		Name:        metaDetailToolName,
 		Description: "Get the full job description and requirements for a Meta job by job ID.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Meta job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaDetailInput) (*mcp.CallToolResult, *metaDetailOutput, error) {

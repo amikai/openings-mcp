@@ -8,13 +8,13 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.html
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.html
-var _mockJobsEmptyRsp []byte
+var mockJobsEmptyRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 // MockNotFoundJobID is the job ID NewMockServer answers with HTTP 404, for
 // exercising the expired/unknown-posting path.
@@ -29,14 +29,14 @@ func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/list/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "kwzzzqqqxyzabc") {
-			serveMockHTML(w, _mockJobsEmptyRsp)
+			serveMockHTML(w, mockJobsEmptyRsp)
 			return
 		}
-		serveMockHTML(w, _mockJobsRsp)
+		serveMockHTML(w, mockJobsRsp)
 	})
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/jobinfo-") && !strings.Contains(r.URL.Path, MockNotFoundJobID) {
-			serveMockHTML(w, _mockJobDetailRsp)
+			serveMockHTML(w, mockJobDetailRsp)
 			return
 		}
 		http.NotFound(w, r)

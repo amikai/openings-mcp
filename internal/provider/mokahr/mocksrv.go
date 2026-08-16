@@ -40,40 +40,40 @@ const (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_page2_rsp.json
-var _mockJobsPage2Rsp []byte
+var mockJobsPage2Rsp []byte
 
 //go:embed testdata/jobs_end_rsp.json
-var _mockJobsEndRsp []byte
+var mockJobsEndRsp []byte
 
 //go:embed testdata/jobs_keyword_rsp.json
-var _mockJobsKeywordRsp []byte
+var mockJobsKeywordRsp []byte
 
 //go:embed testdata/jobs_unknown_site_rsp.json
-var _mockJobsUnknownSiteRsp []byte
+var mockJobsUnknownSiteRsp []byte
 
 //go:embed testdata/job_rsp.json
-var _mockJobRsp []byte
+var mockJobRsp []byte
 
 //go:embed testdata/job_not_found_rsp.json
-var _mockJobNotFoundRsp []byte
+var mockJobNotFoundRsp []byte
 
 //go:embed testdata/filter_aggregations_rsp.json
-var _mockFilterAggregationsRsp []byte
+var mockFilterAggregationsRsp []byte
 
 //go:embed testdata/jobs_no_locations_rsp.json
-var _mockJobsNoLocationsRsp []byte
+var mockJobsNoLocationsRsp []byte
 
 //go:embed testdata/filter_aggregations_empty_rsp.json
-var _mockFilterAggregationsEmptyRsp []byte
+var mockFilterAggregationsEmptyRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockJobsFilteredRsp []byte
+var mockJobsFilteredRsp []byte
 
 //go:embed testdata/jobs_zero_total_rsp.json
-var _mockJobsZeroTotalRsp []byte
+var mockJobsZeroTotalRsp []byte
 
 // NewMockServer returns an httptest.Server replaying the captured MokaHR
 // fixtures, so tests never hit the live API. The fixtures are stored exactly
@@ -89,50 +89,50 @@ func NewMockServer() *httptest.Server {
 		req := decodeMockRequest(r)
 		switch {
 		case req.OrgID == MockNoLocationOrgID && req.SiteID == MockNoLocationSiteID:
-			writeMockJSON(w, _mockJobsNoLocationsRsp)
+			writeMockJSON(w, mockJobsNoLocationsRsp)
 		case req.OrgID == MockOrgID && req.SiteID == MockZeroTotalSiteID && req.Offset == 0:
-			writeMockJSON(w, _mockJobsZeroTotalRsp)
+			writeMockJSON(w, mockJobsZeroTotalRsp)
 		case req.OrgID == MockOrgID && req.SiteID == MockZeroTotalSiteID:
 			// Later offsets reuse the ordinary captures, so a caller that
 			// keeps reading past the useless total finds a real second page.
 			if req.Offset >= 2*MockPageSize {
-				writeMockJSON(w, _mockJobsEndRsp)
+				writeMockJSON(w, mockJobsEndRsp)
 			} else {
-				writeMockJSON(w, _mockJobsPage2Rsp)
+				writeMockJSON(w, mockJobsPage2Rsp)
 			}
 		case req.OrgID != MockOrgID || req.SiteID != MockSiteID:
-			writeMockJSON(w, _mockJobsUnknownSiteRsp)
+			writeMockJSON(w, mockJobsUnknownSiteRsp)
 		case len(req.LocationIDs) > 0 || len(req.ZhinengIDs) > 0:
-			writeMockJSON(w, _mockJobsFilteredRsp)
+			writeMockJSON(w, mockJobsFilteredRsp)
 		case req.Keyword != "":
-			writeMockJSON(w, _mockJobsKeywordRsp)
+			writeMockJSON(w, mockJobsKeywordRsp)
 		case req.Offset >= 2*MockPageSize:
-			writeMockJSON(w, _mockJobsEndRsp)
+			writeMockJSON(w, mockJobsEndRsp)
 		case req.Offset >= MockPageSize:
-			writeMockJSON(w, _mockJobsPage2Rsp)
+			writeMockJSON(w, mockJobsPage2Rsp)
 		default:
-			writeMockJSON(w, _mockJobsRsp)
+			writeMockJSON(w, mockJobsRsp)
 		}
 	})
 
 	mux.HandleFunc("POST /api/outer/ats-apply/website/job", func(w http.ResponseWriter, r *http.Request) {
 		req := decodeMockRequest(r)
 		if req.OrgID != MockOrgID || req.SiteID != MockSiteID || req.JobID != MockJobID {
-			writeMockJSON(w, _mockJobNotFoundRsp)
+			writeMockJSON(w, mockJobNotFoundRsp)
 			return
 		}
-		writeMockJSON(w, _mockJobRsp)
+		writeMockJSON(w, mockJobRsp)
 	})
 
 	mux.HandleFunc("POST /api/outer/ats-apply/website/jobs/v2/filterFieldsAggregations", func(w http.ResponseWriter, r *http.Request) {
 		req := decodeMockRequest(r)
 		switch {
 		case req.OrgID == MockNoLocationOrgID && req.SiteID == MockNoLocationSiteID:
-			writeMockJSON(w, _mockFilterAggregationsEmptyRsp)
+			writeMockJSON(w, mockFilterAggregationsEmptyRsp)
 		case req.OrgID != MockOrgID || req.SiteID != MockSiteID:
-			writeMockJSON(w, _mockJobsUnknownSiteRsp)
+			writeMockJSON(w, mockJobsUnknownSiteRsp)
 		default:
-			writeMockJSON(w, _mockFilterAggregationsRsp)
+			writeMockJSON(w, mockFilterAggregationsRsp)
 		}
 	})
 

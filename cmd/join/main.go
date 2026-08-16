@@ -18,7 +18,7 @@ import (
 // apiBaseURL is join.com's own origin, host to both the public GraphQL
 // endpoint and the SSR pages this client scrapes for detail (see
 // internal/provider/join/API.md).
-const _apiBaseURL = "https://join.com"
+const apiBaseURL = "https://join.com"
 
 func main() {
 	os.Exit(run())
@@ -220,7 +220,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := join.NewClient(_apiBaseURL, nil)
+	client := join.NewClient(apiBaseURL, nil)
 	jobs, err := client.Jobs(ctx, c.CompanyID)
 	if err != nil {
 		return err
@@ -273,7 +273,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := join.NewClient(_apiBaseURL, nil)
+	client := join.NewClient(apiBaseURL, nil)
 	d, err := client.JobDetail(ctx, c.Slug, f.idParam)
 	if err != nil {
 		if errors.Is(err, join.ErrNotFound) {

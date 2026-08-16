@@ -31,7 +31,7 @@ var _ Adapter = (*AshbyAdapter)(nil)
 //   - jobs.ashbyhq.com/acme
 //   - jobs.ashbyhq.com/Acme%20Inc
 //   - jobs.ashbyhq.com/acme/application/job-id
-var _ashbyCareersURLRE = regexp.MustCompile(
+var ashbyCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs\.ashbyhq\.com/(?P<slug>[^/]+)`,
 )
 
@@ -57,7 +57,7 @@ func (a *AshbyAdapter) Roster() []CompanyInfo {
 // segment is the organization name, which is already this adapter's slug
 // form (URL-decoded — Ashby org names may contain spaces).
 func (a *AshbyAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(_ashbyCareersURLRE, u)
+	return matchCareersSlug(ashbyCareersURLRE, u)
 }
 
 // CareersURL renders the roster company's public job board page.

@@ -8,25 +8,25 @@ import (
 )
 
 //go:embed testdata/search_rsp.json
-var _mockSearchRsp []byte
+var mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var _mockSearchFilteredRsp []byte
+var mockSearchFilteredRsp []byte
 
 //go:embed testdata/filters_rsp.json
-var _mockFiltersRsp []byte
+var mockFiltersRsp []byte
 
 //go:embed testdata/view_more_locations_rsp.json
-var _mockViewMoreLocationsRsp []byte
+var mockViewMoreLocationsRsp []byte
 
 //go:embed testdata/view_more_categories_rsp.json
-var _mockViewMoreCategoriesRsp []byte
+var mockViewMoreCategoriesRsp []byte
 
 //go:embed testdata/detail_rsp.html
-var _mockDetailRsp []byte
+var mockDetailRsp []byte
 
 //go:embed testdata/detail_not_found_rsp.html
-var _mockDetailNotFoundRsp []byte
+var mockDetailNotFoundRsp []byte
 
 // MockCompanyCode/MockBoardID/MockOpportunityID/MockNotFoundOpportunityID
 // identify the fixtures captured from TechnoServe's live board (see
@@ -62,27 +62,27 @@ func NewMockServer() *httptest.Server {
 		_ = json.NewDecoder(r.Body).Decode(&body)
 		for _, f := range body.OpportunitySearch.Filters {
 			if f.FieldName == 5 && len(f.Values) > 0 && f.Values[0] == MockFilteredCategoryID {
-				serveMockJSON(_mockSearchFilteredRsp)(w, r)
+				serveMockJSON(mockSearchFilteredRsp)(w, r)
 				return
 			}
 		}
-		serveMockJSON(_mockSearchRsp)(w, r)
+		serveMockJSON(mockSearchRsp)(w, r)
 	})
 	mux.HandleFunc("/"+MockUnknownCompanyCode+"/JobBoard/"+MockBoardID+"/JobBoardView/LoadSearchResults", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	})
 
-	mux.HandleFunc(prefix+"/JobBoardView/GetFilters", serveMockJSON(_mockFiltersRsp))
-	mux.HandleFunc(prefix+"/JobBoardViewMore/ViewMorePhysicalLocations", serveMockJSON(_mockViewMoreLocationsRsp))
-	mux.HandleFunc(prefix+"/JobBoardViewMore/ViewMoreJobCategories", serveMockJSON(_mockViewMoreCategoriesRsp))
+	mux.HandleFunc(prefix+"/JobBoardView/GetFilters", serveMockJSON(mockFiltersRsp))
+	mux.HandleFunc(prefix+"/JobBoardViewMore/ViewMorePhysicalLocations", serveMockJSON(mockViewMoreLocationsRsp))
+	mux.HandleFunc(prefix+"/JobBoardViewMore/ViewMoreJobCategories", serveMockJSON(mockViewMoreCategoriesRsp))
 
 	mux.HandleFunc(prefix+"/OpportunityDetail", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if r.URL.Query().Get("opportunityId") == MockOpportunityID {
-			w.Write(_mockDetailRsp)
+			w.Write(mockDetailRsp)
 			return
 		}
-		w.Write(_mockDetailNotFoundRsp)
+		w.Write(mockDetailNotFoundRsp)
 	})
 
 	return httptest.NewServer(mux)

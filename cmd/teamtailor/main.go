@@ -16,7 +16,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/teamtailor"
 )
 
-const _formatJSON = "json"
+const formatJSON = "json"
 
 func main() {
 	os.Exit(run())
@@ -115,7 +115,7 @@ func normalizeHost(host string) (string, error) {
 }
 
 func runCompanies(format string) error {
-	if format == _formatJSON {
+	if format == formatJSON {
 		return writeJSON(teamtailor.Companies)
 	}
 	for _, c := range teamtailor.Companies {
@@ -224,7 +224,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		jobs = append(jobs, summarize(j))
 	}
 
-	if f.format == _formatJSON {
+	if f.format == formatJSON {
 		return writeJSON(searchResultJSON{Total: len(jobs), Jobs: jobs})
 	}
 
@@ -277,7 +277,7 @@ func runGet(ctx context.Context, f getFlags) error {
 			Company:        feed.Title,
 			Description:    description,
 		}
-		if f.format == _formatJSON {
+		if f.format == formatJSON {
 			return writeJSON(detail)
 		}
 		fmt.Println(detail.Title)

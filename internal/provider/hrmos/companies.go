@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // RosterCompany is a confirmed organization hosting a public HRMOS 採用
 // tenant, drawn from a curated list (internal/provider/hrmos/companies.yaml).
@@ -22,12 +22,12 @@ type RosterCompany struct {
 }
 
 // careersURLTpl formats an HRMOS jobs page URL (e.g. "https://hrmos.co/pages/moneyforward/jobs").
-const _careersURLTpl = "https://hrmos.co/pages/%s/jobs"
+const careersURLTpl = "https://hrmos.co/pages/%s/jobs"
 
 // CareersURL returns the company's human-facing jobs page, e.g.
 // https://hrmos.co/pages/moneyforward/jobs.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.Slug)
+	return fmt.Sprintf(careersURLTpl, c.Slug)
 }
 
 // Companies holds every confirmed HRMOS company, sorted by company name.
@@ -42,7 +42,7 @@ var CompaniesBySlug = buildSlugIndex(Companies)
 // recover from.
 func mustLoadCompanies() []RosterCompany {
 	var cs []RosterCompany
-	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("hrmos: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b RosterCompany) int { return strings.Compare(a.Name, b.Name) })

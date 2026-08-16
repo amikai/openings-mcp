@@ -18,11 +18,11 @@ import (
 // Enum values mirror openapi.yaml's searchJobs parameters. The site silently
 // ignores unrecognized values, so the flags reject them up front.
 var (
-	_targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
-	_degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
-	_employmentTypes = []string{"FULL_TIME", "PART_TIME", "TEMPORARY", "INTERN"}
-	_companies       = []string{"DeepMind", "GFiber", "Google", "Verily Life Sciences", "Waymo", "Wing", "YouTube"}
-	_sortOrders      = []string{"relevance", "date"}
+	targetLevels    = []string{"EARLY", "MID", "ADVANCED", "INTERN_AND_APPRENTICE", "DIRECTOR_PLUS"}
+	degrees         = []string{"PURSUING_DEGREE", "ASSOCIATE", "BACHELORS", "MASTERS", "PHD"}
+	employmentTypes = []string{"FULL_TIME", "PART_TIME", "TEMPORARY", "INTERN"}
+	companies       = []string{"DeepMind", "GFiber", "Google", "Verily Life Sciences", "Waymo", "Wing", "YouTube"}
+	sortOrders      = []string{"relevance", "date"}
 )
 
 // main issues a single JobsRequest built entirely from flags, then fetches
@@ -39,12 +39,12 @@ func run() int {
 		query          = fs.StringLong("query", "", "free-text search query")
 		location       = fs.StringLong("location", "", "location filter (city, region, or country)")
 		hasRemote      = fs.BoolLong("has-remote", "only jobs marked Remote eligible")
-		targetLevel    = fs.StringEnumLong("target-level", usageWithChoices("Experience level", _targetLevels), withUnset(_targetLevels)...)
+		targetLevel    = fs.StringEnumLong("target-level", usageWithChoices("Experience level", targetLevels), withUnset(targetLevels)...)
 		skills         = fs.StringLong("skills", "", "free-text skills and qualifications filter")
-		degree         = fs.StringEnumLong("degree", usageWithChoices("Minimum education level", _degrees), withUnset(_degrees)...)
-		employmentType = fs.StringEnumLong("employment-type", usageWithChoices("Job type", _employmentTypes), withUnset(_employmentTypes)...)
-		company        = fs.StringEnumLong("company", usageWithChoices("Organization", _companies), withUnset(_companies)...)
-		sortBy         = fs.StringEnumLong("sort-by", usageWithChoices("Sort order", _sortOrders), withUnset(_sortOrders)...)
+		degree         = fs.StringEnumLong("degree", usageWithChoices("Minimum education level", degrees), withUnset(degrees)...)
+		employmentType = fs.StringEnumLong("employment-type", usageWithChoices("Job type", employmentTypes), withUnset(employmentTypes)...)
+		company        = fs.StringEnumLong("company", usageWithChoices("Organization", companies), withUnset(companies)...)
+		sortBy         = fs.StringEnumLong("sort-by", usageWithChoices("Sort order", sortOrders), withUnset(sortOrders)...)
 		page           = fs.IntLong("page", 1, "1-based page number; 20 results per page")
 	)
 	if err := ff.Parse(fs, os.Args[1:]); err != nil {

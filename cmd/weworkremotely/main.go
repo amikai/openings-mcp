@@ -25,7 +25,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/weworkremotely"
 )
 
-const _defaultBaseURL = "https://weworkremotely.com"
+const defaultBaseURL = "https://weworkremotely.com"
 
 func main() {
 	os.Exit(run())
@@ -34,7 +34,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("weworkremotely")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "We Work Remotely base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "We Work Remotely base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

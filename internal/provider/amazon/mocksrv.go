@@ -7,19 +7,19 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsResponse []byte
+var mockJobsResponse []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockFilteredJobsResponse []byte
+var mockFilteredJobsResponse []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailResponse []byte
+var mockJobDetailResponse []byte
 
 //go:embed testdata/job_detail_notfound_rsp.json
-var _mockJobDetailNotFoundResponse []byte
+var mockJobDetailNotFoundResponse []byte
 
 //go:embed testdata/jobs_soft_error_rsp.json
-var _mockSoftErrorResponse []byte
+var mockSoftErrorResponse []byte
 
 // NewMockServer returns an httptest.Server that replays captured Amazon Jobs
 // API responses. The caller owns the server and must close it.
@@ -29,15 +29,15 @@ func NewMockServer() *httptest.Server {
 		query := r.URL.Query()
 		switch {
 		case query.Get("base_query") == "3164253":
-			serveMockJSON(_mockJobDetailResponse)(w, r)
+			serveMockJSON(mockJobDetailResponse)(w, r)
 		case query.Get("base_query") == "9999999999":
-			serveMockJSON(_mockJobDetailNotFoundResponse)(w, r)
+			serveMockJSON(mockJobDetailNotFoundResponse)(w, r)
 		case query.Get("base_query") == "soft-error":
-			serveMockJSON(_mockSoftErrorResponse)(w, r)
+			serveMockJSON(mockSoftErrorResponse)(w, r)
 		case len(query["normalized_country_code[]"]) > 0:
-			serveMockJSON(_mockFilteredJobsResponse)(w, r)
+			serveMockJSON(mockFilteredJobsResponse)(w, r)
 		default:
-			serveMockJSON(_mockJobsResponse)(w, r)
+			serveMockJSON(mockJobsResponse)(w, r)
 		}
 	})
 	return httptest.NewServer(mux)

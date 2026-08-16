@@ -73,15 +73,15 @@ type smartRecruitersTestPosting struct {
 }
 
 const (
-	_smartRecruitersTestQueryTrainer  = "trainer"
-	_smartRecruitersTestQueryCommon   = "common"
-	_smartRecruitersTestHouston       = "Houston"
-	_smartRecruitersTestHoustonTX     = "Houston, TX"
-	_smartRecruitersTestTrainerPA     = "Trainer, PA"
-	_smartRecruitersTestTrainerTitle  = "Personal Trainer"
-	_smartRecruitersTestFrontDesk     = "Front Desk Associate"
-	_smartRecruitersTestEngineering   = "Engineering"
-	_smartRecruitersTestRemoteJSONKey = "remote"
+	smartRecruitersTestQueryTrainer  = "trainer"
+	smartRecruitersTestQueryCommon   = "common"
+	smartRecruitersTestHouston       = "Houston"
+	smartRecruitersTestHoustonTX     = "Houston, TX"
+	smartRecruitersTestTrainerPA     = "Trainer, PA"
+	smartRecruitersTestTrainerTitle  = "Personal Trainer"
+	smartRecruitersTestFrontDesk     = "Front Desk Associate"
+	smartRecruitersTestEngineering   = "Engineering"
+	smartRecruitersTestRemoteJSONKey = "remote"
 )
 
 // smartRecruitersSearchServer serves query-specific OR candidate sets and
@@ -120,8 +120,8 @@ func smartRecruitersSearchServer(
 				"name":         posting.title,
 				"releasedDate": "2026-07-10T12:00:00Z",
 				"location": map[string]any{
-					"fullLocation":                    posting.location,
-					_smartRecruitersTestRemoteJSONKey: posting.remote,
+					"fullLocation":                   posting.location,
+					smartRecruitersTestRemoteJSONKey: posting.remote,
 				},
 			})
 		}
@@ -169,10 +169,10 @@ func TestSmartRecruitersDepartmentCatalogFoldsLabelsAndPreservesIDs(t *testing.T
 	catalog := newSmartRecruitersDepartmentCatalog([]smartRecruitersDepartment{
 		{id: "1", label: " Sales "},
 		{id: "2", label: "sales"},
-		{id: "3", label: _smartRecruitersTestEngineering},
+		{id: "3", label: smartRecruitersTestEngineering},
 	})
 
-	assert.Equal(t, []string{_smartRecruitersTestEngineering, "Sales"}, catalog.labels)
+	assert.Equal(t, []string{smartRecruitersTestEngineering, "Sales"}, catalog.labels)
 	assert.Equal(t, []string{"1", "2"}, catalog.idsByLabel["sales"])
 	assert.Equal(t, []string{"3"}, catalog.idsByLabel["engineering"])
 }
@@ -246,15 +246,15 @@ func TestSmartRecruitersSearch(t *testing.T) {
 
 func TestSmartRecruitersSearchExcludesLocationOnlyQueryHits(t *testing.T) {
 	server, _ := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{
-		_smartRecruitersTestQueryTrainer: {
-			{id: "a", title: _smartRecruitersTestTrainerTitle, location: "Los Angeles, CA"},
-			{id: "b", title: _smartRecruitersTestTrainerTitle, location: _smartRecruitersTestHoustonTX},
-			{id: "c", title: _smartRecruitersTestFrontDesk, location: _smartRecruitersTestTrainerPA},
+		smartRecruitersTestQueryTrainer: {
+			{id: "a", title: smartRecruitersTestTrainerTitle, location: "Los Angeles, CA"},
+			{id: "b", title: smartRecruitersTestTrainerTitle, location: smartRecruitersTestHoustonTX},
+			{id: "c", title: smartRecruitersTestFrontDesk, location: smartRecruitersTestTrainerPA},
 		},
 	}, nil)
 	a := newSmartRecruitersSearchAdapter(t, server.URL)
 
-	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: _smartRecruitersTestQueryTrainer})
+	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: smartRecruitersTestQueryTrainer})
 	require.NoError(t, err)
 	assert.Equal(t, 2, res.TotalCount)
 	assert.Equal(t, []string{"a", "b"}, []string{res.Jobs[0].JobID, res.Jobs[1].JobID})
@@ -262,15 +262,15 @@ func TestSmartRecruitersSearchExcludesLocationOnlyQueryHits(t *testing.T) {
 
 func TestSmartRecruitersSearchExcludesTitleOnlyLocationHits(t *testing.T) {
 	server, _ := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{
-		_smartRecruitersTestHouston: {
-			{id: "a", title: _smartRecruitersTestFrontDesk, location: _smartRecruitersTestHoustonTX},
-			{id: "b", title: _smartRecruitersTestTrainerTitle, location: _smartRecruitersTestHoustonTX},
+		smartRecruitersTestHouston: {
+			{id: "a", title: smartRecruitersTestFrontDesk, location: smartRecruitersTestHoustonTX},
+			{id: "b", title: smartRecruitersTestTrainerTitle, location: smartRecruitersTestHoustonTX},
 			{id: "c", title: "Houston Support Specialist", location: "Chicago, IL"},
 		},
 	}, nil)
 	a := newSmartRecruitersSearchAdapter(t, server.URL)
 
-	res, err := a.Search(t.Context(), "equinox", SearchParams{Location: "  " + _smartRecruitersTestHouston + "  "})
+	res, err := a.Search(t.Context(), "equinox", SearchParams{Location: "  " + smartRecruitersTestHouston + "  "})
 	require.NoError(t, err)
 	assert.Equal(t, 2, res.TotalCount)
 	assert.Equal(t, []string{"a", "b"}, []string{res.Jobs[0].JobID, res.Jobs[1].JobID})
@@ -278,19 +278,19 @@ func TestSmartRecruitersSearchExcludesTitleOnlyLocationHits(t *testing.T) {
 
 func TestSmartRecruitersSearchCombinesQueryAndLocationWithAND(t *testing.T) {
 	server, urls := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{
-		_smartRecruitersTestQueryTrainer: {
-			{id: "a", title: _smartRecruitersTestTrainerTitle, location: "Los Angeles, CA"},
-			{id: "b", title: _smartRecruitersTestTrainerTitle, location: _smartRecruitersTestHoustonTX},
-			{id: "c", title: _smartRecruitersTestFrontDesk, location: _smartRecruitersTestTrainerPA},
+		smartRecruitersTestQueryTrainer: {
+			{id: "a", title: smartRecruitersTestTrainerTitle, location: "Los Angeles, CA"},
+			{id: "b", title: smartRecruitersTestTrainerTitle, location: smartRecruitersTestHoustonTX},
+			{id: "c", title: smartRecruitersTestFrontDesk, location: smartRecruitersTestTrainerPA},
 		},
-		_smartRecruitersTestHouston: {
-			{id: "b", title: _smartRecruitersTestTrainerTitle, location: _smartRecruitersTestHoustonTX},
-			{id: "d", title: _smartRecruitersTestFrontDesk, location: _smartRecruitersTestHoustonTX},
+		smartRecruitersTestHouston: {
+			{id: "b", title: smartRecruitersTestTrainerTitle, location: smartRecruitersTestHoustonTX},
+			{id: "d", title: smartRecruitersTestFrontDesk, location: smartRecruitersTestHoustonTX},
 		},
 	}, nil)
 	a := newSmartRecruitersSearchAdapter(t, server.URL)
 
-	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: _smartRecruitersTestQueryTrainer, Location: _smartRecruitersTestHouston})
+	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: smartRecruitersTestQueryTrainer, Location: smartRecruitersTestHouston})
 	require.NoError(t, err)
 	require.Len(t, res.Jobs, 1)
 	assert.Equal(t, "b", res.Jobs[0].JobID)
@@ -302,8 +302,8 @@ func TestSmartRecruitersSearchCombinesQueryAndLocationWithAND(t *testing.T) {
 		lastQueryParams(t, (*urls)[:1]).Get("q"),
 		lastQueryParams(t, (*urls)[1:]).Get("q"),
 	}
-	assert.ElementsMatch(t, []string{_smartRecruitersTestQueryTrainer, _smartRecruitersTestHouston}, queries)
-	assert.NotContains(t, queries, _smartRecruitersTestQueryTrainer+" "+_smartRecruitersTestHouston)
+	assert.ElementsMatch(t, []string{smartRecruitersTestQueryTrainer, smartRecruitersTestHouston}, queries)
+	assert.NotContains(t, queries, smartRecruitersTestQueryTrainer+" "+smartRecruitersTestHouston)
 }
 
 func TestSmartRecruitersSearchRemoteLocationUsesLocationType(t *testing.T) {
@@ -328,18 +328,18 @@ func TestSmartRecruitersSearchRemoteLocationUsesLocationType(t *testing.T) {
 
 	t.Run("query and location", func(t *testing.T) {
 		server, urls := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{
-			_smartRecruitersTestQueryTrainer: {
-				{id: "remote-trainer", title: _smartRecruitersTestTrainerTitle, location: "Angeles, Central Luzon, Philippines", remote: true},
-				{id: "onsite-trainer", title: _smartRecruitersTestTrainerTitle, location: "New York, NY"},
+			smartRecruitersTestQueryTrainer: {
+				{id: "remote-trainer", title: smartRecruitersTestTrainerTitle, location: "Angeles, Central Luzon, Philippines", remote: true},
+				{id: "onsite-trainer", title: smartRecruitersTestTrainerTitle, location: "New York, NY"},
 			},
 			"remote": {
-				{id: "remote-text", title: _smartRecruitersTestFrontDesk, location: "Remote", remote: true},
+				{id: "remote-text", title: smartRecruitersTestFrontDesk, location: "Remote", remote: true},
 			},
 		}, nil)
 		a := newSmartRecruitersSearchAdapter(t, server.URL)
 
 		res, err := a.Search(t.Context(), "deliveryhero", SearchParams{
-			Query:    _smartRecruitersTestQueryTrainer,
+			Query:    smartRecruitersTestQueryTrainer,
 			Location: "remote",
 		})
 		require.NoError(t, err)
@@ -347,7 +347,7 @@ func TestSmartRecruitersSearchRemoteLocationUsesLocationType(t *testing.T) {
 		assert.Equal(t, "remote-trainer", res.Jobs[0].JobID)
 		require.Len(t, *urls, 1)
 		params := lastQueryParams(t, *urls)
-		assert.Equal(t, _smartRecruitersTestQueryTrainer, params.Get("q"))
+		assert.Equal(t, smartRecruitersTestQueryTrainer, params.Get("q"))
 		assert.Equal(t, []string{"REMOTE"}, params["locationType"])
 	})
 }
@@ -357,21 +357,21 @@ func TestSmartRecruitersSearchPagesAfterResidualFiltering(t *testing.T) {
 	for i := range 25 {
 		postings = append(postings, smartRecruitersTestPosting{
 			id:       fmt.Sprintf("match-%03d", i),
-			title:    _smartRecruitersTestTrainerTitle,
+			title:    smartRecruitersTestTrainerTitle,
 			location: "Chicago, IL",
 		})
 	}
 	for i := range 80 {
 		postings = append(postings, smartRecruitersTestPosting{
 			id:       fmt.Sprintf("noise-%03d", i),
-			title:    _smartRecruitersTestFrontDesk,
-			location: _smartRecruitersTestTrainerPA,
+			title:    smartRecruitersTestFrontDesk,
+			location: smartRecruitersTestTrainerPA,
 		})
 	}
-	server, urls := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{_smartRecruitersTestQueryTrainer: postings}, nil)
+	server, urls := smartRecruitersSearchServer(t, map[string][]smartRecruitersTestPosting{smartRecruitersTestQueryTrainer: postings}, nil)
 	a := newSmartRecruitersSearchAdapter(t, server.URL)
 
-	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: _smartRecruitersTestQueryTrainer, Page: 2})
+	res, err := a.Search(t.Context(), "equinox", SearchParams{Query: smartRecruitersTestQueryTrainer, Page: 2})
 	require.NoError(t, err)
 	assert.Equal(t, 25, res.TotalCount)
 	assert.Equal(t, 2, res.TotalPages)
@@ -384,15 +384,15 @@ func TestSmartRecruitersSearchPagesAfterResidualFiltering(t *testing.T) {
 func TestSmartRecruitersSearchRejectsUnboundedCandidateSet(t *testing.T) {
 	server, _ := smartRecruitersSearchServer(t,
 		map[string][]smartRecruitersTestPosting{
-			_smartRecruitersTestQueryCommon: {{id: "a", title: "Common Role", location: "Anywhere"}},
+			smartRecruitersTestQueryCommon: {{id: "a", title: "Common Role", location: "Anywhere"}},
 		},
-		map[string]int{_smartRecruitersTestQueryCommon: _maxSmartRecruitersCandidates + 1},
+		map[string]int{smartRecruitersTestQueryCommon: maxSmartRecruitersCandidates + 1},
 	)
 	a := newSmartRecruitersSearchAdapter(t, server.URL)
 
-	_, err := a.Search(t.Context(), "equinox", SearchParams{Query: _smartRecruitersTestQueryCommon})
+	_, err := a.Search(t.Context(), "equinox", SearchParams{Query: smartRecruitersTestQueryCommon})
 	require.ErrorContains(t, err, "search is too broad")
-	require.ErrorContains(t, err, strconv.Itoa(_maxSmartRecruitersCandidates+1))
+	require.ErrorContains(t, err, strconv.Itoa(maxSmartRecruitersCandidates+1))
 }
 
 func TestSmartRecruitersSearchPagination(t *testing.T) {
@@ -507,7 +507,7 @@ func TestSmartRecruitersCareersHostPatternRegistered(t *testing.T) {
 	// The registry only advertises careers-URL shapes for adapters listed
 	// in careersHostPatternsByAdapter; a missing entry silently degrades
 	// the "unrecognized careers URL" teaching error.
-	assert.Contains(t, _careersHostPatternsByAdapter, "smartrecruiters")
+	assert.Contains(t, careersHostPatternsByAdapter, "smartrecruiters")
 }
 
 func TestSmartRecruitersResolvesThroughRegistry(t *testing.T) {

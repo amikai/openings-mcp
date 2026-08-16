@@ -24,33 +24,33 @@ var _ Adapter = (*DayforceAdapter)(nil)
 // URL uses, independent of the API base URL the client was constructed
 // with (tests point the client at a mock server but still render the real
 // public host, matching smartrecruiters.RosterCompany.CareersURL).
-const _dayforceJobsHost = "https://jobs.dayforcehcm.com"
+const dayforceJobsHost = "https://jobs.dayforcehcm.com"
 
 // dayforcePageSize is the live API's fixed, non-negotiable search page
 // size (verified live — see internal/provider/dayforce openapi.yaml).
 // Search remaps it onto the unified ats.pageSize the way iCIMS does.
-const _dayforcePageSize = 25
+const dayforcePageSize = 25
 
 // dayforceCultureRE matches one culture segment, e.g. "en-US".
-var _dayforceCultureRE = regexp.MustCompile(`(?i)^[a-z]{2}-[a-z]{2}$`)
+var dayforceCultureRE = regexp.MustCompile(`(?i)^[a-z]{2}-[a-z]{2}$`)
 
 // dayforceDefaultCulture is the default for locale-less board URLs and slugs.
-const _dayforceDefaultCulture = "en-US"
+const dayforceDefaultCulture = "en-US"
 
 // dayforceDefaultBoardCode is the default job board code most tenants
 // serve, and the fallback when a legacy-host URL omits the board segment.
-const _dayforceDefaultBoardCode = "CANDIDATEPORTAL"
+const dayforceDefaultBoardCode = "CANDIDATEPORTAL"
 
 // dayforceDefaultDistance is the search radius (miles) applied whenever a
 // location string is supplied, matching the value observed in every live
 // capture that combined locationString with a distance.
-const _dayforceDefaultDistance = 50
+const dayforceDefaultDistance = 50
 
 // dayforceFilterKeys names every key [DayforceAdapter.Search] accepts via
 // SearchParams.Filters. department, pay_class, and pay_type resolve
 // against the board's posting-attribute catalog; travel_required is a
 // static true/false dimension advertised by [DayforceAdapter.Filters].
-var _dayforceFilterKeys = map[string]bool{
+var dayforceFilterKeys = map[string]bool{
 	"department":      true,
 	"pay_class":       true,
 	"pay_type":        true,
@@ -68,7 +68,7 @@ var _dayforceFilterKeys = map[string]bool{
 //   - jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL
 //   - jobs.dayforcehcm.com/en-US/pca/CANDIDATEPORTAL/jobs/62374
 //   - jobs.dayforcehcm.com/unknown/CANDIDATEPORTAL (locale-less form)
-var _dayforceBoardURLRE = regexp.MustCompile(
+var dayforceBoardURLRE = regexp.MustCompile(
 	`(?i)^jobs\.dayforcehcm\.com/(?:(?P<culture>[a-z]{2}-[a-z]{2})/)?(?P<ns>[^/]+)/(?P<xref>[^/]+)(?:/jobs/[^/]+)?/?$`,
 )
 
@@ -81,7 +81,7 @@ var _dayforceBoardURLRE = regexp.MustCompile(
 //   - us1234.dayforcehcm.com/CandidatePortal/en-US/pca
 //   - us1234.dayforcehcm.com/CandidatePortal/en-US/mydayforce/Site/alljobs
 //   - www.mydayforce.com/CandidatePortal/en-US/pca
-var _dayforceLegacyURLRE = regexp.MustCompile(
+var dayforceLegacyURLRE = regexp.MustCompile(
 	`(?i)^(?:us\d+\.dayforcehcm\.com|www\.mydayforce\.com)/CandidatePortal/(?P<culture>[a-z]{2}-[a-z]{2})/(?P<ns>[^/]+?)(?:/Site/(?P<xref>[^/]+))?/?$`,
 )
 
@@ -90,7 +90,7 @@ var _dayforceLegacyURLRE = regexp.MustCompile(
 // defense-in-depth check alongside dayforceBoardURLRE's anchoring (every
 // real route under these prefixes is deeper than the two segments the
 // regex allows, but a future shallow route should still not resolve).
-var _dayforceReservedFirstSegments = map[string]bool{
+var dayforceReservedFirstSegments = map[string]bool{
 	"api":     true,
 	"_next":   true,
 	"profile": true,
@@ -166,7 +166,7 @@ func (a *DayforceAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	}
 	slug := strings.ToLower(ns) + "/" + strings.ToLower(xref)
 	culture = canonicalDayforceCulture(culture)
-	if culture != "" && culture != _dayforceDefaultCulture {
+	if culture != "" && culture != dayforceDefaultCulture {
 		slug += "/" + culture
 	}
 	return slug, true
@@ -179,29 +179,29 @@ func parseDayforceCareersURL(u *url.URL) (ns, xref, culture string, ok bool) {
 	host := strings.ToLower(u.Hostname())
 	subject := host + u.EscapedPath()
 
-	if m := _dayforceBoardURLRE.FindStringSubmatch(subject); m != nil {
-		ns = namedGroup(_dayforceBoardURLRE, m, "ns")
-		xref = namedGroup(_dayforceBoardURLRE, m, "xref")
-		culture = namedGroup(_dayforceBoardURLRE, m, "culture")
-		if _dayforceReservedFirstSegments[strings.ToLower(ns)] {
+	if m := dayforceBoardURLRE.FindStringSubmatch(subject); m != nil {
+		ns = namedGroup(dayforceBoardURLRE, m, "ns")
+		xref = namedGroup(dayforceBoardURLRE, m, "xref")
+		culture = namedGroup(dayforceBoardURLRE, m, "culture")
+		if dayforceReservedFirstSegments[strings.ToLower(ns)] {
 			return "", "", "", false
 		}
 		// A two-segment path is ambiguous: the optional culture group
 		// backtracks into ns, so /en-US/pca parses as ns "en-US". A
 		// culture-shaped namespace is far less likely than a truncated board
 		// URL, so reject rather than mint a slug that can only 404.
-		if culture == "" && _dayforceCultureRE.MatchString(ns) {
+		if culture == "" && dayforceCultureRE.MatchString(ns) {
 			return "", "", "", false
 		}
 		return dayforceUnescapeSegment(ns), dayforceUnescapeSegment(xref), canonicalDayforceCulture(culture), ns != "" && xref != ""
 	}
 
-	if m := _dayforceLegacyURLRE.FindStringSubmatch(subject); m != nil {
-		ns = namedGroup(_dayforceLegacyURLRE, m, "ns")
-		xref = namedGroup(_dayforceLegacyURLRE, m, "xref")
-		culture = namedGroup(_dayforceLegacyURLRE, m, "culture")
+	if m := dayforceLegacyURLRE.FindStringSubmatch(subject); m != nil {
+		ns = namedGroup(dayforceLegacyURLRE, m, "ns")
+		xref = namedGroup(dayforceLegacyURLRE, m, "xref")
+		culture = namedGroup(dayforceLegacyURLRE, m, "culture")
 		if xref == "" {
-			xref = _dayforceDefaultBoardCode
+			xref = dayforceDefaultBoardCode
 		}
 		return dayforceUnescapeSegment(ns), dayforceUnescapeSegment(xref), canonicalDayforceCulture(culture), ns != ""
 	}
@@ -210,7 +210,7 @@ func parseDayforceCareersURL(u *url.URL) (ns, xref, culture string, ok bool) {
 }
 
 func canonicalDayforceCulture(culture string) string {
-	if !_dayforceCultureRE.MatchString(culture) {
+	if !dayforceCultureRE.MatchString(culture) {
 		return ""
 	}
 	parts := strings.SplitN(culture, "-", 2)
@@ -237,7 +237,7 @@ func (a *DayforceAdapter) CareersURL(slug string) (string, bool) {
 }
 
 func dayforceBoardURL(c dayforce.Company) string {
-	return fmt.Sprintf("%s/%s/%s/%s", _dayforceJobsHost, c.Culture(), c.Namespace, c.JobBoardCode)
+	return fmt.Sprintf("%s/%s/%s/%s", dayforceJobsHost, c.Culture(), c.Namespace, c.JobBoardCode)
 }
 
 // dayforceJobURL renders one posting's public page, matching
@@ -263,7 +263,7 @@ func (a *DayforceAdapter) resolveSlug(_ context.Context, slug string) (name stri
 		return "", dayforce.Company{}, fmt.Errorf("dayforce: unknown company %q; pass a roster slug or a jobs.dayforcehcm.com board URL", slug)
 	}
 	ns, xref := parts[0], parts[1]
-	culture := _dayforceDefaultCulture
+	culture := dayforceDefaultCulture
 	if len(parts) == 3 {
 		culture = canonicalDayforceCulture(parts[2])
 		if culture == "" {
@@ -312,10 +312,10 @@ func (a *DayforceAdapter) Search(ctx context.Context, slug string, p SearchParam
 
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/_pageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("dayforce: page %d is too large; retry with a smaller page", page)
 	}
-	start := pageIndex * _pageSize
+	start := pageIndex * pageSize
 
 	req := dayforce.SearchRequest{
 		ClientNamespace: board.Namespace,
@@ -332,7 +332,7 @@ func (a *DayforceAdapter) Search(ctx context.Context, slug string, p SearchParam
 		// sends alongside distance (see the plan doc's captured payload).
 		const distanceUnitMiles = 0
 		req.LocationString = dayforce.NewOptString(location)
-		req.Distance = dayforce.NewOptFloat64(_dayforceDefaultDistance)
+		req.Distance = dayforce.NewOptFloat64(dayforceDefaultDistance)
 		req.DistanceUnit = dayforce.NewOptInt(distanceUnitMiles)
 	}
 	if err := a.applySearchFilters(ctx, &board, &req, p.Filters); err != nil {
@@ -343,10 +343,10 @@ func (a *DayforceAdapter) Search(ctx context.Context, slug string, p SearchParam
 		return a.searchRemote(ctx, slug, board, req, start, page)
 	}
 
-	correctPr := start / _dayforcePageSize
-	offsetInPage := start % _dayforcePageSize
+	correctPr := start / dayforcePageSize
+	offsetInPage := start % dayforcePageSize
 
-	first, err := a.searchPage(ctx, slug, req, correctPr*_dayforcePageSize)
+	first, err := a.searchPage(ctx, slug, req, correctPr*dayforcePageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -364,19 +364,19 @@ func (a *DayforceAdapter) Search(ctx context.Context, slug string, p SearchParam
 		return &SearchResult{Jobs: []JobSummary{}, TotalCount: first.MaxCount, Page: page, TotalPages: totalPages(first.MaxCount)}, nil
 	}
 
-	selected := make([]dayforce.SearchPosting, 0, _pageSize)
+	selected := make([]dayforce.SearchPosting, 0, pageSize)
 	if offsetInPage < len(first.JobPostings) {
 		selected = append(selected, first.JobPostings[offsetInPage:]...)
 	}
-	for nextStart := (correctPr + 1) * _dayforcePageSize; len(selected) < _pageSize && nextStart < first.MaxCount; nextStart += _dayforcePageSize {
+	for nextStart := (correctPr + 1) * dayforcePageSize; len(selected) < pageSize && nextStart < first.MaxCount; nextStart += dayforcePageSize {
 		more, err := a.searchPage(ctx, slug, req, nextStart)
 		if err != nil {
 			return nil, err
 		}
 		selected = append(selected, more.JobPostings...)
 	}
-	if len(selected) > _pageSize {
-		selected = selected[:_pageSize]
+	if len(selected) > pageSize {
+		selected = selected[:pageSize]
 	}
 
 	return &SearchResult{
@@ -413,16 +413,16 @@ func (a *DayforceAdapter) searchRemote(ctx context.Context, slug string, board d
 
 	matched := make([]dayforce.SearchPosting, 0)
 	res := first
-	for offset := 0; ; offset += _dayforcePageSize {
+	for offset := 0; ; offset += dayforcePageSize {
 		for _, p := range res.JobPostings {
 			if p.HasVirtualLocation {
 				matched = append(matched, p)
 			}
 		}
-		if offset+_dayforcePageSize >= res.MaxCount {
+		if offset+dayforcePageSize >= res.MaxCount {
 			break
 		}
-		res, err = a.searchPage(ctx, slug, req, offset+_dayforcePageSize)
+		res, err = a.searchPage(ctx, slug, req, offset+dayforcePageSize)
 		if err != nil {
 			return nil, err
 		}
@@ -431,7 +431,7 @@ func (a *DayforceAdapter) searchRemote(ctx context.Context, slug string, board d
 	if start >= len(matched) {
 		return &SearchResult{Jobs: []JobSummary{}, TotalCount: len(matched), Page: page, TotalPages: totalPages(len(matched))}, nil
 	}
-	end := min(start+_pageSize, len(matched))
+	end := min(start+pageSize, len(matched))
 	return &SearchResult{
 		Jobs:       dayforceSummaries(matched[start:end], board),
 		TotalCount: len(matched),
@@ -478,7 +478,7 @@ func (a *DayforceAdapter) applySearchFilters(ctx context.Context, board *dayforc
 			}
 			req.TravelRequired = dayforce.NewOptBool(b)
 		default:
-			return errUnknownFilterKey(key, _dayforceFilterKeys)
+			return errUnknownFilterKey(key, dayforceFilterKeys)
 		}
 	}
 	return nil

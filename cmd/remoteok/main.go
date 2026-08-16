@@ -25,7 +25,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/remoteok"
 )
 
-const _defaultBaseURL = "https://remoteok.com"
+const defaultBaseURL = "https://remoteok.com"
 
 func main() {
 	os.Exit(run())
@@ -34,7 +34,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("remoteok")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Remote OK base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Remote OK base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

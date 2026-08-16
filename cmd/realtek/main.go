@@ -19,7 +19,7 @@ import (
 
 // apiBaseURL is Realtek's recruitment site origin — the single production
 // server in the provider's openapi.yaml.
-const _apiBaseURL = "https://recruit.realtek.com"
+const apiBaseURL = "https://recruit.realtek.com"
 
 func main() {
 	os.Exit(run())
@@ -197,7 +197,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(_apiBaseURL)
+	client, err := realtek.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -249,7 +249,7 @@ func runDetail(ctx context.Context, timeout time.Duration, jobOppID, format stri
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(_apiBaseURL)
+	client, err := realtek.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -290,7 +290,7 @@ func runTypes(ctx context.Context, timeout time.Duration, format string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(_apiBaseURL)
+	client, err := realtek.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -316,7 +316,7 @@ func runLocations(ctx context.Context, timeout time.Duration, format string) err
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := realtek.NewClient(_apiBaseURL)
+	client, err := realtek.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

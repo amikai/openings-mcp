@@ -19,7 +19,7 @@ import (
 // resolved Company happens to match the mock fixtures' company code and
 // board id, so testUltiProAdapter's baseURL override always applies
 // regardless of which company the slug names.
-const _mockUltiProSlug = "tec1006teser"
+const mockUltiProSlug = "tec1006teser"
 
 func testUltiProAdapter(t *testing.T) *UltiProAdapter {
 	t.Helper()
@@ -47,12 +47,12 @@ func TestUltiProRosterReturnsCompanyNames(t *testing.T) {
 	require.NotEmpty(t, roster)
 	found := false
 	for _, c := range roster {
-		if c.Slug == _mockUltiProSlug {
+		if c.Slug == mockUltiProSlug {
 			found = true
 			assert.Equal(t, "TechnoServe", c.Name)
 		}
 	}
-	assert.True(t, found, "expected %q in roster", _mockUltiProSlug)
+	assert.True(t, found, "expected %q in roster", mockUltiProSlug)
 }
 
 func TestUltiProParseCareersURL(t *testing.T) {
@@ -62,7 +62,7 @@ func TestUltiProParseCareersURL(t *testing.T) {
 		ok   bool
 		slug string
 	}{
-		{"https://recruiting.ultipro.com/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24/", true, _mockUltiProSlug},
+		{"https://recruiting.ultipro.com/TEC1006TESER/JobBoard/18180d88-ced0-4361-bd09-d5eef66dab24/", true, mockUltiProSlug},
 		{"https://recruiting2.ultipro.com/SAL1002/JobBoard/bcc2e2d1-d94c-2041-4126-28086417eb0a/", true, "sal1002"},
 		{
 			// Not on the roster: falls back to the canonical URL slug.
@@ -99,7 +99,7 @@ func TestUltiProParseCareersURL(t *testing.T) {
 
 func TestUltiProSearch(t *testing.T) {
 	a := testUltiProAdapter(t)
-	res, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{})
+	res, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{})
 	require.NoError(t, err)
 	assert.Equal(t, 90, res.TotalCount)
 	assert.Len(t, res.Jobs, 20)
@@ -116,14 +116,14 @@ func TestUltiProSearch(t *testing.T) {
 
 func TestUltiProSearchPageOverflow(t *testing.T) {
 	a := testUltiProAdapter(t)
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{Page: math.MaxInt})
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{Page: math.MaxInt})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "too large")
 }
 
 func TestUltiProSearchFilterDepartment(t *testing.T) {
 	a := testUltiProAdapter(t)
-	res, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	res, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"department": {"Finance"}},
 	})
 	require.NoError(t, err)
@@ -133,18 +133,18 @@ func TestUltiProSearchFilterDepartment(t *testing.T) {
 func TestUltiProSearchFilterTeachingErrors(t *testing.T) {
 	a := testUltiProAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"schedule": {"FullTime"}},
 	})
 	require.ErrorContains(t, err, "unknown filter key")
 
-	_, err = a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err = a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"department": {"Nonexistent Department"}},
 	})
 	require.ErrorContains(t, err, `filter value "Nonexistent Department" not found`)
 	assert.Contains(t, err.Error(), "available:")
 
-	_, err = a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err = a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"location_type": {"nowhere"}},
 	})
 	require.ErrorContains(t, err, `filter value "nowhere" not found`)
@@ -153,7 +153,7 @@ func TestUltiProSearchFilterTeachingErrors(t *testing.T) {
 
 func TestUltiProFilters(t *testing.T) {
 	a := testUltiProAdapter(t)
-	fs, err := a.Filters(t.Context(), _mockUltiProSlug)
+	fs, err := a.Filters(t.Context(), mockUltiProSlug)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"Hybrid", "Onsite", "Remote"}, fs["location_type"])
 	assert.Contains(t, fs["department"], "Finance")
@@ -161,7 +161,7 @@ func TestUltiProFilters(t *testing.T) {
 
 func TestUltiProDetail(t *testing.T) {
 	a := testUltiProAdapter(t)
-	d, err := a.Detail(t.Context(), _mockUltiProSlug, ultipro.MockOpportunityID)
+	d, err := a.Detail(t.Context(), mockUltiProSlug, ultipro.MockOpportunityID)
 	require.NoError(t, err)
 	assert.Equal(t, ultipro.MockOpportunityID, d.JobID)
 	assert.Equal(t, "Conseiller Senior en Partenariat-BeniBiz", d.Title)
@@ -173,7 +173,7 @@ func TestUltiProDetail(t *testing.T) {
 
 func TestUltiProDetailNotFound(t *testing.T) {
 	a := testUltiProAdapter(t)
-	_, err := a.Detail(t.Context(), _mockUltiProSlug, ultipro.MockNotFoundOpportunityID)
+	_, err := a.Detail(t.Context(), mockUltiProSlug, ultipro.MockNotFoundOpportunityID)
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
 }
@@ -243,7 +243,7 @@ func newUltiProRecordingAdapter(t *testing.T) (*UltiProAdapter, *int, *[]recorde
 func TestUltiProSearchFilterValuesCombineIntoOneObject(t *testing.T) {
 	a, _, lastFilters := newUltiProRecordingAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"department": {"Engineering", "Sales"}},
 	})
 	require.NoError(t, err)
@@ -251,7 +251,7 @@ func TestUltiProSearchFilterValuesCombineIntoOneObject(t *testing.T) {
 	assert.Equal(t, 5, (*lastFilters)[0].FieldName)
 	assert.ElementsMatch(t, []string{"cat-eng", "cat-sales"}, (*lastFilters)[0].Values)
 
-	_, err = a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err = a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Filters: FilterSet{"location_type": {"Hybrid", "Onsite"}},
 	})
 	require.NoError(t, err)
@@ -263,7 +263,7 @@ func TestUltiProSearchFilterValuesCombineIntoOneObject(t *testing.T) {
 func TestUltiProSearchRemoteLocationUsesLocationType(t *testing.T) {
 	a, _, lastFilters := newUltiProRecordingAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{Location: "Remote"})
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{Location: "Remote"})
 	require.NoError(t, err)
 	require.Len(t, *lastFilters, 1, "remote location must resolve through location_type, not a field-4 physical-location filter")
 	assert.Equal(t, 37, (*lastFilters)[0].FieldName)
@@ -277,7 +277,7 @@ func TestUltiProSearchRemoteLocationIntersectsExplicitLocationType(t *testing.T)
 	// ANDed criteria (a Remote location intersected with a Remote-or-Hybrid
 	// type), not something that ORs Hybrid into the result — narrow to
 	// Remote only rather than sending both codes.
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Location: "remote",
 		Filters:  FilterSet{"location_type": {"Remote", "Hybrid"}},
 	})
@@ -290,7 +290,7 @@ func TestUltiProSearchRemoteLocationIntersectsExplicitLocationType(t *testing.T)
 func TestUltiProSearchRemoteLocationConflictShortCircuits(t *testing.T) {
 	a, calls, _ := newUltiProRecordingAdapter(t)
 
-	res, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	res, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Location: "remote",
 		Filters:  FilterSet{"location_type": {"Onsite"}},
 	})
@@ -307,14 +307,14 @@ func TestUltiProSearchRemoteLocationConflictShortCircuits(t *testing.T) {
 func TestUltiProSearchRemoteLocationValidatesFiltersFirst(t *testing.T) {
 	a, calls, _ := newUltiProRecordingAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Location: "remote",
 		Filters:  FilterSet{"location_type": {"nowhere"}},
 	})
 	require.ErrorContains(t, err, `filter value "nowhere" not found`)
 	assert.Equal(t, 0, *calls)
 
-	_, err = a.Search(t.Context(), _mockUltiProSlug, SearchParams{
+	_, err = a.Search(t.Context(), mockUltiProSlug, SearchParams{
 		Location: "remote",
 		Filters:  FilterSet{"schedule": {"FullTime"}},
 	})
@@ -328,7 +328,7 @@ func TestUltiProSearchLocationFuzzyMatchesAllHits(t *testing.T) {
 	// "US" substring-matches both Austin and Houston (via LocalizedDescription
 	// "US/Austin", "US/Houston") but not Tokyo; both must OR together in one
 	// field-4 filter rather than erroring or picking just one.
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{Location: "US"})
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{Location: "US"})
 	require.NoError(t, err)
 	require.Len(t, *lastFilters, 1)
 	assert.Equal(t, 4, (*lastFilters)[0].FieldName)
@@ -338,7 +338,7 @@ func TestUltiProSearchLocationFuzzyMatchesAllHits(t *testing.T) {
 func TestUltiProSearchLocationNoMatchErrors(t *testing.T) {
 	a, _, _ := newUltiProRecordingAdapter(t)
 
-	_, err := a.Search(t.Context(), _mockUltiProSlug, SearchParams{Location: "Nowhereville"})
+	_, err := a.Search(t.Context(), mockUltiProSlug, SearchParams{Location: "Nowhereville"})
 	require.ErrorContains(t, err, `no location matching "Nowhereville"`)
 	assert.Contains(t, err.Error(), "available:")
 }
@@ -354,7 +354,7 @@ func TestUltiProDetailPropagatesNonNotFoundErrors(t *testing.T) {
 	a := NewUltiProAdapter(&http.Client{Timeout: 5 * time.Second})
 	a.baseURL = func(ultipro.CareersSite) string { return srv.URL }
 
-	_, err := a.Detail(t.Context(), _mockUltiProSlug, ultipro.MockOpportunityID)
+	_, err := a.Detail(t.Context(), mockUltiProSlug, ultipro.MockOpportunityID)
 	require.Error(t, err)
 	assert.NotContains(t, err.Error(), "not found", "a 500 must surface as a fetch failure, not a misleading not-found teaching error")
 	assert.Contains(t, err.Error(), "500")

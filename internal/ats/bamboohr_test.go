@@ -124,7 +124,7 @@ func TestBambooHRSearchQueryLocationAndFilters(t *testing.T) {
 func TestBambooHRRemoteAndAtsLocation(t *testing.T) {
 	a := testBambooHRVarietyAdapter(t)
 
-	remote, err := a.Search(t.Context(), bamboohr.MockVarietySlug, SearchParams{Location: _remoteLocation})
+	remote, err := a.Search(t.Context(), bamboohr.MockVarietySlug, SearchParams{Location: remoteLocation})
 	require.NoError(t, err)
 	assert.NotEmpty(t, remote.Jobs)
 

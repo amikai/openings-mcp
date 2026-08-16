@@ -17,7 +17,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/herp"
 )
 
-const _baseURL = "https://herp.careers"
+const baseURL = "https://herp.careers"
 
 func main() {
 	os.Exit(run())
@@ -129,7 +129,7 @@ func fetchBoard(ctx context.Context, company string, timeout time.Duration) (*he
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := herp.NewClient(_baseURL)
+	client, err := herp.NewClient(baseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -195,9 +195,9 @@ func summarize(board *herp.CompanyBoard, j *herp.Job) jobSummaryJSON {
 // linked to the HERP Hire career page instead.
 func jobURL(board *herp.CompanyBoard, id string) string {
 	if board.CompanyIsApplicationEnabled.Or(true) {
-		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", _baseURL, board.CompanySlug, id)
+		return fmt.Sprintf("%s/careers/companies/%s/jobs/%s", baseURL, board.CompanySlug, id)
 	}
-	return fmt.Sprintf("%s/v1/%s/%s", _baseURL, board.CompanySlug, id)
+	return fmt.Sprintf("%s/v1/%s/%s", baseURL, board.CompanySlug, id)
 }
 
 // searchFlags carries the parsed "search" subcommand flags into runSearch.

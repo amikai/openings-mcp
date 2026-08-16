@@ -15,7 +15,7 @@ import (
 // mockGreenhouseBoard is the board token the provider mock server serves a
 // content=true dump for (5 hand-crafted jobs; see the provider's
 // testdata/jobs_content_rsp.json).
-const _mockGreenhouseBoard = "safariai"
+const mockGreenhouseBoard = "safariai"
 
 func testGreenhouseAdapter(t *testing.T) *GreenhouseAdapter {
 	t.Helper()
@@ -37,7 +37,7 @@ func TestGreenhouseRoster(t *testing.T) {
 
 func TestGreenhouseSearchAll(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{})
 	require.NoError(t, err)
 	require.Equal(t, 5, res.TotalCount)
 	assert.Equal(t, "6100001004", res.Jobs[0].JobID, "newest job should sort first")
@@ -48,7 +48,7 @@ func TestGreenhouseSearchAll(t *testing.T) {
 		assert.Truef(t, strings.HasPrefix(j.PostedAt, "20"), "PostedAt should be an ISO date, got %q", j.PostedAt)
 	}
 	// 5 jobs < pageSize, so page 2 is empty but the envelope stays sane.
-	page2, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Page: 2})
+	page2, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Page: 2})
 	require.NoError(t, err)
 	assert.Empty(t, page2.Jobs)
 	assert.Equal(t, 2, page2.Page)
@@ -57,7 +57,7 @@ func TestGreenhouseSearchAll(t *testing.T) {
 
 func TestGreenhouseSearchQueryRanksTitleFirst(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Query: "agent platform"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "agent platform"})
 	require.NoError(t, err)
 	require.Equal(t, 2, res.TotalCount, "want title hit + JD-body hit")
 	require.Len(t, res.Jobs, 2)
@@ -67,7 +67,7 @@ func TestGreenhouseSearchQueryRanksTitleFirst(t *testing.T) {
 
 func TestGreenhouseSearchQueryMatchesJDBody(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Query: "kubernetes"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "kubernetes"})
 	require.NoError(t, err)
 	require.Equal(t, 1, res.TotalCount, "query hitting only entity-encoded JD content should match")
 	assert.Equal(t, "Senior Backend Engineer", res.Jobs[0].Title)
@@ -76,7 +76,7 @@ func TestGreenhouseSearchQueryMatchesJDBody(t *testing.T) {
 func TestGreenhouseSearchQueryMatchesOrgUnit(t *testing.T) {
 	a := testGreenhouseAdapter(t)
 	// "people" appears only in the Technical Recruiter job's department.
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Query: "people"})
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Query: "people"})
 	require.NoError(t, err)
 	require.Equal(t, 1, res.TotalCount, "query hitting only the department name should match")
 	assert.Equal(t, "Technical Recruiter", res.Jobs[0].Title)
@@ -84,12 +84,12 @@ func TestGreenhouseSearchQueryMatchesOrgUnit(t *testing.T) {
 
 func TestGreenhouseSearchLocation(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	remote, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Location: "remote"})
+	remote, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Location: "remote"})
 	require.NoError(t, err)
 	require.Equal(t, 1, remote.TotalCount, `Location "remote" should fall back to location-text match`)
 	assert.Equal(t, "Product Designer", remote.Jobs[0].Title)
 
-	london, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{Location: "london"})
+	london, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{Location: "london"})
 	require.NoError(t, err)
 	require.Equal(t, 1, london.TotalCount, `Location "london" should fuzzy-match`)
 	assert.Equal(t, "Data Scientist", london.Jobs[0].Title)
@@ -97,7 +97,7 @@ func TestGreenhouseSearchLocation(t *testing.T) {
 
 func TestGreenhouseSearchFilterDepartment(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{
 		Filters: map[string][]string{"department": {"Engineering"}},
 	})
 	require.NoError(t, err)
@@ -106,7 +106,7 @@ func TestGreenhouseSearchFilterDepartment(t *testing.T) {
 
 func TestGreenhouseFilters(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	fs, err := a.Filters(t.Context(), _mockGreenhouseBoard)
+	fs, err := a.Filters(t.Context(), mockGreenhouseBoard)
 	require.NoError(t, err)
 	for _, key := range []string{"department", "office"} {
 		assert.NotEmptyf(t, fs[key], "FilterSet missing %q: %v", key, fs)
@@ -119,7 +119,7 @@ func TestGreenhouseFilters(t *testing.T) {
 // by the secondary one must still find it.
 func TestGreenhouseSearchFilterSecondaryDepartment(t *testing.T) {
 	a := testGreenhouseAdapter(t)
-	res, err := a.Search(t.Context(), _mockGreenhouseBoard, SearchParams{
+	res, err := a.Search(t.Context(), mockGreenhouseBoard, SearchParams{
 		Filters: map[string][]string{"department": {"Platform"}},
 	})
 	require.NoError(t, err)

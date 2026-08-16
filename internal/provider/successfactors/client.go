@@ -24,8 +24,8 @@ import (
 var ErrJobNotFound = errors.New("successfactors: job not found")
 
 const (
-	_searchPath = "/search/"
-	_facetsPath = "/services/jobs/options/facetValues/"
+	searchPath = "/search/"
+	facetsPath = "/services/jobs/options/facetValues/"
 )
 
 type Client struct {
@@ -105,7 +105,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 	if err != nil {
 		return nil, fmt.Errorf("parse base url %q: %w", c.baseURL, err)
 	}
-	u = u.JoinPath(_searchPath)
+	u = u.JoinPath(searchPath)
 
 	q := u.Query()
 	q.Set("q", req.Query)
@@ -160,7 +160,7 @@ func (c *Client) FacetValues(ctx context.Context, req *SearchRequest) (*FacetVal
 	if err != nil {
 		return nil, fmt.Errorf("parse base url %q: %w", c.baseURL, err)
 	}
-	u = u.JoinPath(_facetsPath)
+	u = u.JoinPath(facetsPath)
 	u.Path += "/"
 
 	bodyFields := map[string]string{
@@ -181,7 +181,7 @@ func (c *Client) FacetValues(ctx context.Context, req *SearchRequest) (*FacetVal
 	}
 	httpReq.Header.Set("Content-Type", "application/json")
 	httpReq.Header.Set("Accept", "application/json")
-	httpReq.Header.Set("User-Agent", _userAgent)
+	httpReq.Header.Set("User-Agent", userAgent)
 
 	resp, err := c.httpClient.Do(httpReq)
 	if err != nil {
@@ -199,14 +199,14 @@ func (c *Client) FacetValues(ctx context.Context, req *SearchRequest) (*FacetVal
 	return raw.toResponse(), nil
 }
 
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
 
 func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document, *url.URL, error) {
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
 	if err != nil {
 		return nil, nil, err
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	req.Header.Set("Accept-Language", "en-US,en;q=0.9")
 

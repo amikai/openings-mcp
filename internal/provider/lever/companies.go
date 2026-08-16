@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // Company is a confirmed Lever tenant from the curated
 // internal/provider/lever/companies.yaml. Site is the slug that namespaces
@@ -24,12 +24,12 @@ type Company struct {
 }
 
 // careersURLTpl formats a Lever job board page URL (e.g. "https://jobs.lever.co/leverdemo").
-const _careersURLTpl = "https://jobs.lever.co/%s"
+const careersURLTpl = "https://jobs.lever.co/%s"
 
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.lever.co/leverdemo. API calls instead pass Site directly.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.Site)
+	return fmt.Sprintf(careersURLTpl, c.Site)
 }
 
 // Companies holds every confirmed Lever tenant, sorted by company name.
@@ -44,7 +44,7 @@ var CompaniesBySite = buildSiteIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("lever: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })

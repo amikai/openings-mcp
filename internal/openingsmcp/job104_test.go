@@ -389,7 +389,7 @@ func TestJob104SalaryTypeLabels(t *testing.T) {
 		{0, ""},
 	}
 	for _, tc := range cases {
-		assert.Equal(t, tc.want, _job104SalaryTypeLabels[tc.s10], "s10=%d", tc.s10)
+		assert.Equal(t, tc.want, job104SalaryTypeLabels[tc.s10], "s10=%d", tc.s10)
 	}
 }
 

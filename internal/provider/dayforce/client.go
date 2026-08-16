@@ -12,7 +12,7 @@ import (
 // userAgent is sent on every request, including the SSR fetch in siteinfo.go
 // that ogen doesn't cover. Mirrored verbatim into every testdata/*.hurl req
 // so live replay matches this client.
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 // ErrCSRFRequired marks a search rejected because the CSRF cookie and
 // X-CSRF-TOKEN header did not both reach the server — a missing token, a
@@ -77,7 +77,7 @@ type userAgentTransport struct {
 
 func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req = req.Clone(req.Context())
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	return t.base.RoundTrip(req)
 }
 

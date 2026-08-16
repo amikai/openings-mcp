@@ -8,10 +8,10 @@ import (
 )
 
 //go:embed testdata/postings_rsp.json
-var _mockPostingsRsp []byte
+var mockPostingsRsp []byte
 
 //go:embed testdata/posting_detail_rsp.json
-var _mockPostingDetailRsp []byte
+var mockPostingDetailRsp []byte
 
 // MockNotFoundSite and MockNotFoundPostingID trigger the mock server's
 // error path so tests can exercise non-200 handling: listing
@@ -33,14 +33,14 @@ func NewMockServer() *httptest.Server {
 			serveMockError(w, http.StatusNotFound, "Document not found")
 			return
 		}
-		serveMockJSON(_mockPostingsRsp)(w, r)
+		serveMockJSON(mockPostingsRsp)(w, r)
 	})
 	mux.HandleFunc("/v0/postings/{site}/{postingId}", func(w http.ResponseWriter, r *http.Request) {
 		if r.PathValue("postingId") == MockNotFoundPostingID {
 			serveMockError(w, http.StatusNotFound, "Document not found")
 			return
 		}
-		serveMockJSON(_mockPostingDetailRsp)(w, r)
+		serveMockJSON(mockPostingDetailRsp)(w, r)
 	})
 	return httptest.NewServer(mux)
 }

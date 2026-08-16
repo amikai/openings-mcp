@@ -41,31 +41,31 @@ const (
 const MockCompaniesTotal = "1031581"
 
 //go:embed testdata/board_rsp.html
-var _mockBoardRsp []byte
+var mockBoardRsp []byte
 
 //go:embed testdata/board_cap_rsp.html
-var _mockBoardCapRsp []byte
+var mockBoardCapRsp []byte
 
 //go:embed testdata/board_minimal_rsp.html
-var _mockBoardMinimalRsp []byte
+var mockBoardMinimalRsp []byte
 
 //go:embed testdata/board_not_found_rsp.html
-var _mockBoardNotFoundRsp []byte
+var mockBoardNotFoundRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_no_jsonld_rsp.html
-var _mockJobDetailNoJSONLDRsp []byte
+var mockJobDetailNoJSONLDRsp []byte
 
 //go:embed testdata/job_not_found_rsp.html
-var _mockJobNotFoundRsp []byte
+var mockJobNotFoundRsp []byte
 
 //go:embed testdata/companies_rsp.json
-var _mockCompaniesRsp []byte
+var mockCompaniesRsp []byte
 
 //go:embed testdata/companies_page2_rsp.json
-var _mockCompaniesPage2Rsp []byte
+var mockCompaniesPage2Rsp []byte
 
 // NewMockServer returns an httptest.Server replaying captured en-gage.net
 // responses, so tests never hit the live host. The caller owns the server
@@ -73,27 +73,27 @@ var _mockCompaniesPage2Rsp []byte
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/"+MockSlug+"/", serveHTML(http.StatusOK, _mockBoardRsp))
-	mux.HandleFunc("/"+MockCapSlug+"/", serveHTML(http.StatusOK, _mockBoardCapRsp))
-	mux.HandleFunc("/"+MockMinimalSlug+"/", serveHTML(http.StatusOK, _mockBoardMinimalRsp))
-	mux.HandleFunc("/"+MockUnknownSlug+"/", serveHTML(http.StatusNotFound, _mockBoardNotFoundRsp))
+	mux.HandleFunc("/"+MockSlug+"/", serveHTML(http.StatusOK, mockBoardRsp))
+	mux.HandleFunc("/"+MockCapSlug+"/", serveHTML(http.StatusOK, mockBoardCapRsp))
+	mux.HandleFunc("/"+MockMinimalSlug+"/", serveHTML(http.StatusOK, mockBoardMinimalRsp))
+	mux.HandleFunc("/"+MockUnknownSlug+"/", serveHTML(http.StatusNotFound, mockBoardNotFoundRsp))
 
-	mux.HandleFunc("/"+MockSlug+"/work_"+MockWorkID+"/", serveHTML(http.StatusOK, _mockJobDetailRsp))
-	mux.HandleFunc("/"+MockSlug+"/work_"+MockUnknownWorkID+"/", serveHTML(http.StatusNotFound, _mockJobNotFoundRsp))
-	mux.HandleFunc("/"+MockNoJSONLDSlug+"/work_"+MockNoJSONLDWorkID+"/", serveHTML(http.StatusOK, _mockJobDetailNoJSONLDRsp))
+	mux.HandleFunc("/"+MockSlug+"/work_"+MockWorkID+"/", serveHTML(http.StatusOK, mockJobDetailRsp))
+	mux.HandleFunc("/"+MockSlug+"/work_"+MockUnknownWorkID+"/", serveHTML(http.StatusNotFound, mockJobNotFoundRsp))
+	mux.HandleFunc("/"+MockNoJSONLDSlug+"/work_"+MockNoJSONLDWorkID+"/", serveHTML(http.StatusOK, mockJobDetailNoJSONLDRsp))
 
 	mux.HandleFunc("/user/api/search/result_work_list/", func(w http.ResponseWriter, r *http.Request) {
 		q := r.URL.Query()
 		switch {
 		case q.Get("page") == "2" && q.Get("p_t") == MockCompaniesTotal:
-			serveJSON(http.StatusOK, _mockCompaniesPage2Rsp)(w, r)
+			serveJSON(http.StatusOK, mockCompaniesPage2Rsp)(w, r)
 		case q.Get("page") == "2":
 			// Live behavior for a page-2 request missing the correct p_t:
 			// a stateless error, not a 4xx.
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			_, _ = w.Write([]byte(`{"result":"error","error_message":"","searchResult":[]}`))
 		default:
-			serveJSON(http.StatusOK, _mockCompaniesRsp)(w, r)
+			serveJSON(http.StatusOK, mockCompaniesRsp)(w, r)
 		}
 	})
 

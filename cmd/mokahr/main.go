@@ -22,7 +22,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/mokahr"
 )
 
-const _formatJSON = "json"
+const formatJSON = "json"
 
 func main() {
 	os.Exit(run())
@@ -184,7 +184,7 @@ func resolveCompany(company string) (mokahr.Company, error) {
 // (internal/provider/mokahr/companies.yaml), sorted by company name. It
 // makes no network call.
 func runCompanies(format string) error {
-	if format == _formatJSON {
+	if format == formatJSON {
 		return writeJSON(mokahr.Companies)
 	}
 	for _, c := range mokahr.Companies {
@@ -315,7 +315,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	}
 	total := res.JobStats.Value.Total.Or(len(jobs))
 
-	if f.format == _formatJSON {
+	if f.format == formatJSON {
 		return writeJSON(searchResultJSON{Total: total, Jobs: jobs})
 	}
 
@@ -369,7 +369,7 @@ func runGet(ctx context.Context, f getFlags) error {
 // printDetail renders one full posting. JSON mode encodes the generated
 // JobDetail as-is — detail is for seeing the whole record.
 func printDetail(d *mokahr.JobDetail, c mokahr.Company, format string) error {
-	if format == _formatJSON {
+	if format == formatJSON {
 		return writeJSON(d)
 	}
 
@@ -437,7 +437,7 @@ func runFilters(ctx context.Context, f filtersFlags) error {
 		return err
 	}
 
-	if f.format == _formatJSON {
+	if f.format == formatJSON {
 		return writeJSON(aggs)
 	}
 

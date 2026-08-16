@@ -7,19 +7,19 @@ import (
 )
 
 //go:embed testdata/search_rsp.json
-var _mockSearchRsp []byte
+var mockSearchRsp []byte
 
 //go:embed testdata/search_query_page_rsp.json
-var _mockSearchQueryPageRsp []byte
+var mockSearchQueryPageRsp []byte
 
 //go:embed testdata/search_no_results_rsp.json
-var _mockSearchNoResultsRsp []byte
+var mockSearchNoResultsRsp []byte
 
 //go:embed testdata/search_invalid_category_rsp.json
-var _mockSearchInvalidCategoryRsp []byte
+var mockSearchInvalidCategoryRsp []byte
 
 //go:embed testdata/search_page_out_of_range_rsp.json
-var _mockSearchPageOutOfRangeRsp []byte
+var mockSearchPageOutOfRangeRsp []byte
 
 // NewMockServer returns an httptest.Server replaying canned
 // RemoteFirstJobs API fixture responses, so tests never hit the live
@@ -36,16 +36,16 @@ func NewMockServer() *httptest.Server {
 		switch {
 		case q.Get("category") == "doesnotexist":
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(_mockSearchInvalidCategoryRsp)
+			w.Write(mockSearchInvalidCategoryRsp)
 		case q.Get("page") == "5":
 			w.WriteHeader(http.StatusBadRequest)
-			w.Write(_mockSearchPageOutOfRangeRsp)
+			w.Write(mockSearchPageOutOfRangeRsp)
 		case q.Get("query") == "zzzzqqqqxxxx":
-			w.Write(_mockSearchNoResultsRsp)
+			w.Write(mockSearchNoResultsRsp)
 		case q.Get("query") == "golang" && q.Get("page") == "1":
-			w.Write(_mockSearchQueryPageRsp)
+			w.Write(mockSearchQueryPageRsp)
 		default:
-			w.Write(_mockSearchRsp)
+			w.Write(mockSearchRsp)
 		}
 	})
 	return httptest.NewServer(mux)

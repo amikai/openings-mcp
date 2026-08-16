@@ -66,7 +66,7 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const _serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
 
 Tool selection:
 - When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) when the company isn't covered.
@@ -88,7 +88,7 @@ Context management:
 // OPENINGS_MCP_LOG_LEVEL, and so on. An explicit flag wins over the
 // environment, and a value the flag's type can't parse is a startup error
 // rather than a silent fallback to the default.
-const _envVarPrefix = "OPENINGS_MCP"
+const envVarPrefix = "OPENINGS_MCP"
 
 func main() {
 	os.Exit(run())
@@ -105,11 +105,11 @@ func run() int {
 		versionFlag          = fs.BoolLong("version", "print version information and exit")
 		dumpCacheTTL         = fs.DurationLong("dump-cache-ttl", ats.DefaultDumpCacheTTL, "TTL for full-board dump cache; <=0 disables the cache")
 	)
-	serveHTTP := &httpFlag{addr: _defaultHTTPAddr}
+	serveHTTP := &httpFlag{addr: defaultHTTPAddr}
 	if _, err := fs.AddFlag(ff.FlagConfig{
 		LongName:      "http",
 		Value:         serveHTTP,
-		Usage:         "serve streamable HTTP instead of stdio, on " + _defaultHTTPAddr + "; --http=ADDR picks another address",
+		Usage:         "serve streamable HTTP instead of stdio, on " + defaultHTTPAddr + "; --http=ADDR picks another address",
 		NoPlaceholder: true,
 	}); err != nil {
 		fmt.Fprintln(os.Stderr, "err:", err)
@@ -121,7 +121,7 @@ func run() int {
 		ShortHelp: "MCP server exposing job-search tools for job boards and company careers sites",
 		Flags:     fs,
 	}
-	if err := cmd.Parse(os.Args[1:], ff.WithEnvVarPrefix(_envVarPrefix)); err != nil {
+	if err := cmd.Parse(os.Args[1:], ff.WithEnvVarPrefix(envVarPrefix)); err != nil {
 		fmt.Fprintln(os.Stderr, ffhelp.Command(cmd))
 		if errors.Is(err, ff.ErrHelp) {
 			return 0
@@ -206,7 +206,7 @@ func runStdio(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpC
 }
 
 // defaultHTTPAddr is where --http listens when given no address of its own.
-const _defaultHTTPAddr = ":8080"
+const defaultHTTPAddr = ":8080"
 
 // httpFlag backs --http, which reads as a bool that carries an optional
 // address: plain --http listens on defaultHTTPAddr, --http=:9000 on :9000,
@@ -240,10 +240,10 @@ func (f *httpFlag) String() string {
 // empty address would start a listener nobody asked for.
 func (f *httpFlag) Set(value string) error {
 	if value == "" {
-		return errors.New(`empty value: use --http for ` + _defaultHTTPAddr + `, or --http=ADDR`)
+		return errors.New(`empty value: use --http for ` + defaultHTTPAddr + `, or --http=ADDR`)
 	}
 	if enabled, err := strconv.ParseBool(value); err == nil {
-		f.enabled, f.addr = enabled, _defaultHTTPAddr
+		f.enabled, f.addr = enabled, defaultHTTPAddr
 		return nil
 	}
 	f.enabled, f.addr = true, value
@@ -460,7 +460,7 @@ type providerClients struct {
 func newServer(clients *providerClients, registry *ats.Registry, logger *slog.Logger) *mcp.Server {
 	server := mcp.NewServer(
 		&mcp.Implementation{Name: "openings-mcp", Version: version},
-		&mcp.ServerOptions{Instructions: _serverInstructions, Logger: logger},
+		&mcp.ServerOptions{Instructions: serverInstructions, Logger: logger},
 	)
 	server.AddReceivingMiddleware(logging.LoggingMiddleware(logger))
 	// Registered last so it wraps outermost, catching panics from tool

@@ -28,7 +28,7 @@ import (
 
 // apiBaseURL is the single production server in the provider's
 // openapi.yaml (paths carry the /remote-jobs prefix).
-const _apiBaseURL = "https://remotive.com/api"
+const apiBaseURL = "https://remotive.com/api"
 
 func main() {
 	os.Exit(run())
@@ -37,7 +37,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("remotive")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _apiBaseURL, "Remotive API base URL")
+		baseURL = rootFlags.StringLong("base-url", apiBaseURL, "Remotive API base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

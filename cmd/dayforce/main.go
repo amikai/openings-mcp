@@ -20,11 +20,11 @@ import (
 
 // apiBaseURL is the Dayforce candidate portal origin — the single server
 // in the provider's openapi.yaml.
-const _apiBaseURL = "https://jobs.dayforcehcm.com"
+const apiBaseURL = "https://jobs.dayforcehcm.com"
 
 // pageSize is the fixed upstream page size; --page is converted to
 // paginationStart against this constant.
-const _pageSize = 25
+const pageSize = 25
 
 func main() {
 	os.Exit(run())
@@ -219,7 +219,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := dayforce.NewBoardClient(_apiBaseURL, nil)
+	client, err := dayforce.NewBoardClient(apiBaseURL, nil)
 	if err != nil {
 		return err
 	}
@@ -228,7 +228,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 		ClientNamespace: company.Namespace,
 		JobBoardCode:    company.JobBoardCode,
 		CultureCode:     company.Culture(),
-		PaginationStart: dayforce.NewOptInt((f.page - 1) * _pageSize),
+		PaginationStart: dayforce.NewOptInt((f.page - 1) * pageSize),
 	}
 	if f.keyword != "" {
 		req.SearchText = dayforce.NewOptString(f.keyword)
@@ -289,7 +289,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := dayforce.NewBoardClient(_apiBaseURL, nil)
+	client, err := dayforce.NewBoardClient(apiBaseURL, nil)
 	if err != nil {
 		return err
 	}

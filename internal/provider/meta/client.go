@@ -10,22 +10,22 @@ import (
 	"strings"
 )
 
-const _graphqlPath = "/graphql"
+const graphqlPath = "/graphql"
 
 // Persisted-query document IDs; see doc.go for how to re-derive them when
 // Meta redeploys the site.
 const (
-	_searchDocID    = "27506805582236862" // CareersJobSearchResultsDataQuery
-	_detailDocID    = "27371134039243725" // CandidatePortalJobDetailsViewQuery
-	_filtersDocID   = "25103492705924273" // CareersJobSearchFiltersV3Query
-	_locationsDocID = "24867916029505828" // CareersJobSearchLocationFilterV3Query
+	searchDocID    = "27506805582236862" // CareersJobSearchResultsDataQuery
+	detailDocID    = "27371134039243725" // CandidatePortalJobDetailsViewQuery
+	filtersDocID   = "25103492705924273" // CareersJobSearchFiltersV3Query
+	locationsDocID = "24867916029505828" // CareersJobSearchLocationFilterV3Query
 )
 
 // lsdToken satisfies the endpoint's presence-only anti-CSRF check; the value
 // itself is never validated for logged-out requests (see doc.go).
-const _lsdToken = "openings-mcp"
+const lsdToken = "openings-mcp"
 
-const _userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
 
 // ErrJobNotFound marks a requisition ID with no active public posting.
 var ErrJobNotFound = errors.New("meta: job not found")
@@ -159,7 +159,7 @@ func JobURL(id string) string {
 func (c *Client) SearchJobs(ctx context.Context, r SearchRequest) (*SearchResponse, error) {
 	variables := searchVariables(r)
 	var data searchData
-	if err := c.graphql(ctx, _searchDocID, variables, &data); err != nil {
+	if err := c.graphql(ctx, searchDocID, variables, &data); err != nil {
 		return nil, fmt.Errorf("search jobs: %w", err)
 	}
 	if data.JobSearch == nil {
@@ -176,14 +176,14 @@ func (c *Client) SearchJobs(ctx context.Context, r SearchRequest) (*SearchRespon
 // them from.
 func (c *Client) SearchFilters(ctx context.Context) (*SearchFilters, error) {
 	var filters filtersData
-	if err := c.graphql(ctx, _filtersDocID, make(map[string]any), &filters); err != nil {
+	if err := c.graphql(ctx, filtersDocID, make(map[string]any), &filters); err != nil {
 		return nil, fmt.Errorf("search filters: %w", err)
 	}
 	if filters.Filters == nil {
 		return nil, errors.New("search filters: response has no job_search_filters")
 	}
 	var locations locationsData
-	if err := c.graphql(ctx, _locationsDocID, make(map[string]any), &locations); err != nil {
+	if err := c.graphql(ctx, locationsDocID, make(map[string]any), &locations); err != nil {
 		return nil, fmt.Errorf("search filters: %w", err)
 	}
 	if locations.Filters == nil {
@@ -213,7 +213,7 @@ func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetail, error
 		"viewasUserID":       nil,
 	}
 	var data detailData
-	if err := c.graphql(ctx, _detailDocID, variables, &data); err != nil {
+	if err := c.graphql(ctx, detailDocID, variables, &data); err != nil {
 		return nil, fmt.Errorf("job detail %q: %w", jobID, err)
 	}
 	if data.Description == nil {
@@ -272,17 +272,17 @@ func (c *Client) graphql(ctx context.Context, docID string, variables any, out a
 		return fmt.Errorf("marshal variables: %w", err)
 	}
 	form := url.Values{
-		"lsd":       {_lsdToken},
+		"lsd":       {lsdToken},
 		"variables": {string(variablesJSON)},
 		"doc_id":    {docID},
 	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+_graphqlPath, strings.NewReader(form.Encode()))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, c.baseURL+graphqlPath, strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
-	req.Header.Set("User-Agent", _userAgent)
+	req.Header.Set("User-Agent", userAgent)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Set("X-FB-LSD", _lsdToken)
+	req.Header.Set("X-FB-LSD", lsdToken)
 	req.Header.Set("Origin", c.baseURL)
 	req.Header.Set("Referer", c.baseURL+"/jobsearch/")
 	req.Header.Set("Sec-Fetch-Dest", "empty")

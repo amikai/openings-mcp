@@ -15,7 +15,7 @@ const DefaultBaseURL = "https://app.mokahr.com"
 // names only, and picking one explicitly is what keeps the job endpoints and
 // the filter endpoint from disagreeing: with no locale, jobs come back with
 // Chinese place names while the aggregations come back with English ones.
-const _defaultLocale = "en-US"
+const defaultLocale = "en-US"
 
 // Error codes MokaHR returns inside an HTTP 200 body. There is no status-code
 // signal at all, so callers distinguish outcomes on these.
@@ -65,7 +65,7 @@ func NewJobsClient(baseURL string, hc *http.Client) (*JobsClient, error) {
 // description. Set NeedStat to learn the board's total size.
 func (c *JobsClient) ListJobs(ctx context.Context, req ListJobsRequest) (*JobList, error) {
 	if !req.Locale.IsSet() {
-		req.Locale = NewOptString(_defaultLocale)
+		req.Locale = NewOptString(defaultLocale)
 	}
 	rsp, err := c.api.ListJobs(ctx, &req)
 	if err != nil {
@@ -85,7 +85,7 @@ func (c *JobsClient) ListJobs(ctx context.Context, req ListJobsRequest) (*JobLis
 // its department and employment type.
 func (c *JobsClient) GetJob(ctx context.Context, req GetJobRequest) (*JobDetail, error) {
 	if !req.Locale.IsSet() {
-		req.Locale = NewOptString(_defaultLocale)
+		req.Locale = NewOptString(defaultLocale)
 	}
 	rsp, err := c.api.GetJob(ctx, &req)
 	if err != nil {
@@ -106,7 +106,7 @@ func (c *JobsClient) GetJob(ctx context.Context, req GetJobRequest) (*JobDetail,
 // [JobsClient.ListJobs] accepts.
 func (c *JobsClient) ListFilterAggregations(ctx context.Context, req SiteRef) (*FilterAggregations, error) {
 	if !req.Locale.IsSet() {
-		req.Locale = NewOptString(_defaultLocale)
+		req.Locale = NewOptString(defaultLocale)
 	}
 	rsp, err := c.api.ListFilterAggregations(ctx, &req)
 	if err != nil {

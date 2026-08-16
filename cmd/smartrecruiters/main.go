@@ -19,7 +19,7 @@ import (
 // apiBaseURL is SmartRecruiters' public Posting API origin — the single
 // production server in the provider's openapi.yaml (paths carry the /v1
 // prefix).
-const _apiBaseURL = "https://api.smartrecruiters.com"
+const apiBaseURL = "https://api.smartrecruiters.com"
 
 func main() {
 	os.Exit(run())
@@ -244,7 +244,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := smartrecruiters.NewClient(_apiBaseURL)
+	client, err := smartrecruiters.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -319,7 +319,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := smartrecruiters.NewClient(_apiBaseURL)
+	client, err := smartrecruiters.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

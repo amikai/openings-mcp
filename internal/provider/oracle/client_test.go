@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	_searchFields = "TotalJobsCount,Limit,Offset;" +
+	searchFields = "TotalJobsCount,Limit,Offset;" +
 		"requisitionList:Id,Title,PostedDate,PrimaryLocation,WorkplaceType,WorkplaceTypeCode;" +
 		"requisitionList.secondaryLocations:Name;" +
 		"titlesFacet:Id,Name,TotalCount;locationsFacet:Id,Name,TotalCount;" +
 		"categoriesFacet:Id,Name,TotalCount;postingDatesFacet:Id,Name,TotalCount;" +
 		"workLocationsFacet:Id,Name,TotalCount;organizationsFacet:Id,Name,TotalCount;" +
 		"workplaceTypesFacet:Id,Name,TotalCount"
-	_detailFields = "Id,Title,ExternalPostedStartDate,PrimaryLocation,WorkplaceType," +
+	detailFields = "Id,Title,ExternalPostedStartDate,PrimaryLocation,WorkplaceType," +
 		"ExternalDescriptionStr,CorporateDescriptionStr,ExternalResponsibilitiesStr," +
 		"ExternalQualificationsStr;secondaryLocations:Name"
 )
@@ -130,7 +130,7 @@ func newTestClient(t *testing.T) *Client {
 func searchParams(finder string) SearchJobsParams {
 	return SearchJobsParams{
 		OnlyData:       SearchJobsOnlyDataTrue,
-		Fields:         NewOptString(_searchFields),
+		Fields:         NewOptString(searchFields),
 		Finder:         finder,
 		AcceptLanguage: NewOptString("en"),
 		OraIrcLanguage: NewOptString("en"),
@@ -140,7 +140,7 @@ func searchParams(finder string) SearchJobsParams {
 func detailParams(finder string) GetJobDetailParams {
 	return GetJobDetailParams{
 		OnlyData:       GetJobDetailOnlyDataTrue,
-		Fields:         NewOptString(_detailFields),
+		Fields:         NewOptString(detailFields),
 		Finder:         finder,
 		AcceptLanguage: NewOptString("en"),
 		OraIrcLanguage: NewOptString("en"),

@@ -19,7 +19,7 @@ var _ Adapter = (*AvatureAdapter)(nil)
 
 // avatureLocaleSegmentRE matches a portal locale path segment such as
 // "en_US"; careers URLs may carry one before the portal name.
-var _avatureLocaleSegmentRE = regexp.MustCompile(`^[a-z]{2}_[A-Z]{2}$`)
+var avatureLocaleSegmentRE = regexp.MustCompile(`^[a-z]{2}_[A-Z]{2}$`)
 
 // AvatureAdapter serves public Avature career portals. Search and detail
 // are server-rendered HTML (see internal/provider/avature/doc.go). Roster
@@ -34,12 +34,12 @@ type AvatureAdapter struct {
 }
 
 // avatureBaseURLTpl formats a portal slug/host into a base URL (e.g. "https://bloomberg.avature.net/careers").
-const _avatureBaseURLTpl = "https://%s"
+const avatureBaseURLTpl = "https://%s"
 
 func NewAvatureAdapter(hc *http.Client) *AvatureAdapter {
 	return &AvatureAdapter{
 		hc:      hc,
-		baseURL: func(slug string) string { return fmt.Sprintf(_avatureBaseURLTpl, slug) },
+		baseURL: func(slug string) string { return fmt.Sprintf(avatureBaseURLTpl, slug) },
 	}
 }
 
@@ -60,7 +60,7 @@ func (a *AvatureAdapter) Roster() []CompanyInfo {
 func (a *AvatureAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
 	segs := strings.Split(strings.Trim(u.EscapedPath(), "/"), "/")
-	if len(segs) > 0 && _avatureLocaleSegmentRE.MatchString(segs[0]) {
+	if len(segs) > 0 && avatureLocaleSegmentRE.MatchString(segs[0]) {
 		segs = segs[1:]
 	}
 	if len(segs) == 0 || segs[0] == "" {
@@ -110,10 +110,10 @@ func (a *AvatureAdapter) Search(ctx context.Context, slug string, p SearchParams
 	pageIndex := page - 1
 	// Page is user-controlled with no schema maximum; reject values that
 	// would overflow the start offset (same guard as the Workday adapter).
-	if pageIndex > math.MaxInt/_pageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("avature: page %d is too large; retry with a smaller page", page)
 	}
-	start := pageIndex * _pageSize
+	start := pageIndex * pageSize
 
 	client := avature.NewClient(base, a.hc)
 	query := strings.TrimSpace(p.Query)
@@ -144,7 +144,7 @@ func (a *AvatureAdapter) Search(ctx context.Context, slug string, p SearchParams
 		}
 		// fresh == 0 also breaks on a portal that ignored jobOffset and
 		// replayed the same page — repeating the request cannot progress.
-		if fresh == 0 || !res.HasNext || len(collected) >= _pageSize {
+		if fresh == 0 || !res.HasNext || len(collected) >= pageSize {
 			break
 		}
 	}
@@ -160,8 +160,8 @@ func (a *AvatureAdapter) Search(ctx context.Context, slug string, p SearchParams
 	}
 
 	jobs := collected
-	if len(jobs) > _pageSize {
-		jobs = jobs[:_pageSize]
+	if len(jobs) > pageSize {
+		jobs = jobs[:pageSize]
 	}
 	summaries := make([]JobSummary, 0, len(jobs))
 	for _, j := range jobs {

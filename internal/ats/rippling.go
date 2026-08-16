@@ -32,7 +32,7 @@ var _ Adapter = (*RipplingAdapter)(nil)
 // Examples (hostname + escaped path):
 //   - ats.rippling.com/pythian/jobs
 //   - ats.rippling.com/boom-supersonic/jobs/144f31c4-...
-var _ripplingCareersURLRE = regexp.MustCompile(
+var ripplingCareersURLRE = regexp.MustCompile(
 	`(?i)^ats\.rippling\.com/(?P<slug>[^/]+)`,
 )
 
@@ -58,7 +58,7 @@ func (a *RipplingAdapter) Roster() []CompanyInfo {
 // segment is the board slug. Rippling mints lowercase slugs and its API is
 // case-sensitive, so the captured segment is lowercased before use.
 func (a *RipplingAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(_ripplingCareersURLRE, u)
+	slug, ok := matchCareersSlug(ripplingCareersURLRE, u)
 	return strings.ToLower(slug), ok
 }
 

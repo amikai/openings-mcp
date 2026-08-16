@@ -21,10 +21,10 @@ const (
 	// NoDesk's Algolia application ID and search-only API key. Both are
 	// public: they ship in the site's own /js/search.min.js. The key only
 	// works with a nodesk.co Referer header (see the package doc).
-	_algoliaAppID  = "0586L1SOK8"
-	_algoliaAPIKey = "8dacb58c6f375cba28e19ecf1f03e9e1"
+	algoliaAppID  = "0586L1SOK8"
+	algoliaAPIKey = "8dacb58c6f375cba28e19ecf1f03e9e1"
 
-	_refererValue = "https://nodesk.co/"
+	refererValue = "https://nodesk.co/"
 )
 
 // MaxHitsPerPage is the largest page size the index actually honors;
@@ -195,9 +195,9 @@ func (c *Client) query(ctx context.Context, params url.Values, out *searchRespon
 		return err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Algolia-Application-Id", _algoliaAppID)
-	req.Header.Set("X-Algolia-API-Key", _algoliaAPIKey)
-	req.Header.Set("Referer", _refererValue)
+	req.Header.Set("X-Algolia-Application-Id", algoliaAppID)
+	req.Header.Set("X-Algolia-API-Key", algoliaAPIKey)
+	req.Header.Set("Referer", refererValue)
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {

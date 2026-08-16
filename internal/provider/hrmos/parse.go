@@ -16,7 +16,7 @@ import (
 
 // pgCountPattern extracts the true total from p.pg-count's
 // "全 N 件中 M 件 を表示しています" text (fact 3).
-var _pgCountPattern = regexp.MustCompile(`全\s*(\d+)\s*件中`)
+var pgCountPattern = regexp.MustCompile(`全\s*(\d+)\s*件中`)
 
 // parseJobsHTML parses one jobs-listing page. A past-the-end page (fact 14)
 // has zero cassettes and no p.pg-count, which is not an error: Total comes
@@ -26,7 +26,7 @@ func parseJobsHTML(doc *goquery.Document) (*JobsResponse, error) {
 	resp := &JobsResponse{MaxPage: 1}
 
 	if countText := doc.Find("p.pg-count").First().Text(); countText != "" {
-		m := _pgCountPattern.FindStringSubmatch(countText)
+		m := pgCountPattern.FindStringSubmatch(countText)
 		if m == nil {
 			return nil, fmt.Errorf("unrecognized search response: pg-count text %q has no total", strings.TrimSpace(countText))
 		}
@@ -53,7 +53,7 @@ func parseJobsHTML(doc *goquery.Document) (*JobsResponse, error) {
 
 // jobIDFromHrefPattern captures the trailing job id segment of a cassette
 // or detail-page href: https://hrmos.co/pages/{slug}/jobs/{id}.
-var _jobIDFromHrefPattern = regexp.MustCompile(`/pages/[^/]+/jobs/([^/?#]+)$`)
+var jobIDFromHrefPattern = regexp.MustCompile(`/pages/[^/]+/jobs/([^/?#]+)$`)
 
 // parseJobCassette extracts one li.pg-list-cassette. An empty job ID or an
 // href that doesn't match the /pages/{slug}/jobs/{id} shape is a selector-
@@ -66,7 +66,7 @@ func parseJobCassette(li *goquery.Selection) (Job, error) {
 		return Job{}, errors.New("job cassette has no link")
 	}
 	job.URL = href
-	m := _jobIDFromHrefPattern.FindStringSubmatch(href)
+	m := jobIDFromHrefPattern.FindStringSubmatch(href)
 	if m == nil || m[1] == "" {
 		return Job{}, fmt.Errorf("job cassette href %q does not match /pages/{slug}/jobs/{id}", href)
 	}
@@ -88,7 +88,7 @@ func parseJobCassette(li *goquery.Selection) (Job, error) {
 
 // facetAllValues are the data-attribute values HRMOS uses for its "すべて"
 // (show all) pseudo-option, which is UI chrome, not a real facet value.
-const _facetAllValue = "ALL"
+const facetAllValue = "ALL"
 
 // parseFacetGroups reads nav.sg-job-filters: one FacetGroup per <tr> that
 // carries a <th> label (fact 4). A tenant may define none — nav.sg-job-
@@ -102,10 +102,10 @@ func parseFacetGroups(doc *goquery.Document) []FacetGroup {
 		}
 		group := FacetGroup{Label: strings.TrimSpace(th.Text())}
 		for _, a := range tr.Find("a.jsc-jobType-trigger, a.jsc-jobCategory-trigger").EachIter() {
-			if v, ok := a.Attr("data-job-type"); ok && v == _facetAllValue {
+			if v, ok := a.Attr("data-job-type"); ok && v == facetAllValue {
 				continue
 			}
-			if v, ok := a.Attr("data-job-category"); ok && v == _facetAllValue {
+			if v, ok := a.Attr("data-job-category"); ok && v == facetAllValue {
 				continue
 			}
 			group.Options = append(group.Options, strings.TrimSpace(a.Text()))
@@ -305,7 +305,7 @@ func fillDetailFromMarkup(doc *goquery.Document, detail *JobDetailResponse) {
 			continue
 		}
 		var loc Location
-		if m := _postalCodePattern.FindStringSubmatch(text); m != nil {
+		if m := postalCodePattern.FindStringSubmatch(text); m != nil {
 			loc.PostalCode = m[1]
 			text = normalizeSpace(strings.Replace(text, m[0], "", 1))
 		}
@@ -316,7 +316,7 @@ func fillDetailFromMarkup(doc *goquery.Document, detail *JobDetailResponse) {
 
 // postalCodePattern matches a Japanese postal code as it appears at the head
 // of a pg-descriptions 勤務地 entry, e.g. "106-0041 東京都港区...".
-var _postalCodePattern = regexp.MustCompile(`(\d{3}-\d{4})`)
+var postalCodePattern = regexp.MustCompile(`(\d{3}-\d{4})`)
 
 // lookupKV returns the value of the first pair with the given key.
 func lookupKV(pairs []KV, key string) string {
@@ -349,13 +349,13 @@ func parseDescriptionTable(section *goquery.Selection) []KV {
 	return kvs
 }
 
-var _whitespaceRunPattern = regexp.MustCompile(`[ \t]*\n[ \t]*`)
+var whitespaceRunPattern = regexp.MustCompile(`[ \t]*\n[ \t]*`)
 
 // collapseWhitespace trims leading/trailing space on every line of a
 // flattened <td>'s text without discarding the newlines pre-formatted
 // content (<pre> blocks) relies on for structure.
 func collapseWhitespace(s string) string {
-	return _whitespaceRunPattern.ReplaceAllString(strings.TrimSpace(s), "\n")
+	return whitespaceRunPattern.ReplaceAllString(strings.TrimSpace(s), "\n")
 }
 
 // htmlToText flattens an HTML-valued JSON-LD field to plain text: block
@@ -377,10 +377,10 @@ func htmlToText(s string) string {
 	for _, n := range nodes {
 		appendNodeText(&sb, n)
 	}
-	return strings.TrimSpace(_blankLinePattern.ReplaceAllString(sb.String(), "\n\n"))
+	return strings.TrimSpace(blankLinePattern.ReplaceAllString(sb.String(), "\n\n"))
 }
 
-var _blankLinePattern = regexp.MustCompile(`\n{3,}`)
+var blankLinePattern = regexp.MustCompile(`\n{3,}`)
 
 // appendNodeText flattens a node's text, inserting newlines around
 // block-level elements so a rich-text field reads as plain text.

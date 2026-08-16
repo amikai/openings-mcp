@@ -12,15 +12,15 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // hostRE matches the two UltiPro hosts observed in live traffic
 // (recruiting.ultipro.com, recruiting2.ultipro.com); an optional trailing
 // digit tolerates further numbered hosts UKG may add.
-var _hostRE = regexp.MustCompile(`^recruiting\d*\.ultipro\.com$`)
+var hostRE = regexp.MustCompile(`^recruiting\d*\.ultipro\.com$`)
 
 // boardIDRE matches a lowercase GUID, the observed board-id shape.
-var _boardIDRE = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
+var boardIDRE = regexp.MustCompile(`^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$`)
 
 // Company is a confirmed UltiPro tenant board. Host varies per tenant
 // (recruiting.ultipro.com vs recruiting2.ultipro.com, verified live — see
@@ -36,21 +36,21 @@ type Company struct {
 // careersURLTpl formats an UltiPro job board page URL.
 // Parameters: 1: Host (e.g. "recruiting.ultipro.com"), 2: CompanyCode (e.g. "TEC1006TESER"), 3: BoardID (e.g. "guid").
 // Example: "https://recruiting.ultipro.com/TEC1006TESER/JobBoard/guid/"
-const _careersURLTpl = "https://%s/%s/JobBoard/%s/"
+const careersURLTpl = "https://%s/%s/JobBoard/%s/"
 
 // baseURLTpl formats an UltiPro job board API base URL.
 // Parameters: 1: Host (e.g. "recruiting.ultipro.com"), 2: CompanyCode (e.g. "TEC1006TESER"), 3: BoardID (e.g. "guid").
 // Example: "https://recruiting.ultipro.com/TEC1006TESER/JobBoard/guid"
-const _baseURLTpl = "https://%s/%s/JobBoard/%s"
+const baseURLTpl = "https://%s/%s/JobBoard/%s"
 
 // CareersURL returns the company's human-facing job board page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.Host, c.CompanyCode, c.BoardID)
+	return fmt.Sprintf(careersURLTpl, c.Host, c.CompanyCode, c.BoardID)
 }
 
 // BaseURL returns the board's API base URL, for [NewClient].
 func (c Company) BaseURL() string {
-	return fmt.Sprintf(_baseURLTpl, c.Host, c.CompanyCode, c.BoardID)
+	return fmt.Sprintf(baseURLTpl, c.Host, c.CompanyCode, c.BoardID)
 }
 
 // Companies holds every confirmed UltiPro board, sorted by company name.
@@ -60,7 +60,7 @@ var Companies = mustLoadCompanies()
 var CompaniesByCode = buildCodeIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(_companiesYAML)
+	cs, err := loadCompanies(companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("ultipro: load companies.yaml: %v", err))
 	}
@@ -100,13 +100,13 @@ func validateCompany(c Company) error {
 		return errors.New("company name is required")
 	case c.Host == "":
 		return fmt.Errorf("company %q: host is required", c.Name)
-	case !_hostRE.MatchString(c.Host):
+	case !hostRE.MatchString(c.Host):
 		return fmt.Errorf("company %q: host %q must match recruiting<N>.ultipro.com", c.Name, c.Host)
 	case c.CompanyCode == "":
 		return fmt.Errorf("company %q: company_code is required", c.Name)
 	case c.BoardID == "":
 		return fmt.Errorf("company %q: board_id is required", c.Name)
-	case !_boardIDRE.MatchString(c.BoardID):
+	case !boardIDRE.MatchString(c.BoardID):
 		return fmt.Errorf("company %q: board_id %q must be a lowercase GUID", c.Name, c.BoardID)
 	}
 	return nil

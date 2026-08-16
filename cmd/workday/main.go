@@ -21,7 +21,7 @@ import (
 // fires at once — fetchJobResult never returns an error, so the only reason
 // to bound it is being a considerate caller of someone else's career site
 // rather than firing --limit-many requests in a single burst.
-const _maxConcurrentDetailFetches = 5
+const maxConcurrentDetailFetches = 5
 
 func main() {
 	os.Exit(run())
@@ -310,7 +310,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 
 	results := make([]jobResultJSON, len(search.JobPostings))
 	g, gCtx := errgroup.WithContext(ctx)
-	g.SetLimit(_maxConcurrentDetailFetches)
+	g.SetLimit(maxConcurrentDetailFetches)
 	for i, job := range search.JobPostings {
 		g.Go(func() error {
 			results[i] = fetchJobResult(gCtx, client, f.tenant, baseURL, job)

@@ -27,7 +27,7 @@ var _ Adapter = (*WorkableAdapter)(nil)
 //   - apply.workable.com/blueground
 //   - apply.workable.com/blueground/j/B02DA69C8F
 //   - apply.workable.com/some-unknown-co/
-var _workableCareersURLRE = regexp.MustCompile(
+var workableCareersURLRE = regexp.MustCompile(
 	`(?i)^apply\.workable\.com/(?P<slug>[^/]+)`,
 )
 
@@ -35,13 +35,13 @@ const (
 	// workableUpstreamPageSize is the API's fixed page size; there is no
 	// limit field, so one unified page costs pageSize/workableUpstreamPageSize
 	// cursor requests.
-	_workableUpstreamPageSize = 10
+	workableUpstreamPageSize = 10
 	// maxWorkableCandidates bounds the local-AND candidate walk to
 	// maxWorkableCandidates/workableUpstreamPageSize upstream requests.
-	_maxWorkableCandidates = 200
+	maxWorkableCandidates = 200
 	// workableDetailConcurrency caps concurrent detail fetches when Search
 	// enriches descriptions for residual query matching.
-	_workableDetailConcurrency = 8
+	workableDetailConcurrency = 8
 )
 
 // WorkableAdapter serves Workable-hosted companies via the public job board
@@ -78,7 +78,7 @@ func (a *WorkableAdapter) Roster() []CompanyInfo {
 // non-roster companies need no special slug form. "api" is the API prefix on
 // the same host, not an account.
 func (a *WorkableAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	slug, ok := matchCareersSlug(_workableCareersURLRE, u)
+	slug, ok := matchCareersSlug(workableCareersURLRE, u)
 	if !ok || strings.EqualFold(slug, "api") {
 		return "", false
 	}
@@ -146,7 +146,7 @@ func (a *WorkableAdapter) searchWorkablePage(
 	requestedPage int,
 	req workable.SearchRequest,
 ) (*SearchResult, error) {
-	const perUnified = _pageSize / _workableUpstreamPageSize
+	const perUnified = pageSize / workableUpstreamPageSize
 	page := clampPage(requestedPage)
 	if page-1 > math.MaxInt/perUnified {
 		return nil, fmt.Errorf("workable: page %d is too large; retry with a smaller page", page)
@@ -203,7 +203,7 @@ func (a *WorkableAdapter) searchWorkableCandidates(
 		if err != nil {
 			return nil, err
 		}
-		if rsp.Total > _maxWorkableCandidates {
+		if rsp.Total > maxWorkableCandidates {
 			return nil, fmt.Errorf("workable: search is too broad (%d candidates); add a more specific query, location, or filter", rsp.Total)
 		}
 		items = append(items, rsp.Results...)
@@ -239,7 +239,7 @@ func (a *WorkableAdapter) enrichDescriptions(ctx context.Context, slug string, j
 		return nil
 	}
 	g, gCtx := errgroup.WithContext(ctx)
-	g.SetLimit(_workableDetailConcurrency)
+	g.SetLimit(workableDetailConcurrency)
 	for i := range jobs {
 		i := i
 		g.Go(func() error {

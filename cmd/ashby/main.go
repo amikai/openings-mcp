@@ -19,7 +19,7 @@ import (
 
 // apiBaseURL is Ashby's public posting API origin — the single production
 // server in the provider's openapi.yaml.
-const _apiBaseURL = "https://api.ashbyhq.com"
+const apiBaseURL = "https://api.ashbyhq.com"
 
 func main() {
 	os.Exit(run())
@@ -132,7 +132,7 @@ func fetchBoard(ctx context.Context, board string, timeout time.Duration) (*ashb
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := ashby.NewClient(_apiBaseURL)
+	client, err := ashby.NewClient(apiBaseURL)
 	if err != nil {
 		return nil, err
 	}

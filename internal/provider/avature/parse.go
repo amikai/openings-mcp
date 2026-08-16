@@ -12,11 +12,11 @@ import (
 // job id in its final path segment. Social-share links never match: they
 // carry the posting URL percent-encoded inside a query string, so the
 // literal "/JobDetail/" segment does not appear.
-var _jobDetailPathRE = regexp.MustCompile(`/JobDetail/[^/?#]+/(\d+)(?:[?#]|$)`)
+var jobDetailPathRE = regexp.MustCompile(`/JobDetail/[^/?#]+/(\d+)(?:[?#]|$)`)
 
 var (
-	_totalOfRE      = regexp.MustCompile(`of\s+([\d,]+)`)
-	_totalResultsRE = regexp.MustCompile(`([\d,]+)\s+results?`)
+	totalOfRE      = regexp.MustCompile(`of\s+([\d,]+)`)
+	totalResultsRE = regexp.MustCompile(`([\d,]+)\s+results?`)
 )
 
 func parseSearchHTML(doc *goquery.Document) *SearchResponse {
@@ -31,7 +31,7 @@ func parseSearchHTML(doc *goquery.Document) *SearchResponse {
 	index := make(map[string]int)
 	for _, a := range doc.Find("a[href]").EachIter() {
 		href, _ := a.Attr("href")
-		m := _jobDetailPathRE.FindStringSubmatch(href)
+		m := jobDetailPathRE.FindStringSubmatch(href)
 		if m == nil {
 			continue
 		}
@@ -65,11 +65,11 @@ func parseTotal(doc *goquery.Document) int {
 		return -1
 	}
 	text := normSpace(legend.Text())
-	if m := _totalOfRE.FindStringSubmatch(text); m != nil {
+	if m := totalOfRE.FindStringSubmatch(text); m != nil {
 		return atoiCommas(m[1])
 	}
 	for _, s := range []string{text, legend.AttrOr("aria-label", "")} {
-		if m := _totalResultsRE.FindStringSubmatch(s); m != nil {
+		if m := totalResultsRE.FindStringSubmatch(s); m != nil {
 			return atoiCommas(m[1])
 		}
 	}

@@ -18,7 +18,7 @@ import (
 // leverAPIBaseURL is the global-instance base URL. Every curated site in
 // companies.yaml lives on the global instance, so the CLI never needs the
 // EU server (https://api.eu.lever.co).
-const _leverAPIBaseURL = "https://api.lever.co"
+const leverAPIBaseURL = "https://api.lever.co"
 
 func main() {
 	os.Exit(run())
@@ -183,7 +183,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := lever.NewClient(_leverAPIBaseURL)
+	client, err := lever.NewClient(leverAPIBaseURL)
 	if err != nil {
 		return err
 	}
@@ -248,7 +248,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := lever.NewClient(_leverAPIBaseURL)
+	client, err := lever.NewClient(leverAPIBaseURL)
 	if err != nil {
 		return err
 	}

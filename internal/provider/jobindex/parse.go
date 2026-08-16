@@ -11,9 +11,9 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const _stashMarker = "var Stash = "
+const stashMarker = "var Stash = "
 
-var _reJobID = regexp.MustCompile(`(?i)^[a-z]\d+$`)
+var reJobID = regexp.MustCompile(`(?i)^[a-z]\d+$`)
 
 // parseSearchHTML extracts Stash searchResponse and returns it with upstream
 // field names. Per result we drop card "html" and collapse job links to a
@@ -123,7 +123,7 @@ func jobApplyURL(m map[string]any) string {
 // read.
 func extractStash(r io.Reader) (map[string]any, error) {
 	br := bufio.NewReader(r)
-	if err := skipToMarker(br, _stashMarker); err != nil {
+	if err := skipToMarker(br, stashMarker); err != nil {
 		return nil, err
 	}
 	var stash map[string]any
@@ -267,7 +267,7 @@ func parseDetailHTML(r io.Reader, tid string) (*JobDetail, error) {
 		}
 	}
 
-	if d.Tid == "" || !_reJobID.MatchString(d.Tid) {
+	if d.Tid == "" || !reJobID.MatchString(d.Tid) {
 		if extracted := tidFromURL(d.URL); extracted != "" {
 			d.Tid = extracted
 		} else if extracted := tidFromURL(og["og:url"]); extracted != "" {

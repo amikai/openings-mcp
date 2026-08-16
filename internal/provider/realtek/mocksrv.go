@@ -7,22 +7,22 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockJobsFilteredRsp []byte
+var mockJobsFilteredRsp []byte
 
 //go:embed testdata/types_rsp.json
-var _mockTypesRsp []byte
+var mockTypesRsp []byte
 
 //go:embed testdata/locations_rsp.json
-var _mockLocationsRsp []byte
+var mockLocationsRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_notfound_rsp.json
-var _mockJobDetailNotFoundRsp []byte
+var mockJobDetailNotFoundRsp []byte
 
 // NewMockServer returns an httptest.Server serving canned Realtek
 // recruitment site fixture responses, so tests never hit the live site.
@@ -31,7 +31,7 @@ var _mockJobDetailNotFoundRsp []byte
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
 
-	mux.HandleFunc("/Job/GetAllJobList", serveMockJSON(_mockJobsRsp))
+	mux.HandleFunc("/Job/GetAllJobList", serveMockJSON(mockJobsRsp))
 
 	mux.HandleFunc("/Job/GetFilterList", func(w http.ResponseWriter, r *http.Request) {
 		if err := r.ParseForm(); err != nil {
@@ -39,22 +39,22 @@ func NewMockServer() *httptest.Server {
 			return
 		}
 		if r.PostFormValue("keyword") == "verification" {
-			serveMockJSON(_mockJobsFilteredRsp)(w, r)
+			serveMockJSON(mockJobsFilteredRsp)(w, r)
 			return
 		}
-		serveMockJSON(_mockJobsRsp)(w, r)
+		serveMockJSON(mockJobsRsp)(w, r)
 	})
 
-	mux.HandleFunc("/Job/GetAllTypeList", serveMockJSON(_mockTypesRsp))
+	mux.HandleFunc("/Job/GetAllTypeList", serveMockJSON(mockTypesRsp))
 
-	mux.HandleFunc("/Job/GetAllLocationList", serveMockJSON(_mockLocationsRsp))
+	mux.HandleFunc("/Job/GetAllLocationList", serveMockJSON(mockLocationsRsp))
 
 	mux.HandleFunc("/Job/GetVacancyDetail", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("JobOppId") == "18" {
-			serveMockJSON(_mockJobDetailRsp)(w, r)
+			serveMockJSON(mockJobDetailRsp)(w, r)
 			return
 		}
-		serveMockJSON(_mockJobDetailNotFoundRsp)(w, r)
+		serveMockJSON(mockJobDetailNotFoundRsp)(w, r)
 	})
 
 	return httptest.NewServer(mux)

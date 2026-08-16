@@ -17,7 +17,7 @@ import (
 )
 
 // apiBaseURL is Delta's careers portal origin.
-const _apiBaseURL = "https://rws.deltaww.com"
+const apiBaseURL = "https://rws.deltaww.com"
 
 func main() {
 	os.Exit(run())
@@ -200,7 +200,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := delta.NewClient(_apiBaseURL)
+	client, err := delta.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -241,7 +241,7 @@ func runDetail(ctx context.Context, timeout time.Duration, id, lang, format stri
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := delta.NewClient(_apiBaseURL)
+	client, err := delta.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -312,7 +312,7 @@ func runAreas(ctx context.Context, timeout time.Duration, lang, format string) e
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := delta.NewClient(_apiBaseURL)
+	client, err := delta.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

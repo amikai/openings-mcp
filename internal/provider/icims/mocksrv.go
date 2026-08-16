@@ -8,31 +8,31 @@ import (
 )
 
 //go:embed testdata/search_rsp.html
-var _mockSearchRsp []byte
+var mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.html
-var _mockSearchFilteredRsp []byte
+var mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_location_rsp.html
-var _mockSearchLocationRsp []byte
+var mockSearchLocationRsp []byte
 
 //go:embed testdata/search_location_lorton_rsp.html
-var _mockSearchLocationLortonRsp []byte
+var mockSearchLocationLortonRsp []byte
 
 //go:embed testdata/search_no_results_rsp.html
-var _mockSearchNoResultsRsp []byte
+var mockSearchNoResultsRsp []byte
 
 //go:embed testdata/search_posted_rsp.html
-var _mockSearchPostedRsp []byte
+var mockSearchPostedRsp []byte
 
 //go:embed testdata/search_unknown_company_rsp.html
-var _mockSearchUnknownCompanyRsp []byte
+var mockSearchUnknownCompanyRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_not_found_rsp.html
-var _mockJobDetailNotFoundRsp []byte
+var mockJobDetailNotFoundRsp []byte
 
 // NewMockServer returns an httptest.Server that replays captured iCIMS HTML
 // fixtures. The caller owns the server and must Close it.
@@ -46,23 +46,23 @@ func NewMockServer() *httptest.Server {
 		hasLorton := strings.Contains(locs, "lorton")
 		switch {
 		case q.Get("searchKeyword") == "zzzznonexistentkeyword12345":
-			serveHTML(_mockSearchNoResultsRsp)(w, r)
+			serveHTML(mockSearchNoResultsRsp)(w, r)
 		case strings.Contains(strings.ToLower(q.Get("searchKeyword")), "posted"):
 			// Peraton Lorton capture — one card with a posted-date span.
-			serveHTML(_mockSearchPostedRsp)(w, r)
+			serveHTML(mockSearchPostedRsp)(w, r)
 		case hasAustin && hasLorton:
 			// The union of both locations is the whole three-job board.
-			serveHTML(_mockSearchRsp)(w, r)
+			serveHTML(mockSearchRsp)(w, r)
 		case hasAustin:
 			// Encoded value (12781-12827-Austin) — Austin-only jobs 1977, 1922.
-			serveHTML(_mockSearchLocationRsp)(w, r)
+			serveHTML(mockSearchLocationRsp)(w, r)
 		case hasLorton:
 			// Encoded value (12781-12830-Lorton) — Lorton-only job 1925.
-			serveHTML(_mockSearchLocationLortonRsp)(w, r)
+			serveHTML(mockSearchLocationLortonRsp)(w, r)
 		case strings.Contains(strings.ToLower(q.Get("searchKeyword")), "product"):
-			serveHTML(_mockSearchFilteredRsp)(w, r)
+			serveHTML(mockSearchFilteredRsp)(w, r)
 		default:
-			serveHTML(_mockSearchRsp)(w, r)
+			serveHTML(mockSearchRsp)(w, r)
 		}
 	})
 	// Unknown-tenant fixture is served from a separate host in live tests;
@@ -70,14 +70,14 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("/unknown/jobs/search", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusNotFound)
-		_, _ = w.Write(_mockSearchUnknownCompanyRsp)
+		_, _ = w.Write(mockSearchUnknownCompanyRsp)
 	})
 	mux.HandleFunc("/jobs/999999999/", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusGone)
-		_, _ = w.Write(_mockJobDetailNotFoundRsp)
+		_, _ = w.Write(mockJobDetailNotFoundRsp)
 	})
-	mux.HandleFunc("/jobs/1977/", serveHTML(_mockJobDetailRsp))
+	mux.HandleFunc("/jobs/1977/", serveHTML(mockJobDetailRsp))
 	return httptest.NewServer(mux)
 }
 

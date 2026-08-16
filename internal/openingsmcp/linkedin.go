@@ -8,7 +8,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-var _linkedinSearchInputRawSchema = []byte(`{
+var linkedinSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -58,7 +58,7 @@ var _linkedinSearchInputRawSchema = []byte(`{
 // openapi.yaml's searchJobs parameters: human labels instead of the site's
 // raw form-field codes (workplace_type/job_type map back via ids.go;
 // posted_within maps back via linkedinPostedWithinSeconds below).
-var _linkedinSearchInputSchema = mustSchema(_linkedinSearchInputRawSchema)
+var linkedinSearchInputSchema = mustSchema(linkedinSearchInputRawSchema)
 
 type linkedinSearchInput struct {
 	Keyword       string   `json:"keyword,omitempty"`
@@ -72,7 +72,7 @@ type linkedinSearchInput struct {
 
 // linkedinPostedWithinSeconds maps a human label to the seconds value
 // linkedin.JobsRequest.PostedWithinSeconds expects (f_TPR=r{n} on the wire).
-var _linkedinPostedWithinSeconds = map[string]int{
+var linkedinPostedWithinSeconds = map[string]int{
 	"Past day":   86400,
 	"Past week":  604800,
 	"Past month": 2592000,
@@ -103,7 +103,7 @@ func linkedinMCPToHTTPRequest(in *linkedinSearchInput) (*linkedin.JobsRequest, e
 	}
 
 	if in.PostedWithin != "" {
-		seconds, ok := _linkedinPostedWithinSeconds[in.PostedWithin]
+		seconds, ok := linkedinPostedWithinSeconds[in.PostedWithin]
 		if !ok {
 			return nil, fmt.Errorf("invalid posted_within %q", in.PostedWithin)
 		}
@@ -196,7 +196,7 @@ func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 		Name:        "linkedin_search_jobs",
 		Description: "Search jobs on LinkedIn's public guest job-search surface. LinkedIn's rate limiting is aggressive; back off instead of retrying on a 429.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search LinkedIn jobs", ReadOnlyHint: true},
-		InputSchema: _linkedinSearchInputSchema,
+		InputSchema: linkedinSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
 		req, err := linkedinMCPToHTTPRequest(in)
 		if err != nil {

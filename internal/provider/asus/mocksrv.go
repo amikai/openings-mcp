@@ -8,25 +8,25 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.html
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_en_rsp.html
-var _mockJobsEnRsp []byte
+var mockJobsEnRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.html
-var _mockJobsFilteredRsp []byte
+var mockJobsFilteredRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.html
-var _mockJobsEmptyRsp []byte
+var mockJobsEmptyRsp []byte
 
 //go:embed testdata/job_detail_rsp.html
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_not_found_rsp.html
-var _mockJobNotFoundRsp []byte
+var mockJobNotFoundRsp []byte
 
 //go:embed testdata/cities_rsp.json
-var _mockCitiesRsp []byte
+var mockCitiesRsp []byte
 
 // NewMockServer returns an httptest.Server mimicking the ASUS recruitment site.
 func NewMockServer() *httptest.Server {
@@ -37,12 +37,12 @@ func NewMockServer() *httptest.Server {
 		if sn == "762c08de-1daa-4aa8-9668-d8a746ce24a8" {
 			w.Header().Set("Content-Type", "text/html; charset=utf-8")
 			w.WriteHeader(http.StatusOK)
-			w.Write(_mockJobDetailRsp)
+			w.Write(mockJobDetailRsp)
 			return
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write(_mockJobNotFoundRsp)
+		w.Write(mockJobNotFoundRsp)
 	})
 
 	mux.HandleFunc("/Jobs/GetCities", func(w http.ResponseWriter, r *http.Request) {
@@ -50,7 +50,7 @@ func NewMockServer() *httptest.Server {
 		if country == "TW" {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			w.WriteHeader(http.StatusOK)
-			w.Write(_mockCitiesRsp)
+			w.Write(mockCitiesRsp)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
@@ -63,21 +63,21 @@ func NewMockServer() *httptest.Server {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		if kw == "xyz999foobar" {
 			w.WriteHeader(http.StatusOK)
-			w.Write(_mockJobsEmptyRsp)
+			w.Write(mockJobsEmptyRsp)
 			return
 		}
 		if isEnglishLocale(r) {
 			w.WriteHeader(http.StatusOK)
-			w.Write(_mockJobsEnRsp)
+			w.Write(mockJobsEnRsp)
 			return
 		}
 		if kw != "" || r.URL.Query().Get("Location") != "" || len(r.URL.Query()["REQ_TYPEs_Prefix"]) > 0 {
 			w.WriteHeader(http.StatusOK)
-			w.Write(_mockJobsFilteredRsp)
+			w.Write(mockJobsFilteredRsp)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
-		w.Write(_mockJobsRsp)
+		w.Write(mockJobsRsp)
 	})
 
 	return httptest.NewServer(mux)

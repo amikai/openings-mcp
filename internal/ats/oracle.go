@@ -25,7 +25,7 @@ import (
 //   - /hcmUI/CandidateExperience/en/sites/Mayo-US/job/386920
 //   - /hcmUI/CandidateExperience/en-US/sites/Acme/jobs
 //   - /hcmUI/CandidateExperience/en/sites/Acme/job/123
-var _oracleCareersPathRE = regexp.MustCompile(
+var oracleCareersPathRE = regexp.MustCompile(
 	`(?i)(?:^|/)hcmUI/CandidateExperience/(?P<language>[^/]+)/sites/(?P<site>[^/]+)(?:/|$)`,
 )
 
@@ -97,7 +97,7 @@ func (a *OracleAdapter) Search(
 
 	page := clampPage(p.Page)
 	pageIndex := page - 1
-	if pageIndex > math.MaxInt/_pageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("oracle: page %d is too large; retry with a smaller page", page)
 	}
 
@@ -116,8 +116,8 @@ func (a *OracleAdapter) Search(
 
 	res, err := client.Search(ctx, oracle.SearchRequest{
 		Keyword: strings.TrimSpace(p.Query),
-		Limit:   _pageSize,
-		Offset:  pageIndex * _pageSize,
+		Limit:   pageSize,
+		Offset:  pageIndex * pageSize,
 		Filters: filters,
 	})
 	if err != nil {
@@ -414,12 +414,12 @@ func parseOracleCareersURL(
 		return "", "", "", "", false
 	}
 
-	m := _oracleCareersPathRE.FindStringSubmatch(u.Path)
+	m := oracleCareersPathRE.FindStringSubmatch(u.Path)
 	if m == nil {
 		return "", "", "", "", false
 	}
-	language = strings.TrimSpace(namedGroup(_oracleCareersPathRE, m, "language"))
-	site = strings.TrimSpace(namedGroup(_oracleCareersPathRE, m, "site"))
+	language = strings.TrimSpace(namedGroup(oracleCareersPathRE, m, "language"))
+	site = strings.TrimSpace(namedGroup(oracleCareersPathRE, m, "site"))
 	if language == "" || site == "" {
 		return "", "", "", "", false
 	}

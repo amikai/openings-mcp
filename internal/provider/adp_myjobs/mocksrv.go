@@ -20,13 +20,13 @@ const MockSecondSlug = "churchmutual"
 const MockUnknownSlug = "this-company-does-not-exist-xyz-openings-mcp"
 
 //go:embed testdata/career_site_guitarcenterexternal.json
-var _mockCareerSiteGC []byte
+var mockCareerSiteGC []byte
 
 //go:embed testdata/career_site_churchmutual.json
-var _mockCareerSiteCM []byte
+var mockCareerSiteCM []byte
 
 //go:embed testdata/career_site_unknown_rsp.json
-var _mockCareerSiteUnknown []byte
+var mockCareerSiteUnknown []byte
 
 // mockBoard is the tiny board the mock server filters over.
 func mockBoard() []JobRequisition {
@@ -93,7 +93,7 @@ func mockBoard() []JobRequisition {
 
 // mockCustomFilterRE matches one "FIELDn eq 'value'" clause, the only $filter
 // shape upstream honors. Clauses are ANDed with "&&"; see [CustomFilter].
-var _mockCustomFilterRE = regexp.MustCompile(`^(FIELD[0-9]+) eq '(.*)'$`)
+var mockCustomFilterRE = regexp.MustCompile(`^(FIELD[0-9]+) eq '(.*)'$`)
 
 // mockFacets is the catalog the mock board files its jobs under. FIELD1 is
 // deliberately not "location": the slot codes are positional, so nothing may
@@ -147,11 +147,11 @@ func NewMockServer() *httptest.Server {
 		slug = strings.Trim(slug, "/")
 		switch strings.ToLower(slug) {
 		case MockSlug:
-			serveJSON(w, http.StatusOK, _mockCareerSiteGC)
+			serveJSON(w, http.StatusOK, mockCareerSiteGC)
 		case MockSecondSlug:
-			serveJSON(w, http.StatusOK, _mockCareerSiteCM)
+			serveJSON(w, http.StatusOK, mockCareerSiteCM)
 		default:
-			serveJSON(w, http.StatusBadRequest, _mockCareerSiteUnknown)
+			serveJSON(w, http.StatusBadRequest, mockCareerSiteUnknown)
 		}
 	})
 	mux.HandleFunc("/myadp_prefix/mycareer/public/staffing/v1/job-requisitions/apply-custom-filters", func(w http.ResponseWriter, r *http.Request) {
@@ -215,7 +215,7 @@ func filterMockByCustomFilters(jobs []JobRequisition, filter string) []JobRequis
 	byJob := mockJobFacets()
 
 	for _, clause := range strings.Split(filter, " && ") {
-		m := _mockCustomFilterRE.FindStringSubmatch(strings.TrimSpace(clause))
+		m := mockCustomFilterRE.FindStringSubmatch(strings.TrimSpace(clause))
 		if m == nil || !configured[m[1]] {
 			continue
 		}

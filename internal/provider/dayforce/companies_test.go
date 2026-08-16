@@ -16,7 +16,7 @@ func TestCompaniesLoaded(t *testing.T) {
 		assert.NotEmpty(t, c.JobBoardCode)
 		assert.Positive(t, c.JobBoardID)
 		if c.CultureCode == "" {
-			assert.Equal(t, _defaultCultureCode, c.Culture())
+			assert.Equal(t, defaultCultureCode, c.Culture())
 		} else {
 			assert.Equal(t, c.CultureCode, c.Culture())
 		}

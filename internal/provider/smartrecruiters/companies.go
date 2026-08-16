@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // RosterCompany is a confirmed organization hosting a public SmartRecruiters
 // career site, drawn from a curated list
@@ -30,13 +30,13 @@ type RosterCompany struct {
 }
 
 // careersURLTpl formats a SmartRecruiters career site URL (e.g. "https://jobs.smartrecruiters.com/Equinox").
-const _careersURLTpl = "https://jobs.smartrecruiters.com/%s"
+const careersURLTpl = "https://jobs.smartrecruiters.com/%s"
 
 // CareersURL returns the company's human-facing career site, e.g.
 // https://jobs.smartrecruiters.com/Equinox. API calls instead pass
 // CompanyIdentifier directly as the companyIdentifier parameter.
 func (c RosterCompany) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.CompanyIdentifier)
+	return fmt.Sprintf(careersURLTpl, c.CompanyIdentifier)
 }
 
 // Companies holds every confirmed SmartRecruiters company, sorted by
@@ -53,7 +53,7 @@ var CompaniesByIdentifier = buildIdentifierIndex(Companies)
 // recover from.
 func mustLoadCompanies() []RosterCompany {
 	var cs []RosterCompany
-	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("smartrecruiters: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b RosterCompany) int { return strings.Compare(a.Name, b.Name) })

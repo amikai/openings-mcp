@@ -15,7 +15,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/amazon"
 )
 
-const _defaultBaseURL = "https://www.amazon.jobs"
+const defaultBaseURL = "https://www.amazon.jobs"
 
 func main() {
 	os.Exit(run())
@@ -24,7 +24,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("amazon")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Amazon Jobs base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Amazon Jobs base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

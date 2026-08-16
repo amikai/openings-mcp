@@ -32,7 +32,7 @@ var _ Adapter = (*LeverAdapter)(nil)
 //   - jobs.lever.co/acme
 //   - jobs.eu.lever.co/acme
 //   - jobs.lever.co/acme/00000000-0000
-var _leverCareersURLRE = regexp.MustCompile(
+var leverCareersURLRE = regexp.MustCompile(
 	`(?i)^jobs(?:\.eu)?\.lever\.co/(?P<slug>[^/]+)`,
 )
 
@@ -57,7 +57,7 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 // ParseCareersURL recognizes Lever-hosted board URLs; the first path
 // segment is the organization, which is already this adapter's slug form.
 func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(_leverCareersURLRE, u)
+	return matchCareersSlug(leverCareersURLRE, u)
 }
 
 // CareersURL renders the roster company's public job board page.

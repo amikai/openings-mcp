@@ -8,25 +8,25 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_page2_rsp.json
-var _mockJobsPage2Rsp []byte
+var mockJobsPage2Rsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockJobsFilteredRsp []byte
+var mockJobsFilteredRsp []byte
 
 //go:embed testdata/jobs_filters_rsp.json
-var _mockJobsFiltersRsp []byte
+var mockJobsFiltersRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_not_found_rsp.txt
-var _mockJobNotFoundRsp []byte
+var mockJobNotFoundRsp []byte
 
 //go:embed testdata/jobs_unknown_company_rsp.txt
-var _mockJobsUnknownCompanyRsp []byte
+var mockJobsUnknownCompanyRsp []byte
 
 // MockUnknownCompany is an account deliberately absent from any roster,
 // matching the quirk captured in testdata/jobs_unknown_company_rsp.txt: an
@@ -55,21 +55,21 @@ func NewMockServer() *httptest.Server {
 		}
 		switch {
 		case body.Token == MockPage2Token:
-			serveMockJSON(_mockJobsPage2Rsp)(w, r)
+			serveMockJSON(mockJobsPage2Rsp)(w, r)
 		case body.Query == "engineer":
-			serveMockJSON(_mockJobsFilteredRsp)(w, r)
+			serveMockJSON(mockJobsFilteredRsp)(w, r)
 		default:
-			serveMockJSON(_mockJobsRsp)(w, r)
+			serveMockJSON(mockJobsRsp)(w, r)
 		}
 	})
 
-	mux.HandleFunc("/api/v3/accounts/blueground/jobs/filters", serveMockJSON(_mockJobsFiltersRsp))
+	mux.HandleFunc("/api/v3/accounts/blueground/jobs/filters", serveMockJSON(mockJobsFiltersRsp))
 
-	mux.HandleFunc("/api/v3/accounts/"+MockUnknownCompany+"/jobs", serveMockText(http.StatusNotFound, _mockJobsUnknownCompanyRsp))
+	mux.HandleFunc("/api/v3/accounts/"+MockUnknownCompany+"/jobs", serveMockText(http.StatusNotFound, mockJobsUnknownCompanyRsp))
 
-	mux.HandleFunc("/api/v2/accounts/blueground/jobs/B02DA69C8F", serveMockJSON(_mockJobDetailRsp))
+	mux.HandleFunc("/api/v2/accounts/blueground/jobs/B02DA69C8F", serveMockJSON(mockJobDetailRsp))
 
-	mux.HandleFunc("/api/v2/accounts/blueground/jobs/0000000000", serveMockText(http.StatusNotFound, _mockJobNotFoundRsp))
+	mux.HandleFunc("/api/v2/accounts/blueground/jobs/0000000000", serveMockText(http.StatusNotFound, mockJobNotFoundRsp))
 
 	return httptest.NewServer(mux)
 }

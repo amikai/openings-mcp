@@ -24,7 +24,7 @@ var _ Adapter = (*EightfoldAdapter)(nil)
 //
 // Examples (hostname):
 //   - eaton.eightfold.ai
-var _eightfoldCareersHostRE = regexp.MustCompile(
+var eightfoldCareersHostRE = regexp.MustCompile(
 	`(?i)^(?P<tenant>.+)\.eightfold\.ai$`,
 )
 
@@ -32,7 +32,7 @@ var _eightfoldCareersHostRE = regexp.MustCompile(
 // tenant returns exactly 10 positions per request regardless of any
 // num/limit/size/count/pageSize query parameter tried, so Search fetches
 // two consecutive upstream pages to fill one unified pageSize (20) page.
-const _upstreamPageSize = 10
+const upstreamPageSize = 10
 
 // EightfoldAdapter serves Eightfold-hosted career sites
 // (<tenant>.eightfold.ai). Search runs server-side: query and location are
@@ -83,11 +83,11 @@ func (a *EightfoldAdapter) Roster() []CompanyInfo {
 // resolves tenants already on the roster — see the domain-derivation note
 // on [EightfoldAdapter].
 func (a *EightfoldAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	m := _eightfoldCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
+	m := eightfoldCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
 	if m == nil {
 		return "", false
 	}
-	tenant := namedGroup(_eightfoldCareersHostRE, m, "tenant")
+	tenant := namedGroup(eightfoldCareersHostRE, m, "tenant")
 	if _, ok := eightfold.CompaniesByTenant[tenant]; !ok {
 		return "", false
 	}
@@ -110,7 +110,7 @@ func (a *EightfoldAdapter) Search(ctx context.Context, slug string, p SearchPara
 	}
 
 	page := clampPage(p.Page)
-	start := (page - 1) * _pageSize
+	start := (page - 1) * pageSize
 
 	params := eightfold.SearchParams{Domain: c.Domain, Start: eightfold.NewOptInt(start)}
 	if p.Query != "" {
@@ -135,8 +135,8 @@ func (a *EightfoldAdapter) Search(ctx context.Context, slug string, p SearchPara
 
 	// Fill the unified 20-job page with a second upstream page, only when
 	// the first page was full and more results actually remain.
-	if len(jobs) == _upstreamPageSize && total > start+_upstreamPageSize {
-		params.Start = eightfold.NewOptInt(start + _upstreamPageSize)
+	if len(jobs) == upstreamPageSize && total > start+upstreamPageSize {
+		params.Start = eightfold.NewOptInt(start + upstreamPageSize)
 		more, _, err := a.searchPage(ctx, c, params, filterValues)
 		if err != nil {
 			return nil, err
@@ -456,8 +456,8 @@ func v2JobSummaries(positions []eightfold.V2Position) []JobSummary {
 }
 
 // eightfoldBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://nutanix.eightfold.ai").
-const _eightfoldBaseURLTpl = "https://%s.eightfold.ai"
+const eightfoldBaseURLTpl = "https://%s.eightfold.ai"
 
 func eightfoldBaseURL(tenant string) string {
-	return fmt.Sprintf(_eightfoldBaseURLTpl, tenant)
+	return fmt.Sprintf(eightfoldBaseURLTpl, tenant)
 }

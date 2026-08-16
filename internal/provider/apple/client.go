@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	_defaultLocale    = SearchJobsRequestLocaleEnUs
-	_longDateFormat   = DateFormatLongDateMMMMDYYYY
-	_mediumDateFormat = DateFormatMediumDateMMMDYYYY
+	defaultLocale    = SearchJobsRequestLocaleEnUs
+	longDateFormat   = DateFormatLongDateMMMMDYYYY
+	mediumDateFormat = DateFormatMediumDateMMMDYYYY
 )
 
 // ErrJobNotFound marks an Apple position ID that has no active public posting.
@@ -234,11 +234,11 @@ func searchAPIRequest(request SearchRequest) (*SearchJobsRequest, error) {
 		Query:   keyword,
 		Filters: filters,
 		Page:    page,
-		Locale:  _defaultLocale,
+		Locale:  defaultLocale,
 		Sort:    sort,
 		Format: DateFormat{
-			LongDate:   _longDateFormat,
-			MediumDate: _mediumDateFormat,
+			LongDate:   longDateFormat,
+			MediumDate: mediumDateFormat,
 		},
 	}, nil
 }

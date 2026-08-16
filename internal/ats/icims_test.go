@@ -69,11 +69,11 @@ func TestICIMSParseCareersURL(t *testing.T) {
 
 // mockFixtureHost is a roster host used only for mock-backed tests. The
 // adapter overrides baseURL to the mock server, so live DNS is never hit.
-const _mockFixtureHost = "careers-peraton.icims.com"
+const mockFixtureHost = "careers-peraton.icims.com"
 
 func TestICIMSSearch(t *testing.T) {
 	a := testICIMSAdapter(t)
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{})
 	require.NoError(t, err)
 	assert.Equal(t, 3, res.TotalCount)
 	assert.Equal(t, 1, res.Page)
@@ -88,14 +88,14 @@ func TestICIMSSearch(t *testing.T) {
 
 func TestICIMSSearchKeyword(t *testing.T) {
 	a := testICIMSAdapter(t)
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Query: "Product"})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Query: "Product"})
 	require.NoError(t, err)
 	assert.NotEmpty(t, res.Jobs)
 }
 
 func TestICIMSSearchLocation(t *testing.T) {
 	a := testICIMSAdapter(t)
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Location: "Austin"})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Location: "Austin"})
 	require.NoError(t, err)
 	require.Len(t, res.Jobs, 2)
 	assert.Equal(t, 2, res.TotalCount)
@@ -110,7 +110,7 @@ func TestICIMSSearchLocationMultiMatch(t *testing.T) {
 	a := testICIMSAdapter(t)
 	// "US" hits the Austin and Lorton options; both ride one query as
 	// repeated searchLocation params, returning all three board jobs.
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Location: "US"})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Location: "US"})
 	require.NoError(t, err)
 	require.Len(t, res.Jobs, 3)
 	assert.Equal(t, 3, res.TotalCount)
@@ -124,7 +124,7 @@ func TestICIMSSearchPostedAt(t *testing.T) {
 	a := testICIMSAdapter(t)
 	// The "posted" keyword routes the mock to the Peraton Lorton capture,
 	// whose single card carries a posted-date span.
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Query: "posted"})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Query: "posted"})
 	require.NoError(t, err)
 	require.Len(t, res.Jobs, 1)
 	assert.Equal(t, "167924", res.Jobs[0].JobID)
@@ -133,14 +133,14 @@ func TestICIMSSearchPostedAt(t *testing.T) {
 
 func TestICIMSSearchPageOverflow(t *testing.T) {
 	a := testICIMSAdapter(t)
-	_, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: math.MaxInt})
+	_, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: math.MaxInt})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "too large")
 }
 
 func TestICIMSSearchNoResults(t *testing.T) {
 	a := testICIMSAdapter(t)
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Query: "zzzznonexistentkeyword12345"})
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Query: "zzzznonexistentkeyword12345"})
 	require.NoError(t, err)
 	assert.Empty(t, res.Jobs)
 	assert.Equal(t, 0, res.TotalCount)
@@ -148,7 +148,7 @@ func TestICIMSSearchNoResults(t *testing.T) {
 
 func TestICIMSFilters(t *testing.T) {
 	a := testICIMSAdapter(t)
-	fs, err := a.Filters(t.Context(), _mockFixtureHost)
+	fs, err := a.Filters(t.Context(), mockFixtureHost)
 	require.NoError(t, err)
 	assert.Equal(t, []string{"Sales & Communication - Sales", "Technology - Product Management"}, fs["category"])
 	assert.Contains(t, fs["positionType"], "Full-Time")
@@ -206,7 +206,7 @@ func TestICIMSSearchFilters(t *testing.T) {
 	a := NewICIMSAdapter(&http.Client{Timeout: 5 * time.Second})
 	a.baseURL = func(string) string { return srv.URL }
 
-	res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{
+	res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{
 		Filters: FilterSet{"category": {"Engineering"}},
 	})
 	require.NoError(t, err)
@@ -214,7 +214,7 @@ func TestICIMSSearchFilters(t *testing.T) {
 	assert.Equal(t, 2, res.TotalCount)
 
 	// Labels resolve case-insensitively; keys AND together.
-	res, err = a.Search(t.Context(), _mockFixtureHost, SearchParams{
+	res, err = a.Search(t.Context(), mockFixtureHost, SearchParams{
 		Filters: FilterSet{"category": {"engineering"}, "positionType": {"Part-Time"}},
 	})
 	require.NoError(t, err)
@@ -222,7 +222,7 @@ func TestICIMSSearchFilters(t *testing.T) {
 	assert.Equal(t, "2", res.Jobs[0].JobID)
 
 	// Values within a key OR together.
-	res, err = a.Search(t.Context(), _mockFixtureHost, SearchParams{
+	res, err = a.Search(t.Context(), mockFixtureHost, SearchParams{
 		Filters: FilterSet{"category": {"Engineering", "Sales"}},
 	})
 	require.NoError(t, err)
@@ -234,13 +234,13 @@ func TestICIMSSearchFilterTeachingErrors(t *testing.T) {
 	a := NewICIMSAdapter(&http.Client{Timeout: 5 * time.Second})
 	a.baseURL = func(string) string { return srv.URL }
 
-	_, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{
+	_, err := a.Search(t.Context(), mockFixtureHost, SearchParams{
 		Filters: FilterSet{"department": {"Engineering"}},
 	})
 	require.ErrorContains(t, err, "unknown filter key")
 	assert.Contains(t, err.Error(), "category")
 
-	_, err = a.Search(t.Context(), _mockFixtureHost, SearchParams{
+	_, err = a.Search(t.Context(), mockFixtureHost, SearchParams{
 		Filters: FilterSet{"category": {"Nonexistent"}},
 	})
 	require.ErrorContains(t, err, `filter value "Nonexistent" not found`)
@@ -249,7 +249,7 @@ func TestICIMSSearchFilterTeachingErrors(t *testing.T) {
 
 func TestICIMSDetail(t *testing.T) {
 	a := testICIMSAdapter(t)
-	d, err := a.Detail(t.Context(), _mockFixtureHost, "1977")
+	d, err := a.Detail(t.Context(), mockFixtureHost, "1977")
 	require.NoError(t, err)
 	assert.Equal(t, "1977", d.JobID)
 	assert.Equal(t, "Senior Product Manager", d.Title)
@@ -261,14 +261,14 @@ func TestICIMSDetail(t *testing.T) {
 
 func TestICIMSDetailNotFound(t *testing.T) {
 	a := testICIMSAdapter(t)
-	_, err := a.Detail(t.Context(), _mockFixtureHost, "999999999")
+	_, err := a.Detail(t.Context(), mockFixtureHost, "999999999")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
 }
 
 func TestICIMSDetailBadID(t *testing.T) {
 	a := testICIMSAdapter(t)
-	_, err := a.Detail(t.Context(), _mockFixtureHost, "not-a-number")
+	_, err := a.Detail(t.Context(), mockFixtureHost, "not-a-number")
 	require.Error(t, err)
 }
 
@@ -292,22 +292,22 @@ func TestICIMSSearchMultiPagePagination(t *testing.T) {
 	a := NewICIMSAdapter(&http.Client{Timeout: 5 * time.Second})
 	a.baseURL = func(string) string { return srv.URL }
 
-	page1, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: 1})
+	page1, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: 1})
 	require.NoError(t, err)
 	assert.Equal(t, totalJobs, page1.TotalCount)
 	assert.Equal(t, 3, page1.TotalPages) // ceil(60/20)
-	require.Len(t, page1.Jobs, _pageSize)
+	require.Len(t, page1.Jobs, pageSize)
 	assert.Equal(t, "1", page1.Jobs[0].JobID)
 	assert.Equal(t, "20", page1.Jobs[len(page1.Jobs)-1].JobID)
 
-	page2, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: 2})
+	page2, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: 2})
 	require.NoError(t, err)
 	assert.Equal(t, totalJobs, page2.TotalCount)
-	require.Len(t, page2.Jobs, _pageSize, "page 2 must not collapse to empty from partial last-page PageSize")
+	require.Len(t, page2.Jobs, pageSize, "page 2 must not collapse to empty from partial last-page PageSize")
 	assert.Equal(t, "21", page2.Jobs[0].JobID)
 	assert.Equal(t, "40", page2.Jobs[len(page2.Jobs)-1].JobID)
 
-	page3, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: 3})
+	page3, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: 3})
 	require.NoError(t, err)
 	assert.Equal(t, totalJobs, page3.TotalCount)
 	require.Len(t, page3.Jobs, 20)
@@ -331,7 +331,7 @@ func TestICIMSSearchPaginationSweep(t *testing.T) {
 				wantPages := totalPages(total)
 				var got []string
 				for page := 1; page <= max(wantPages, 1); page++ {
-					res, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: page})
+					res, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: page})
 					require.NoError(t, err, "page %d", page)
 					assert.Equal(t, total, res.TotalCount, "TotalCount on page %d", page)
 					assert.Equal(t, wantPages, res.TotalPages, "TotalPages on page %d", page)
@@ -345,7 +345,7 @@ func TestICIMSSearchPaginationSweep(t *testing.T) {
 				}
 				assert.Equal(t, want, got, "walk of all unified pages must cover every job exactly once, in order")
 
-				beyond, err := a.Search(t.Context(), _mockFixtureHost, SearchParams{Page: wantPages + 1})
+				beyond, err := a.Search(t.Context(), mockFixtureHost, SearchParams{Page: wantPages + 1})
 				require.NoError(t, err)
 				assert.Empty(t, beyond.Jobs, "page past the end must be empty")
 				assert.Equal(t, total, beyond.TotalCount, "past-the-end TotalCount")

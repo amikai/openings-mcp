@@ -21,7 +21,7 @@ import (
 
 // apiBaseURL is en-gage.net's own origin — every tenant is hosted at
 // en-gage.net/<slug>/.
-const _apiBaseURL = "https://en-gage.net"
+const apiBaseURL = "https://en-gage.net"
 
 func main() {
 	os.Exit(run())
@@ -184,7 +184,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := engage.NewClient(_apiBaseURL, nil)
+	client := engage.NewClient(apiBaseURL, nil)
 	board, err := client.Board(ctx, slug)
 	if err != nil {
 		return err
@@ -247,7 +247,7 @@ func runDetail(ctx context.Context, f detailFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client := engage.NewClient(_apiBaseURL, nil)
+	client := engage.NewClient(apiBaseURL, nil)
 	detail, err := client.Job(ctx, slug, f.workID)
 	if err != nil {
 		return err

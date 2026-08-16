@@ -29,7 +29,7 @@ import (
 
 // apiBaseURL is the single production server in the provider's
 // openapi.yaml (paths carry the /central and /candidate prefixes).
-const _apiBaseURL = "https://app.flowxtra.com/api"
+const apiBaseURL = "https://app.flowxtra.com/api"
 
 func main() {
 	os.Exit(run())
@@ -38,7 +38,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("flowxtra")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _apiBaseURL, "Flowxtra API base URL")
+		baseURL = rootFlags.StringLong("base-url", apiBaseURL, "Flowxtra API base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

@@ -14,10 +14,10 @@ import (
 )
 
 const (
-	_defaultBaseURL = "https://recruit.asus.com"
-	_jobsPath       = "/Jobs"
-	_detailPath     = "/Jobs/Detail"
-	_citiesPath     = "/Jobs/GetCities"
+	defaultBaseURL = "https://recruit.asus.com"
+	jobsPath       = "/Jobs"
+	detailPath     = "/Jobs/Detail"
+	citiesPath     = "/Jobs/GetCities"
 )
 
 // Client talks to the ASUS Careers site.
@@ -105,7 +105,7 @@ type CityItem struct {
 func NewClient(baseURL string, httpClient *http.Client) *Client {
 	return &Client{
 		httpClient: cmp.Or(httpClient, http.DefaultClient),
-		baseURL:    cmp.Or(strings.TrimRight(baseURL, "/"), _defaultBaseURL),
+		baseURL:    cmp.Or(strings.TrimRight(baseURL, "/"), defaultBaseURL),
 	}
 }
 
@@ -122,7 +122,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 	if err != nil {
 		return nil, fmt.Errorf("parse baseURL: %w", err)
 	}
-	u.Path = _jobsPath
+	u.Path = jobsPath
 
 	q := u.Query()
 	if req.Keyword != "" {
@@ -177,7 +177,7 @@ func (c *Client) Detail(ctx context.Context, id string) (*JobDetail, error) {
 	if err != nil {
 		return nil, fmt.Errorf("parse baseURL: %w", err)
 	}
-	u.Path = _detailPath
+	u.Path = detailPath
 	q := u.Query()
 	q.Set("sn", id)
 	u.RawQuery = q.Encode()
@@ -215,7 +215,7 @@ func (c *Client) GetCities(ctx context.Context, countryCode string) ([]CityItem,
 	if err != nil {
 		return nil, fmt.Errorf("parse baseURL: %w", err)
 	}
-	u.Path = _citiesPath
+	u.Path = citiesPath
 	q := u.Query()
 	q.Set("countryTw", countryCode)
 	u.RawQuery = q.Encode()

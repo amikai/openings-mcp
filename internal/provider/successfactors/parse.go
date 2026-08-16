@@ -51,10 +51,10 @@ func parseJobRow(row *goquery.Selection) (Job, bool) {
 // jobIDFromHref extracts the trailing numeric ID from a /job/{slug}/{id}/
 // detail link (see openapi.yaml: the slug is cosmetic, only the ID
 // resolves the posting).
-var _jobHrefID = regexp.MustCompile(`/job/[^/]+/(\d+)/?$`)
+var jobHrefID = regexp.MustCompile(`/job/[^/]+/(\d+)/?$`)
 
 func jobIDFromHref(href string) string {
-	m := _jobHrefID.FindStringSubmatch(href)
+	m := jobHrefID.FindStringSubmatch(href)
 	if m == nil {
 		return ""
 	}
@@ -67,7 +67,7 @@ func jobIDFromHref(href string) string {
 // default-German site). The connector word between the two <b> tags is
 // locale text ("of", "von", ...) that isn't worth matching per-locale; the
 // total is always the last <b>-tagged number regardless of language.
-var _resultsTotalPattern = regexp.MustCompile(`<b>([\d,]+)</b>`)
+var resultsTotalPattern = regexp.MustCompile(`<b>([\d,]+)</b>`)
 
 func parseResultsTotal(doc *goquery.Document) int {
 	label := doc.Find("span.paginationLabel").First()
@@ -78,7 +78,7 @@ func parseResultsTotal(doc *goquery.Document) int {
 	if err != nil {
 		return 0
 	}
-	matches := _resultsTotalPattern.FindAllStringSubmatch(html, -1)
+	matches := resultsTotalPattern.FindAllStringSubmatch(html, -1)
 	if len(matches) == 0 {
 		return 0
 	}
@@ -157,13 +157,13 @@ func detailTitle(doc *goquery.Document) string {
 // (and localized "Détails du poste" / "Jobdetails") suffix so the bare
 // posting title remains. Returns "" when the document title is empty or is
 // only a site chrome string (no " | " separator with a job-details marker).
-var _jobDetailsTitleSuffix = regexp.MustCompile(`(?i)\s+(?:job\s+details|détails\s+du\s+poste|jobdetails|stellenangebotsdetails)\s*\|.*$`)
+var jobDetailsTitleSuffix = regexp.MustCompile(`(?i)\s+(?:job\s+details|détails\s+du\s+poste|jobdetails|stellenangebotsdetails)\s*\|.*$`)
 
 func titleFromDocumentTitle(raw string) string {
 	if raw == "" {
 		return ""
 	}
-	if stripped := strings.TrimSpace(_jobDetailsTitleSuffix.ReplaceAllString(raw, "")); stripped != "" && stripped != raw {
+	if stripped := strings.TrimSpace(jobDetailsTitleSuffix.ReplaceAllString(raw, "")); stripped != "" && stripped != raw {
 		return stripped
 	}
 	return ""

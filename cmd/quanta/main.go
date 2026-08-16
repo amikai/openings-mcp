@@ -25,7 +25,7 @@ import (
 
 // apiBaseURL is the single production server in the provider's
 // openapi.yaml.
-const _apiBaseURL = "https://hr.quantatw.com"
+const apiBaseURL = "https://hr.quantatw.com"
 
 func main() {
 	os.Exit(run())
@@ -118,7 +118,7 @@ func fetchJobs(ctx context.Context, timeout time.Duration) ([]quanta.Job, error)
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := quanta.NewClient(_apiBaseURL)
+	client, err := quanta.NewClient(apiBaseURL)
 	if err != nil {
 		return nil, err
 	}

@@ -18,7 +18,7 @@ import (
 
 // apiBaseURL is Rippling's public Job Board API origin — the single
 // production server in the provider's openapi.yaml.
-const _apiBaseURL = "https://api.rippling.com/platform/api/ats/v1"
+const apiBaseURL = "https://api.rippling.com/platform/api/ats/v1"
 
 func main() {
 	os.Exit(run())
@@ -259,7 +259,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := rippling.NewClient(_apiBaseURL)
+	client, err := rippling.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -325,7 +325,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := rippling.NewClient(_apiBaseURL)
+	client, err := rippling.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

@@ -9,8 +9,8 @@ import (
 // both limits come from the official docs at
 // https://remotefirstjobs.com/jobs-api.
 const (
-	_pageSize = 100
-	_maxPage  = 4
+	pageSize = 100
+	maxPage  = 4
 )
 
 // FindOptions narrows [Client.FindJob]'s page scan to the search that
@@ -37,7 +37,7 @@ func (c *Client) FindJob(ctx context.Context, id string, opts FindOptions) (*Job
 	if opts.Category != "" {
 		params.Category = NewOptString(opts.Category)
 	}
-	for page := range _maxPage + 1 {
+	for page := range maxPage + 1 {
 		params.Page = NewOptInt(page)
 		res, err := c.SearchJobs(ctx, params)
 		if err != nil {
@@ -56,7 +56,7 @@ func (c *Client) FindJob(ctx context.Context, id string, opts FindOptions) (*Job
 				return &result.Jobs[i], nil
 			}
 		}
-		if len(result.Jobs) < _pageSize {
+		if len(result.Jobs) < pageSize {
 			break
 		}
 	}

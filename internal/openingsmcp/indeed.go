@@ -8,7 +8,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 )
 
-var _indeedSearchInputRawSchema = []byte(`{
+var indeedSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"keyword": {
@@ -62,7 +62,7 @@ var _indeedSearchInputRawSchema = []byte(`{
 // indeedSearchInputSchema is hand-written JSON kept aligned with the
 // jobSearch GraphQL fields the Indeed provider requests: human labels instead of the
 // site's raw filter codes (job_type maps back via indeed.JobTypeIDs).
-var _indeedSearchInputSchema = mustSchema(_indeedSearchInputRawSchema)
+var indeedSearchInputSchema = mustSchema(indeedSearchInputRawSchema)
 
 type indeedSearchInput struct {
 	Keyword     string `json:"keyword,omitempty"`
@@ -149,7 +149,7 @@ func indeedHTTPToMCPResponse(resp *indeed.JobsResponse) *indeedSearchOutput {
 	return out
 }
 
-var _indeedDetailInputRawSchema = []byte(`{
+var indeedDetailInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
 		"job_key": {
@@ -167,7 +167,7 @@ var _indeedDetailInputRawSchema = []byte(`{
 	"additionalProperties": false
 }`)
 
-var _indeedDetailInputSchema = mustSchema(_indeedDetailInputRawSchema)
+var indeedDetailInputSchema = mustSchema(indeedDetailInputRawSchema)
 
 type indeedDetailInput struct {
 	JobKey  string `json:"job_key"`
@@ -269,7 +269,7 @@ func RegisterIndeed(s *mcp.Server, c *indeed.Client) {
 		Name:        "indeed_search_jobs",
 		Description: "Search job postings on Indeed.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Indeed jobs", ReadOnlyHint: true},
-		InputSchema: _indeedSearchInputSchema,
+		InputSchema: indeedSearchInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *indeedSearchInput) (*mcp.CallToolResult, *indeedSearchOutput, error) {
 		req, err := indeedMCPToHTTPRequest(in)
 		if err != nil {
@@ -286,7 +286,7 @@ func RegisterIndeed(s *mcp.Server, c *indeed.Client) {
 		Name:        "indeed_get_job_detail",
 		Description: "Get full details for an Indeed job posting.",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Indeed job details", ReadOnlyHint: true},
-		InputSchema: _indeedDetailInputSchema,
+		InputSchema: indeedDetailInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *indeedDetailInput) (*mcp.CallToolResult, *indeedDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.Country, in.JobKey)
 		if err != nil {

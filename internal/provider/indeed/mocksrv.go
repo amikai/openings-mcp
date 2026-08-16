@@ -9,16 +9,16 @@ import (
 )
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.json
-var _mockJobsFilteredRsp []byte
+var mockJobsFilteredRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_detail_notfound_rsp.json
-var _mockJobDetailNotFoundRsp []byte
+var mockJobDetailNotFoundRsp []byte
 
 // MockNotFoundJobKey is the job key the mock server treats as not-found,
 // mirroring the real jobData empty-results shape captured in
@@ -49,15 +49,15 @@ func NewMockServer() *httptest.Server {
 			// document string for hand-written clients / hurl captures.
 			if strings.Contains(string(body.Variables), MockNotFoundJobKey) ||
 				strings.Contains(body.Query, MockNotFoundJobKey) {
-				_, _ = w.Write(_mockJobDetailNotFoundRsp)
+				_, _ = w.Write(mockJobDetailNotFoundRsp)
 				return
 			}
-			_, _ = w.Write(_mockJobDetailRsp)
+			_, _ = w.Write(mockJobDetailRsp)
 		case strings.Contains(string(body.Variables), "dateOnIndeed") ||
 			strings.Contains(body.Query, "dateOnIndeed"):
-			_, _ = w.Write(_mockJobsFilteredRsp)
+			_, _ = w.Write(mockJobsFilteredRsp)
 		default:
-			_, _ = w.Write(_mockJobsRsp)
+			_, _ = w.Write(mockJobsRsp)
 		}
 	})
 	return httptest.NewServer(mux)

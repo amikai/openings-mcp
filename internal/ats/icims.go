@@ -27,7 +27,7 @@ var _ Adapter = (*ICIMSAdapter)(nil)
 // Examples (hostname):
 //   - careers-peraton.icims.com
 //   - uscareers-example.icims.com
-var _icimsCareersHostRE = regexp.MustCompile(
+var icimsCareersHostRE = regexp.MustCompile(
 	`(?i)^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?\.icims\.com$`,
 )
 
@@ -42,12 +42,12 @@ type ICIMSAdapter struct {
 }
 
 // icimsBaseURLTpl formats a portal host into a base URL (e.g. "https://careers-peraton.icims.com").
-const _icimsBaseURLTpl = "https://%s"
+const icimsBaseURLTpl = "https://%s"
 
 func NewICIMSAdapter(hc *http.Client) *ICIMSAdapter {
 	return &ICIMSAdapter{
 		hc:      hc,
-		baseURL: func(host string) string { return fmt.Sprintf(_icimsBaseURLTpl, host) },
+		baseURL: func(host string) string { return fmt.Sprintf(icimsBaseURLTpl, host) },
 	}
 }
 
@@ -66,7 +66,7 @@ func (a *ICIMSAdapter) Roster() []CompanyInfo {
 // callers can pass a careers URL directly.
 func (a *ICIMSAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	host := strings.ToLower(u.Hostname())
-	if !_icimsCareersHostRE.MatchString(host) {
+	if !icimsCareersHostRE.MatchString(host) {
 		return "", false
 	}
 	isReservedHost := strings.HasPrefix(host, "login") || strings.HasPrefix(host, "cdn") ||
@@ -96,10 +96,10 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 	pageIndex := page - 1
 	// Page is user-controlled with no schema maximum; reject values that
 	// would overflow the start offset (same guard as the Workday adapter).
-	if pageIndex > math.MaxInt/_pageSize {
+	if pageIndex > math.MaxInt/pageSize {
 		return nil, fmt.Errorf("icims: page %d is too large; retry with a smaller page", page)
 	}
-	start := pageIndex * _pageSize
+	start := pageIndex * pageSize
 
 	client := icims.NewClient(a.baseURL(host), a.hc)
 	keyword := strings.TrimSpace(p.Query)
@@ -179,7 +179,7 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 
 	// Stitch further upstream pages while the slice starts mid-page or the
 	// tenant page size is smaller than the unified pageSize.
-	for next := correctPr + 1; len(selected) < _pageSize && next < totalPagesUp; next++ {
+	for next := correctPr + 1; len(selected) < pageSize && next < totalPagesUp; next++ {
 		r := base
 		r.Page = next
 		more, err := client.Search(ctx, &r)
@@ -189,8 +189,8 @@ func (a *ICIMSAdapter) Search(ctx context.Context, slug string, p SearchParams) 
 		selected = append(selected, more.Jobs...)
 	}
 
-	if len(selected) > _pageSize {
-		selected = selected[:_pageSize]
+	if len(selected) > pageSize {
+		selected = selected[:pageSize]
 	}
 
 	return &SearchResult{

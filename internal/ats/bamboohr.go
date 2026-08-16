@@ -25,7 +25,7 @@ var _ Adapter = (*BambooHRAdapter)(nil)
 // Examples (hostname):
 //   - concept2.bamboohr.com
 //   - acme.bamboohr.com
-var _bambooHRCareersHostRE = regexp.MustCompile(
+var bambooHRCareersHostRE = regexp.MustCompile(
 	`(?i)^(?P<slug>[^.]+)\.bamboohr\.com$`,
 )
 
@@ -44,9 +44,9 @@ type BambooHRAdapter struct {
 }
 
 const (
-	_bambooHRDetailConcurrency = 8
+	bambooHRDetailConcurrency = 8
 	// bambooHRBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://curtinmaritime.bamboohr.com").
-	_bambooHRBaseURLTpl = "https://%s.bamboohr.com"
+	bambooHRBaseURLTpl = "https://%s.bamboohr.com"
 )
 
 // NewBambooHRAdapter derives a redirect-blocking copy of hc: BambooHR
@@ -61,7 +61,7 @@ func NewBambooHRAdapter(hc *http.Client, dumpCache *DumpCache) *BambooHRAdapter 
 	return &BambooHRAdapter{
 		hc: &c,
 		baseURL: func(slug string) string {
-			return fmt.Sprintf(_bambooHRBaseURLTpl, slug)
+			return fmt.Sprintf(bambooHRBaseURLTpl, slug)
 		},
 		dumpCache: dumpCache,
 	}
@@ -77,7 +77,7 @@ func (a *BambooHRAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-var _bambooHRReservedHosts = map[string]bool{
+var bambooHRReservedHosts = map[string]bool{
 	"api":           true,
 	"app":           true,
 	"careers":       true,
@@ -93,12 +93,12 @@ var _bambooHRReservedHosts = map[string]bool{
 
 // ParseCareersURL recognizes BambooHR subdomain careers pages.
 func (a *BambooHRAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	m := _bambooHRCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
+	m := bambooHRCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
 	if m == nil {
 		return "", false
 	}
-	slug := namedGroup(_bambooHRCareersHostRE, m, "slug")
-	if slug == "" || _bambooHRReservedHosts[slug] {
+	slug := namedGroup(bambooHRCareersHostRE, m, "slug")
+	if slug == "" || bambooHRReservedHosts[slug] {
 		return "", false
 	}
 	return slug, true
@@ -278,7 +278,7 @@ func (a *BambooHRAdapter) enrichDescriptions(
 		return err
 	}
 	g, gCtx := errgroup.WithContext(ctx)
-	g.SetLimit(_bambooHRDetailConcurrency)
+	g.SetLimit(bambooHRDetailConcurrency)
 	for i := range jobs {
 		i := i
 		g.Go(func() error {

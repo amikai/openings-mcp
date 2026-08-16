@@ -10,7 +10,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // Company is a confirmed organization hosting a public Ashby job board,
 // drawn from a curated list (internal/provider/ashby/companies.yaml). Every
@@ -25,13 +25,13 @@ type Company struct {
 }
 
 // careersURLTpl formats an Ashby job board page URL (e.g. "https://jobs.ashbyhq.com/openai").
-const _careersURLTpl = "https://jobs.ashbyhq.com/%s"
+const careersURLTpl = "https://jobs.ashbyhq.com/%s"
 
 // CareersURL returns the company's human-facing job board page, e.g.
 // https://jobs.ashbyhq.com/openai. API calls instead pass Board directly as
 // the jobBoardName parameter.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.Board)
+	return fmt.Sprintf(careersURLTpl, c.Board)
 }
 
 // Companies holds every confirmed Ashby board, sorted by company name.
@@ -46,7 +46,7 @@ var CompaniesByBoard = buildBoardIndex(Companies)
 // recover from.
 func mustLoadCompanies() []Company {
 	var cs []Company
-	if err := yaml.Unmarshal(_companiesYAML, &cs); err != nil {
+	if err := yaml.Unmarshal(companiesYAML, &cs); err != nil {
 		panic(fmt.Sprintf("ashby: parse companies.yaml: %v", err))
 	}
 	slices.SortFunc(cs, func(a, b Company) int { return strings.Compare(a.Name, b.Name) })

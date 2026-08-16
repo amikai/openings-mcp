@@ -20,7 +20,7 @@ import (
 
 // apiBaseURL is Greenhouse's public Job Board API origin — the single
 // production server in the provider's openapi.yaml.
-const _apiBaseURL = "https://boards-api.greenhouse.io/v1"
+const apiBaseURL = "https://boards-api.greenhouse.io/v1"
 
 func main() {
 	os.Exit(run())
@@ -251,7 +251,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := greenhouse.NewClient(_apiBaseURL)
+	client, err := greenhouse.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -319,7 +319,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := greenhouse.NewClient(_apiBaseURL)
+	client, err := greenhouse.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

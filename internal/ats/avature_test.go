@@ -19,7 +19,7 @@ import (
 
 // avatureMockSlug is a roster slug used only for mock-backed tests. The
 // adapter overrides baseURL to the mock server, so live DNS is never hit.
-const _avatureMockSlug = "bloomberg.avature.net/careers"
+const avatureMockSlug = "bloomberg.avature.net/careers"
 
 func testAvatureAdapter(t *testing.T, mockPortal string) *AvatureAdapter {
 	t.Helper()
@@ -78,12 +78,12 @@ func TestAvatureParseCareersURL(t *testing.T) {
 // 20-job page: offsets 0 and 12 both come from real Bloomberg captures.
 func TestAvatureSearch(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	res, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{})
+	res, err := a.Search(t.Context(), avatureMockSlug, SearchParams{})
 	require.NoError(t, err)
 	assert.Equal(t, 436, res.TotalCount)
 	assert.Equal(t, 22, res.TotalPages)
 	assert.Equal(t, 1, res.Page)
-	require.Len(t, res.Jobs, _pageSize)
+	require.Len(t, res.Jobs, pageSize)
 
 	first := res.Jobs[0]
 	assert.Equal(t, "20873", first.JobID)
@@ -96,7 +96,7 @@ func TestAvatureSearch(t *testing.T) {
 
 func TestAvatureSearchKeyword(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	res, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Query: "engineer"})
+	res, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Query: "engineer"})
 	require.NoError(t, err)
 	assert.Equal(t, 281, res.TotalCount)
 	assert.NotEmpty(t, res.Jobs)
@@ -105,7 +105,7 @@ func TestAvatureSearchKeyword(t *testing.T) {
 
 func TestAvatureSearchNoResults(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	res, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Query: "zzzznonexistentkeyword12345"})
+	res, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Query: "zzzznonexistentkeyword12345"})
 	require.NoError(t, err)
 	assert.Empty(t, res.Jobs)
 	assert.Equal(t, 0, res.TotalCount)
@@ -117,7 +117,7 @@ func TestAvatureSearchNoResults(t *testing.T) {
 // page the pagination link promises.
 func TestAvatureSearchNoLegend(t *testing.T) {
 	a := testAvatureAdapter(t, "/nolegend")
-	res, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{})
+	res, err := a.Search(t.Context(), avatureMockSlug, SearchParams{})
 	require.NoError(t, err)
 	// The fixture replays the same 6 jobs for any offset, so the dedupe
 	// guard stops the walk after one fetch.
@@ -129,33 +129,33 @@ func TestAvatureSearchNoLegend(t *testing.T) {
 
 func TestAvatureSearchLocationUnsupported(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	_, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Location: "London"})
+	_, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Location: "London"})
 	require.ErrorContains(t, err, "location filtering is not supported")
 }
 
 func TestAvatureSearchFiltersUnsupported(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	_, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Filters: FilterSet{"category": {"x"}}})
+	_, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Filters: FilterSet{"category": {"x"}}})
 	require.ErrorContains(t, err, "no filters are available")
 }
 
 func TestAvatureSearchPageOverflow(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	_, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Page: math.MaxInt})
+	_, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Page: math.MaxInt})
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "too large")
 }
 
 func TestAvatureFilters(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	fs, err := a.Filters(t.Context(), _avatureMockSlug)
+	fs, err := a.Filters(t.Context(), avatureMockSlug)
 	require.NoError(t, err)
 	assert.Empty(t, fs)
 }
 
 func TestAvatureDetail(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	d, err := a.Detail(t.Context(), _avatureMockSlug, "20873")
+	d, err := a.Detail(t.Context(), avatureMockSlug, "20873")
 	require.NoError(t, err)
 	assert.Equal(t, "20873", d.JobID)
 	assert.Equal(t, "Enterprise Services - FXGO Tradedesk, Client Services Specialist - Singapore", d.Title)
@@ -167,7 +167,7 @@ func TestAvatureDetail(t *testing.T) {
 
 func TestAvatureDetailNotFound(t *testing.T) {
 	a := testAvatureAdapter(t, "/careers")
-	_, err := a.Detail(t.Context(), _avatureMockSlug, "999999999")
+	_, err := a.Detail(t.Context(), avatureMockSlug, "999999999")
 	require.Error(t, err)
 	assert.Contains(t, err.Error(), "not found")
 }
@@ -199,7 +199,7 @@ func TestAvatureSearchPaginationSweep(t *testing.T) {
 					wantPages := totalPages(total)
 					var got []string
 					for page := 1; page <= max(wantPages, 1); page++ {
-						res, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Page: page})
+						res, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Page: page})
 						require.NoError(t, err, "page %d", page)
 						if legend {
 							assert.Equal(t, total, res.TotalCount, "TotalCount on page %d", page)
@@ -221,7 +221,7 @@ func TestAvatureSearchPaginationSweep(t *testing.T) {
 					}
 					assert.Equal(t, want, got, "walk of all unified pages must cover every job exactly once, in order")
 
-					beyond, err := a.Search(t.Context(), _avatureMockSlug, SearchParams{Page: wantPages + 1})
+					beyond, err := a.Search(t.Context(), avatureMockSlug, SearchParams{Page: wantPages + 1})
 					require.NoError(t, err)
 					assert.Empty(t, beyond.Jobs, "page past the end must be empty")
 				})

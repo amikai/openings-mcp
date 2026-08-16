@@ -52,7 +52,7 @@ func TestSuccessFactorsSearch(t *testing.T) {
 	assert.Equal(t, 1, res.Page)
 	// The upstream table always returns 25 rows; the adapter trims to the
 	// unified page size.
-	assert.Len(t, res.Jobs, _pageSize)
+	assert.Len(t, res.Jobs, pageSize)
 
 	first := res.Jobs[0]
 	assert.Equal(t, "1414343333", first.JobID)
@@ -125,7 +125,7 @@ func TestSuccessFactorsFilterMultipleValuesReturnsSupersetWithoutFanout(t *testi
 		if got := r.URL.Query().Get("optionsFacetsDD_country"); got != "" {
 			t.Errorf("country filter = %q, want omitted for multi-value input", got)
 		}
-		w.Write([]byte(_successFactorsSupersetFixture))
+		w.Write([]byte(successFactorsSupersetFixture))
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()
@@ -143,7 +143,7 @@ func TestSuccessFactorsFilterMultipleValuesReturnsSupersetWithoutFanout(t *testi
 	assert.Zero(t, facetRequests)
 }
 
-const _successFactorsSupersetFixture = `<html><body>
+const successFactorsSupersetFixture = `<html><body>
 <span class="keywordsearch-icon"></span>
 <span class="paginationLabel">Results <b>1 – 3</b> of <b>3</b></span>
 <table><tbody>
@@ -175,7 +175,7 @@ func TestSuccessFactorsMultiValueFilterKeepsSingleValueFilters(t *testing.T) {
 		w.Header().Set("Content-Type", "text/html")
 		assert.Empty(t, r.URL.Query().Get("optionsFacetsDD_country"))
 		assert.Equal(t, "ENG", r.URL.Query().Get("optionsFacetsDD_department"))
-		w.Write([]byte(_successFactorsSupersetFixture))
+		w.Write([]byte(successFactorsSupersetFixture))
 	})
 	srv := httptest.NewServer(mux)
 	defer srv.Close()

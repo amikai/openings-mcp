@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // Company is a confirmed organization with a public Avature career portal.
 // URL is the portal base without a locale segment
@@ -42,7 +42,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(_companiesYAML)
+	cs, err := loadCompanies(companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("avature: load companies.yaml: %v", err))
 	}
@@ -51,7 +51,7 @@ func mustLoadCompanies() []Company {
 
 // localeSegmentRE matches an Avature locale path segment such as "en_US".
 // Roster URLs must omit it — the portal 302s to its default locale itself.
-var _localeSegmentRE = regexp.MustCompile(`^[a-z]{2}_[A-Z]{2}$`)
+var localeSegmentRE = regexp.MustCompile(`^[a-z]{2}_[A-Z]{2}$`)
 
 func loadCompanies(data []byte) ([]Company, error) {
 	var cs []Company
@@ -102,7 +102,7 @@ func validateCompany(c Company) error {
 	if len(segs) != 1 || segs[0] == "" {
 		return fmt.Errorf("company %q: url %q must have exactly one path segment (the portal name)", c.Name, c.URL)
 	}
-	if _localeSegmentRE.MatchString(segs[0]) {
+	if localeSegmentRE.MatchString(segs[0]) {
 		return fmt.Errorf("company %q: url %q must omit the locale segment", c.Name, c.URL)
 	}
 	return nil

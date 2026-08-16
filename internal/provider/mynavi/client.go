@@ -17,7 +17,7 @@ import (
 // search accepts, in units of 10,000 JPY (万円) — the fixed steps of the
 // site's own salary pulldown. Any other value is HTTP 404 upstream, so
 // [Client.Jobs] rejects it client-side.
-var _minSalaries = []int{
+var minSalaries = []int{
 	150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700,
 	800, 900, 1000, 1100, 1200, 1300, 1400, 1500,
 }
@@ -110,7 +110,7 @@ type JobDetailResponse struct {
 	JobBenefits            string
 }
 
-var _jobIDPattern = regexp.MustCompile(`^\d+-\d+-\d+-\d+$`)
+var jobIDPattern = regexp.MustCompile(`^\d+-\d+-\d+-\d+$`)
 
 func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	u, err := url.Parse(c.baseURL)
@@ -121,8 +121,8 @@ func (c *Client) jobsURL(r *JobsRequest) (string, error) {
 	// site's canonical list URLs end with "/".
 	segs := []string{"list"}
 	if r.MinSalary != 0 {
-		if !slices.Contains(_minSalaries, r.MinSalary) {
-			return "", fmt.Errorf("min salary %d万円 is not a value the site accepts; valid steps: %v", r.MinSalary, _minSalaries)
+		if !slices.Contains(minSalaries, r.MinSalary) {
+			return "", fmt.Errorf("min salary %d万円 is not a value the site accepts; valid steps: %v", r.MinSalary, minSalaries)
 		}
 		segs = append(segs, fmt.Sprintf("min%04d", r.MinSalary))
 	}
@@ -167,7 +167,7 @@ func (c *Client) Jobs(ctx context.Context, r *JobsRequest) (*JobsResponse, error
 // expired ID is an error (the site serves a clean 404 once a posting
 // passes its listing end date).
 func (c *Client) JobDetail(ctx context.Context, jobID string) (*JobDetailResponse, error) {
-	if !_jobIDPattern.MatchString(jobID) {
+	if !jobIDPattern.MatchString(jobID) {
 		return nil, fmt.Errorf("job id %q: want four numbers separated by hyphens, e.g. 348855-1-29-1", jobID)
 	}
 	u, err := url.Parse(c.baseURL)

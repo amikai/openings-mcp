@@ -25,7 +25,7 @@ var _ Adapter = (*RecruiteeAdapter)(nil)
 // Examples (hostname):
 //   - bunq.recruitee.com
 //   - acme.recruitee.com
-var _recruiteeCareersHostRE = regexp.MustCompile(
+var recruiteeCareersHostRE = regexp.MustCompile(
 	`(?i)^(?P<slug>.+)\.recruitee\.com$`,
 )
 
@@ -39,13 +39,13 @@ type RecruiteeAdapter struct {
 }
 
 // recruiteeBaseURLTpl formats a tenant subdomain into a base URL (e.g. "https://mous.recruitee.com").
-const _recruiteeBaseURLTpl = "https://%s.recruitee.com"
+const recruiteeBaseURLTpl = "https://%s.recruitee.com"
 
 func NewRecruiteeAdapter(hc *http.Client, dumpCache *DumpCache) *RecruiteeAdapter {
 	return &RecruiteeAdapter{
 		hc: hc,
 		baseURL: func(slug string) string {
-			return fmt.Sprintf(_recruiteeBaseURLTpl, slug)
+			return fmt.Sprintf(recruiteeBaseURLTpl, slug)
 		},
 		dumpCache: dumpCache,
 	}
@@ -61,7 +61,7 @@ func (a *RecruiteeAdapter) Roster() []CompanyInfo {
 	return infos
 }
 
-var _recruiteeReservedHosts = map[string]bool{
+var recruiteeReservedHosts = map[string]bool{
 	"api":          true,
 	"app":          true,
 	"assets":       true,
@@ -76,12 +76,12 @@ var _recruiteeReservedHosts = map[string]bool{
 
 // ParseCareersURL recognizes Recruitee subdomain career pages.
 func (a *RecruiteeAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	m := _recruiteeCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
+	m := recruiteeCareersHostRE.FindStringSubmatch(strings.ToLower(u.Hostname()))
 	if m == nil {
 		return "", false
 	}
-	slug := namedGroup(_recruiteeCareersHostRE, m, "slug")
-	if slug == "" || _recruiteeReservedHosts[slug] {
+	slug := namedGroup(recruiteeCareersHostRE, m, "slug")
+	if slug == "" || recruiteeReservedHosts[slug] {
 		return "", false
 	}
 	return slug, true

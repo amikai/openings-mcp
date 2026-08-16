@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	_searchPath = "/jobsoegning"
-	_detailPath = "/vis-job"
+	searchPath = "/jobsoegning"
+	detailPath = "/vis-job"
 	// DefaultPageSize is Jobindex's fixed search page size observed live.
 	DefaultPageSize = 20
 )
@@ -141,7 +141,7 @@ func (c *Client) JobDetail(ctx context.Context, tid string) (*JobDetail, error) 
 			tid = extracted
 		}
 	}
-	u := c.baseURL + _detailPath + "/" + url.PathEscape(tid)
+	u := c.baseURL + detailPath + "/" + url.PathEscape(tid)
 	res, err := c.get(ctx, u)
 	if err != nil {
 		return nil, err
@@ -156,9 +156,9 @@ func (c *Client) searchURL(req *JobsRequest) (string, error) {
 		return "", fmt.Errorf("parse base URL: %w", err)
 	}
 	if area := strings.Trim(req.Area, "/"); area != "" {
-		u = u.JoinPath(_searchPath, area)
+		u = u.JoinPath(searchPath, area)
 	} else {
-		u = u.JoinPath(_searchPath)
+		u = u.JoinPath(searchPath)
 	}
 	q := u.Query()
 	if req.Keyword != "" {

@@ -10,7 +10,7 @@ import (
 )
 
 func TestExtractStashAndSearch(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsRsp), 1)
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsRsp), 1)
 	require.NoError(t, err)
 	require.Len(t, resp.Results, 5)
 	assert.Equal(t, 70, resp.Hitcount)

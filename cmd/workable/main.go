@@ -20,7 +20,7 @@ import (
 // apiBaseURL is the origin behind Workable-hosted careers pages — the single
 // production server in the provider's openapi.yaml (paths carry the
 // /api/v3 and /api/v2 prefixes).
-const _apiBaseURL = "https://apply.workable.com"
+const apiBaseURL = "https://apply.workable.com"
 
 func main() {
 	os.Exit(run())
@@ -290,7 +290,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(_apiBaseURL)
+	client, err := workable.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -373,7 +373,7 @@ func runFilters(ctx context.Context, company string, timeout time.Duration, form
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(_apiBaseURL)
+	client, err := workable.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -442,7 +442,7 @@ func runGet(ctx context.Context, f getFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := workable.NewClient(_apiBaseURL)
+	client, err := workable.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

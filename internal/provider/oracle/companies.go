@@ -12,7 +12,7 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // Company is a confirmed organization with a public Oracle Recruiting Cloud
 // career site. Host is the Fusion API/career hostname (e.g.
@@ -29,21 +29,21 @@ type Company struct {
 // careersURLTpl formats an Oracle Recruiting Cloud job search page URL.
 // Parameters: 1: Host (e.g. "jpmc.fa.oraclecloud.com"), 2: Site (e.g. "CX_1").
 // Example: "https://jpmc.fa.oraclecloud.com/hcmUI/CandidateExperience/en/sites/CX_1/jobs"
-const _careersURLTpl = "https://%s/hcmUI/CandidateExperience/en/sites/%s/jobs"
+const careersURLTpl = "https://%s/hcmUI/CandidateExperience/en/sites/%s/jobs"
 
 // apiBaseURLTpl formats an Oracle Fusion API origin URL.
 // Parameters: 1: Host (e.g. "jpmc.fa.oraclecloud.com").
 // Example: "https://jpmc.fa.oraclecloud.com"
-const _apiBaseURLTpl = "https://%s"
+const apiBaseURLTpl = "https://%s"
 
 // CareersURL returns the company's human-facing job search page.
 func (c Company) CareersURL() string {
-	return fmt.Sprintf(_careersURLTpl, c.Host, c.Site)
+	return fmt.Sprintf(careersURLTpl, c.Host, c.Site)
 }
 
 // APIBaseURL returns the Fusion origin used for Candidate Experience REST calls.
 func (c Company) APIBaseURL() string {
-	return fmt.Sprintf(_apiBaseURLTpl, c.Host)
+	return fmt.Sprintf(apiBaseURLTpl, c.Host)
 }
 
 // Companies holds every confirmed Oracle career site, sorted by company name.
@@ -53,7 +53,7 @@ var Companies = mustLoadCompanies()
 var CompaniesByKey = buildKeyIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(_companiesYAML)
+	cs, err := loadCompanies(companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("oracle: load companies.yaml: %v", err))
 	}

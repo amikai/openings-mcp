@@ -14,7 +14,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/mynavi"
 )
 
-const _defaultBaseURL = "https://tenshoku.mynavi.jp"
+const defaultBaseURL = "https://tenshoku.mynavi.jp"
 
 func main() {
 	os.Exit(run())
@@ -23,7 +23,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("mynavi")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Mynavi Tenshoku base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Mynavi Tenshoku base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

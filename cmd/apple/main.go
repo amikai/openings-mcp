@@ -18,8 +18,8 @@ import (
 )
 
 const (
-	_defaultBaseURL = "https://jobs.apple.com"
-	_jsonFormat     = "json"
+	defaultBaseURL = "https://jobs.apple.com"
+	jsonFormat     = "json"
 )
 
 func main() {
@@ -29,7 +29,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("apple")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Apple Jobs API base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Apple Jobs API base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)
@@ -209,7 +209,7 @@ func teamFilters(values []string) ([]apple.TeamFilter, error) {
 }
 
 func writeSearch(out io.Writer, format string, page int, response *apple.SearchResponse) error {
-	if format == _jsonFormat {
+	if format == jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {
@@ -258,7 +258,7 @@ func runFilters(ctx context.Context, flags filterFlags, out io.Writer) error {
 }
 
 func writeFilters(out io.Writer, format string, teams *apple.TeamsResponse) error {
-	if format == _jsonFormat {
+	if format == jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(map[string]any{"teams": teams.Res, "products": apple.Products}); err != nil {
@@ -307,7 +307,7 @@ func runDetail(ctx context.Context, flags detailFlags, out io.Writer) error {
 }
 
 func writeDetail(out io.Writer, format string, response *apple.JobDetailResponse) error {
-	if format == _jsonFormat {
+	if format == jsonFormat {
 		encoder := json.NewEncoder(out)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(response); err != nil {

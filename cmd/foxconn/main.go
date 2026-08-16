@@ -18,7 +18,7 @@ import (
 
 // apiBaseURL is Foxconn's Taiwan careers origin — the single production
 // server in the provider's openapi.yaml.
-const _apiBaseURL = "https://recruit.foxconn.com"
+const apiBaseURL = "https://recruit.foxconn.com"
 
 func main() {
 	os.Exit(run())
@@ -176,7 +176,7 @@ func runSearch(ctx context.Context, f searchFlags) error {
 	ctx, cancel := context.WithTimeout(ctx, f.timeout)
 	defer cancel()
 
-	client, err := foxconn.NewClient(_apiBaseURL)
+	client, err := foxconn.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -225,7 +225,7 @@ func runDetail(ctx context.Context, timeout time.Duration, id, format string) er
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := foxconn.NewClient(_apiBaseURL)
+	client, err := foxconn.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}
@@ -308,7 +308,7 @@ func runCodes(ctx context.Context, timeout time.Duration, format string) error {
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	client, err := foxconn.NewClient(_apiBaseURL)
+	client, err := foxconn.NewClient(apiBaseURL)
 	if err != nil {
 		return err
 	}

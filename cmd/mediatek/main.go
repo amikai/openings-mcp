@@ -16,7 +16,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/mediatek"
 )
 
-const _defaultBaseURL = "https://careers.mediatek.com"
+const defaultBaseURL = "https://careers.mediatek.com"
 
 func main() {
 	os.Exit(run())
@@ -24,7 +24,7 @@ func main() {
 
 func run() int {
 	rootFlags := ff.NewFlagSet("mediatek")
-	baseURL := rootFlags.StringLong("base-url", _defaultBaseURL, "MediaTek Careers base URL")
+	baseURL := rootFlags.StringLong("base-url", defaultBaseURL, "MediaTek Careers base URL")
 	timeout := rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 	format := rootFlags.StringEnumLong("format", "output format", "text", "json")
 	rootCmd := &ff.Command{

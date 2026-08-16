@@ -10,7 +10,7 @@ import (
 )
 
 func TestParseJobsHTML(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(_mockJobsP1Rsp))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(mockJobsP1Rsp))
 	require.NoError(t, err)
 
 	got, err := parseJobsHTML(doc)
@@ -33,7 +33,7 @@ func TestParseJobsHTML(t *testing.T) {
 }
 
 func TestParseJobsHTMLPastTheEnd(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(_mockJobsP4Rsp))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(mockJobsP4Rsp))
 	require.NoError(t, err)
 
 	got, err := parseJobsHTML(doc)
@@ -45,7 +45,7 @@ func TestParseJobsHTMLPastTheEnd(t *testing.T) {
 }
 
 func TestParseJobsHTMLNoFacets(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(_mockJobsNofacetsRsp))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(mockJobsNofacetsRsp))
 	require.NoError(t, err)
 
 	got, err := parseJobsHTML(doc)
@@ -69,7 +69,7 @@ func TestParseJobsHTMLNoFacets(t *testing.T) {
 }
 
 func TestParseJobDetailHTML(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(_mockJobDetailSalaryRsp))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(mockJobDetailSalaryRsp))
 	require.NoError(t, err)
 
 	got, err := parseJobDetailHTML(doc, MockJobIDSalary, "https://hrmos.co/pages/visional/jobs/0000381")
@@ -88,7 +88,7 @@ func TestParseJobDetailHTML(t *testing.T) {
 }
 
 func TestParseJobDetailHTMLNilSalary(t *testing.T) {
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(_mockJobDetailRsp))
+	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(mockJobDetailRsp))
 	require.NoError(t, err)
 
 	got, err := parseJobDetailHTML(doc, MockJobID, "https://hrmos.co/pages/moneyforward/jobs/0000265")

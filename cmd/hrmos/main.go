@@ -15,7 +15,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/hrmos"
 )
 
-const _defaultBaseURL = "https://hrmos.co"
+const defaultBaseURL = "https://hrmos.co"
 
 func main() {
 	os.Exit(run())
@@ -24,7 +24,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("hrmos")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "HRMOS 採用 base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "HRMOS 採用 base URL")
 		company = rootFlags.StringLong("company", "", "HRMOS tenant slug, e.g. moneyforward (see 'hrmos companies' for the curated list; any live tenant slug also works)")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")

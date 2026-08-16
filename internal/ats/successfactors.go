@@ -19,7 +19,7 @@ var _ Adapter = (*SuccessFactorsAdapter)(nil)
 // successFactorsDateLayout matches java.util.Date#toString, the format
 // SuccessFactors emits for itemprop="datePosted" (e.g.
 // "Mon Jul 13 00:00:00 UTC 2026").
-const _successFactorsDateLayout = "Mon Jan 2 15:04:05 MST 2006"
+const successFactorsDateLayout = "Mon Jan 2 15:04:05 MST 2006"
 
 // SuccessFactorsAdapter serves SAP SuccessFactors Career Site Builder
 // tenants. Search and detail are server-rendered HTML pages (see
@@ -32,12 +32,12 @@ type SuccessFactorsAdapter struct {
 }
 
 // successFactorsBaseURLTpl formats a portal host into a base URL (e.g. "https://jobs.siemens.com").
-const _successFactorsBaseURLTpl = "https://%s"
+const successFactorsBaseURLTpl = "https://%s"
 
 func NewSuccessFactorsAdapter(hc *http.Client) *SuccessFactorsAdapter {
 	return &SuccessFactorsAdapter{
 		hc:      hc,
-		baseURL: func(host string) string { return fmt.Sprintf(_successFactorsBaseURLTpl, host) },
+		baseURL: func(host string) string { return fmt.Sprintf(successFactorsBaseURLTpl, host) },
 	}
 }
 
@@ -94,7 +94,7 @@ func (a *SuccessFactorsAdapter) Search(ctx context.Context, slug string, p Searc
 		Query:          p.Query,
 		LocationSearch: strings.TrimSpace(p.Location),
 		Filters:        filterValues,
-		StartRow:       (page - 1) * _pageSize,
+		StartRow:       (page - 1) * pageSize,
 	}
 	res, err := client.Search(ctx, &req)
 	if err != nil {
@@ -103,8 +103,8 @@ func (a *SuccessFactorsAdapter) Search(ctx context.Context, slug string, p Searc
 	// The upstream table always returns (up to) 25 rows regardless of
 	// startRow (see openapi.yaml); trim to the unified pageSize.
 	jobs := res.Jobs
-	if len(jobs) > _pageSize {
-		jobs = jobs[:_pageSize]
+	if len(jobs) > pageSize {
+		jobs = jobs[:pageSize]
 	}
 	return &SearchResult{
 		Jobs:       successFactorsJobSummaries(jobs, c.Host),
@@ -289,7 +289,7 @@ func successFactorsPostedAt(raw string) string {
 	if raw == "" {
 		return ""
 	}
-	t, err := time.Parse(_successFactorsDateLayout, raw)
+	t, err := time.Parse(successFactorsDateLayout, raw)
 	if err != nil {
 		return raw
 	}

@@ -26,14 +26,14 @@ type CareersSite struct {
 //   - acme.wd103.myworkdayjobs.com/zh-tw/jobs4acme/job/Taipei/Engineer_JR1
 //
 // myworkdaysite.com is deliberately unsupported (#113).
-var _careersURLRE = regexp.MustCompile(
+var careersURLRE = regexp.MustCompile(
 	`(?i)^(?P<tenant>[^.]+)\.wd[^.]+\.myworkdayjobs\.com/` +
 		`(?:(?P<locale>[a-z]{2}(?:-[a-z]{2})?)/)?(?P<site>[^/]+)`,
 )
 
 // localeSegment matches a lone language prefix used to reject locale-only
 // paths like /en-US with no site segment after.
-var _localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
+var localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
 
 // ParseCareersURL reports whether u is a Workday career-site URL and
 // extracts its parts. It accepts only the public host shape
@@ -48,15 +48,15 @@ var _localeSegment = regexp.MustCompile(`^[a-zA-Z]{2}(?:-[a-zA-Z]{2})?$`)
 // https://github.com/amikai/openings-mcp/issues/113 for the evidence.
 func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 	host := strings.ToLower(u.Hostname())
-	m := _careersURLRE.FindStringSubmatch(host + u.EscapedPath())
+	m := careersURLRE.FindStringSubmatch(host + u.EscapedPath())
 	if m == nil {
 		return CareersSite{}, false
 	}
-	tenant := m[_careersURLRE.SubexpIndex("tenant")]
-	locale := m[_careersURLRE.SubexpIndex("locale")]
-	site := m[_careersURLRE.SubexpIndex("site")]
+	tenant := m[careersURLRE.SubexpIndex("tenant")]
+	locale := m[careersURLRE.SubexpIndex("locale")]
+	site := m[careersURLRE.SubexpIndex("site")]
 	// Locale-only paths like /en-US leave the locale in the site group.
-	if locale == "" && _localeSegment.MatchString(site) {
+	if locale == "" && localeSegment.MatchString(site) {
 		return CareersSite{}, false
 	}
 	return CareersSite{Host: host, Tenant: tenant, Site: site}, true
@@ -65,20 +65,20 @@ func ParseCareersURL(u *url.URL) (CareersSite, bool) {
 // siteBaseURLTpl formats a non-roster Workday CareersSite CXS API base URL.
 // Parameters: 1: Host (e.g. "stripe.wd5.myworkdayjobs.com"), 2: Tenant (e.g. "stripe"), 3: Site (e.g. "Stripe_Careers").
 // Example: "https://stripe.wd5.myworkdayjobs.com/wday/cxs/stripe/Stripe_Careers"
-const _siteBaseURLTpl = "https://%s/wday/cxs/%s/%s"
+const siteBaseURLTpl = "https://%s/wday/cxs/%s/%s"
 
 // siteCanonicalURLTpl formats a non-roster Workday career site canonical URL.
 // Parameters: 1: Host (e.g. "stripe.wd5.myworkdayjobs.com"), 2: Site (e.g. "Stripe_Careers").
 // Example: "https://stripe.wd5.myworkdayjobs.com/Stripe_Careers"
-const _siteCanonicalURLTpl = "https://%s/%s"
+const siteCanonicalURLTpl = "https://%s/%s"
 
 // BaseURL derives the CXS API base URL, mirroring Company.BaseURL.
 func (s CareersSite) BaseURL() string {
-	return fmt.Sprintf(_siteBaseURLTpl, s.Host, s.Tenant, s.Site)
+	return fmt.Sprintf(siteBaseURLTpl, s.Host, s.Tenant, s.Site)
 }
 
 // CanonicalURL renders the slug form the ats layer circulates for
 // non-roster tenants: locale, deep links, query, and fragment stripped.
 func (s CareersSite) CanonicalURL() string {
-	return fmt.Sprintf(_siteCanonicalURLTpl, s.Host, s.Site)
+	return fmt.Sprintf(siteCanonicalURLTpl, s.Host, s.Site)
 }

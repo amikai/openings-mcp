@@ -11,9 +11,9 @@ import (
 	"strings"
 )
 
-const _defaultBaseURL = "https://careers.synopsys.com"
+const defaultBaseURL = "https://careers.synopsys.com"
 
-var _defaultHeader = http.Header{
+var defaultHeader = http.Header{
 	"User-Agent": {"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"},
 	"Accept":     {"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"},
 }
@@ -35,7 +35,7 @@ type Config struct {
 func NewClient(conf Config) *Client {
 	baseURL := conf.BaseURL
 	if baseURL == "" {
-		baseURL = _defaultBaseURL
+		baseURL = defaultBaseURL
 	}
 	return &Client{
 		httpClient: cmp.Or(conf.HTTPClient, http.DefaultClient),
@@ -48,7 +48,7 @@ func newRequest(ctx context.Context, method, rawURL string) (*http.Request, erro
 	if err != nil {
 		return nil, err
 	}
-	req.Header = _defaultHeader.Clone()
+	req.Header = defaultHeader.Clone()
 	return req, nil
 }
 
@@ -119,7 +119,7 @@ func (c *Client) ResolveLocation(ctx context.Context, term string) ([]LocationSu
 // JobDetail expects city, slug, and jobID from one [Job] returned by
 // [Client.Jobs].
 func (c *Client) JobDetail(ctx context.Context, city, slug, jobID string) (*JobDetailResponse, error) {
-	path := fmt.Sprintf("/job/%s/%s/%s/%s", city, slug, _orgID, jobID)
+	path := fmt.Sprintf("/job/%s/%s/%s/%s", city, slug, orgID, jobID)
 	req, err := newRequest(ctx, http.MethodGet, c.baseURL+path)
 	if err != nil {
 		return nil, fmt.Errorf("job detail: %w", err)

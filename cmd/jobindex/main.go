@@ -14,7 +14,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/jobindex"
 )
 
-const _defaultBaseURL = "https://www.jobindex.dk"
+const defaultBaseURL = "https://www.jobindex.dk"
 
 func main() {
 	os.Exit(run())
@@ -23,7 +23,7 @@ func main() {
 func run() int {
 	rootFlags := ff.NewFlagSet("jobindex")
 	var (
-		baseURL = rootFlags.StringLong("base-url", _defaultBaseURL, "Jobindex base URL")
+		baseURL = rootFlags.StringLong("base-url", defaultBaseURL, "Jobindex base URL")
 		timeout = rootFlags.DurationLong("timeout", 60*time.Second, "request timeout")
 		format  = rootFlags.StringEnumLong("format", "output format", "text", "json")
 	)

@@ -12,8 +12,8 @@ func TestCompaniesLoaded(t *testing.T) {
 	require.NotEmpty(t, Companies)
 	for _, c := range Companies {
 		assert.NotEmpty(t, c.Name)
-		assert.True(t, _hostRE.MatchString(c.Host), "host %q", c.Host)
-		assert.True(t, _boardIDRE.MatchString(c.BoardID), "board_id %q", c.BoardID)
+		assert.True(t, hostRE.MatchString(c.Host), "host %q", c.Host)
+		assert.True(t, boardIDRE.MatchString(c.BoardID), "board_id %q", c.BoardID)
 		assert.NotEmpty(t, c.CompanyCode)
 		got, ok := CompaniesByCode[strings.ToLower(c.CompanyCode)]
 		require.True(t, ok, "code index missing %q", c.CompanyCode)

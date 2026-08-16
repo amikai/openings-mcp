@@ -12,19 +12,19 @@ import (
 )
 
 const (
-	_appleTestServerName = "test"
-	_appleTestClientName = "test-client"
-	_appleTestKeywordKey = "keyword"
-	_appleTestKeyword    = "software engineer"
-	_appleTestPageKey    = "page"
-	_appleTestSortKey    = "sort"
-	_appleTestJobIDKey   = "job_id"
-	_appleTestLocation   = "Taipei, Taiwan"
+	appleTestServerName = "test"
+	appleTestClientName = "test-client"
+	appleTestKeywordKey = "keyword"
+	appleTestKeyword    = "software engineer"
+	appleTestPageKey    = "page"
+	appleTestSortKey    = "sort"
+	appleTestJobIDKey   = "job_id"
+	appleTestLocation   = "Taipei, Taiwan"
 )
 
 func testAppleMCPClientServer(t *testing.T) *mcp.ClientSession {
 	t.Helper()
-	server := mcp.NewServer(&mcp.Implementation{Name: _appleTestServerName, Version: "v0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: appleTestServerName, Version: "v0"}, nil)
 	mock := apple.NewMockServer()
 	t.Cleanup(mock.Close)
 	client, err := apple.NewJobsClient(mock.URL, mock.Client())
@@ -36,7 +36,7 @@ func testAppleMCPClientServer(t *testing.T) *mcp.ClientSession {
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = serverSession.Close() })
 
-	mcpClient := mcp.NewClient(&mcp.Implementation{Name: _appleTestClientName, Version: "v0"}, nil)
+	mcpClient := mcp.NewClient(&mcp.Implementation{Name: appleTestClientName, Version: "v0"}, nil)
 	clientSession, err := mcpClient.Connect(t.Context(), clientTransport, nil)
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = clientSession.Close() })
@@ -44,17 +44,17 @@ func testAppleMCPClientServer(t *testing.T) *mcp.ClientSession {
 }
 
 func TestRegisterApple(t *testing.T) {
-	server := mcp.NewServer(&mcp.Implementation{Name: _appleTestServerName, Version: "v0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: appleTestServerName, Version: "v0"}, nil)
 	client, err := apple.NewJobsClient("https://jobs.apple.com", nil)
 	require.NoError(t, err)
 	RegisterApple(server, client)
-	assertTools(t, server, _appleSearchToolName, _appleDetailToolName, _appleFiltersToolName)
+	assertTools(t, server, appleSearchToolName, appleDetailToolName, appleFiltersToolName)
 }
 
 func TestAppleGetSearchFiltersE2E(t *testing.T) {
 	client := testAppleMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _appleFiltersToolName,
+		Name:      appleFiltersToolName,
 		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
@@ -75,14 +75,14 @@ func TestAppleSearchJobsFilteredE2E(t *testing.T) {
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name: "apple_search_jobs",
 		Arguments: map[string]any{
-			_appleTestKeywordKey: "engineer",
-			"country_code":       "USA",
-			_appleTestSortKey:    string(apple.SortNewest),
-			_appleTestPageKey:    2,
-			"keywords":           []string{"camera"},
-			"teams":              []string{"HRDWR/CAM"},
-			"products":           []string{"IPHN"},
-			"languages":          []string{"en_US"},
+			appleTestKeywordKey: "engineer",
+			"country_code":      "USA",
+			appleTestSortKey:    string(apple.SortNewest),
+			appleTestPageKey:    2,
+			"keywords":          []string{"camera"},
+			"teams":             []string{"HRDWR/CAM"},
+			"products":          []string{"IPHN"},
+			"languages":         []string{"en_US"},
 		},
 	})
 	require.NoError(t, err)
@@ -102,8 +102,8 @@ func TestAppleSearchJobsLocationsWithoutCountryE2E(t *testing.T) {
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name: "apple_search_jobs",
 		Arguments: map[string]any{
-			_appleTestKeywordKey: "distributed engineer",
-			"locations":          []string{"TPEI", "NTC9"},
+			appleTestKeywordKey: "distributed engineer",
+			"locations":         []string{"TPEI", "NTC9"},
 		},
 	})
 	require.NoError(t, err)
@@ -133,10 +133,10 @@ func TestAppleSearchJobsE2E(t *testing.T) {
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
 		Name: "apple_search_jobs",
 		Arguments: map[string]any{
-			_appleTestKeywordKey: _appleTestKeyword,
-			"country_code":       "TWN",
-			_appleTestSortKey:    string(apple.SortRelevance),
-			_appleTestPageKey:    1,
+			appleTestKeywordKey: appleTestKeyword,
+			"country_code":      "TWN",
+			appleTestSortKey:    string(apple.SortRelevance),
+			appleTestPageKey:    1,
 		},
 	})
 	require.NoError(t, err)
@@ -154,7 +154,7 @@ func TestAppleSearchJobsE2E(t *testing.T) {
 		URL:         "https://jobs.apple.com/en-us/details/200624996/soc-packaging-engineer",
 		Title:       "SoC Packaging Engineer",
 		Team:        "Hardware",
-		Locations:   []string{_appleTestLocation},
+		Locations:   []string{appleTestLocation},
 		PostedOn:    "Jun 29, 2026",
 		WeeklyHours: 40,
 		Summary:     output.Data[0].Summary,
@@ -165,8 +165,8 @@ func TestAppleSearchJobsE2E(t *testing.T) {
 func TestAppleGetJobDetailE2E(t *testing.T) {
 	client := testAppleMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _appleDetailToolName,
-		Arguments: map[string]any{_appleTestJobIDKey: apple.MockJobID},
+		Name:      appleDetailToolName,
+		Arguments: map[string]any{appleTestJobIDKey: apple.MockJobID},
 	})
 	require.NoError(t, err)
 	require.False(t, result.IsError)
@@ -177,7 +177,7 @@ func TestAppleGetJobDetailE2E(t *testing.T) {
 	require.NoError(t, json.Unmarshal(data, &output))
 	assert.Equal(t, apple.MockJobID, output.JobID)
 	assert.Equal(t, "SoC Packaging Engineer", output.Title)
-	assert.Equal(t, []string{_appleTestLocation}, output.Locations)
+	assert.Equal(t, []string{appleTestLocation}, output.Locations)
 	assert.Equal(t, "Standard", output.EmploymentType)
 	assert.NotEmpty(t, output.Responsibilities)
 	assert.NotEmpty(t, output.MinimumQualifications)
@@ -186,8 +186,8 @@ func TestAppleGetJobDetailE2E(t *testing.T) {
 func TestAppleGetJobDetailNotFoundE2E(t *testing.T) {
 	client := testAppleMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _appleDetailToolName,
-		Arguments: map[string]any{_appleTestJobIDKey: apple.MockNotFoundJobID},
+		Name:      appleDetailToolName,
+		Arguments: map[string]any{appleTestJobIDKey: apple.MockNotFoundJobID},
 	})
 	require.NoError(t, err)
 	require.True(t, result.IsError)
@@ -197,7 +197,7 @@ func TestAppleGetJobDetailNotFoundE2E(t *testing.T) {
 }
 
 func TestAppleLocationLabel(t *testing.T) {
-	assert.Equal(t, _appleTestLocation, appleLocationLabel("Taipei", "Taiwan"))
+	assert.Equal(t, appleTestLocation, appleLocationLabel("Taipei", "Taiwan"))
 	assert.Equal(t, "Taiwan", appleLocationLabel("Taiwan", "Taiwan"))
 	assert.Equal(t, "Taiwan", appleLocationLabel("", "Taiwan"))
 }

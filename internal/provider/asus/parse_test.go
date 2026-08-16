@@ -8,7 +8,7 @@ import (
 )
 
 func TestParseSearchHTML_Success(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsRsp), "https://recruit.asus.com")
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsRsp), "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -35,7 +35,7 @@ func TestParseSearchHTML_Success(t *testing.T) {
 }
 
 func TestParseSearchHTML_FilterOptions(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsRsp), "https://recruit.asus.com")
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsRsp), "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -68,7 +68,7 @@ func TestParseSearchHTML_FilterOptions(t *testing.T) {
 // read off the page rather than compiled into the package: the same board
 // serves a different set of category filter values to an en-US session.
 func TestParseSearchHTML_FilterOptionsEnglish(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsEnRsp), "https://recruit.asus.com")
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsEnRsp), "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -109,7 +109,7 @@ func optionLabels(opts []FilterOption) []string {
 }
 
 func TestParseSearchHTML_Filtered(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsFilteredRsp), "https://recruit.asus.com")
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsFilteredRsp), "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -119,7 +119,7 @@ func TestParseSearchHTML_Filtered(t *testing.T) {
 }
 
 func TestParseSearchHTML_Empty(t *testing.T) {
-	resp, err := parseSearchHTML(bytes.NewReader(_mockJobsEmptyRsp), "https://recruit.asus.com")
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsEmptyRsp), "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -140,7 +140,7 @@ func TestParseSearchHTML_Empty(t *testing.T) {
 }
 
 func TestParseDetailHTML_Success(t *testing.T) {
-	detail, err := parseDetailHTML(bytes.NewReader(_mockJobDetailRsp), "762c08de-1daa-4aa8-9668-d8a746ce24a8", "https://recruit.asus.com")
+	detail, err := parseDetailHTML(bytes.NewReader(mockJobDetailRsp), "762c08de-1daa-4aa8-9668-d8a746ce24a8", "https://recruit.asus.com")
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -168,7 +168,7 @@ func TestParseDetailHTML_Success(t *testing.T) {
 }
 
 func TestParseDetailHTML_NotFound(t *testing.T) {
-	_, err := parseDetailHTML(bytes.NewReader(_mockJobNotFoundRsp), "invalid-id", "https://recruit.asus.com")
+	_, err := parseDetailHTML(bytes.NewReader(mockJobNotFoundRsp), "invalid-id", "https://recruit.asus.com")
 	if err == nil {
 		t.Fatal("expected error parsing not found response, got nil")
 	}

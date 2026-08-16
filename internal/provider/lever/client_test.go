@@ -24,18 +24,18 @@ func newMockServer(t *testing.T) *httptest.Server {
 		assert.Equal(t, "3", q.Get("limit"))
 		assert.Equal(t, []string{"Arlington, TX", "New York, NY"}, q["location"])
 		assert.Equal(t, []string{"Customer Success"}, q["department"])
-		serveMockJSON(_mockPostingsRsp)(w, r)
+		serveMockJSON(mockPostingsRsp)(w, r)
 	})
 	mux.HandleFunc("/v0/postings/{site}/{postingId}", func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "leverdemo", r.PathValue("site"))
 		assert.Equal(t, "33538a2f-d27d-4a96-8f05-fa4b0e4d940e", r.PathValue("postingId"))
-		serveMockJSON(_mockPostingDetailRsp)(w, r)
+		serveMockJSON(mockPostingDetailRsp)(w, r)
 	})
 	return httptest.NewServer(mux)
 }
 
-var _wantPosting = Posting{
+var wantPosting = Posting{
 	ID:   "33538a2f-d27d-4a96-8f05-fa4b0e4d940e",
 	Text: NewNilString("AbelsonTaylor Writer"),
 	Categories: NewOptPostingCategories(PostingCategories{
@@ -88,7 +88,7 @@ func TestListPostings(t *testing.T) {
 	require.NoError(t, err)
 	require.Len(t, got, 3)
 
-	assert.Equal(t, _wantPosting, got[0])
+	assert.Equal(t, wantPosting, got[0])
 }
 
 func TestGetPosting(t *testing.T) {
@@ -103,7 +103,7 @@ func TestGetPosting(t *testing.T) {
 		PostingId: "33538a2f-d27d-4a96-8f05-fa4b0e4d940e",
 	})
 	require.NoError(t, err)
-	assert.Equal(t, &_wantPosting, got)
+	assert.Equal(t, &wantPosting, got)
 }
 
 func TestListPostingsNotFound(t *testing.T) {

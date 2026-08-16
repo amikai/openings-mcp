@@ -36,33 +36,33 @@ const MockOutsideFounderSlug = "kaminashi"
 const MockUnknownSlug = "this-company-does-not-exist-xyz"
 
 //go:embed testdata/company_rsp.json
-var _mockCompanyRsp []byte
+var mockCompanyRsp []byte
 
 //go:embed testdata/company_sparse_rsp.json
-var _mockCompanySparseRsp []byte
+var mockCompanySparseRsp []byte
 
 //go:embed testdata/company_media_optout_rsp.json
-var _mockCompanyMediaOptOutRsp []byte
+var mockCompanyMediaOptOutRsp []byte
 
 //go:embed testdata/company_outside_founder_rsp.json
-var _mockCompanyOutsideFounderRsp []byte
+var mockCompanyOutsideFounderRsp []byte
 
 //go:embed testdata/company_not_found_rsp.json
-var _mockCompanyNotFoundRsp []byte
+var mockCompanyNotFoundRsp []byte
 
 //go:embed testdata/jobs_rsp.json
-var _mockJobsRsp []byte
+var mockJobsRsp []byte
 
 // NewMockServer returns a fixture-replaying HERP Career API. The caller owns
 // the server and must close it.
 func NewMockServer() *httptest.Server {
 	mux := http.NewServeMux()
-	mux.HandleFunc("/careers/api/v1/companies/"+MockSlug, serveMockJSON(http.StatusOK, _mockCompanyRsp))
-	mux.HandleFunc("/careers/api/v1/companies/"+MockSparseSlug, serveMockJSON(http.StatusOK, _mockCompanySparseRsp))
-	mux.HandleFunc("/careers/api/v1/companies/"+MockMediaOptOutSlug, serveMockJSON(http.StatusOK, _mockCompanyMediaOptOutRsp))
-	mux.HandleFunc("/careers/api/v1/companies/"+MockOutsideFounderSlug, serveMockJSON(http.StatusOK, _mockCompanyOutsideFounderRsp))
-	mux.HandleFunc("/careers/api/v1/jobs", serveMockJSON(http.StatusOK, _mockJobsRsp))
-	mux.HandleFunc("/careers/api/v1/companies/", serveMockJSON(http.StatusNotFound, _mockCompanyNotFoundRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockSlug, serveMockJSON(http.StatusOK, mockCompanyRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockSparseSlug, serveMockJSON(http.StatusOK, mockCompanySparseRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockMediaOptOutSlug, serveMockJSON(http.StatusOK, mockCompanyMediaOptOutRsp))
+	mux.HandleFunc("/careers/api/v1/companies/"+MockOutsideFounderSlug, serveMockJSON(http.StatusOK, mockCompanyOutsideFounderRsp))
+	mux.HandleFunc("/careers/api/v1/jobs", serveMockJSON(http.StatusOK, mockJobsRsp))
+	mux.HandleFunc("/careers/api/v1/companies/", serveMockJSON(http.StatusNotFound, mockCompanyNotFoundRsp))
 	mux.HandleFunc("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	})

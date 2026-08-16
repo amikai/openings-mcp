@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	_mockCSRFToken = "33e493ffd99180b626498ce539f01c92fdb6f0bf6c4f083209b6fb7621440194"
-	_mockCSRFValue = "33e493ffd99180b626498ce539f01c92fdb6f0bf6c4f083209b6fb7621440194%7Cc140f3a1832ef33a64a626452e79531f01c5b96f18340401e4ecd73a95996e7a"
+	mockCSRFToken = "33e493ffd99180b626498ce539f01c92fdb6f0bf6c4f083209b6fb7621440194"
+	mockCSRFValue = "33e493ffd99180b626498ce539f01c92fdb6f0bf6c4f083209b6fb7621440194%7Cc140f3a1832ef33a64a626452e79531f01c5b96f18340401e4ecd73a95996e7a"
 
 	// MockJobID and MockNotFoundJobID are dayforce/testdata/detail_*.json's
 	// posting ids, for tests exercising [BoardClient.Job].
@@ -47,52 +47,52 @@ const (
 )
 
 //go:embed testdata/search_rsp.json
-var _mockSearchRsp []byte
+var mockSearchRsp []byte
 
 //go:embed testdata/search_filtered_rsp.json
-var _mockSearchFilteredRsp []byte
+var mockSearchFilteredRsp []byte
 
 //go:embed testdata/search_page2_rsp.json
-var _mockSearchPage2Rsp []byte
+var mockSearchPage2Rsp []byte
 
 //go:embed testdata/search_alljobs_rsp.json
-var _mockSearchAllJobsRsp []byte
+var mockSearchAllJobsRsp []byte
 
 //go:embed testdata/search_unknown_tenant_rsp.json
-var _mockSearchUnknownTenantRsp []byte
+var mockSearchUnknownTenantRsp []byte
 
 //go:embed testdata/search_null_location_rsp.json
-var _mockSearchNullLocationRsp []byte
+var mockSearchNullLocationRsp []byte
 
 //go:embed testdata/search_null_postinglocations_rsp.json
-var _mockSearchNullPostingLocationsRsp []byte
+var mockSearchNullPostingLocationsRsp []byte
 
 //go:embed testdata/detail_rsp.json
-var _mockDetailRsp []byte
+var mockDetailRsp []byte
 
 //go:embed testdata/detail_null_currency_rsp.json
-var _mockDetailNullCurrencyRsp []byte
+var mockDetailNullCurrencyRsp []byte
 
 //go:embed testdata/detail_bool_attribute_rsp.json
-var _mockDetailBoolAttributeRsp []byte
+var mockDetailBoolAttributeRsp []byte
 
 //go:embed testdata/detail_null_description_header_rsp.json
-var _mockDetailNullDescriptionHeaderRsp []byte
+var mockDetailNullDescriptionHeaderRsp []byte
 
 //go:embed testdata/detail_not_found_rsp.json
-var _mockDetailNotFoundRsp []byte
+var mockDetailNotFoundRsp []byte
 
 //go:embed testdata/attributes_departments_rsp.json
-var _mockDepartmentsRsp []byte
+var mockDepartmentsRsp []byte
 
 //go:embed testdata/attributes_payclasses_rsp.json
-var _mockPayClassesRsp []byte
+var mockPayClassesRsp []byte
 
 //go:embed testdata/attributes_paytypes_rsp.json
-var _mockPayTypesRsp []byte
+var mockPayTypesRsp []byte
 
 //go:embed testdata/siteinfo_rsp.html
-var _mockSiteInfoRsp []byte
+var mockSiteInfoRsp []byte
 
 // NewMockServer returns an httptest.Server that replays captured Dayforce
 // candidate portal responses, including the next-auth CSRF cookie/header
@@ -107,18 +107,18 @@ func NewMockServer() *httptest.Server {
 	mux.HandleFunc("GET /api/auth/csrf", func(w http.ResponseWriter, r *http.Request) {
 		http.SetCookie(w, &http.Cookie{
 			Name:     "__Host-next-auth.csrf-token",
-			Value:    _mockCSRFValue,
+			Value:    mockCSRFValue,
 			Path:     "/",
 			Secure:   true,
 			HttpOnly: true,
 			SameSite: http.SameSiteNoneMode,
 		})
-		serveMockJSON(w, http.StatusOK, []byte(`{"csrfToken":"`+_mockCSRFToken+`"}`))
+		serveMockJSON(w, http.StatusOK, []byte(`{"csrfToken":"`+mockCSRFToken+`"}`))
 	})
 
 	mux.HandleFunc("POST /api/geo/{ns}/jobposting/search", func(w http.ResponseWriter, r *http.Request) {
 		cookie, err := r.Cookie("__Host-next-auth.csrf-token")
-		if err != nil || cookie.Value != _mockCSRFValue || r.Header.Get("X-Csrf-Token") != _mockCSRFToken {
+		if err != nil || cookie.Value != mockCSRFValue || r.Header.Get("X-Csrf-Token") != mockCSRFToken {
 			// The live 403 body is a bare 9-byte "Forbidden" string with no
 			// Content-Type; the spec models this response with no content,
 			// so its exact bytes here are unchecked by the generated client.
@@ -129,9 +129,9 @@ func NewMockServer() *httptest.Server {
 
 		switch r.PathValue("ns") {
 		case "nosuchtenantxyz":
-			serveMockProblem(w, http.StatusNotFound, _mockSearchUnknownTenantRsp)
+			serveMockProblem(w, http.StatusNotFound, mockSearchUnknownTenantRsp)
 		case "mydayforce":
-			serveMockJSON(w, http.StatusOK, _mockSearchAllJobsRsp)
+			serveMockJSON(w, http.StatusOK, mockSearchAllJobsRsp)
 		case "pca":
 			serveMockJSON(w, http.StatusOK, pcaSearchFixture(r))
 		case "mymilacron":
@@ -139,9 +139,9 @@ func NewMockServer() *httptest.Server {
 		case "emptyboard", "badculture":
 			serveMockJSON(w, http.StatusOK, []byte(`{"jobPostings":[],"maxCount":0,"offset":0,"count":0}`))
 		case "nossr":
-			serveMockJSON(w, http.StatusOK, _mockSearchRsp)
+			serveMockJSON(w, http.StatusOK, mockSearchRsp)
 		default:
-			serveMockProblem(w, http.StatusNotFound, _mockSearchUnknownTenantRsp)
+			serveMockProblem(w, http.StatusNotFound, mockSearchUnknownTenantRsp)
 		}
 	})
 
@@ -149,36 +149,36 @@ func NewMockServer() *httptest.Server {
 		if r.PathValue("ns") == "pca" && r.PathValue("ns2") == "pca" &&
 			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
 			r.PathValue("postingId") == "62374" {
-			serveMockJSON(w, http.StatusOK, _mockDetailRsp)
+			serveMockJSON(w, http.StatusOK, mockDetailRsp)
 			return
 		}
 		if r.PathValue("ns") == "jdemea" && r.PathValue("ns2") == "jdemea" &&
 			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
 			r.PathValue("postingId") == "35762" {
-			serveMockJSON(w, http.StatusOK, _mockDetailNullCurrencyRsp)
+			serveMockJSON(w, http.StatusOK, mockDetailNullCurrencyRsp)
 			return
 		}
 		if r.PathValue("ns") == "mymilacron" && r.PathValue("ns2") == "mymilacron" &&
 			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
 			r.PathValue("postingId") == "2684" {
-			serveMockJSON(w, http.StatusOK, _mockDetailBoolAttributeRsp)
+			serveMockJSON(w, http.StatusOK, mockDetailBoolAttributeRsp)
 			return
 		}
 		if r.PathValue("ns") == "ara" && r.PathValue("ns2") == "ara" &&
 			r.PathValue("culture") == "en-US" && r.PathValue("jobBoardId") == "1" &&
 			r.PathValue("postingId") == "8" {
-			serveMockJSON(w, http.StatusOK, _mockDetailNullDescriptionHeaderRsp)
+			serveMockJSON(w, http.StatusOK, mockDetailNullDescriptionHeaderRsp)
 			return
 		}
 		// Any other ns/culture/jobBoardId/postingId combination, including a
 		// valid posting id requested under a different tenant, replays the
 		// captured cross-tenant 404 fixture.
-		serveMockProblem(w, http.StatusNotFound, _mockDetailNotFoundRsp)
+		serveMockProblem(w, http.StatusNotFound, mockDetailNotFoundRsp)
 	})
 
-	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/departments/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(_mockDepartmentsRsp))
-	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/payclasses/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(_mockPayClassesRsp))
-	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/paytypes/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(_mockPayTypesRsp))
+	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/departments/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(mockDepartmentsRsp))
+	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/payclasses/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(mockPayClassesRsp))
+	mux.HandleFunc("GET /api/geo/{ns}/postingattributes/paytypes/{ns2}/{jobBoardId}/{culture}", serveMockJSONFunc(mockPayTypesRsp))
 
 	mux.HandleFunc("GET /{culture}/{ns}/{xref}", func(w http.ResponseWriter, r *http.Request) {
 		if ns := r.PathValue("ns"); ns == "badculture" || ns == "nossr" {
@@ -187,7 +187,7 @@ func NewMockServer() *httptest.Server {
 		}
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write(_mockSiteInfoRsp)
+		_, _ = w.Write(mockSiteInfoRsp)
 	})
 
 	return httptest.NewTLSServer(mux)
@@ -199,10 +199,10 @@ func NewMockServer() *httptest.Server {
 func pcaSearchFixture(r *http.Request) []byte {
 	var req SearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return _mockSearchRsp
+		return mockSearchRsp
 	}
 	if text, ok := req.SearchText.Get(); ok && text == "electrical engineer" {
-		return _mockSearchFilteredRsp
+		return mockSearchFilteredRsp
 	}
 	// Location branch pins the captured geo payload. A request that has
 	// locationString but not distance 50 / distanceUnit 0 falls through
@@ -212,17 +212,17 @@ func pcaSearchFixture(r *http.Request) []byte {
 		dist, distOK := req.Distance.Get()
 		unit, unitOK := req.DistanceUnit.Get()
 		if distOK && dist == 50 && unitOK && unit == 0 {
-			return _mockSearchFilteredRsp
+			return mockSearchFilteredRsp
 		}
-		return _mockSearchRsp
+		return mockSearchRsp
 	}
 	if start, ok := req.PaginationStart.Get(); ok && start == 25 {
-		return _mockSearchPage2Rsp
+		return mockSearchPage2Rsp
 	}
 	if start, ok := req.PaginationStart.Get(); ok && start > 25 {
 		return []byte(`{"jobPostings":[],"maxCount":352,"offset":0,"count":0}`)
 	}
-	return _mockSearchRsp
+	return mockSearchRsp
 }
 
 // mymilacronSearchFixture picks between mymilacron's two captured fixtures:
@@ -232,12 +232,12 @@ func pcaSearchFixture(r *http.Request) []byte {
 func mymilacronSearchFixture(r *http.Request) []byte {
 	var req SearchRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return _mockSearchNullLocationRsp
+		return mockSearchNullLocationRsp
 	}
 	if start, ok := req.PaginationStart.Get(); ok && start == 25 {
-		return _mockSearchNullPostingLocationsRsp
+		return mockSearchNullPostingLocationsRsp
 	}
-	return _mockSearchNullLocationRsp
+	return mockSearchNullLocationRsp
 }
 
 func serveMockJSON(w http.ResponseWriter, status int, data []byte) {

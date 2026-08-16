@@ -12,11 +12,11 @@ import (
 )
 
 //go:embed companies.yaml
-var _companiesYAML []byte
+var companiesYAML []byte
 
 // slugRE matches a HERP Career company slug, the single path segment in
 // herp.careers/careers/companies/{slug}.
-var _slugRE = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
+var slugRE = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]*$`)
 
 // Company is a confirmed organization listed on HERP Career. Slug is the
 // path segment in herp.careers/careers/companies/{slug} and the provider's
@@ -41,7 +41,7 @@ var Companies = mustLoadCompanies()
 var CompaniesBySlug = buildSlugIndex(Companies)
 
 func mustLoadCompanies() []Company {
-	cs, err := loadCompanies(_companiesYAML)
+	cs, err := loadCompanies(companiesYAML)
 	if err != nil {
 		panic(fmt.Sprintf("herp: load companies.yaml: %v", err))
 	}
@@ -80,7 +80,7 @@ func validateCompany(c Company) error {
 		return errors.New("company name is required")
 	case c.Slug == "":
 		return fmt.Errorf("company %q: slug is required", c.Name)
-	case !_slugRE.MatchString(c.Slug):
+	case !slugRE.MatchString(c.Slug):
 		return fmt.Errorf("company %q: invalid slug %q", c.Name, c.Slug)
 	}
 	return nil

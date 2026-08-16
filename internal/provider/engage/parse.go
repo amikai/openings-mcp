@@ -15,7 +15,7 @@ import (
 // workIDPathRE matches a posting link's /<slug>/work_<id>/ path and captures
 // the numeric id. The link also carries a "?via_recruit_page=1" query string
 // on the board, which this pattern ignores.
-var _workIDPathRE = regexp.MustCompile(`/work_(\d+)/`)
+var workIDPathRE = regexp.MustCompile(`/work_(\d+)/`)
 
 // parseBoard extracts every dt.category / dd.dataArea pair from a tenant
 // board page. Each employment-type category renders as its own
@@ -63,7 +63,7 @@ func parseBoard(doc *goquery.Document) (*Board, error) {
 func parseJobEntry(dd *goquery.Selection) (Job, bool) {
 	a := dd.Find("a.linkKoma").First()
 	href, _ := a.Attr("href")
-	m := _workIDPathRE.FindStringSubmatch(href)
+	m := workIDPathRE.FindStringSubmatch(href)
 	if m == nil {
 		return Job{}, false
 	}

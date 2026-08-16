@@ -7,25 +7,25 @@ import (
 )
 
 //go:embed testdata/jobs_workplace_rsp.json
-var _mockJobsWorkplaceRsp []byte
+var mockJobsWorkplaceRsp []byte
 
 //go:embed testdata/jobs_keyword_rsp.json
-var _mockJobsKeywordRsp []byte
+var mockJobsKeywordRsp []byte
 
 //go:embed testdata/jobs_empty_rsp.json
-var _mockJobsEmptyRsp []byte
+var mockJobsEmptyRsp []byte
 
 //go:embed testdata/job_detail_rsp.json
-var _mockJobDetailRsp []byte
+var mockJobDetailRsp []byte
 
 //go:embed testdata/job_not_found_rsp.json
-var _mockJobNotFoundRsp []byte
+var mockJobNotFoundRsp []byte
 
 //go:embed testdata/workplace_codes_rsp.json
-var _mockWorkplaceCodesRsp []byte
+var mockWorkplaceCodesRsp []byte
 
 //go:embed testdata/talent_zone_codes_rsp.json
-var _mockTalentZoneCodesRsp []byte
+var mockTalentZoneCodesRsp []byte
 
 // MockDetailID is the opaque detail id captured in job_detail_rsp.json.
 const MockDetailID = "08de75d7bd7611a790b20d5b47c2f1bb"
@@ -49,24 +49,24 @@ func NewMockServer() *httptest.Server {
 		q := r.URL.Query()
 		switch {
 		case q.Get("workplaceCode") == "CH":
-			serveMockJSON(_mockJobsWorkplaceRsp)(w, r)
+			serveMockJSON(mockJobsWorkplaceRsp)(w, r)
 		case q.Get("keywords") == "ADAS":
-			serveMockJSON(_mockJobsKeywordRsp)(w, r)
+			serveMockJSON(mockJobsKeywordRsp)(w, r)
 		default:
-			serveMockJSON(_mockJobsEmptyRsp)(w, r)
+			serveMockJSON(mockJobsEmptyRsp)(w, r)
 		}
 	})
 
-	mux.HandleFunc("/hh_recruit_tw_api/portal_api/JobVacancies/"+MockDetailID, serveMockJSON(_mockJobDetailRsp))
+	mux.HandleFunc("/hh_recruit_tw_api/portal_api/JobVacancies/"+MockDetailID, serveMockJSON(mockJobDetailRsp))
 
 	mux.HandleFunc("/hh_recruit_tw_api/portal_api/JobVacancies/"+MockNotFoundID, func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/problem+json")
 		w.WriteHeader(http.StatusNotFound)
-		w.Write(_mockJobNotFoundRsp)
+		w.Write(mockJobNotFoundRsp)
 	})
 
-	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes", serveMockJSON(_mockWorkplaceCodesRsp))
-	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes", serveMockJSON(_mockTalentZoneCodesRsp))
+	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/Workplace/Codes", serveMockJSON(mockWorkplaceCodesRsp))
+	mux.HandleFunc("/hh_recruit_tw_api/portal_api/Labels/TalentZone/Codes", serveMockJSON(mockTalentZoneCodesRsp))
 
 	return httptest.NewServer(mux)
 }

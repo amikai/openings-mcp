@@ -12,15 +12,15 @@ import (
 )
 
 const (
-	_metaTestServerName = "test"
-	_metaTestClientName = "test-client"
-	_metaTestJobIDKey   = "job_id"
-	_metaTestJobTitle   = "Instagram Product Designer, Brand-in-Product"
+	metaTestServerName = "test"
+	metaTestClientName = "test-client"
+	metaTestJobIDKey   = "job_id"
+	metaTestJobTitle   = "Instagram Product Designer, Brand-in-Product"
 )
 
 func testMetaMCPClientServer(t *testing.T) *mcp.ClientSession {
 	t.Helper()
-	server := mcp.NewServer(&mcp.Implementation{Name: _metaTestServerName, Version: "v0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: metaTestServerName, Version: "v0"}, nil)
 	mock := meta.NewMockServer()
 	t.Cleanup(mock.Close)
 	RegisterMeta(server, meta.NewClient(mock.URL, mock.Client()))
@@ -30,7 +30,7 @@ func testMetaMCPClientServer(t *testing.T) *mcp.ClientSession {
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = serverSession.Close() })
 
-	mcpClient := mcp.NewClient(&mcp.Implementation{Name: _metaTestClientName, Version: "v0"}, nil)
+	mcpClient := mcp.NewClient(&mcp.Implementation{Name: metaTestClientName, Version: "v0"}, nil)
 	clientSession, err := mcpClient.Connect(t.Context(), clientTransport, nil)
 	require.NoError(t, err)
 	t.Cleanup(func() { _ = clientSession.Close() })
@@ -38,15 +38,15 @@ func testMetaMCPClientServer(t *testing.T) *mcp.ClientSession {
 }
 
 func TestRegisterMeta(t *testing.T) {
-	server := mcp.NewServer(&mcp.Implementation{Name: _metaTestServerName, Version: "v0"}, nil)
+	server := mcp.NewServer(&mcp.Implementation{Name: metaTestServerName, Version: "v0"}, nil)
 	RegisterMeta(server, meta.NewClient("https://www.metacareers.com", nil))
-	assertTools(t, server, _metaSearchToolName, _metaDetailToolName, _metaFiltersToolName)
+	assertTools(t, server, metaSearchToolName, metaDetailToolName, metaFiltersToolName)
 }
 
 func TestMetaGetSearchFiltersE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _metaFiltersToolName,
+		Name:      metaFiltersToolName,
 		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
@@ -71,7 +71,7 @@ func TestMetaGetSearchFiltersE2E(t *testing.T) {
 func TestMetaSearchJobsTechnologiesE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name: _metaSearchToolName,
+		Name: metaSearchToolName,
 		Arguments: map[string]any{
 			// The mock replays the Singapore-filtered fixture for any
 			// variables containing "Singapore"; the point here is that the
@@ -92,7 +92,7 @@ func TestMetaSearchJobsTechnologiesE2E(t *testing.T) {
 func TestMetaSearchJobsE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _metaSearchToolName,
+		Name:      metaSearchToolName,
 		Arguments: make(map[string]any),
 	})
 	require.NoError(t, err)
@@ -103,11 +103,11 @@ func TestMetaSearchJobsE2E(t *testing.T) {
 	var output metaSearchOutput
 	require.NoError(t, json.Unmarshal(data, &output))
 	assert.Equal(t, 648, output.Total)
-	require.Len(t, output.Data, _metaDefaultLimit)
+	require.Len(t, output.Data, metaDefaultLimit)
 	assert.Equal(t, metaJobSummary{
 		JobID:     meta.MockJobID,
 		URL:       "https://www.metacareers.com/jobs/1063741453022215/",
-		Title:     _metaTestJobTitle,
+		Title:     metaTestJobTitle,
 		Locations: []string{"Menlo Park, CA", "New York, NY", "San Francisco, CA"},
 		Teams:     []string{"Design & User Experience", "Creative"},
 		SubTeams:  []string{"Design"},
@@ -117,7 +117,7 @@ func TestMetaSearchJobsE2E(t *testing.T) {
 func TestMetaSearchJobsPagingE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name: _metaSearchToolName,
+		Name: metaSearchToolName,
 		Arguments: map[string]any{
 			"limit":  5,
 			"offset": 645,
@@ -137,7 +137,7 @@ func TestMetaSearchJobsPagingE2E(t *testing.T) {
 func TestMetaSearchJobsLimitAboveSchemaMaxE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _metaSearchToolName,
+		Name:      metaSearchToolName,
 		Arguments: map[string]any{"limit": 10000},
 	})
 	require.NoError(t, err)
@@ -147,7 +147,7 @@ func TestMetaSearchJobsLimitAboveSchemaMaxE2E(t *testing.T) {
 func TestMetaSearchJobsFilteredE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name: _metaSearchToolName,
+		Name: metaSearchToolName,
 		Arguments: map[string]any{
 			"keyword": "engineer",
 			"offices": []string{"Singapore"},
@@ -169,8 +169,8 @@ func TestMetaSearchJobsFilteredE2E(t *testing.T) {
 func TestMetaGetJobDetailE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _metaDetailToolName,
-		Arguments: map[string]any{_metaTestJobIDKey: meta.MockJobID},
+		Name:      metaDetailToolName,
+		Arguments: map[string]any{metaTestJobIDKey: meta.MockJobID},
 	})
 	require.NoError(t, err)
 	require.False(t, result.IsError)
@@ -180,7 +180,7 @@ func TestMetaGetJobDetailE2E(t *testing.T) {
 	var output metaDetailOutput
 	require.NoError(t, json.Unmarshal(data, &output))
 	assert.Equal(t, meta.MockJobID, output.JobID)
-	assert.Equal(t, _metaTestJobTitle, output.Title)
+	assert.Equal(t, metaTestJobTitle, output.Title)
 	assert.Equal(t, []string{"Menlo Park, CA", "New York, NY", "San Francisco, CA"}, output.Locations)
 	assert.Contains(t, output.Description, "Product Designer")
 	assert.NotContains(t, output.Description, "<span>")
@@ -200,8 +200,8 @@ func TestMetaGetJobDetailE2E(t *testing.T) {
 func TestMetaGetJobDetailNotFoundE2E(t *testing.T) {
 	client := testMetaMCPClientServer(t)
 	result, err := client.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      _metaDetailToolName,
-		Arguments: map[string]any{_metaTestJobIDKey: meta.MockNotFoundJobID},
+		Name:      metaDetailToolName,
+		Arguments: map[string]any{metaTestJobIDKey: meta.MockNotFoundJobID},
 	})
 	require.NoError(t, err)
 	require.True(t, result.IsError)
