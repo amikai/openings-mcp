@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -298,12 +297,8 @@ func (c *Client) graphql(ctx context.Context, docID string, variables any, out a
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return fmt.Errorf("read response: %w", err)
-	}
 	var envelope gqlEnvelope
-	if err := json.Unmarshal(body, &envelope); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&envelope); err != nil {
 		return fmt.Errorf("parse response: %w", err)
 	}
 	if len(envelope.Errors) > 0 {

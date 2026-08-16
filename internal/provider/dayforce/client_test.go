@@ -475,7 +475,7 @@ func TestSiteInfoMissingJobBoardID(t *testing.T) {
 	html := `<html><body><script id="__NEXT_DATA__" type="application/json">` +
 		`{"props":{"pageProps":{"dehydratedState":{"queries":[{"queryKey":["site-info"],"state":{"data":{"jobBoardId":0}}}]}}}}` +
 		`</script></body></html>`
-	_, err := parseSiteInfo([]byte(html))
+	_, err := parseSiteInfo(strings.NewReader(html))
 	require.Error(t, err)
 	assert.ErrorContains(t, err, "missing jobBoardId")
 }
@@ -484,13 +484,13 @@ func TestSiteInfoAllowsNullClientID(t *testing.T) {
 	html := `<html><body><script id="__NEXT_DATA__" type="application/json">` +
 		`{"props":{"pageProps":{"dehydratedState":{"queries":[{"queryKey":["site-info"],"state":{"data":{"jobBoardId":1,"clientId":null}}}]}}}}` +
 		`</script></body></html>`
-	info, err := parseSiteInfo([]byte(html))
+	info, err := parseSiteInfo(strings.NewReader(html))
 	require.NoError(t, err)
 	assert.Equal(t, 1, info.JobBoardId)
 }
 
 func TestSiteInfoMissingNextData(t *testing.T) {
-	_, err := parseSiteInfo([]byte("<html><body>not a dayforce page</body></html>"))
+	_, err := parseSiteInfo(strings.NewReader("<html><body>not a dayforce page</body></html>"))
 	require.Error(t, err)
 }
 
@@ -501,7 +501,7 @@ func TestSiteInfoMissingSiteInfoQuery(t *testing.T) {
 	html := `<html><body><script id="__NEXT_DATA__" type="application/json">` +
 		`{"props":{"pageProps":{"dehydratedState":{"queries":[{"queryKey":["something-else"],"state":{"data":{}}}]}}}}` +
 		`</script></body></html>`
-	_, err := parseSiteInfo([]byte(html))
+	_, err := parseSiteInfo(strings.NewReader(html))
 	require.Error(t, err)
 }
 

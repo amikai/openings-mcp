@@ -3,7 +3,6 @@ package nodesk
 import (
 	_ "embed"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -51,15 +50,10 @@ func NewMockServer() *httptest.Server {
 			serveJSON(w, http.StatusForbidden, mockMissingRefererRsp)
 			return
 		}
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
 		var q struct {
 			Params string `json:"params"`
 		}
-		if err := json.Unmarshal(body, &q); err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&q); err != nil {
 			http.Error(w, "malformed query body", http.StatusBadRequest)
 			return
 		}

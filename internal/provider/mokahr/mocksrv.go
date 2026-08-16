@@ -3,7 +3,6 @@ package mokahr
 import (
 	_ "embed"
 	"encoding/json"
-	"io"
 	"net/http"
 	"net/http/httptest"
 )
@@ -153,11 +152,7 @@ type mockRequest struct {
 
 func decodeMockRequest(r *http.Request) mockRequest {
 	var req mockRequest
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return req
-	}
-	_ = json.Unmarshal(body, &req)
+	_ = json.NewDecoder(r.Body).Decode(&req)
 	return req
 }
 

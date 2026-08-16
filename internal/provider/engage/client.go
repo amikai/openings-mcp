@@ -1,7 +1,6 @@
 package engage
 
 import (
-	"bytes"
 	"cmp"
 	"context"
 	"encoding/json"
@@ -108,16 +107,13 @@ func (c *Client) Companies(ctx context.Context, page, prevTotal int) (*Companies
 		page = 1
 	}
 	u := fmt.Sprintf("%s/user/api/search/result_work_list/?p_t=%d&f_t=0&page=%d", c.baseURL, prevTotal, page)
-	body, status, err := c.getJSON(ctx, u)
+	var wire aggregatorResponse
+	status, err := c.getJSON(ctx, u, &wire)
 	if err != nil {
 		return nil, fmt.Errorf("engage: companies page %d: %w", page, err)
 	}
 	if status != http.StatusOK {
 		return nil, fmt.Errorf("engage: companies page %d: HTTP %d", page, status)
-	}
-	var wire aggregatorResponse
-	if err := json.Unmarshal(body, &wire); err != nil {
-		return nil, fmt.Errorf("engage: companies page %d: decode response: %w", page, err)
 	}
 	if wire.Result != "success" {
 		return nil, fmt.Errorf("engage: companies page %d: result %q: %s", page, wire.Result, wire.ErrorMessage)
@@ -150,40 +146,41 @@ func (c *Client) jobURL(slug, workID string) string {
 // getHTML issues one GET and parses the body as HTML regardless of status
 // code, so callers can inspect error pages (e.g. the 404 body) if needed.
 func (c *Client) getHTML(ctx context.Context, rawURL string) (*goquery.Document, int, error) {
-	body, status, err := c.get(ctx, rawURL, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-	if err != nil {
-		return nil, 0, err
-	}
-	doc, err := goquery.NewDocumentFromReader(bytes.NewReader(body))
-	if err != nil {
-		return nil, status, fmt.Errorf("parse html: %w", err)
-	}
-	return doc, status, nil
-}
-
-func (c *Client) getJSON(ctx context.Context, rawURL string) ([]byte, int, error) {
-	return c.get(ctx, rawURL, "application/json")
-}
-
-func (c *Client) get(ctx context.Context, rawURL, accept string) ([]byte, int, error) {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
-	if err != nil {
-		return nil, 0, err
-	}
-	req.Header.Set("User-Agent", userAgent)
-	req.Header.Set("Accept", accept)
-
-	resp, err := c.httpClient.Do(req)
+	resp, err := c.do(ctx, rawURL, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
 	if err != nil {
 		return nil, 0, err
 	}
 	defer resp.Body.Close()
-
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 8<<20))
+	doc, err := goquery.NewDocumentFromReader(io.LimitReader(resp.Body, 8<<20))
 	if err != nil {
-		return nil, resp.StatusCode, fmt.Errorf("read body: %w", err)
+		return nil, resp.StatusCode, fmt.Errorf("parse html: %w", err)
 	}
-	return body, resp.StatusCode, nil
+	return doc, resp.StatusCode, nil
+}
+
+func (c *Client) getJSON(ctx context.Context, rawURL string, dest any) (int, error) {
+	resp, err := c.do(ctx, rawURL, "application/json")
+	if err != nil {
+		return 0, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return resp.StatusCode, nil
+	}
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 8<<20)).Decode(dest); err != nil {
+		return resp.StatusCode, fmt.Errorf("decode response: %w", err)
+	}
+	return resp.StatusCode, nil
+}
+
+func (c *Client) do(ctx context.Context, rawURL, accept string) (*http.Response, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("User-Agent", userAgent)
+	req.Header.Set("Accept", accept)
+	return c.httpClient.Do(req)
 }
 
 // aggregatorResponse is the result_work_list wire shape, trimmed to the

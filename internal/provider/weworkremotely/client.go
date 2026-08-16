@@ -5,7 +5,6 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"path"
@@ -193,13 +192,8 @@ func (c *Client) fetch(ctx context.Context, rawURL string) ([]Job, error) {
 		return nil, fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
 
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("read response: %w", err)
-	}
-
 	var feed rssFeed
-	if err := xml.Unmarshal(body, &feed); err != nil {
+	if err := xml.NewDecoder(resp.Body).Decode(&feed); err != nil {
 		return nil, fmt.Errorf("parse rss: %w", err)
 	}
 
