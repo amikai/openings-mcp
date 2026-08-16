@@ -41,8 +41,7 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
 - **Dedicated company career sites**: **[Amazon Jobs](https://www.amazon.jobs)**,
   **[Apple Careers](https://jobs.apple.com)**,
   **[Google Careers](https://www.google.com/about/careers/applications/jobs)**,
-  **[Meta Careers](https://www.metacareers.com)**,
-  **[NVIDIA Careers](https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite)**, and
+  **[Meta Careers](https://www.metacareers.com)**, and
   **[TSMC Careers](https://careers.tsmc.com)**.
 
 ⚠️ Token use adds up fast when your client explores multiple postings or

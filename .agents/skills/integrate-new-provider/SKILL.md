@@ -1,6 +1,6 @@
 ---
 name: integrate-new-provider
-description: Use when adding a new job-listings provider to openings-mcp — a new ATS platform (like Workday, Greenhouse, Lever, Ashby, SmartRecruiters) or a dedicated job board or careers site (like 104, Cake, Google, NVIDIA, TSMC) — or when finishing a stalled integration by wiring an existing provider package into the MCP server, e.g. its client, tests, and debug CLI all work but its companies aren't reachable through the MCP tools.
+description: Use when adding a new job-listings provider to openings-mcp — a new ATS platform (like Workday, Greenhouse, Lever, Ashby, SmartRecruiters) or a dedicated job board or careers site (like 104, Cake, Google, Meta, TSMC) — or when finishing a stalled integration by wiring an existing provider package into the MCP server, e.g. its client, tests, and debug CLI all work but its companies aren't reachable through the MCP tools.
 ---
 
 # Integrate a New Provider
@@ -32,7 +32,7 @@ GraphQL / `__NEXT_DATA__`).
   `search_jobs_by_company` tools. Examples: workday, greenhouse, lever, ashby.
 - **Single site or job board**: dedicated `<name>_search_jobs` /
   `<name>_get_job_detail` MCP tools in `internal/openingsmcp/<name>.go`.
-  Examples: job104, cake, google, nvidia, tsmc, linkedin.
+  Examples: job104, cake, google, tsmc, linkedin.
 
 RSS/Atom and most niche boards land on dedicated tools unless each tenant
 has a stable, roster-able feed URL and multi-company routing is worth it.
