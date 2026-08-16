@@ -31,7 +31,7 @@ func main() {
 
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
-		area    = searchFS.StringLong("area", "", "area code filter (e.g. A, B, WJ, or A;B); see the 'areas' subcommand")
+		area    = searchFS.StringLong("area", "", "area code filter (e.g. A, B, C, or A;B); see the 'areas' subcommand")
 		keyword = searchFS.StringLong("keyword", "", "job title keyword filter (case-insensitive substring)")
 		lang    = searchFS.StringLong("lang", "en-US", "language tag (e.g. en-US, zh-TW, zh-CN)")
 	)
@@ -159,14 +159,13 @@ func summarize(j delta.JobSummary) jobSummaryJSON {
 }
 
 func printSummary(s jobSummaryJSON) {
-	if s.AreaName != "" || s.JobPlaceName != "" {
-		if s.JobPlaceName != "" && s.JobPlaceName != s.AreaName {
-			fmt.Printf("Location: %s (%s)\n", s.AreaName, s.JobPlaceName)
-		} else if s.AreaName != "" {
-			fmt.Printf("Location: %s\n", s.AreaName)
-		} else {
-			fmt.Printf("Location: %s\n", s.JobPlaceName)
-		}
+	switch {
+	case s.AreaName != "" && s.JobPlaceName != "" && s.AreaName != s.JobPlaceName:
+		fmt.Printf("Location: %s (%s)\n", s.AreaName, s.JobPlaceName)
+	case s.AreaName != "":
+		fmt.Printf("Location: %s\n", s.AreaName)
+	case s.JobPlaceName != "":
+		fmt.Printf("Location: %s\n", s.JobPlaceName)
 	}
 	if s.Education != "" {
 		fmt.Printf("Education: %s\n", s.Education)
