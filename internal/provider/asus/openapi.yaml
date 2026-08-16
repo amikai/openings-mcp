@@ -22,6 +22,23 @@ info:
     - `/Jobs/GetCities`: JSON helper endpoint returning available cities for a
       given country code (`countryTw`).
 
+    ## Where filter values come from
+
+    `/Jobs/GetCities` is the only JSON endpoint, and it serves cities alone.
+    The category, country and experience options are served nowhere but the
+    `/Jobs` search form itself, as `input[name=REQ_TYPEs_Prefix]`,
+    `select#Location` and `select#WORK_EXP`. This spec therefore fixes no
+    value set for them: the served page is the enumeration.
+
+    Two behaviours make that worth respecting. `REQ_TYPEs_Prefix` submits the
+    category's **localized label** as its value, and the board is bilingual —
+    a session that visited `/Home/SetLanguage?culture=en-US` filters with
+    `Research and Development` where a zh-TW session filters with `研究發展`,
+    and each value is inert in the other's locale. And an unrecognized
+    `REQ_TYPEs_Prefix` or `WORK_EXP` is dropped rather than rejected, so the
+    answer is the whole board under HTTP 200. `Location` is the exception: an
+    unknown country code matches nothing.
+
 servers:
   - url: https://recruit.asus.com
     description: ASUS Careers
@@ -44,8 +61,9 @@ paths:
         - name: REQ_TYPEs_Prefix
           in: query
           description: |
-            Job function category prefix.
-            Valid values are defined in `Category`.
+            Job function category prefix, repeated once per selected category.
+            See `Category` for where the valid values come from and why an
+            unrecognized one is not an error.
           required: false
           schema:
             type: array
@@ -59,6 +77,11 @@ paths:
           description: |
             Two-letter country code following ISO 3166-1 alpha-2 (e.g. `TW`, `US`, `CN`, `JP`),
             with the exception of Slovenia which uses `SL` instead of the standard `SI`.
+            The codes on offer are the `select#Location` options of the `/Jobs`
+            search form; they list every country ASUS operates in, not the ones
+            currently hiring, so a valid code may match nothing. Unlike the
+            other filters, an unknown code matches nothing rather than being
+            ignored.
           required: false
           schema:
             type: string
@@ -73,7 +96,8 @@ paths:
         - name: WORK_EXP
           in: query
           description: |
-            Years of experience filter code. Valid values are defined in `ExperienceLevel`.
+            Years of experience filter code. See `ExperienceLevel` for where
+            the valid values come from.
           required: false
           schema:
             $ref: '#/components/schemas/ExperienceLevel'
@@ -89,7 +113,11 @@ paths:
           example: 1
       responses:
         '200':
-          description: HTML page containing the job listing table and pagination controls.
+          description: |
+            HTML page containing the job listing table, pagination controls, and
+            the search form whose controls enumerate the category, country and
+            experience filter values. The form is rendered even when the query
+            matched nothing.
           content:
             text/html:
               schema:
@@ -155,28 +183,29 @@ components:
     Category:
       type: string
       description: |
-        Top-level job category prefix on ASUS Careers.
-      enum:
+        Top-level job category prefix on ASUS Careers, spelled as the category's
+        own localized label — the value is the display text, so it is only
+        accepted by the locale that served it (`研究發展` for zh-TW,
+        `Research and Development` for en-US).
+
+        The values on offer are the `input[name=REQ_TYPEs_Prefix]` checkboxes of
+        the `/Jobs` search form for the current locale. No fixed set is listed
+        here: one would be a copy that is right for one locale at a time, and
+        an unrecognized value is silently ignored rather than rejected, so a
+        stale copy reads as an unfiltered board rather than as an error.
+      examples:
         - 研究發展
-        - 業務/行銷
-        - 工程技術
-        - 管理/支援
+        - Research and Development
 
     ExperienceLevel:
       type: string
       description: |
-        Years of experience filter code:
-        - `0`: 2年以下 (Under 2 years)
-        - `1`: 3-5年 (3-5 years)
-        - `2`: 6-10年 (6-10 years)
-        - `3`: 11-15年 (11-15 years)
-        - `4`: 16年以上 (16 years and above)
-      enum:
+        Years of experience filter code, from the `select#WORK_EXP` options of
+        the `/Jobs` search form. The codes are locale-independent; only their
+        labels translate (`0` is 2年以下 / Less than 2 Years). An unrecognized
+        code is silently ignored rather than rejected.
+      examples:
         - "0"
-        - "1"
-        - "2"
-        - "3"
-        - "4"
 
     JobSummary:
       type: object
