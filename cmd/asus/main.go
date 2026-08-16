@@ -31,10 +31,10 @@ func main() {
 	searchFS := ff.NewFlagSet("search").SetParent(rootFlags)
 	var (
 		keyword    = searchFS.StringLong("keyword", "", "free-text keyword search across job titles")
-		category   = searchFS.StringEnumLong("category", "category prefix (choices: 研究發展, 業務/行銷, 工程技術, 管理/支援)", "", "研究發展", "業務/行銷", "工程技術", "管理/支援")
+		category   = searchFS.StringLong("category", "", "category prefix from the codes subcommand (e.g. 研究發展); an unrecognized one is ignored by the board")
 		location   = searchFS.StringLong("location", "", "ISO 3166-1 alpha-2 country code (e.g. TW, US, CN, JP; Slovenia is SL)")
 		city       = searchFS.StringLong("city", "", "city code from cities subcommand (e.g. TPE, HSI)")
-		experience = searchFS.StringEnumLong("experience", "experience level code (choices: 0: <2y, 1: 3-5y, 2: 6-10y, 3: 11-15y, 4: 16y+)", "", "0", "1", "2", "3", "4")
+		experience = searchFS.StringLong("experience", "", "experience level code from the codes subcommand (e.g. 0); an unrecognized one is ignored by the board")
 		page       = searchFS.IntLong("page", 1, "1-based page number")
 	)
 	searchCmd := &ff.Command{
@@ -100,13 +100,13 @@ func main() {
 	codesCmd := &ff.Command{
 		Name:      "codes",
 		Usage:     "asus codes [--format text|json]",
-		ShortHelp: "list known filter options (categories, experience levels)",
+		ShortHelp: "list the search form's filter options (categories, countries, experience levels)",
 		Flags:     codesFS,
 		Exec: func(ctx context.Context, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("codes takes no positional arguments, got %v", args)
 			}
-			return runCodes(*format)
+			return runCodes(ctx, *baseURL, *timeout, *format)
 		},
 	}
 	rootCmd.Subcommands = append(rootCmd.Subcommands, codesCmd)
@@ -146,9 +146,9 @@ func runSearch(ctx context.Context, baseURL string, timeout time.Duration, forma
 	defer cancel()
 
 	client := asus.NewClient(baseURL, nil)
-	var categories []asus.Category
+	var categories []string
 	if f.category != "" {
-		categories = append(categories, asus.Category(f.category))
+		categories = append(categories, f.category)
 	}
 
 	resp, err := client.Search(ctx, &asus.SearchRequest{
@@ -156,7 +156,7 @@ func runSearch(ctx context.Context, baseURL string, timeout time.Duration, forma
 		Categories: categories,
 		Location:   f.location,
 		City:       f.city,
-		Experience: asus.ExperienceLevel(f.experience),
+		Experience: f.experience,
 		Page:       f.page,
 	})
 	if err != nil {
@@ -268,40 +268,46 @@ func runCities(ctx context.Context, baseURL string, timeout time.Duration, count
 	return nil
 }
 
-func runCodes(format string) error {
-	type codeDoc struct {
-		Categories map[string]string `json:"categories"`
-		Experience map[string]string `json:"experience"`
-	}
-	doc := codeDoc{
-		Categories: map[string]string{
-			"研究發展": "Research and Development",
-			"業務/行銷": "Marketing / Sales",
-			"工程技術": "Technology / Engineering",
-			"管理/支援": "Business Support / Administration",
-		},
-		Experience: map[string]string{
-			"0": "2年以下 (Under 2 years)",
-			"1": "3-5年 (3-5 years)",
-			"2": "6-10年 (6-10 years)",
-			"3": "11-15年 (11-15 years)",
-			"4": "16年以上 (16 years and above)",
-		},
+// runCodes prints the filter options the /Jobs search form itself offers,
+// which is where the valid --category, --location and --experience values
+// come from. They are locale-bound: the same board serves English category
+// values to an en-US session.
+func runCodes(ctx context.Context, baseURL string, timeout time.Duration, format string) error {
+	ctx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	resp, err := asus.NewClient(baseURL, nil).Search(ctx, nil)
+	if err != nil {
+		return err
 	}
 
 	if format == "json" {
 		enc := json.NewEncoder(os.Stdout)
 		enc.SetIndent("", "  ")
-		return enc.Encode(doc)
+		return enc.Encode(map[string][]asus.FilterOption{
+			"categories":  resp.Categories,
+			"countries":   resp.Countries,
+			"experiences": resp.Experiences,
+		})
 	}
 
-	fmt.Println("--- Categories (--category) ---")
-	for k, v := range doc.Categories {
-		fmt.Printf("  %-10s %s\n", k, v)
-	}
-	fmt.Println("\n--- Experience Levels (--experience) ---")
-	for k, v := range doc.Experience {
-		fmt.Printf("  %-3s %s\n", k, v)
+	for _, group := range []struct {
+		flag    string
+		options []asus.FilterOption
+	}{
+		{"--category", resp.Categories},
+		{"--location", resp.Countries},
+		{"--experience", resp.Experiences},
+	} {
+		fmt.Printf("--- %s (%d) ---\n", group.flag, len(group.options))
+		for _, o := range group.options {
+			if o.Label == o.Value {
+				fmt.Printf("  %s\n", o.Value)
+				continue
+			}
+			fmt.Printf("  %-6s %s\n", o.Value, o.Label)
+		}
+		fmt.Println()
 	}
 	return nil
 }

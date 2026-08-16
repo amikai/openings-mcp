@@ -4,10 +4,14 @@ import (
 	_ "embed"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 )
 
 //go:embed testdata/jobs_rsp.html
 var mockJobsRsp []byte
+
+//go:embed testdata/jobs_en_rsp.html
+var mockJobsEnRsp []byte
 
 //go:embed testdata/jobs_filtered_rsp.html
 var mockJobsFilteredRsp []byte
@@ -62,6 +66,11 @@ func NewMockServer() *httptest.Server {
 			w.Write(mockJobsEmptyRsp)
 			return
 		}
+		if isEnglishLocale(r) {
+			w.WriteHeader(http.StatusOK)
+			w.Write(mockJobsEnRsp)
+			return
+		}
 		if kw != "" || r.URL.Query().Get("Location") != "" || len(r.URL.Query()["REQ_TYPEs_Prefix"]) > 0 {
 			w.WriteHeader(http.StatusOK)
 			w.Write(mockJobsFilteredRsp)
@@ -72,4 +81,18 @@ func NewMockServer() *httptest.Server {
 	})
 
 	return httptest.NewServer(mux)
+}
+
+// isEnglishLocale reports whether the session picked en-US at
+// /Home/SetLanguage, which decides the locale of the labels — and so of the
+// category filter values — the board renders. The real site keys this off a
+// culture cookie whose name embeds a deployment-specific GUID
+// ("hrisweb.<guid>"), so match on the value rather than pinning that name.
+func isEnglishLocale(r *http.Request) bool {
+	for _, c := range r.Cookies() {
+		if strings.Contains(c.Value, "en-US") {
+			return true
+		}
+	}
+	return false
 }

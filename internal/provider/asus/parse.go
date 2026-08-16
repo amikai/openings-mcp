@@ -1,6 +1,7 @@
 package asus
 
 import (
+	"cmp"
 	"fmt"
 	"io"
 	"net/url"
@@ -23,10 +24,10 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 	}
 
 	var jobs []JobSummary
-	doc.Find("table.Rwd-Table tbody tr").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find("table.Rwd-Table tbody tr").EachIter() {
 		title := cleanText(s.Find("td[data-label*=\"職缺名稱\"], td[data-label*=\"Job Title\"]").Text())
 		if title == "" {
-			return
+			continue
 		}
 
 		jobNo := ""
@@ -68,7 +69,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 			DetailURL:  detailURL,
 			ApplyURL:   applyURL,
 		})
-	})
+	}
 
 	currentPage := 0
 	totalPages := 0
@@ -92,7 +93,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 			}
 		} else {
 			// Find the highest page link if skipToLast is absent
-			doc.Find(".pagination a[href*=\"page=\"], .w3-pagination a[href*=\"page=\"]").Each(func(_ int, s *goquery.Selection) {
+			for _, s := range doc.Find(".pagination a[href*=\"page=\"], .w3-pagination a[href*=\"page=\"]").EachIter() {
 				if href, exists := s.Attr("href"); exists {
 					if m := pagePattern.FindStringSubmatch(href); len(m) > 1 {
 						if tp, err := strconv.Atoi(m[1]); err == nil && tp > totalPages {
@@ -100,7 +101,7 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 						}
 					}
 				}
-			})
+			}
 			if totalPages < currentPage {
 				totalPages = currentPage
 			}
@@ -111,7 +112,46 @@ func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
 		Jobs:        jobs,
 		TotalPages:  totalPages,
 		CurrentPage: currentPage,
+		Categories:  parseCategoryOptions(doc),
+		Countries:   parseSelectOptions(doc, "select#Location"),
+		Experiences: parseSelectOptions(doc, "select#WORK_EXP"),
 	}, nil
+}
+
+// parseCategoryOptions reads the search form's category checkboxes, the only
+// place the board publishes the values REQ_TYPEs_Prefix accepts. The label is
+// the <label> the checkbox shares its <li> with, which spells the same text as
+// the value.
+func parseCategoryOptions(doc *goquery.Document) []FilterOption {
+	var out []FilterOption
+	for _, box := range doc.Find("input[name='REQ_TYPEs_Prefix']").EachIter() {
+		value := cleanText(box.AttrOr("value", ""))
+		if value == "" {
+			continue
+		}
+		label := cleanText(box.Parent().Find("label").First().Text())
+		out = append(out, FilterOption{Value: value, Label: cmp.Or(label, value)})
+	}
+	return out
+}
+
+// parseSelectOptions reads one search-form <select>'s options, skipping the
+// valueless "請選擇" / "Select" placeholder.
+//
+// select#City is deliberately not among the callers: a served page renders it
+// empty and the site fills it from /Jobs/GetCities once a country is picked,
+// so cities come from [Client.GetCities] instead.
+func parseSelectOptions(doc *goquery.Document, selector string) []FilterOption {
+	var out []FilterOption
+	for _, opt := range doc.Find(selector).First().Find("option").EachIter() {
+		value := cleanText(opt.AttrOr("value", ""))
+		if value == "" {
+			continue
+		}
+		label := cleanText(opt.Text())
+		out = append(out, FilterOption{Value: value, Label: cmp.Or(label, value)})
+	}
+	return out
 }
 
 func parseDetailHTML(r io.Reader, id string, baseURL string) (*JobDetail, error) {
@@ -137,7 +177,7 @@ func parseDetailHTML(r io.Reader, id string, baseURL string) (*JobDetail, error)
 	empType := cleanText(doc.Find("table.Rwd-Table-Info td[data-label=\"性質\"], table.Rwd-Table-Info td[data-label=\"Job Type\"]").Text())
 
 	var description, requirements string
-	doc.Find(".Detail-InfoText > div").Each(func(_ int, s *goquery.Selection) {
+	for _, s := range doc.Find(".Detail-InfoText > div").EachIter() {
 		h3 := cleanText(s.Find("h3").Text())
 		text := cleanBlockText(s.Find("p"))
 		if strings.Contains(h3, "工作說明") || strings.Contains(strings.ToLower(h3), "job description") || strings.Contains(strings.ToLower(h3), "description") {
@@ -145,7 +185,7 @@ func parseDetailHTML(r io.Reader, id string, baseURL string) (*JobDetail, error)
 		} else if strings.Contains(h3, "需求條件") || strings.Contains(strings.ToLower(h3), "requirements") || strings.Contains(strings.ToLower(h3), "qualifications") {
 			requirements = text
 		}
-	})
+	}
 
 	applyURL := ""
 	if applyLink := doc.Find("a[href*=\"SignIn\"][href*=\"Detail\"]"); applyLink.Length() > 0 {

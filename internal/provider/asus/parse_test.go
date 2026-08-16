@@ -2,6 +2,7 @@ package asus
 
 import (
 	"bytes"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -33,6 +34,80 @@ func TestParseSearchHTML_Success(t *testing.T) {
 	}
 }
 
+func TestParseSearchHTML_FilterOptions(t *testing.T) {
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsRsp), "https://recruit.asus.com")
+	if err != nil {
+		t.Fatalf("unexpected parse error: %v", err)
+	}
+
+	if got, want := optionValues(resp.Categories), []string{"研究發展", "業務/行銷", "工程技術", "管理/支援"}; !slices.Equal(got, want) {
+		t.Errorf("categories = %v, want %v", got, want)
+	}
+	if got, want := optionValues(resp.Experiences), []string{"0", "1", "2", "3", "4"}; !slices.Equal(got, want) {
+		t.Errorf("experiences = %v, want %v", got, want)
+	}
+	if got, want := optionLabels(resp.Experiences)[0], "2年以下"; got != want {
+		t.Errorf("first experience label = %q, want %q", got, want)
+	}
+
+	countries := optionValues(resp.Countries)
+	// The "請選擇" placeholder carries no value and must not become an option.
+	if slices.Contains(countries, "") {
+		t.Error("countries contain the valueless placeholder option")
+	}
+	if !slices.Contains(countries, "TW") {
+		t.Errorf("countries missing TW: %v", countries)
+	}
+	// Slovenia deviates from ISO 3166-1 alpha-2 (SI).
+	if !slices.Contains(countries, "SL") {
+		t.Error("countries missing the SL deviation for Slovenia")
+	}
+}
+
+// TestParseSearchHTML_FilterOptionsEnglish pins the reason the options are
+// read off the page rather than compiled into the package: the same board
+// serves a different set of category filter values to an en-US session.
+func TestParseSearchHTML_FilterOptionsEnglish(t *testing.T) {
+	resp, err := parseSearchHTML(bytes.NewReader(mockJobsEnRsp), "https://recruit.asus.com")
+	if err != nil {
+		t.Fatalf("unexpected parse error: %v", err)
+	}
+
+	want := []string{
+		"Research and Development",
+		"Marketing / Sales",
+		"Technology / Engineering",
+		"Business Support / Administration",
+	}
+	if got := optionValues(resp.Categories); !slices.Equal(got, want) {
+		t.Errorf("categories = %v, want %v", got, want)
+	}
+	// Country and experience values stay locale-independent codes; only their
+	// labels translate.
+	if got, want := optionValues(resp.Experiences), []string{"0", "1", "2", "3", "4"}; !slices.Equal(got, want) {
+		t.Errorf("experiences = %v, want %v", got, want)
+	}
+	if got, want := optionLabels(resp.Experiences)[0], "Less than 2 Years"; got != want {
+		t.Errorf("first experience label = %q, want %q", got, want)
+	}
+}
+
+func optionValues(opts []FilterOption) []string {
+	values := make([]string, len(opts))
+	for i, o := range opts {
+		values[i] = o.Value
+	}
+	return values
+}
+
+func optionLabels(opts []FilterOption) []string {
+	labels := make([]string, len(opts))
+	for i, o := range opts {
+		labels[i] = o.Label
+	}
+	return labels
+}
+
 func TestParseSearchHTML_Filtered(t *testing.T) {
 	resp, err := parseSearchHTML(bytes.NewReader(mockJobsFilteredRsp), "https://recruit.asus.com")
 	if err != nil {
@@ -56,6 +131,11 @@ func TestParseSearchHTML_Empty(t *testing.T) {
 	}
 	if resp.CurrentPage != 0 {
 		t.Errorf("expected 0 current page, got %d", resp.CurrentPage)
+	}
+	// A zero-result page still renders the search form, so callers can offer
+	// the filter options that would widen the search.
+	if len(resp.Categories) == 0 {
+		t.Error("expected the empty result page to still carry the category options")
 	}
 }
 

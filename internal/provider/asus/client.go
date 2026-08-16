@@ -20,65 +20,49 @@ const (
 	citiesPath     = "/Jobs/GetCities"
 )
 
-// Category represents a top-level job category prefix on ASUS Careers.
-type Category string
-
-const (
-	CategoryRD        Category = "研究發展"
-	CategoryMarketing Category = "業務/行銷"
-	CategoryTech      Category = "工程技術"
-	CategoryAdmin     Category = "管理/支援"
-)
-
-// AllCategories lists all valid top-level category prefixes.
-var AllCategories = []Category{
-	CategoryRD,
-	CategoryMarketing,
-	CategoryTech,
-	CategoryAdmin,
-}
-
-// ExperienceLevel represents a work experience filter code on ASUS Careers.
-type ExperienceLevel string
-
-const (
-	ExperienceUnder2Years ExperienceLevel = "0"
-	Experience3To5Years   ExperienceLevel = "1"
-	Experience6To10Years  ExperienceLevel = "2"
-	Experience11To15Years ExperienceLevel = "3"
-	ExperienceOver16Years ExperienceLevel = "4"
-)
-
-// AllExperienceLevels lists all valid experience level filter codes.
-var AllExperienceLevels = []ExperienceLevel{
-	ExperienceUnder2Years,
-	Experience3To5Years,
-	Experience6To10Years,
-	Experience11To15Years,
-	ExperienceOver16Years,
-}
-
 // Client talks to the ASUS Careers site.
 type Client struct {
 	httpClient *http.Client
 	baseURL    string
 }
 
-// SearchRequest configures a query to /Jobs.
+// SearchRequest configures a query to /Jobs. Categories and Experience take
+// the values the search form offers, which [SearchResponse] carries; the board
+// ignores a value it does not recognize and answers with the unfiltered board,
+// so a wrong one reads as "this category has every job" rather than an error.
+// Location is the exception: an unknown country code matches nothing.
 type SearchRequest struct {
 	Keyword    string
-	Categories []Category
+	Categories []string
 	Location   string
 	City       string
-	Experience ExperienceLevel
+	Experience string
 	Page       int
 }
 
-// SearchResponse contains the parsed jobs and pagination state.
+// SearchResponse contains the parsed jobs, pagination state, and the filter
+// options the page offers.
 type SearchResponse struct {
 	Jobs        []JobSummary `json:"jobs"`
 	TotalPages  int          `json:"totalPages"`
 	CurrentPage int          `json:"currentPage"`
+	// Categories, Countries, and Experiences are the search form's own
+	// options, read off whichever /Jobs page served this response. Every page
+	// carries the full form, empty result pages included.
+	//
+	// Category values are the localized labels themselves, so they only filter
+	// for the locale that served them (see the package doc). Country and
+	// experience values are locale-independent codes.
+	Categories  []FilterOption `json:"categories,omitempty"`
+	Countries   []FilterOption `json:"countries,omitempty"`
+	Experiences []FilterOption `json:"experiences,omitempty"`
+}
+
+// FilterOption is one entry of a /Jobs search-form control: Value is what the
+// form submits, Label the text shown next to it.
+type FilterOption struct {
+	Value string `json:"value"`
+	Label string `json:"label"`
 }
 
 // JobSummary represents a vacancy listed on the search results page.
@@ -146,7 +130,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 	}
 	for _, cat := range req.Categories {
 		if cat != "" {
-			q.Add("REQ_TYPEs_Prefix", string(cat))
+			q.Add("REQ_TYPEs_Prefix", cat)
 		}
 	}
 	if req.Location != "" {
@@ -156,7 +140,7 @@ func (c *Client) Search(ctx context.Context, req *SearchRequest) (*SearchRespons
 		q.Set("City", req.City)
 	}
 	if req.Experience != "" {
-		q.Set("WORK_EXP", string(req.Experience))
+		q.Set("WORK_EXP", req.Experience)
 	}
 	if req.Page > 1 {
 		q.Set("page", strconv.Itoa(req.Page))
