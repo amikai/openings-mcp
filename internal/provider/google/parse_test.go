@@ -20,7 +20,7 @@ var wantJobs = []Job{
 		},
 	},
 	{
-		ID: "82975510480462534", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan",
+		ID: "82975510480462534", Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan; Taipei, Taiwan",
 		ExperienceLevel: "Mid",
 		MinimumQualifications: []string{
 			"Bachelor's degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
@@ -28,7 +28,7 @@ var wantJobs = []Job{
 		},
 	},
 	{
-		ID: "81991011634422470", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ID: "81991011634422470", Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan; Zhubei, Zhubei City, Hsinchu County, Taiwan",
 		ExperienceLevel: "Mid",
 		MinimumQualifications: []string{
 			"Bachelor's degree in Electrical Engineering, a similar field, or equivalent practical experience.",
@@ -147,7 +147,7 @@ var wantJobs = []Job{
 		},
 	},
 	{
-		ID: "103770758580183750", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+		ID: "103770758580183750", Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan; Zhubei, Zhubei City, Hsinchu County, Taiwan",
 		ExperienceLevel: "Mid",
 		MinimumQualifications: []string{
 			"Bachelor’s degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
@@ -337,4 +337,87 @@ func TestParseDetailHTML(t *testing.T) {
 	require.True(t, ok)
 
 	assert.Equal(t, *wantDetail, *got)
+}
+
+func TestParseJobsFromDSSynthetic(t *testing.T) {
+	const htmlDoc = `<html><head><script>
+AF_initDataCallback({key: 'ds:1', hash: '1', data:[[["99999", "Staff Infrastructure Engineer", "https://example.com/apply", [null, "<ul><li>Lead infra</li></ul>"], [null, "<h3>Minimum qualifications:</h3><ul><li>8+ years</li></ul>"], "projects/123", null, "YouTube", "en-US", [["Taipei, Taiwan", ["Taipei"]]], [null, "<p>Build scalable infra.</p>"], null, null, null, null, null, null, null, null, [null, "<ul><li>8+ years of Go experience.</li></ul>"], 3]], null, 1, 20], sideChannel: {}});
+</script></head><body></body></html>`
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlDoc))
+	require.NoError(t, err)
+
+	jobs, err := parseJobsHTML(doc)
+	require.NoError(t, err)
+	require.Len(t, jobs, 1)
+
+	assert.Equal(t, Job{
+		ID:                    "99999",
+		Title:                 "Staff Infrastructure Engineer",
+		Company:               "YouTube",
+		Location:              "Taipei, Taiwan",
+		ExperienceLevel:       "Advanced",
+		MinimumQualifications: []string{"8+ years of Go experience."},
+	}, jobs[0])
+}
+
+func TestParseJobDetailFromDSSynthetic(t *testing.T) {
+	const htmlDoc = `<html><head><script>
+AF_initDataCallback({key: 'ds:0', hash: '1', data:[["99999", "Staff Infrastructure Engineer", "https://example.com/apply", [null, "<ul><li>Lead infra</li></ul>"], [null, "<h3>Minimum qualifications:</h3><ul><li>8+ years</li></ul>"], "projects/123", null, "YouTube", "en-US", [["Taipei, Taiwan", ["Taipei"]]], [null, "<p>Build scalable infra.</p>"], null, null, null, null, null, null, null, null, [null, ""]]], sideChannel: {}});
+</script></head><body></body></html>`
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlDoc))
+	require.NoError(t, err)
+
+	detail, ok := parseJobDetailHTML(doc, "99999")
+	require.True(t, ok)
+
+	assert.Equal(t, "99999", detail.ID)
+	assert.Equal(t, "Staff Infrastructure Engineer", detail.Title)
+	assert.Equal(t, "YouTube", detail.Company)
+	assert.Equal(t, "Taipei, Taiwan", detail.Location)
+	assert.Contains(t, detail.About, "Build scalable infra.")
+	assert.Contains(t, detail.Responsibilities, "Lead infra")
+	assert.Contains(t, detail.Qualifications, "Minimum qualifications")
+}
+
+func TestParseJobsFromDSSyntheticRemote(t *testing.T) {
+	const htmlDoc = `<html><head><script>
+AF_initDataCallback({key: 'ds:1', hash: '1', data:[[["88888", "Senior Backend Engineer", "https://example.com/apply", [null, "<ul><li>Build APIs</li></ul>"], [null, "<h3>Minimum qualifications:</h3><ul><li>5+ years</li></ul>"], "projects/123", null, "Google", "en-US", [["San Francisco, CA, USA", ["San Francisco"]]], [null, "<p>Remote team.</p>"], null, null, null, null, null, 1, null, null, [null, "<ul><li>5+ years of Go experience.</li></ul>"], 2]], null, 1, 20], sideChannel: {}});
+</script></head><body></body></html>`
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlDoc))
+	require.NoError(t, err)
+
+	jobs, err := parseJobsHTML(doc)
+	require.NoError(t, err)
+	require.Len(t, jobs, 1)
+
+	assert.Equal(t, Job{
+		ID:                    "88888",
+		Title:                 "Senior Backend Engineer",
+		Company:               "Google",
+		Location:              "San Francisco, CA, USA",
+		Remote:                true,
+		ExperienceLevel:       "Mid",
+		MinimumQualifications: []string{"5+ years of Go experience."},
+	}, jobs[0])
+}
+
+func TestParseJobDetailFromDSSyntheticRemote(t *testing.T) {
+	const htmlDoc = `<html><head><script>
+AF_initDataCallback({key: 'ds:0', hash: '1', data:[["88888", "Senior Backend Engineer", "https://example.com/apply", [null, "<ul><li>Build APIs</li></ul>"], [null, "<h3>Minimum qualifications:</h3><ul><li>5+ years</li></ul>"], "projects/123", null, "Google", "en-US", [["San Francisco, CA, USA", ["San Francisco"]]], [null, "<p>Remote team.</p>"], null, null, null, null, null, 1, null, null, [null, ""]]], sideChannel: {}});
+</script></head><body></body></html>`
+
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(htmlDoc))
+	require.NoError(t, err)
+
+	detail, ok := parseJobDetailHTML(doc, "88888")
+	require.True(t, ok)
+
+	assert.Equal(t, "88888", detail.ID)
+	assert.Equal(t, "Senior Backend Engineer", detail.Title)
+	assert.Equal(t, "Google", detail.Company)
+	assert.Equal(t, "San Francisco, CA, USA", detail.Location)
+	assert.True(t, detail.Remote)
 }

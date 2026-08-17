@@ -141,7 +141,7 @@ func TestGoogleSearchJobsE2E(t *testing.T) {
 			},
 			{
 				ID: "82975510480462534", URL: "https://www.google.com/about/careers/applications/jobs/results/82975510480462534",
-				Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan",
+				Title: "SoC Product Engineer, Google Cloud", Company: "Google", Location: "Zhubei, Zhubei City, Hsinchu County, Taiwan; Taipei, Taiwan",
 				ExperienceLevel: "Mid",
 				MinimumQualifications: []string{
 					"Bachelor's degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
@@ -150,7 +150,7 @@ func TestGoogleSearchJobsE2E(t *testing.T) {
 			},
 			{
 				ID: "81991011634422470", URL: "https://www.google.com/about/careers/applications/jobs/results/81991011634422470",
-				Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+				Title: "Silicon Physical Design CAD Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan; Zhubei, Zhubei City, Hsinchu County, Taiwan",
 				ExperienceLevel: "Mid",
 				MinimumQualifications: []string{
 					"Bachelor's degree in Electrical Engineering, a similar field, or equivalent practical experience.",
@@ -282,7 +282,7 @@ func TestGoogleSearchJobsE2E(t *testing.T) {
 			},
 			{
 				ID: "103770758580183750", URL: "https://www.google.com/about/careers/applications/jobs/results/103770758580183750",
-				Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan",
+				Title: "CPU RTL Design Engineer", Company: "Google", Location: "New Taipei, Banqiao District, New Taipei City, Taiwan; Zhubei, Zhubei City, Hsinchu County, Taiwan",
 				ExperienceLevel: "Mid",
 				MinimumQualifications: []string{
 					"Bachelor’s degree in Electrical Engineering, Computer Engineering, Computer Science, or a related field, or equivalent practical experience.",
