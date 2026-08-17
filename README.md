@@ -133,6 +133,8 @@ harvesting.
 
 ## Credits
 
+- [freehire](https://github.com/strelov1/freehire)
+
 Inspired by these MCP job-search servers:
 
 - [job104-mcp](https://github.com/mozzan/job104-mcp)
