@@ -45,6 +45,7 @@ import (
 	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/amikai/openings-mcp/internal/provider/eightfold"
 	"github.com/amikai/openings-mcp/internal/provider/flowxtra"
+	"github.com/amikai/openings-mcp/internal/provider/freehire"
 	"github.com/amikai/openings-mcp/internal/provider/google"
 	"github.com/amikai/openings-mcp/internal/provider/indeed"
 	"github.com/amikai/openings-mcp/internal/provider/job104"
@@ -66,11 +67,11 @@ var (
 // serverInstructions carries the cross-tool guidance for host LLMs: provider
 // routing and the shared search→detail flow. Per-tool behavior stays in each
 // tool's description.
-const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
+const serverInstructions = `openings-mcp exposes job-search tools in two families: (1) per-provider tools for the job boards 104, Cake.me (Taiwan-centric), Jobindex (Denmark), Mynavi Tenshoku (Japan), Flowxtra (board-wide across every company on the Flowxtra careers platform, Europe-leaning), freehire.me (IT/tech catalogue across many company ATS boards), LinkedIn and Indeed (global), plus the careers sites of Amazon, Apple, Google, Meta, and TSMC; (2) unified company tools — search_jobs_by_company, get_filters_by_company, get_job_detail_by_company — covering thousands of companies behind one company parameter.
 
 Tool selection:
-- When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) when the company isn't covered.
-- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
+- When the user names a specific company, try search_jobs_by_company first; it covers thousands of companies and its error message suggests close matches when a name isn't recognized. If it does not recognize the company, try freehire second: freehire_search_companies turns an approximate or misspelled name into the company_slug that freehire_search_jobs takes, and freehire crawls many ATS platforms this server has no adapter for. Fall back to the per-provider tools (linkedin, indeed, 104, jobindex, mynavi, ...) only after both, since they search by keyword rather than by company.
+- When the user explicitly names a job board or careers site as the desired source (for example LinkedIn, Indeed, 104, Cake.me, Jobindex, マイナビ転職/Mynavi, Flowxtra, freehire.me, Amazon Jobs, Apple Careers, Google Careers, Meta Careers, or TSMC Careers), use that source's dedicated tools. A company name by itself is not a source selection.
 - When the user has no target in mind, offer them the provider choices; if they don't pick one, start with the job boards (104, Cake.me, LinkedIn, Indeed, Jobindex for Denmark, and Mynavi for Japan) rather than a single company's careers site.
 - search_jobs_by_company also accepts recognized public careers-page URLs from the career systems this server supports. Do not pass other careers sites; some career systems accept URLs only for companies already in the curated roster.
 - When a company is ambiguous, the unified company tools reject the call and list the matching companies by name with their public careers URLs; retry the same tool with one of the listed careers URLs, not with the original name.
@@ -82,7 +83,8 @@ Query construction:
 
 Context management:
 - Search results are paginated; fetch additional pages rather than broadening the query.
-- After filtering, fetch details when both hold: the user's criteria include something summaries can't answer (tech stack, remote policy, overtime culture, education requirements written in the posting body, etc.), and the filtered set is small enough to fetch economically (roughly 5-10 postings). If either condition fails, present summaries and let the user decide whether to go deeper.`
+- After filtering, fetch details when both hold: the user's criteria include something summaries can't answer (tech stack, remote policy, overtime culture, education requirements written in the posting body, etc.), and the filtered set is small enough to fetch economically (roughly 5-10 postings). If either condition fails, present summaries and let the user decide whether to go deeper.
+- freehire_search_jobs and search_jobs_by_company can return the same posting, because freehire crawls those company ATS boards. When combining results, dedupe by URL; ignore tracking query parameters such as utm_source.`
 
 // envVarPrefix binds every flag to an environment variable: --log-level reads
 // OPENINGS_MCP_LOG_LEVEL, and so on. An explicit flag wins over the
@@ -336,6 +338,11 @@ func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Serv
 		return nil, fmt.Errorf("create Flowxtra client: %w", err)
 	}
 
+	cFreehire, err := freehire.NewClient("https://freehire.me/api/v1", freehire.WithClient(hc))
+	if err != nil {
+		return nil, fmt.Errorf("create freehire client: %w", err)
+	}
+
 	cJobindex := jobindex.NewClient("https://www.jobindex.dk", hc)
 
 	cMynavi := mynavi.NewClient("https://tenshoku.mynavi.jp", hc)
@@ -357,6 +364,7 @@ func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Serv
 		linkedin: cLinkedin,
 		indeed:   cIndeed,
 		flowxtra: cFlowxtra,
+		freehire: cFreehire,
 		jobindex: cJobindex,
 		mynavi:   cMynavi,
 		meta:     cMeta,
@@ -452,6 +460,7 @@ type providerClients struct {
 	linkedin *linkedin.Client
 	indeed   *indeed.Client
 	flowxtra *flowxtra.Client
+	freehire *freehire.Client
 	jobindex *jobindex.Client
 	mynavi   *mynavi.Client
 	meta     *meta.Client
@@ -475,6 +484,7 @@ func newServer(clients *providerClients, registry *ats.Registry, logger *slog.Lo
 	openingsmcp.RegisterLinkedin(server, clients.linkedin)
 	openingsmcp.RegisterIndeed(server, clients.indeed)
 	openingsmcp.RegisterFlowxtra(server, clients.flowxtra)
+	openingsmcp.RegisterFreehire(server, clients.freehire)
 	openingsmcp.RegisterJobindex(server, clients.jobindex)
 	openingsmcp.RegisterMynavi(server, clients.mynavi)
 	openingsmcp.RegisterMeta(server, clients.meta)

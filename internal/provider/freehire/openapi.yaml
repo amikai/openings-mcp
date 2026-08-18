@@ -1,0 +1,585 @@
+openapi: 3.0.3
+info:
+  title: freehire ChatGPT Actions API
+  version: 1.0.0
+  description: |
+    Public, read-only FreeHire API for ChatGPT Actions. Search IT jobs, inspect
+    job details, find similar jobs, and inspect companies. This simplified schema
+    intentionally excludes authenticated tracking endpoints.
+servers:
+  - url: https://freehire.me/api/v1
+security: []
+tags:
+  - name: Jobs
+    description: Public job search, facets, details, and similar jobs.
+  - name: Companies
+    description: Public company search and company details.
+paths:
+  /agent/jobs/search:
+    get:
+      operationId: agentSearchJobs
+      tags:
+        - Jobs
+      summary: Search open jobs for agents
+      description: |
+        Agent-friendly job search. Every result carries the job's full description
+        (verbatim from the database, not the search-index preview), in the format
+        selected by description_format.
+      x-openai-isConsequential: false
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Full-text query over title, company, and description.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+          description: Page size.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Rows to skip.
+        - name: sort
+          in: query
+          schema:
+            type: string
+            enum:
+              - created_at
+              - posted_at
+              - salary_min
+              - salary_max
+          description: Sort field. Omit for relevance or newest default.
+        - name: order
+          in: query
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+          description: Sort direction.
+        - name: semantic_ratio
+          in: query
+          schema:
+            type: number
+            minimum: 0
+            maximum: 1
+            default: 0
+          description: Hybrid semantic search ratio.
+        - name: regions
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - global
+                - north_america
+                - latam
+                - eu
+                - uk
+                - mena
+                - africa
+                - apac
+                - cis
+          description: Geographic regions.
+        - name: work_mode
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - remote
+                - hybrid
+                - onsite
+          description: Work format.
+        - name: category
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Role category from getJobFacets.
+        - name: seniority
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - intern
+                - junior
+                - middle
+                - senior
+                - lead
+                - staff
+                - principal
+                - c_level
+          description: Seniority levels.
+        - name: skills
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Canonical skill slugs from getJobFacets.
+        - name: countries
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Country codes from getJobFacets.
+        - name: company_slug
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Company slugs from searchCompanies or getJobFacets.
+        - name: source
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+          description: Job source slugs from getJobFacets.
+        - name: salary_min
+          in: query
+          schema:
+            type: integer
+          description: Minimum salary lower bound.
+        - name: salary_max
+          in: query
+          schema:
+            type: integer
+          description: Maximum salary upper bound.
+        - name: description_format
+          in: query
+          schema:
+            type: string
+            enum:
+              - html
+              - text
+              - markdown
+            default: html
+          description: Format of the full description (html is the stored verbatim markup).
+      responses:
+        "200":
+          description: Matching jobs with pagination metadata.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobListEnvelope"
+        default:
+          $ref: "#/components/responses/Error"
+  /jobs/facets:
+    get:
+      operationId: getJobFacets
+      tags:
+        - Jobs
+      summary: Get live filter vocabulary and counts
+      description: |
+        Return facet values, counts, canonical skill slugs, and numeric ranges.
+        Use this before applying uncertain filters such as skills, countries,
+        company_slug, source, or category.
+      x-openai-isConsequential: false
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Full-text query over title, company, and description.
+        - name: regions
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: work_mode
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: category
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: seniority
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: skills
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: countries
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: company_slug
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: source
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: salary_min
+          in: query
+          schema:
+            type: integer
+        - name: salary_max
+          in: query
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Facet distribution for matching jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FacetsEnvelope"
+        default:
+          $ref: "#/components/responses/Error"
+  /jobs/{slug}:
+    get:
+      operationId: getJob
+      tags:
+        - Jobs
+      summary: Get a job by slug
+      x-openai-isConsequential: false
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Job public_slug.
+      responses:
+        "200":
+          description: Job detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Job"
+        default:
+          $ref: "#/components/responses/Error"
+  /jobs/{slug}/similar:
+    get:
+      operationId: getSimilarJobs
+      tags:
+        - Jobs
+      summary: Find jobs similar to a job
+      x-openai-isConsequential: false
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Job public_slug.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 50
+            default: 10
+          description: Maximum similar jobs to return.
+      responses:
+        "200":
+          description: Similar jobs.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/JobListEnvelope"
+        default:
+          $ref: "#/components/responses/Error"
+  /companies:
+    get:
+      operationId: searchCompanies
+      tags:
+        - Companies
+      summary: Search companies
+      x-openai-isConsequential: false
+      parameters:
+        - name: q
+          in: query
+          schema:
+            type: string
+          description: Case-insensitive company name substring.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Page size.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Rows to skip.
+      responses:
+        "200":
+          description: Companies with job counts.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/CompanySummary"
+                  meta:
+                    $ref: "#/components/schemas/PaginationMeta"
+        default:
+          $ref: "#/components/responses/Error"
+  /companies/{slug}:
+    get:
+      operationId: getCompany
+      tags:
+        - Companies
+      summary: Get company details and open jobs
+      x-openai-isConsequential: false
+      parameters:
+        - name: slug
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Company slug.
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          description: Page size.
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: Rows to skip.
+      responses:
+        "200":
+          description: Company and open jobs.
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: object
+                    additionalProperties: true
+                    properties:
+                      company:
+                        $ref: "#/components/schemas/CompanySummary"
+                      jobs:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/Job"
+        default:
+          $ref: "#/components/responses/Error"
+components:
+  responses:
+    Error:
+      description: Error response.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorEnvelope"
+  schemas:
+    Job:
+      type: object
+      additionalProperties: true
+      required:
+        - public_slug
+        - title
+        - company
+      properties:
+        public_slug:
+          type: string
+        title:
+          type: string
+        company:
+          type: string
+        company_slug:
+          type: string
+        url:
+          type: string
+          format: uri
+        location:
+          type: string
+        regions:
+          type: array
+          items:
+            type: string
+        countries:
+          type: array
+          items:
+            type: string
+        work_mode:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
+        source:
+          type: string
+        posted_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        closed_at:
+          type: string
+          nullable: true
+          format: date-time
+        description:
+          type: string
+        enrichment:
+          type: object
+          additionalProperties: true
+        reality:
+          type: object
+          additionalProperties: true
+    JobListEnvelope:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/Job"
+        meta:
+          $ref: "#/components/schemas/PaginationMeta"
+    FacetsEnvelope:
+      type: object
+      required:
+        - data
+      properties:
+        data:
+          type: object
+          required:
+            - total
+            - facets
+          additionalProperties: true
+          properties:
+            total:
+              type: integer
+            facets:
+              type: object
+              additionalProperties:
+                type: object
+                additionalProperties:
+                  type: integer
+            stats:
+              type: object
+              additionalProperties:
+                type: object
+                additionalProperties:
+                  type: number
+    CompanySummary:
+      type: object
+      additionalProperties: true
+      required:
+        - slug
+        - name
+      properties:
+        slug:
+          type: string
+        name:
+          type: string
+        job_count:
+          type: integer
+    PaginationMeta:
+      type: object
+      additionalProperties: true
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+    ErrorEnvelope:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string

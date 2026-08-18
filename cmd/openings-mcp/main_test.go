@@ -153,6 +153,10 @@ func TestServerListsJobTools(t *testing.T) {
 		"jobindex_get_job_detail",
 		"mynavi_search_jobs",
 		"mynavi_get_job_detail",
+		"freehire_search_jobs",
+		"freehire_get_job_facets",
+		"freehire_search_companies",
+		"freehire_get_job_detail",
 		"search_jobs_by_company",
 		"get_filters_by_company",
 		"get_job_detail_by_company",
@@ -244,6 +248,17 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "Eightfold")
 	assert.NotContains(t, serverInstructions, "SuccessFactors")
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
+	// Company routing is ordered: unified tools, then freehire, then the
+	// per-provider boards.
+	assert.Contains(t, serverInstructions, "try search_jobs_by_company first")
+	assert.Contains(t, serverInstructions, "try freehire second")
+	assert.Contains(t, serverInstructions, "only after both")
+	assert.Less(t,
+		strings.Index(serverInstructions, "try freehire second"),
+		strings.Index(serverInstructions, "Fall back to the per-provider tools"),
+		"freehire has to be offered before the per-provider boards")
+	assert.Contains(t, serverInstructions, "freehire_search_jobs and search_jobs_by_company can return the same posting")
+	assert.Contains(t, serverInstructions, "dedupe by URL")
 }
 
 // TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry

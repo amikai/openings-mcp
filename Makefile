@@ -13,6 +13,7 @@ OPENAPI_SPECS := \
 	internal/provider/flowxtra/openapi.yaml \
 	internal/provider/fourdayweek/openapi.yaml \
 	internal/provider/foxconn/openapi.yaml \
+	internal/provider/freehire/openapi.yaml \
 	internal/provider/google/openapi.yaml \
 	internal/provider/greenhouse/openapi.yaml \
 	internal/provider/herp/openapi.yaml \

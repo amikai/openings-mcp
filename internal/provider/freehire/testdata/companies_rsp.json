@@ -1,0 +1,42 @@
+{
+    "data": [
+        {
+            "slug": "adria-solutions",
+            "name": "Adria Solutions",
+            "job_count": 67,
+            "tagline": null,
+            "industries": [],
+            "hq_country": null,
+            "collections": [],
+            "feedback_count": 0,
+            "feedback_rating_avg": null
+        },
+        {
+            "slug": "adria-solutions-ltd",
+            "name": "Adria Solutions Ltd",
+            "job_count": 51,
+            "tagline": null,
+            "industries": [],
+            "hq_country": null,
+            "collections": [],
+            "feedback_count": 0,
+            "feedback_rating_avg": null
+        },
+        {
+            "slug": "adrian-bay-rehabilitation-and-nursing-center",
+            "name": "Adrian Bay Rehabilitation and Nursing Center",
+            "job_count": 2,
+            "tagline": "Provides skilled nursing and rehabilitative therapy in a residential facility.",
+            "industries": [],
+            "hq_country": "US",
+            "collections": [],
+            "feedback_count": 0,
+            "feedback_rating_avg": null
+        }
+    ],
+    "meta": {
+        "limit": 3,
+        "offset": 0,
+        "total": 72
+    }
+}
