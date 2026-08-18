@@ -3,7 +3,9 @@ package openingsmcp
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -928,6 +930,17 @@ func freehireIgnoredParams(ignored []freehire.IgnoredParam) error {
 	return fmt.Errorf("freehire dropped %d parameter(s) and answered with an unfiltered result: %s — this openings-mcp build has drifted from freehire's openapi.yaml", len(ignored), strings.Join(names, ", "))
 }
 
+// freehireDetailError names a record upstream does not hold, and leaves
+// every other failure intact. Only a 404 means the id is wrong; reporting a
+// timeout, a rate limit, or an unparseable body as "not found" would send
+// the caller hunting for a stale slug instead of retrying.
+func freehireDetailError(err error, kind, id string) error {
+	if sc, ok := errors.AsType[*freehire.ErrorStatusCode](err); ok && sc.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("%s %q not found", kind, id)
+	}
+	return fmt.Errorf("%s %q: %w", kind, id, err)
+}
+
 // freehirePassthrough re-encodes one of the spec's open-ended objects as
 // a plain map. The spec names their fields but still allows extras, so
 // re-encoding forwards every key upstream sent rather than only the ones
@@ -1187,7 +1200,7 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 			Offset: freehireOptInt(in.Offset),
 		})
 		if err != nil {
-			return errorResult(fmt.Errorf("company %q not found", in.CompanySlug)), nil, nil
+			return errorResult(freehireDetailError(err, "company", in.CompanySlug)), nil, nil
 		}
 		return nil, freehireCompanyDetailOutputOf(res), nil
 	})
@@ -1222,7 +1235,7 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 		}
 		res, err := c.GetJob(ctx, freehire.GetJobParams{Slug: in.JobID})
 		if err != nil {
-			return errorResult(fmt.Errorf("job %q not found", in.JobID)), nil, nil
+			return errorResult(freehireDetailError(err, "job", in.JobID)), nil, nil
 		}
 		job := freehireJobOf(res.Data)
 		return nil, &job, nil

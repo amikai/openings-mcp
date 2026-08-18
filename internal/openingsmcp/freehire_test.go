@@ -2,7 +2,9 @@ package openingsmcp
 
 import (
 	"encoding/json"
+	"errors"
 	"maps"
+	"net/http"
 	"slices"
 	"testing"
 
@@ -397,6 +399,57 @@ func TestFreehireGetJobDetailE2E(t *testing.T) {
 	assert.Equal(t, "stale", output.Reality["class"])
 	assert.EqualValues(t, 40, output.Reality["age_days"])
 	assert.EqualValues(t, 2, output.Reality["repost_count"])
+}
+
+// TestFreehireDetailError covers the difference between "this id is wrong"
+// and "the request failed". Only a 404 means the caller should look at the
+// id; anything else has to keep its cause or the caller retries the wrong
+// thing.
+func TestFreehireDetailError(t *testing.T) {
+	notFound := &freehire.ErrorStatusCode{StatusCode: http.StatusNotFound}
+	assert.EqualError(t, freehireDetailError(notFound, "job", "abc"), `job "abc" not found`)
+
+	for _, code := range []int{http.StatusInternalServerError, http.StatusTooManyRequests, http.StatusBadRequest} {
+		err := freehireDetailError(&freehire.ErrorStatusCode{StatusCode: code}, "job", "abc")
+		assert.NotContains(t, err.Error(), "not found", "HTTP %d must not read as a stale slug", code)
+		assert.Contains(t, err.Error(), `job "abc"`)
+	}
+
+	// A transport failure never reaches a status code at all.
+	transport := errors.New("dial tcp: connection refused")
+	err := freehireDetailError(transport, "company", "stripe")
+	assert.NotContains(t, err.Error(), "not found")
+	assert.ErrorIs(t, err, transport, "the cause survives for the caller to inspect")
+}
+
+// TestFreehireGetJobDetailUpstreamFailureE2E covers the same distinction
+// through the tool: an unreachable API must not be reported as a slug the
+// catalogue does not hold.
+func TestFreehireGetJobDetailUpstreamFailureE2E(t *testing.T) {
+	server := mcp.NewServer(&mcp.Implementation{Name: "test", Version: "v0"}, nil)
+	// A server that is closed before the call, so every request fails in
+	// transport rather than with a status.
+	dead := freehire.NewMockServer()
+	url := dead.URL
+	dead.Close()
+	client, err := freehire.NewClient(url)
+	require.NoError(t, err)
+	RegisterFreehire(server, client)
+
+	serverTransport, clientTransport := mcp.NewInMemoryTransports()
+	serverSession, err := server.Connect(t.Context(), serverTransport, nil)
+	require.NoError(t, err)
+	t.Cleanup(func() { serverSession.Close() })
+	mcpClient := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "v0"}, nil)
+	clientSession, err := mcpClient.Connect(t.Context(), clientTransport, nil)
+	require.NoError(t, err)
+	t.Cleanup(func() { clientSession.Close() })
+
+	text := callFreehireErr(t, clientSession, "freehire_get_job_detail", map[string]any{
+		"job_id": freehire.MockJobSlug,
+	})
+	assert.NotContains(t, text, "not found")
+	assert.Contains(t, text, freehire.MockJobSlug)
 }
 
 func TestFreehireGetJobDetailNotFoundE2E(t *testing.T) {
