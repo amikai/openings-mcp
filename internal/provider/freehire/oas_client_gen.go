@@ -30,8 +30,11 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// AgentSearchJobs invokes agentSearchJobs operation.
 	//
-	// Agent-friendly job search. Every result carries the job's full description (verbatim from the
-	// database, not the search-index preview), in the format selected by description_format.
+	// Identical query surface to `searchJobs`, but every result carries the job's full description, read
+	// verbatim from the database rather than the search index's preview, in the format selected by
+	// `description_format`.
+	//
+	// Responses are several times larger per hit than `searchJobs`, so prefer a small `limit`.
 	//
 	// GET /agent/jobs/search
 	AgentSearchJobs(ctx context.Context, params AgentSearchJobsParams) (*JobListEnvelope, error)
@@ -43,29 +46,63 @@ type Invoker interface {
 	GetCompany(ctx context.Context, params GetCompanyParams) (*GetCompanyOK, error)
 	// GetJob invokes getJob operation.
 	//
-	// Get a job by slug.
+	// Full detail for one posting: the verbatim stored description (HTML) and the `ghost` signal, which
+	// `agentSearchJobs` does not carry. This is the only endpoint that serves a closed posting;
+	// `closed_at` is non-null when the role is no longer open.
 	//
 	// GET /jobs/{slug}
 	GetJob(ctx context.Context, params GetJobParams) (*GetJobOK, error)
 	// GetJobFacets invokes getJobFacets operation.
 	//
-	// Return facet values, counts, canonical skill slugs, and numeric ranges. Use this before applying
-	// uncertain filters such as skills, countries, company_slug, source, or category.
+	// Return facet values, counts, canonical skill slugs, and numeric ranges for the postings matching the
+	// same filter grammar the search endpoints take. Call this before applying any uncertain filter.
+	//
+	// A distribution is counted per facet and the wide-valued ones (`cities`, `skills`) dominate, so
+	// narrow with `facets=` whenever you read only a few. `company_slug` has no distribution — use
+	// `searchCompanies` for the company typeahead.
 	//
 	// GET /jobs/facets
 	GetJobFacets(ctx context.Context, params GetJobFacetsParams) (*FacetsEnvelope, error)
 	// GetSimilarJobs invokes getSimilarJobs operation.
 	//
-	// Find jobs similar to a job.
+	// Nearest neighbours from a precomputed semantic list, nearest first. The list is built offline, so a
+	// neighbour that has since closed is dropped silently — a response may hold fewer items than
+	// `limit`.
 	//
 	// GET /jobs/{slug}/similar
-	GetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (*JobListEnvelope, error)
+	GetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (*GetSimilarJobsOK, error)
+	// SearchCities invokes searchCities operation.
+	//
+	// Typeahead over the city dictionary. The returned `value` is exactly what the `cities` job facet
+	// expects — resolve here before filtering, since the facet holds canonical display names ("London")
+	// and matches nothing on a near miss.
+	//
+	// City names are not unique: "London" exists in both `gb` and `ca`. The `cities` facet has no country
+	// qualifier, so combine it with `countries` only if you accept the OR-group widening described at the
+	// top of this schema.
+	//
+	// GET /geo/cities
+	SearchCities(ctx context.Context, params SearchCitiesParams) (*SearchCitiesOK, error)
 	// SearchCompanies invokes searchCompanies operation.
 	//
-	// Search companies.
+	// Companies that currently have at least one open role, most active first. Facet parameters are
+	// repeatable (OR within a facet, AND across facets) and compose with `q`.
+	//
+	// `meta.total` is exact whenever any filter is present. On a completely unfiltered request it is a
+	// planner estimate, because counting the whole catalogue exactly is too expensive to do per request.
 	//
 	// GET /companies
 	SearchCompanies(ctx context.Context, params SearchCompaniesParams) (*SearchCompaniesOK, error)
+	// SearchJobs invokes searchJobs operation.
+	//
+	// Full-text and faceted search over open postings. Descriptions are the search index's truncated
+	// preview. Use `agentSearchJobs` when you need the full verbatim body of every hit, or `getJob` for
+	// the one posting the user picked.
+	//
+	// Closed postings are never in the index, so they never appear here.
+	//
+	// GET /jobs/search
+	SearchJobs(ctx context.Context, params SearchJobsParams) (*JobListEnvelope, error)
 }
 
 // Client implements OAS client.
@@ -109,8 +146,11 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // AgentSearchJobs invokes agentSearchJobs operation.
 //
-// Agent-friendly job search. Every result carries the job's full description (verbatim from the
-// database, not the search-index preview), in the format selected by description_format.
+// Identical query surface to `searchJobs`, but every result carries the job's full description, read
+// verbatim from the database rather than the search index's preview, in the format selected by
+// `description_format`.
+//
+// Responses are several times larger per hit than `searchJobs`, so prefer a small `limit`.
 //
 // GET /agent/jobs/search
 func (c *Client) AgentSearchJobs(ctx context.Context, params AgentSearchJobsParams) (*JobListEnvelope, error) {
@@ -247,16 +287,16 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 		}
 	}
 	{
-		// Encode "semantic_ratio" parameter.
+		// Encode "description_format" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "semantic_ratio",
+			Name:    "description_format",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.SemanticRatio.Get(); ok {
-				return e.EncodeValue(conv.Float64ToString(val))
+			if val, ok := params.DescriptionFormat.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
 		}); err != nil {
@@ -277,6 +317,58 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 					for i, item := range params.Regions {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Countries != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Countries {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "cities" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Cities != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Cities {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
 							return errors.Wrapf(err, "[%d]", i)
 						}
@@ -327,6 +419,32 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 			if params.Category != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
 					for i, item := range params.Category {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "role" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Role != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Role {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -394,17 +512,138 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 		}
 	}
 	{
-		// Encode "countries" parameter.
+		// Encode "skills_mode" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "countries",
+			Name:    "skills_mode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.Countries != nil {
+			if val, ok := params.SkillsMode.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "is_tech" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.IsTech != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.Countries {
+					for i, item := range params.IsTech {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "ai_archetype" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.AiArchetype != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.AiArchetype {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "collections" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Collections != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Collections {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "reality" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Reality != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Reality {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "source" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Source != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Source {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -446,17 +685,121 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 		}
 	}
 	{
-		// Encode "source" parameter.
+		// Encode "employment_type" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "source",
+			Name:    "employment_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.Source != nil {
+			if params.EmploymentType != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.Source {
+					for i, item := range params.EmploymentType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "relocation" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Relocation != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Relocation {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "english_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EnglishLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EnglishLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "education_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EducationLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EducationLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posting_language" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.PostingLanguage != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.PostingLanguage {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -465,6 +808,153 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 					}
 					return nil
 				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "domains" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Domains != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Domains {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanyType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanyType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_size" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySize != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySize {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_currency" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryCurrency != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryCurrency {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryPeriod != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryPeriod {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "visa_sponsorship" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.VisaSponsorship.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -506,16 +996,189 @@ func (c *Client) sendAgentSearchJobs(ctx context.Context, params AgentSearchJobs
 		}
 	}
 	{
-		// Encode "description_format" parameter.
+		// Encode "experience_years_min" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "description_format",
+			Name:    "experience_years_min",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.DescriptionFormat.Get(); ok {
-				return e.EncodeValue(conv.StringToString(string(val)))
+			if val, ok := params.ExperienceYearsMin.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posted_within_days" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PostedWithinDays.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "regions_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "regions_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.RegionsExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.RegionsExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CountriesExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CountriesExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "work_mode_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "work_mode_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.WorkModeExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.WorkModeExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "skills_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "skills_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SkillsExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SkillsExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "source_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "source_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SourceExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SourceExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_slug_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_slug_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySlugExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySlugExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
 			}
 			return nil
 		}); err != nil {
@@ -691,7 +1354,9 @@ func (c *Client) sendGetCompany(ctx context.Context, params GetCompanyParams) (r
 
 // GetJob invokes getJob operation.
 //
-// Get a job by slug.
+// Full detail for one posting: the verbatim stored description (HTML) and the `ghost` signal, which
+// `agentSearchJobs` does not carry. This is the only endpoint that serves a closed posting;
+// `closed_at` is non-null when the role is no longer open.
 //
 // GET /jobs/{slug}
 func (c *Client) GetJob(ctx context.Context, params GetJobParams) (*GetJobOK, error) {
@@ -789,8 +1454,12 @@ func (c *Client) sendGetJob(ctx context.Context, params GetJobParams) (res *GetJ
 
 // GetJobFacets invokes getJobFacets operation.
 //
-// Return facet values, counts, canonical skill slugs, and numeric ranges. Use this before applying
-// uncertain filters such as skills, countries, company_slug, source, or category.
+// Return facet values, counts, canonical skill slugs, and numeric ranges for the postings matching the
+// same filter grammar the search endpoints take. Call this before applying any uncertain filter.
+//
+// A distribution is counted per facet and the wide-valued ones (`cities`, `skills`) dominate, so
+// narrow with `facets=` whenever you read only a few. `company_slug` has no distribution — use
+// `searchCompanies` for the company typeahead.
 //
 // GET /jobs/facets
 func (c *Client) GetJobFacets(ctx context.Context, params GetJobFacetsParams) (*FacetsEnvelope, error) {
@@ -859,6 +1528,40 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 		}
 	}
 	{
+		// Encode "facets" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "facets",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Facets.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "disjunctive" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "disjunctive",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Disjunctive.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "regions" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "regions",
@@ -870,6 +1573,58 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 			if params.Regions != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
 					for i, item := range params.Regions {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Countries != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Countries {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "cities" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Cities != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Cities {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -897,7 +1652,7 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 				return e.EncodeArray(func(e uri.Encoder) error {
 					for i, item := range params.WorkMode {
 						if err := func() error {
-							return e.EncodeValue(conv.StringToString(item))
+							return e.EncodeValue(conv.StringToString(string(item)))
 						}(); err != nil {
 							return errors.Wrapf(err, "[%d]", i)
 						}
@@ -937,6 +1692,32 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 		}
 	}
 	{
+		// Encode "role" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Role != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Role {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "seniority" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "seniority",
@@ -949,7 +1730,7 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 				return e.EncodeArray(func(e uri.Encoder) error {
 					for i, item := range params.Seniority {
 						if err := func() error {
-							return e.EncodeValue(conv.StringToString(item))
+							return e.EncodeValue(conv.StringToString(string(item)))
 						}(); err != nil {
 							return errors.Wrapf(err, "[%d]", i)
 						}
@@ -989,17 +1770,138 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 		}
 	}
 	{
-		// Encode "countries" parameter.
+		// Encode "skills_mode" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "countries",
+			Name:    "skills_mode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.Countries != nil {
+			if val, ok := params.SkillsMode.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "is_tech" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.IsTech != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.Countries {
+					for i, item := range params.IsTech {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "ai_archetype" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.AiArchetype != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.AiArchetype {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "collections" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Collections != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Collections {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "reality" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Reality != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Reality {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "source" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Source != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Source {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -1041,17 +1943,121 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 		}
 	}
 	{
-		// Encode "source" parameter.
+		// Encode "employment_type" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "source",
+			Name:    "employment_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if params.Source != nil {
+			if params.EmploymentType != nil {
 				return e.EncodeArray(func(e uri.Encoder) error {
-					for i, item := range params.Source {
+					for i, item := range params.EmploymentType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "relocation" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Relocation != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Relocation {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "english_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EnglishLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EnglishLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "education_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EducationLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EducationLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posting_language" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.PostingLanguage != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.PostingLanguage {
 						if err := func() error {
 							return e.EncodeValue(conv.StringToString(item))
 						}(); err != nil {
@@ -1060,6 +2066,153 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 					}
 					return nil
 				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "domains" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Domains != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Domains {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanyType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanyType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_size" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySize != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySize {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_currency" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryCurrency != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryCurrency {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryPeriod != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryPeriod {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "visa_sponsorship" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.VisaSponsorship.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
@@ -1100,6 +2253,40 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "experience_years_min" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "experience_years_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ExperienceYearsMin.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posted_within_days" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PostedWithinDays.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -1133,15 +2320,17 @@ func (c *Client) sendGetJobFacets(ctx context.Context, params GetJobFacetsParams
 
 // GetSimilarJobs invokes getSimilarJobs operation.
 //
-// Find jobs similar to a job.
+// Nearest neighbours from a precomputed semantic list, nearest first. The list is built offline, so a
+// neighbour that has since closed is dropped silently — a response may hold fewer items than
+// `limit`.
 //
 // GET /jobs/{slug}/similar
-func (c *Client) GetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (*JobListEnvelope, error) {
+func (c *Client) GetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (*GetSimilarJobsOK, error) {
 	res, err := c.sendGetSimilarJobs(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (res *JobListEnvelope, err error) {
+func (c *Client) sendGetSimilarJobs(ctx context.Context, params GetSimilarJobsParams) (res *GetSimilarJobsOK, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getSimilarJobs"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -1251,9 +2440,137 @@ func (c *Client) sendGetSimilarJobs(ctx context.Context, params GetSimilarJobsPa
 	return result, nil
 }
 
+// SearchCities invokes searchCities operation.
+//
+// Typeahead over the city dictionary. The returned `value` is exactly what the `cities` job facet
+// expects — resolve here before filtering, since the facet holds canonical display names ("London")
+// and matches nothing on a near miss.
+//
+// City names are not unique: "London" exists in both `gb` and `ca`. The `cities` facet has no country
+// qualifier, so combine it with `countries` only if you accept the OR-group widening described at the
+// top of this schema.
+//
+// GET /geo/cities
+func (c *Client) SearchCities(ctx context.Context, params SearchCitiesParams) (*SearchCitiesOK, error) {
+	res, err := c.sendSearchCities(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendSearchCities(ctx context.Context, params SearchCitiesParams) (res *SearchCitiesOK, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("searchCities"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/geo/cities"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SearchCitiesOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/geo/cities"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "q" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "q",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Q.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "country" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "country",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Country.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeSearchCitiesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
 // SearchCompanies invokes searchCompanies operation.
 //
-// Search companies.
+// Companies that currently have at least one open role, most active first. Facet parameters are
+// repeatable (OR within a facet, AND across facets) and compose with `q`.
+//
+// `meta.total` is exact whenever any filter is present. On a completely unfiltered request it is a
+// planner estimate, because counting the whole catalogue exactly is too expensive to do per request.
 //
 // GET /companies
 func (c *Client) SearchCompanies(ctx context.Context, params SearchCompaniesParams) (*SearchCompaniesOK, error) {
@@ -1355,6 +2672,361 @@ func (c *Client) sendSearchCompanies(ctx context.Context, params SearchCompanies
 			return res, errors.Wrap(err, "encode query")
 		}
 	}
+	{
+		// Encode "sort" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Sort.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "collections" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Collections != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Collections {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "regions" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Regions != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Regions {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Countries != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Countries {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "remote_regions" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "remote_regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.RemoteRegions != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.RemoteRegions {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "industries" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "industries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Industries != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Industries {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "domains" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Domains != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Domains {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanyType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanyType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_size" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySize != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySize {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "maturity" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "maturity",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Maturity != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Maturity {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "yc_batch" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "yc_batch",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.YcBatch != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.YcBatch {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "yc_status" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "yc_status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.YcStatus != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.YcStatus {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "yc_stage" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "yc_stage",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.YcStage != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.YcStage {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "yc_flags" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "yc_flags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.YcFlags != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.YcFlags {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
 	u.RawQuery = q.Values().Encode()
 
 	stage = "EncodeRequest"
@@ -1379,6 +3051,1061 @@ func (c *Client) sendSearchCompanies(ctx context.Context, params SearchCompanies
 
 	stage = "DecodeResponse"
 	result, err := decodeSearchCompaniesResponse(resp)
+	if err != nil {
+		return res, errors.Wrap(err, "decode response")
+	}
+
+	return result, nil
+}
+
+// SearchJobs invokes searchJobs operation.
+//
+// Full-text and faceted search over open postings. Descriptions are the search index's truncated
+// preview. Use `agentSearchJobs` when you need the full verbatim body of every hit, or `getJob` for
+// the one posting the user picked.
+//
+// Closed postings are never in the index, so they never appear here.
+//
+// GET /jobs/search
+func (c *Client) SearchJobs(ctx context.Context, params SearchJobsParams) (*JobListEnvelope, error) {
+	res, err := c.sendSearchJobs(ctx, params)
+	return res, err
+}
+
+func (c *Client) sendSearchJobs(ctx context.Context, params SearchJobsParams) (res *JobListEnvelope, err error) {
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("searchJobs"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.URLTemplateKey.String("/jobs/search"),
+	}
+	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		elapsedDuration := time.Since(startTime)
+		c.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), metric.WithAttributes(otelAttrs...))
+	}()
+
+	// Increment request counter.
+	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+
+	// Start a span for this request.
+	ctx, span := c.cfg.Tracer.Start(ctx, SearchJobsOperation,
+		trace.WithAttributes(otelAttrs...),
+		clientSpanKind,
+	)
+	// Track stage for error reporting.
+	var stage string
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, stage)
+			c.errors.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
+		}
+		span.End()
+	}()
+
+	stage = "BuildURL"
+	u := uri.Clone(c.requestURL(ctx))
+	var pathParts [1]string
+	pathParts[0] = "/jobs/search"
+	uri.AddPathParts(u, pathParts[:]...)
+
+	stage = "EncodeQueryParams"
+	q := uri.NewQueryEncoder()
+	{
+		// Encode "q" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "q",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Q.Get(); ok {
+				return e.EncodeValue(conv.StringToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "limit" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Limit.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "offset" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Offset.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "sort" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Sort.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "order" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "order",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Order.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "regions" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Regions != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Regions {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Countries != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Countries {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "cities" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Cities != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Cities {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "work_mode" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "work_mode",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.WorkMode != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.WorkMode {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "category" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "category",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Category != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Category {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "role" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Role != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Role {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "seniority" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "seniority",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Seniority != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Seniority {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "skills" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "skills",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Skills != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Skills {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "skills_mode" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "skills_mode",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SkillsMode.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "is_tech" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.IsTech != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.IsTech {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "ai_archetype" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.AiArchetype != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.AiArchetype {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "collections" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Collections != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Collections {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "reality" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Reality != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Reality {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "source" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Source != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Source {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_slug" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_slug",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySlug != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySlug {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "employment_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "employment_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EmploymentType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EmploymentType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "relocation" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Relocation != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Relocation {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "english_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EnglishLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EnglishLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "education_level" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.EducationLevel != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.EducationLevel {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posting_language" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.PostingLanguage != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.PostingLanguage {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "domains" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.Domains != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Domains {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_type" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanyType != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanyType {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_size" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySize != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySize {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_currency" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryCurrency != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryCurrency {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_period" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SalaryPeriod != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SalaryPeriod {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(string(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "visa_sponsorship" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.VisaSponsorship.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_min" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SalaryMin.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "salary_max" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "salary_max",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.SalaryMax.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "experience_years_min" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "experience_years_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.ExperienceYearsMin.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "posted_within_days" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PostedWithinDays.Get(); ok {
+				return e.EncodeValue(conv.IntToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "regions_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "regions_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.RegionsExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.RegionsExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "countries_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "countries_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CountriesExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CountriesExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "work_mode_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "work_mode_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.WorkModeExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.WorkModeExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "skills_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "skills_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SkillsExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SkillsExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "source_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "source_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.SourceExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.SourceExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "company_slug_exclude" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "company_slug_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if params.CompanySlugExclude != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.CompanySlugExclude {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	u.RawQuery = q.Values().Encode()
+
+	stage = "EncodeRequest"
+	r, err := ht.NewRequest(ctx, "GET", u)
+	if err != nil {
+		return res, errors.Wrap(err, "create request")
+	}
+
+	stage = "SendRequest"
+	resp, err := c.cfg.Client.Do(r)
+	if err != nil {
+		return res, errors.Wrap(err, "do request")
+	}
+	body := resp.Body
+	defer func() {
+		// Drain the body to EOF before closing, so the underlying
+		// connection can be reused by the Transport regardless of the
+		// response status code. See https://github.com/ogen-go/ogen/issues/1670.
+		_, _ = io.Copy(io.Discard, body)
+		_ = body.Close()
+	}()
+
+	stage = "DecodeResponse"
+	result, err := decodeSearchJobsResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}

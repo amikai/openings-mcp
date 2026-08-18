@@ -1,0 +1,36 @@
+{
+    "data": [
+        {
+            "value": "London",
+            "country": "gb"
+        },
+        {
+            "value": "Londonderry County Borough",
+            "country": "gb"
+        },
+        {
+            "value": "Brent",
+            "country": "gb"
+        },
+        {
+            "value": "Bexley",
+            "country": "gb"
+        },
+        {
+            "value": "Sutton",
+            "country": "gb"
+        },
+        {
+            "value": "Derry",
+            "country": "gb"
+        },
+        {
+            "value": "Hounslow",
+            "country": "gb"
+        },
+        {
+            "value": "Barnet",
+            "country": "gb"
+        }
+    ]
+}

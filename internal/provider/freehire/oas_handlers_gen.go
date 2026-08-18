@@ -35,8 +35,11 @@ func (c *codeRecorder) Unwrap() http.ResponseWriter {
 
 // handleAgentSearchJobsRequest handles agentSearchJobs operation.
 //
-// Agent-friendly job search. Every result carries the job's full description (verbatim from the
-// database, not the search-index preview), in the format selected by description_format.
+// Identical query surface to `searchJobs`, but every result carries the job's full description, read
+// verbatim from the database rather than the search index's preview, in the format selected by
+// `description_format`.
+//
+// Responses are several times larger per hit than `searchJobs`, so prefer a small `limit`.
 //
 // GET /agent/jobs/search
 func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -128,7 +131,7 @@ func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, 
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    AgentSearchJobsOperation,
-			OperationSummary: "Search open jobs for agents",
+			OperationSummary: "Search open jobs for agents (full descriptions)",
 			OperationID:      "agentSearchJobs",
 			Body:             nil,
 			RawBody:          rawBody,
@@ -154,13 +157,21 @@ func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, 
 					In:   "query",
 				}: params.Order,
 				{
-					Name: "semantic_ratio",
+					Name: "description_format",
 					In:   "query",
-				}: params.SemanticRatio,
+				}: params.DescriptionFormat,
 				{
 					Name: "regions",
 					In:   "query",
 				}: params.Regions,
+				{
+					Name: "countries",
+					In:   "query",
+				}: params.Countries,
+				{
+					Name: "cities",
+					In:   "query",
+				}: params.Cities,
 				{
 					Name: "work_mode",
 					In:   "query",
@@ -170,6 +181,10 @@ func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, 
 					In:   "query",
 				}: params.Category,
 				{
+					Name: "role",
+					In:   "query",
+				}: params.Role,
+				{
 					Name: "seniority",
 					In:   "query",
 				}: params.Seniority,
@@ -178,17 +193,77 @@ func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, 
 					In:   "query",
 				}: params.Skills,
 				{
-					Name: "countries",
+					Name: "skills_mode",
 					In:   "query",
-				}: params.Countries,
+				}: params.SkillsMode,
+				{
+					Name: "is_tech",
+					In:   "query",
+				}: params.IsTech,
+				{
+					Name: "ai_archetype",
+					In:   "query",
+				}: params.AiArchetype,
+				{
+					Name: "collections",
+					In:   "query",
+				}: params.Collections,
+				{
+					Name: "reality",
+					In:   "query",
+				}: params.Reality,
+				{
+					Name: "source",
+					In:   "query",
+				}: params.Source,
 				{
 					Name: "company_slug",
 					In:   "query",
 				}: params.CompanySlug,
 				{
-					Name: "source",
+					Name: "employment_type",
 					In:   "query",
-				}: params.Source,
+				}: params.EmploymentType,
+				{
+					Name: "relocation",
+					In:   "query",
+				}: params.Relocation,
+				{
+					Name: "english_level",
+					In:   "query",
+				}: params.EnglishLevel,
+				{
+					Name: "education_level",
+					In:   "query",
+				}: params.EducationLevel,
+				{
+					Name: "posting_language",
+					In:   "query",
+				}: params.PostingLanguage,
+				{
+					Name: "domains",
+					In:   "query",
+				}: params.Domains,
+				{
+					Name: "company_type",
+					In:   "query",
+				}: params.CompanyType,
+				{
+					Name: "company_size",
+					In:   "query",
+				}: params.CompanySize,
+				{
+					Name: "salary_currency",
+					In:   "query",
+				}: params.SalaryCurrency,
+				{
+					Name: "salary_period",
+					In:   "query",
+				}: params.SalaryPeriod,
+				{
+					Name: "visa_sponsorship",
+					In:   "query",
+				}: params.VisaSponsorship,
 				{
 					Name: "salary_min",
 					In:   "query",
@@ -198,9 +273,37 @@ func (s *Server) handleAgentSearchJobsRequest(args [0]string, argsEscaped bool, 
 					In:   "query",
 				}: params.SalaryMax,
 				{
-					Name: "description_format",
+					Name: "experience_years_min",
 					In:   "query",
-				}: params.DescriptionFormat,
+				}: params.ExperienceYearsMin,
+				{
+					Name: "posted_within_days",
+					In:   "query",
+				}: params.PostedWithinDays,
+				{
+					Name: "regions_exclude",
+					In:   "query",
+				}: params.RegionsExclude,
+				{
+					Name: "countries_exclude",
+					In:   "query",
+				}: params.CountriesExclude,
+				{
+					Name: "work_mode_exclude",
+					In:   "query",
+				}: params.WorkModeExclude,
+				{
+					Name: "skills_exclude",
+					In:   "query",
+				}: params.SkillsExclude,
+				{
+					Name: "source_exclude",
+					In:   "query",
+				}: params.SourceExclude,
+				{
+					Name: "company_slug_exclude",
+					In:   "query",
+				}: params.CompanySlugExclude,
 			},
 			Raw: r,
 		}
@@ -416,7 +519,9 @@ func (s *Server) handleGetCompanyRequest(args [1]string, argsEscaped bool, w htt
 
 // handleGetJobRequest handles getJob operation.
 //
-// Get a job by slug.
+// Full detail for one posting: the verbatim stored description (HTML) and the `ghost` signal, which
+// `agentSearchJobs` does not carry. This is the only endpoint that serves a closed posting;
+// `closed_at` is non-null when the role is no longer open.
 //
 // GET /jobs/{slug}
 func (s *Server) handleGetJobRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -570,8 +675,12 @@ func (s *Server) handleGetJobRequest(args [1]string, argsEscaped bool, w http.Re
 
 // handleGetJobFacetsRequest handles getJobFacets operation.
 //
-// Return facet values, counts, canonical skill slugs, and numeric ranges. Use this before applying
-// uncertain filters such as skills, countries, company_slug, source, or category.
+// Return facet values, counts, canonical skill slugs, and numeric ranges for the postings matching the
+// same filter grammar the search endpoints take. Call this before applying any uncertain filter.
+//
+// A distribution is counted per facet and the wide-valued ones (`cities`, `skills`) dominate, so
+// narrow with `facets=` whenever you read only a few. `company_slug` has no distribution — use
+// `searchCompanies` for the company typeahead.
 //
 // GET /jobs/facets
 func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -673,9 +782,25 @@ func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w h
 					In:   "query",
 				}: params.Q,
 				{
+					Name: "facets",
+					In:   "query",
+				}: params.Facets,
+				{
+					Name: "disjunctive",
+					In:   "query",
+				}: params.Disjunctive,
+				{
 					Name: "regions",
 					In:   "query",
 				}: params.Regions,
+				{
+					Name: "countries",
+					In:   "query",
+				}: params.Countries,
+				{
+					Name: "cities",
+					In:   "query",
+				}: params.Cities,
 				{
 					Name: "work_mode",
 					In:   "query",
@@ -685,6 +810,10 @@ func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w h
 					In:   "query",
 				}: params.Category,
 				{
+					Name: "role",
+					In:   "query",
+				}: params.Role,
+				{
 					Name: "seniority",
 					In:   "query",
 				}: params.Seniority,
@@ -693,17 +822,77 @@ func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w h
 					In:   "query",
 				}: params.Skills,
 				{
-					Name: "countries",
+					Name: "skills_mode",
 					In:   "query",
-				}: params.Countries,
+				}: params.SkillsMode,
+				{
+					Name: "is_tech",
+					In:   "query",
+				}: params.IsTech,
+				{
+					Name: "ai_archetype",
+					In:   "query",
+				}: params.AiArchetype,
+				{
+					Name: "collections",
+					In:   "query",
+				}: params.Collections,
+				{
+					Name: "reality",
+					In:   "query",
+				}: params.Reality,
+				{
+					Name: "source",
+					In:   "query",
+				}: params.Source,
 				{
 					Name: "company_slug",
 					In:   "query",
 				}: params.CompanySlug,
 				{
-					Name: "source",
+					Name: "employment_type",
 					In:   "query",
-				}: params.Source,
+				}: params.EmploymentType,
+				{
+					Name: "relocation",
+					In:   "query",
+				}: params.Relocation,
+				{
+					Name: "english_level",
+					In:   "query",
+				}: params.EnglishLevel,
+				{
+					Name: "education_level",
+					In:   "query",
+				}: params.EducationLevel,
+				{
+					Name: "posting_language",
+					In:   "query",
+				}: params.PostingLanguage,
+				{
+					Name: "domains",
+					In:   "query",
+				}: params.Domains,
+				{
+					Name: "company_type",
+					In:   "query",
+				}: params.CompanyType,
+				{
+					Name: "company_size",
+					In:   "query",
+				}: params.CompanySize,
+				{
+					Name: "salary_currency",
+					In:   "query",
+				}: params.SalaryCurrency,
+				{
+					Name: "salary_period",
+					In:   "query",
+				}: params.SalaryPeriod,
+				{
+					Name: "visa_sponsorship",
+					In:   "query",
+				}: params.VisaSponsorship,
 				{
 					Name: "salary_min",
 					In:   "query",
@@ -712,6 +901,14 @@ func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w h
 					Name: "salary_max",
 					In:   "query",
 				}: params.SalaryMax,
+				{
+					Name: "experience_years_min",
+					In:   "query",
+				}: params.ExperienceYearsMin,
+				{
+					Name: "posted_within_days",
+					In:   "query",
+				}: params.PostedWithinDays,
 			},
 			Raw: r,
 		}
@@ -765,7 +962,9 @@ func (s *Server) handleGetJobFacetsRequest(args [0]string, argsEscaped bool, w h
 
 // handleGetSimilarJobsRequest handles getSimilarJobs operation.
 //
-// Find jobs similar to a job.
+// Nearest neighbours from a precomputed semantic list, nearest first. The list is built offline, so a
+// neighbour that has since closed is dropped silently — a response may hold fewer items than
+// `limit`.
 //
 // GET /jobs/{slug}/similar
 func (s *Server) handleGetSimilarJobsRequest(args [1]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -852,7 +1051,7 @@ func (s *Server) handleGetSimilarJobsRequest(args [1]string, argsEscaped bool, w
 
 	var rawBody []byte
 
-	var response *JobListEnvelope
+	var response *GetSimilarJobsOK
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -877,7 +1076,7 @@ func (s *Server) handleGetSimilarJobsRequest(args [1]string, argsEscaped bool, w
 		type (
 			Request  = struct{}
 			Params   = GetSimilarJobsParams
-			Response = *JobListEnvelope
+			Response = *GetSimilarJobsOK
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -921,9 +1120,177 @@ func (s *Server) handleGetSimilarJobsRequest(args [1]string, argsEscaped bool, w
 	}
 }
 
+// handleSearchCitiesRequest handles searchCities operation.
+//
+// Typeahead over the city dictionary. The returned `value` is exactly what the `cities` job facet
+// expects — resolve here before filtering, since the facet holds canonical display names ("London")
+// and matches nothing on a near miss.
+//
+// City names are not unique: "London" exists in both `gb` and `ca`. The `cities` facet has no country
+// qualifier, so combine it with `countries` only if you accept the OR-group widening described at the
+// top of this schema.
+//
+// GET /geo/cities
+func (s *Server) handleSearchCitiesRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	statusWriter := &codeRecorder{ResponseWriter: w}
+	w = statusWriter
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("searchCities"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/geo/cities"),
+	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), SearchCitiesOperation,
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+
+		attrSet := labeler.AttributeSet()
+		attrs := attrSet.ToSlice()
+		code := statusWriter.status
+		if code != 0 {
+			codeAttr := semconv.HTTPResponseStatusCode(code)
+			attrs = append(attrs, codeAttr)
+			span.SetAttributes(attrs...)
+		}
+		attrOpt := metric.WithAttributes(attrs...)
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+
+			// https://opentelemetry.io/docs/specs/semconv/http/http-spans/#status
+			// Span Status MUST be left unset if HTTP status code was in the 1xx, 2xx or 3xx ranges,
+			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
+			// max redirects exceeded), in which case status MUST be set to Error.
+			code := statusWriter.status
+			if code < 100 || code >= 500 {
+				span.SetStatus(codes.Error, stage)
+			}
+
+			attrSet := labeler.AttributeSet()
+			attrs := attrSet.ToSlice()
+			if code != 0 {
+				attrs = append(attrs, semconv.HTTPResponseStatusCode(code))
+			}
+
+			s.errors.Add(ctx, 1, metric.WithAttributes(attrs...))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: SearchCitiesOperation,
+			ID:   "searchCities",
+		}
+	)
+	params, err := decodeSearchCitiesParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var rawBody []byte
+
+	var response *SearchCitiesOK
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    SearchCitiesOperation,
+			OperationSummary: "Resolve a city name to the canonical cities facet value",
+			OperationID:      "searchCities",
+			Body:             nil,
+			RawBody:          rawBody,
+			Params: middleware.Parameters{
+				{
+					Name: "q",
+					In:   "query",
+				}: params.Q,
+				{
+					Name: "country",
+					In:   "query",
+				}: params.Country,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = SearchCitiesParams
+			Response = *SearchCitiesOK
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackSearchCitiesParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.SearchCities(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.SearchCities(ctx, params)
+	}
+	if err != nil {
+		if errRes, ok := errors.Into[*ErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
+		return
+	}
+
+	if err := encodeSearchCitiesResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
 // handleSearchCompaniesRequest handles searchCompanies operation.
 //
-// Search companies.
+// Companies that currently have at least one open role, most active first. Facet parameters are
+// repeatable (OR within a facet, AND across facets) and compose with `q`.
+//
+// `meta.total` is exact whenever any filter is present. On a completely unfiltered request it is a
+// planner estimate, because counting the whole catalogue exactly is too expensive to do per request.
 //
 // GET /companies
 func (s *Server) handleSearchCompaniesRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
@@ -1032,6 +1399,62 @@ func (s *Server) handleSearchCompaniesRequest(args [0]string, argsEscaped bool, 
 					Name: "offset",
 					In:   "query",
 				}: params.Offset,
+				{
+					Name: "sort",
+					In:   "query",
+				}: params.Sort,
+				{
+					Name: "collections",
+					In:   "query",
+				}: params.Collections,
+				{
+					Name: "regions",
+					In:   "query",
+				}: params.Regions,
+				{
+					Name: "countries",
+					In:   "query",
+				}: params.Countries,
+				{
+					Name: "remote_regions",
+					In:   "query",
+				}: params.RemoteRegions,
+				{
+					Name: "industries",
+					In:   "query",
+				}: params.Industries,
+				{
+					Name: "domains",
+					In:   "query",
+				}: params.Domains,
+				{
+					Name: "company_type",
+					In:   "query",
+				}: params.CompanyType,
+				{
+					Name: "company_size",
+					In:   "query",
+				}: params.CompanySize,
+				{
+					Name: "maturity",
+					In:   "query",
+				}: params.Maturity,
+				{
+					Name: "yc_batch",
+					In:   "query",
+				}: params.YcBatch,
+				{
+					Name: "yc_status",
+					In:   "query",
+				}: params.YcStatus,
+				{
+					Name: "yc_stage",
+					In:   "query",
+				}: params.YcStage,
+				{
+					Name: "yc_flags",
+					In:   "query",
+				}: params.YcFlags,
 			},
 			Raw: r,
 		}
@@ -1075,6 +1498,324 @@ func (s *Server) handleSearchCompaniesRequest(args [0]string, argsEscaped bool, 
 	}
 
 	if err := encodeSearchCompaniesResponse(response, w, span); err != nil {
+		defer recordError("EncodeResponse", err)
+		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+		}
+		return
+	}
+}
+
+// handleSearchJobsRequest handles searchJobs operation.
+//
+// Full-text and faceted search over open postings. Descriptions are the search index's truncated
+// preview. Use `agentSearchJobs` when you need the full verbatim body of every hit, or `getJob` for
+// the one posting the user picked.
+//
+// Closed postings are never in the index, so they never appear here.
+//
+// GET /jobs/search
+func (s *Server) handleSearchJobsRequest(args [0]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+	statusWriter := &codeRecorder{ResponseWriter: w}
+	w = statusWriter
+	otelAttrs := []attribute.KeyValue{
+		otelogen.OperationID("searchJobs"),
+		semconv.HTTPRequestMethodKey.String("GET"),
+		semconv.HTTPRouteKey.String("/jobs/search"),
+	}
+	// Add attributes from config.
+	otelAttrs = append(otelAttrs, s.cfg.Attributes...)
+
+	// Start a span for this request.
+	ctx, span := s.cfg.Tracer.Start(r.Context(), SearchJobsOperation,
+		trace.WithAttributes(otelAttrs...),
+		serverSpanKind,
+	)
+	defer span.End()
+
+	// Add Labeler to context.
+	labeler := &Labeler{attrs: otelAttrs}
+	ctx = contextWithLabeler(ctx, labeler)
+
+	// Run stopwatch.
+	startTime := time.Now()
+	defer func() {
+		elapsedDuration := time.Since(startTime)
+
+		attrSet := labeler.AttributeSet()
+		attrs := attrSet.ToSlice()
+		code := statusWriter.status
+		if code != 0 {
+			codeAttr := semconv.HTTPResponseStatusCode(code)
+			attrs = append(attrs, codeAttr)
+			span.SetAttributes(attrs...)
+		}
+		attrOpt := metric.WithAttributes(attrs...)
+
+		// Increment request counter.
+		s.requests.Add(ctx, 1, attrOpt)
+
+		// Use floating point division here for higher precision (instead of Millisecond method).
+		s.duration.Record(ctx, float64(elapsedDuration)/float64(time.Millisecond), attrOpt)
+	}()
+
+	var (
+		recordError = func(stage string, err error) {
+			span.RecordError(err)
+
+			// https://opentelemetry.io/docs/specs/semconv/http/http-spans/#status
+			// Span Status MUST be left unset if HTTP status code was in the 1xx, 2xx or 3xx ranges,
+			// unless there was another error (e.g., network error receiving the response body; or 3xx codes with
+			// max redirects exceeded), in which case status MUST be set to Error.
+			code := statusWriter.status
+			if code < 100 || code >= 500 {
+				span.SetStatus(codes.Error, stage)
+			}
+
+			attrSet := labeler.AttributeSet()
+			attrs := attrSet.ToSlice()
+			if code != 0 {
+				attrs = append(attrs, semconv.HTTPResponseStatusCode(code))
+			}
+
+			s.errors.Add(ctx, 1, metric.WithAttributes(attrs...))
+		}
+		err          error
+		opErrContext = ogenerrors.OperationContext{
+			Name: SearchJobsOperation,
+			ID:   "searchJobs",
+		}
+	)
+	params, err := decodeSearchJobsParams(args, argsEscaped, r)
+	if err != nil {
+		err = &ogenerrors.DecodeParamsError{
+			OperationContext: opErrContext,
+			Err:              err,
+		}
+		defer recordError("DecodeParams", err)
+		s.cfg.ErrorHandler(ctx, w, r, err)
+		return
+	}
+
+	var rawBody []byte
+
+	var response *JobListEnvelope
+	if m := s.cfg.Middleware; m != nil {
+		mreq := middleware.Request{
+			Context:          ctx,
+			OperationName:    SearchJobsOperation,
+			OperationSummary: "Search open jobs",
+			OperationID:      "searchJobs",
+			Body:             nil,
+			RawBody:          rawBody,
+			Params: middleware.Parameters{
+				{
+					Name: "q",
+					In:   "query",
+				}: params.Q,
+				{
+					Name: "limit",
+					In:   "query",
+				}: params.Limit,
+				{
+					Name: "offset",
+					In:   "query",
+				}: params.Offset,
+				{
+					Name: "sort",
+					In:   "query",
+				}: params.Sort,
+				{
+					Name: "order",
+					In:   "query",
+				}: params.Order,
+				{
+					Name: "regions",
+					In:   "query",
+				}: params.Regions,
+				{
+					Name: "countries",
+					In:   "query",
+				}: params.Countries,
+				{
+					Name: "cities",
+					In:   "query",
+				}: params.Cities,
+				{
+					Name: "work_mode",
+					In:   "query",
+				}: params.WorkMode,
+				{
+					Name: "category",
+					In:   "query",
+				}: params.Category,
+				{
+					Name: "role",
+					In:   "query",
+				}: params.Role,
+				{
+					Name: "seniority",
+					In:   "query",
+				}: params.Seniority,
+				{
+					Name: "skills",
+					In:   "query",
+				}: params.Skills,
+				{
+					Name: "skills_mode",
+					In:   "query",
+				}: params.SkillsMode,
+				{
+					Name: "is_tech",
+					In:   "query",
+				}: params.IsTech,
+				{
+					Name: "ai_archetype",
+					In:   "query",
+				}: params.AiArchetype,
+				{
+					Name: "collections",
+					In:   "query",
+				}: params.Collections,
+				{
+					Name: "reality",
+					In:   "query",
+				}: params.Reality,
+				{
+					Name: "source",
+					In:   "query",
+				}: params.Source,
+				{
+					Name: "company_slug",
+					In:   "query",
+				}: params.CompanySlug,
+				{
+					Name: "employment_type",
+					In:   "query",
+				}: params.EmploymentType,
+				{
+					Name: "relocation",
+					In:   "query",
+				}: params.Relocation,
+				{
+					Name: "english_level",
+					In:   "query",
+				}: params.EnglishLevel,
+				{
+					Name: "education_level",
+					In:   "query",
+				}: params.EducationLevel,
+				{
+					Name: "posting_language",
+					In:   "query",
+				}: params.PostingLanguage,
+				{
+					Name: "domains",
+					In:   "query",
+				}: params.Domains,
+				{
+					Name: "company_type",
+					In:   "query",
+				}: params.CompanyType,
+				{
+					Name: "company_size",
+					In:   "query",
+				}: params.CompanySize,
+				{
+					Name: "salary_currency",
+					In:   "query",
+				}: params.SalaryCurrency,
+				{
+					Name: "salary_period",
+					In:   "query",
+				}: params.SalaryPeriod,
+				{
+					Name: "visa_sponsorship",
+					In:   "query",
+				}: params.VisaSponsorship,
+				{
+					Name: "salary_min",
+					In:   "query",
+				}: params.SalaryMin,
+				{
+					Name: "salary_max",
+					In:   "query",
+				}: params.SalaryMax,
+				{
+					Name: "experience_years_min",
+					In:   "query",
+				}: params.ExperienceYearsMin,
+				{
+					Name: "posted_within_days",
+					In:   "query",
+				}: params.PostedWithinDays,
+				{
+					Name: "regions_exclude",
+					In:   "query",
+				}: params.RegionsExclude,
+				{
+					Name: "countries_exclude",
+					In:   "query",
+				}: params.CountriesExclude,
+				{
+					Name: "work_mode_exclude",
+					In:   "query",
+				}: params.WorkModeExclude,
+				{
+					Name: "skills_exclude",
+					In:   "query",
+				}: params.SkillsExclude,
+				{
+					Name: "source_exclude",
+					In:   "query",
+				}: params.SourceExclude,
+				{
+					Name: "company_slug_exclude",
+					In:   "query",
+				}: params.CompanySlugExclude,
+			},
+			Raw: r,
+		}
+
+		type (
+			Request  = struct{}
+			Params   = SearchJobsParams
+			Response = *JobListEnvelope
+		)
+		response, err = middleware.HookMiddleware[
+			Request,
+			Params,
+			Response,
+		](
+			m,
+			mreq,
+			unpackSearchJobsParams,
+			func(ctx context.Context, request Request, params Params) (response Response, err error) {
+				response, err = s.h.SearchJobs(ctx, params)
+				return response, err
+			},
+		)
+	} else {
+		response, err = s.h.SearchJobs(ctx, params)
+	}
+	if err != nil {
+		if errRes, ok := errors.Into[*ErrorStatusCode](err); ok {
+			if err := encodeErrorResponse(errRes, w, span); err != nil {
+				defer recordError("Internal", err)
+			}
+			return
+		}
+		if errors.Is(err, ht.ErrNotImplemented) {
+			s.cfg.ErrorHandler(ctx, w, r, err)
+			return
+		}
+		if err := encodeErrorResponse(s.h.NewError(ctx, err), w, span); err != nil {
+			defer recordError("Internal", err)
+		}
+		return
+	}
+
+	if err := encodeSearchJobsResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)

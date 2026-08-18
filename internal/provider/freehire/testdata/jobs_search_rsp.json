@@ -1,90 +1,21 @@
 {
     "data": [
         {
-            "public_slug": "golang-developer-backend-developer-boardroom-appointments-bw2y2vte",
-            "source": "manatal",
+            "public_slug": "golang-developer-sequoiaat-jfzun3rb",
+            "source": "freshteam",
             "manually_added": false,
-            "external_id": "boardroom-appointments:QX35WVWY",
-            "url": "https://www.careers-page.com/boardroom-appointments/job/QX35WVWY?utm_source=freehire.me",
-            "title": "Golang Developer (Backend Developer)",
-            "company": "Boardroom Appointments",
-            "company_slug": "boardroom-appointments",
-            "location": "Pretoria, GP, South Africa",
-            "description": "*Minimum Requirements:*\n\n* Bachelors degree in Computer Science or Engineering (or similar)\n* 2-4 years working experience\n* Software development\n* Golang & Typescript.\n* Design and build data stores with complex relationships (relational or NoSQL).\n* Built/Designed distributed systems, back-end APIs, or microservices and cloud infrastructure, best practices, and security.\n* CS fundamentals in object-oriented design, data structures, algorithm design and complexity analysis\n* Experience with continuous deployment technologies (CICD eg. Github actions).\n\n*Skills and Knowledge (desirable):*\n\n* Familiarity with (TDD) unit testing, performance, load, or end-to-end integration tests. Cloud infrastructure such as AWS and Azure..\n* IAC, CDK, AWS Cloud formation, Terraform.\n* Understand business processes and domains.\n\n*Responsibilities:*\n\n* Communicates with B2B GM and B2B Back end Lead regarding understanding of systems, and strategy and then oversees the implementation.\n* Communication with team members about expectations and solutions speci\ufb01cations, ensuring product quality by standardizing work procedures based on the company policies\n* This would include responsibilities such as DevOPS, optimizing internal tools and \ufb02ows, ensuring security and processes for development and cloud infrastructure with technical documentation and software development lifecycle \ufb02ows.\n* Assists with process, structure, task management, and implementations.\n* Developing and maintaining software products and solutions offered by the company.\n\n*\ufeff\ufeff\n*",
-            "countries": [
-                "za"
-            ],
-            "regions": [
-                "africa"
-            ],
-            "skills": [
-                "api",
-                "aws",
-                "azure",
-                "cdk",
-                "cloud",
-                "devops",
-                "distributed-systems",
-                "github",
-                "github-actions",
-                "go",
-                "infrastructure-as-code",
-                "microservices",
-                "nosql",
-                "oop",
-                "tdd",
-                "terraform",
-                "typescript",
-                "unit-testing"
-            ],
-            "cities": [
-                "Pretoria"
-            ],
-            "collections": [],
-            "is_tech": "tech",
-            "posted_at": "2026-08-17T23:27:53Z",
-            "created_at": "2026-08-17T23:27:53Z",
-            "updated_at": "2026-08-17T23:27:53Z",
-            "last_seen_at": "2026-08-17T23:27:53Z",
-            "closed_at": null,
-            "enrichment": {
-                "employment_type": "full_time",
-                "experience_years_min": 2,
-                "education_level": "bachelor",
-                "category": "backend",
-                "posting_language": "en"
-            },
-            "enriched_at": null,
-            "enrichment_version": 0,
-            "view_count": 0,
-            "applied_count": 0,
-            "upvote_count": 0,
-            "downvote_count": 0,
-            "my_vote": 0,
-            "reality": {
-                "class": "fresh",
-                "age_days": 0,
-                "repost_count": 1,
-                "mass_posting_count": 1,
-                "fake_freshness": false
-            }
-        },
-        {
-            "public_slug": "golang-developer-caliberly-2ulpx6dm",
-            "source": "manatal",
-            "manually_added": false,
-            "external_id": "caliberly:LRX47WXX",
-            "url": "https://www.careers-page.com/caliberly/job/LRX47WXX?utm_source=freehire.me",
+            "external_id": "sequoiaat:d-QMraWxF2kA",
+            "url": "https://sequoiaat.freshteam.com/jobs/d-QMraWxF2kA/golang-developer?utm_source=freehire.me",
             "title": "Golang Developer",
-            "company": "Caliberly",
-            "company_slug": "caliberly",
-            "location": "Dubai, United Arab Emirates",
-            "description": "We are looking for an experienced Golang Developer to join our team to build and maintain a high-performance, scalable, and secure Payment Gateway system. The ideal candidate will have a deep understanding of Golang, experience with building microservices, and a solid foundation in payment gateway solutions including handling online payments, fraud detection, PCI-DSS compliance, and third-party integrations.\n\n*Key Responsibilities:*\n\n* Design, develop, and maintain secure, scalable, and high-performance payment gateway applications using Golang.\n* Implement and manage microservices architecture for the payment gateway platform.\n* Integrate with third-party payment processors, banks, and financial institutions for seamless payment handling.\n* Collaborate with cross-functional teams (DevOps, QA, Product Management) to define and build new features.\n* Ensure the system is compliant with payment industry standards such as PCI-DSS.\n* Design and optimize database schemas for payment-related data.\n* Write efficient, well-documented, and testable code following industry best practices.\n* Troubleshoot and debug issues across the entire stack, ensuring quick resolution of any production issues.\n* Monitor and optimize system performance to handle large transaction volumes.\n* Stay up-to-date with the latest trends in the fintech and payment processing space.\n\n*Qualifications & Skills:*\n\n* 3+ years of experience in Golang development.\n* Proven experience with payment gateway development, including knowledge of payment methods (credit cards, e-wallets, etc.) and industry standards.\n* Strong understanding of RESTful APIs, microservices, and service-oriented architectures (SOA).\n* Experience with third-party API integrations (payment processors, banks, etc.).\n* Familiarity with PCI-DSS compliance and security best practices for handling sensitive payment data.\n* Hands-on experience with SQL/NoSQL databases (e.g., MySQL, PostgreSQL, MongoDB).\n* Experience with Docker, Kubernetes, or other containerization and orchestration tools.\n* Knowledge of cloud platforms such as AWS, Google Cloud, or Azure.\n* Solid understanding of version control (Git) and CI/CD pipelines.",
+            "company": "sequoiaat",
+            "company_slug": "sequoiaat",
+            "location": "Tamil Nadu, Chennai, India",
+            "description": "<div><strong>Job Description:</strong></div><div>We are looking for a <strong>Golang Developer</strong> with <strong>2 to 5 years</strong> of experience to develop and maintain high-performance backend systems. You will work on <strong>API development, microservices, and scalable applications</strong> using Golang.</div><div><strong>Responsibilities:</strong></div><ul><li>Develop and maintain backend services using <strong>Golang</strong>.</li><li>Design and implement <strong>RESTful APIs and microservices</strong>.</li><li>Work with <strong>databases</strong> (SQL/NoSQL) for efficient data handling.</li><li>Collaborate with teams to build scalable applications.</li><li>Optimize performance and troubleshoot issues.</li><li>Work with <strong>Docker, Kubernetes, and cloud platforms</strong> (AWS, GCP, or Azure).</li></ul><div><strong>Requirements:</strong></div><div>✔ <strong>2+ years</strong> of Golang development experience.<br>✔ Strong understanding of <strong>Goroutines and",
             "countries": [
-                "ae"
+                "in"
             ],
             "regions": [
-                "mena"
+                "apac"
             ],
             "skills": [
                 "api",
@@ -92,37 +23,103 @@
                 "azure",
                 "ci-cd",
                 "cloud",
-                "containerization",
-                "devops",
                 "docker",
-                "fintech",
                 "gcp",
                 "git",
                 "go",
                 "kubernetes",
                 "microservices",
-                "mongodb",
-                "mysql",
                 "nosql",
-                "postgresql",
                 "rest",
-                "soa",
-                "sql",
-                "version-control"
+                "sql"
             ],
             "cities": [
-                "Dubai"
+                "Chennai"
             ],
             "collections": [],
             "is_tech": "tech",
-            "posted_at": "2026-08-17T23:26:59Z",
-            "created_at": "2026-08-17T23:26:59Z",
-            "updated_at": "2026-08-17T23:26:59Z",
-            "last_seen_at": "2026-08-17T23:26:59Z",
+            "posted_at": "2026-08-18T06:55:20Z",
+            "created_at": "2026-07-22T04:12:04Z",
+            "updated_at": "2026-08-18T07:39:48Z",
+            "last_seen_at": "2026-08-18T10:43:59Z",
             "closed_at": null,
             "enrichment": {
-                "employment_type": "full_time",
-                "experience_years_min": 3,
+                "summary": "Builds and maintains high-performance backend systems in Go, designing RESTful APIs and microservices while optimizing performance and troubleshooting issues.",
+                "salary_min": 1000000,
+                "salary_max": 2000000,
+                "salary_currency": "INR",
+                "salary_period": "year",
+                "experience_years_min": 2,
+                "category": "software_engineering",
+                "domains": [
+                    "other"
+                ],
+                "posting_language": "en",
+                "company_type": "product",
+                "company_size": "51-200"
+            },
+            "enriched_at": "2026-07-23T03:14:14Z",
+            "enrichment_version": 2,
+            "view_count": 3,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "stale",
+                "age_days": 27,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        },
+        {
+            "public_slug": "golang-developer-marktine-technology-solutions-pvt-ltd-3jnmgyef",
+            "source": "zohorecruit",
+            "manually_added": false,
+            "external_id": "marktine.zohorecruit.com:634479000000375272",
+            "url": "https://marktine.zohorecruit.com/jobs/Careers/634479000000375272?utm_source=freehire.me",
+            "title": "Golang Developer",
+            "company": "Marktine Technology Solutions Pvt Ltd",
+            "company_slug": "marktine-technology-solutions-pvt-ltd",
+            "location": "",
+            "description": "\n \n \n  <span><p>This is a remote position.</p>\n   <div><br>\n   </div></span><br><span><h3>Requirements</h3>\n   <div><br>\n   </div>\n   <ul>\n    <li><span>Minimum 5 to 6 years of experience with atleast 2+ years of expertise in building applications using GOLang (mandatory)</span><br></li>\n    <li><span>Experience in building scalable service API’s using GOLang (mandatory)</span><br></li>\n    <li><span>Experience working on linux environment (mandatory)</span><br></li>\n    <li><span>Experience in developing Cloud Native applications using Micro services, Elastic BeanStalk, ElastiCache, Lambda, S3, SQS and SNS etc, AWS preference if any</span><br></li>\n    <li><span>Has expertise in handling applications being developed using Angular 7+ (optional)</span><br></li>\n    <li><span>Experience in using Databases like PostgreSql, My SQL &amp; No SQL DBs like Mongo DB</span><br></li>\n    <li><span>Familiar with Agile development skills (e.g. Scrum)</span><br></li>\n    <li><span>Expertise with",
+            "countries": [],
+            "regions": [],
+            "work_mode": "remote",
+            "skills": [
+                "agile",
+                "angular",
+                "api",
+                "aws",
+                "cloud",
+                "cloud-native",
+                "confluence",
+                "devops",
+                "ecs",
+                "eks",
+                "git",
+                "go",
+                "jira",
+                "lambda",
+                "linux",
+                "mongodb",
+                "postgresql",
+                "scrum",
+                "sns",
+                "sql",
+                "sqs"
+            ],
+            "cities": [],
+            "collections": [],
+            "is_tech": "tech",
+            "posted_at": "2026-08-18T02:33:10Z",
+            "created_at": "2026-08-18T02:33:10Z",
+            "updated_at": "2026-08-18T02:33:10Z",
+            "last_seen_at": "2026-08-18T02:33:10Z",
+            "closed_at": null,
+            "enrichment": {
+                "experience_years_min": 2,
                 "category": "software_engineering",
                 "posting_language": "en"
             },
@@ -145,6 +142,6 @@
     "meta": {
         "limit": 2,
         "offset": 0,
-        "total": 2867
+        "total": 2857
     }
 }

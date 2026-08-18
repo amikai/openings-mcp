@@ -148,6 +148,31 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 				}
 
+			case 'g': // Prefix: "geo/cities"
+
+				if l := len("geo/cities"); len(elem) >= l && elem[0:l] == "geo/cities" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch r.Method {
+					case "GET":
+						s.handleSearchCitiesRequest([0]string{}, elemIsEscaped, w, r)
+					default:
+						s.notAllowed(w, r, notAllowedParams{
+							allowedMethods: "GET",
+							allowedHeaders: nil,
+							acceptPost:     "",
+							acceptPatch:    "",
+						})
+					}
+
+					return
+				}
+
 			case 'j': // Prefix: "jobs/"
 
 				if l := len("jobs/"); len(elem) >= l && elem[0:l] == "jobs/" {
@@ -173,6 +198,32 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 						switch r.Method {
 						case "GET":
 							s.handleGetJobFacetsRequest([0]string{}, elemIsEscaped, w, r)
+						default:
+							s.notAllowed(w, r, notAllowedParams{
+								allowedMethods: "GET",
+								allowedHeaders: nil,
+								acceptPost:     "",
+								acceptPatch:    "",
+							})
+						}
+
+						return
+					}
+
+					elem = origElem
+				case 's': // Prefix: "search"
+					origElem := elem
+					if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch r.Method {
+						case "GET":
+							s.handleSearchJobsRequest([0]string{}, elemIsEscaped, w, r)
 						default:
 							s.notAllowed(w, r, notAllowedParams{
 								allowedMethods: "GET",
@@ -356,7 +407,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 					switch method {
 					case "GET":
 						r.name = AgentSearchJobsOperation
-						r.summary = "Search open jobs for agents"
+						r.summary = "Search open jobs for agents (full descriptions)"
 						r.operationID = "agentSearchJobs"
 						r.operationGroup = ""
 						r.pathPattern = "/agent/jobs/search"
@@ -428,6 +479,31 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 
 				}
 
+			case 'g': // Prefix: "geo/cities"
+
+				if l := len("geo/cities"); len(elem) >= l && elem[0:l] == "geo/cities" {
+					elem = elem[l:]
+				} else {
+					break
+				}
+
+				if len(elem) == 0 {
+					// Leaf node.
+					switch method {
+					case "GET":
+						r.name = SearchCitiesOperation
+						r.summary = "Resolve a city name to the canonical cities facet value"
+						r.operationID = "searchCities"
+						r.operationGroup = ""
+						r.pathPattern = "/geo/cities"
+						r.args = args
+						r.count = 0
+						return r, true
+					default:
+						return
+					}
+				}
+
 			case 'j': // Prefix: "jobs/"
 
 				if l := len("jobs/"); len(elem) >= l && elem[0:l] == "jobs/" {
@@ -457,6 +533,32 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							r.operationID = "getJobFacets"
 							r.operationGroup = ""
 							r.pathPattern = "/jobs/facets"
+							r.args = args
+							r.count = 0
+							return r, true
+						default:
+							return
+						}
+					}
+
+					elem = origElem
+				case 's': // Prefix: "search"
+					origElem := elem
+					if l := len("search"); len(elem) >= l && elem[0:l] == "search" {
+						elem = elem[l:]
+					} else {
+						break
+					}
+
+					if len(elem) == 0 {
+						// Leaf node.
+						switch method {
+						case "GET":
+							r.name = SearchJobsOperation
+							r.summary = "Search open jobs"
+							r.operationID = "searchJobs"
+							r.operationGroup = ""
+							r.pathPattern = "/jobs/search"
 							r.args = args
 							r.count = 0
 							return r, true

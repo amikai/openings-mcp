@@ -1,7 +1,7 @@
-# Deep paging is capped: offset+limit may reach MaxResultWindow but not
-# exceed it. openapi.yaml puts no maximum on offset, so the ceiling is
-# only observable here.
-GET https://freehire.me/api/v1/agent/jobs/search
+# Deep paging is capped: offset+limit may reach 10000 but not exceed it.
+# openapi.yaml states the ceiling in the offset parameter's prose only —
+# there is no maximum in the schema — so it stays observable only here.
+GET https://freehire.me/api/v1/jobs/search
 [QueryStringParams]
 q: golang
 limit: 1
@@ -12,7 +12,7 @@ HTTP 200
 header "Content-Type" contains "application/json"
 jsonpath "$.meta.offset" == 9999
 
-GET https://freehire.me/api/v1/agent/jobs/search
+GET https://freehire.me/api/v1/jobs/search
 [QueryStringParams]
 q: golang
 limit: 100
@@ -22,7 +22,7 @@ HTTP 400
 [Asserts]
 jsonpath "$.error" == "pagination too deep"
 
-GET https://freehire.me/api/v1/agent/jobs/search
+GET https://freehire.me/api/v1/jobs/search
 [QueryStringParams]
 q: golang
 limit: 1

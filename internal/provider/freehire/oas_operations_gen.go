@@ -11,5 +11,7 @@ const (
 	GetJobOperation          OperationName = "GetJob"
 	GetJobFacetsOperation    OperationName = "GetJobFacets"
 	GetSimilarJobsOperation  OperationName = "GetSimilarJobs"
+	SearchCitiesOperation    OperationName = "SearchCities"
 	SearchCompaniesOperation OperationName = "SearchCompanies"
+	SearchJobsOperation      OperationName = "SearchJobs"
 )

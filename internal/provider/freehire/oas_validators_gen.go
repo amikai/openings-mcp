@@ -3,11 +3,132 @@
 package freehire
 
 import (
+	"fmt"
+
 	"github.com/go-faster/errors"
 	"github.com/ogen-go/ogen/validate"
 )
 
-func (s AgentSearchJobsDescriptionFormat) Validate() error {
+func (s AIArchetypeItem) Validate() error {
+	switch s {
+	case "rag_app_builder":
+		return nil
+	case "agent_builder":
+		return nil
+	case "cloud_ml_platform_engineer":
+		return nil
+	case "ml_trainer_researcher":
+		return nil
+	case "fullstack_ai_engineer":
+		return nil
+	case "devops_infra_engineer":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *CompanyDetail) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.FeedbackRatingAvg.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "feedback_rating_avg",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s CompanySizeItem) Validate() error {
+	switch s {
+	case "1-10":
+		return nil
+	case "11-50":
+		return nil
+	case "51-200":
+		return nil
+	case "201-500":
+		return nil
+	case "501-1000":
+		return nil
+	case "1000+":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *CompanySummary) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.FeedbackRatingAvg.Get(); ok {
+			if err := func() error {
+				if err := (validate.Float{}).Validate(float64(value)); err != nil {
+					return errors.Wrap(err, "float")
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "feedback_rating_avg",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s CompanyTypeItem) Validate() error {
+	switch s {
+	case "product":
+		return nil
+	case "startup":
+		return nil
+	case "outsource":
+		return nil
+	case "outstaff":
+		return nil
+	case "agency":
+		return nil
+	case "inhouse":
+		return nil
+	case "government":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s DescriptionFormat) Validate() error {
 	switch s {
 	case "html":
 		return nil
@@ -20,87 +141,102 @@ func (s AgentSearchJobsDescriptionFormat) Validate() error {
 	}
 }
 
-func (s AgentSearchJobsOrder) Validate() error {
+func (s DomainsItem) Validate() error {
 	switch s {
-	case "asc":
+	case "fintech":
 		return nil
-	case "desc":
+	case "crypto":
+		return nil
+	case "ecommerce":
+		return nil
+	case "gambling":
+		return nil
+	case "gamedev":
+		return nil
+	case "media":
+		return nil
+	case "travel":
+		return nil
+	case "healthcare":
+		return nil
+	case "edtech":
+		return nil
+	case "govtech":
+		return nil
+	case "devtools":
+		return nil
+	case "cybersecurity":
+		return nil
+	case "ai":
+		return nil
+	case "hrtech":
+		return nil
+	case "adtech":
+		return nil
+	case "proptech":
+		return nil
+	case "logistics":
+		return nil
+	case "mobility":
+		return nil
+	case "climatetech":
+		return nil
+	case "other":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
 
-func (s AgentSearchJobsRegionsItem) Validate() error {
+func (s EducationLevelItem) Validate() error {
 	switch s {
-	case "global":
+	case "none":
 		return nil
-	case "north_america":
+	case "bachelor":
 		return nil
-	case "latam":
+	case "master":
 		return nil
-	case "eu":
-		return nil
-	case "uk":
-		return nil
-	case "mena":
-		return nil
-	case "africa":
-		return nil
-	case "apac":
-		return nil
-	case "cis":
+	case "phd":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
 
-func (s AgentSearchJobsSeniorityItem) Validate() error {
+func (s EmploymentTypeItem) Validate() error {
 	switch s {
-	case "intern":
+	case "full_time":
 		return nil
-	case "junior":
+	case "part_time":
 		return nil
-	case "middle":
+	case "contract":
 		return nil
-	case "senior":
+	case "internship":
 		return nil
-	case "lead":
-		return nil
-	case "staff":
-		return nil
-	case "principal":
-		return nil
-	case "c_level":
+	case "fellowship":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
 	}
 }
 
-func (s AgentSearchJobsSort) Validate() error {
+func (s EnglishLevelItem) Validate() error {
 	switch s {
-	case "created_at":
+	case "none":
 		return nil
-	case "posted_at":
+	case "a1":
 		return nil
-	case "salary_min":
+	case "a2":
 		return nil
-	case "salary_max":
+	case "b1":
 		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
-func (s AgentSearchJobsWorkModeItem) Validate() error {
-	switch s {
-	case "remote":
+	case "b2":
 		return nil
-	case "hybrid":
+	case "c1":
 		return nil
-	case "onsite":
+	case "c2":
+		return nil
+	case "native":
 		return nil
 	default:
 		return errors.Errorf("invalid value: %v", s)
@@ -204,7 +340,411 @@ func (s FacetsEnvelopeDataStatsItem) Validate() error {
 	return nil
 }
 
+func (s *GetCompanyOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Data.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "data",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetCompanyOKData) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Company.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "company",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		var failures []validate.FieldError
+		for i, elem := range s.Jobs {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "jobs",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetJobOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if err := s.Data.Validate(); err != nil {
+			return err
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "data",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s *GetSimilarJobsOK) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Data == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Data {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "data",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s IsTechItem) Validate() error {
+	switch s {
+	case "tech":
+		return nil
+	case "non_tech":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *Job) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.WorkMode.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "work_mode",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.IsTech.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "is_tech",
+			Error: err,
+		})
+	}
+	if err := func() error {
+		if value, ok := s.Reality.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "reality",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s JobIsTech) Validate() error {
+	switch s {
+	case "tech":
+		return nil
+	case "non_tech":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *JobListEnvelope) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if s.Data == nil {
+			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Data {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "data",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s JobWorkMode) Validate() error {
+	switch s {
+	case "remote":
+		return nil
+	case "hybrid":
+		return nil
+	case "onsite":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s Order) Validate() error {
+	switch s {
+	case "asc":
+		return nil
+	case "desc":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *Reality) Validate() error {
+	if s == nil {
+		return validate.ErrNilPointer
+	}
+
+	var failures []validate.FieldError
+	if err := func() error {
+		if value, ok := s.Class.Get(); ok {
+			if err := func() error {
+				if err := value.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		failures = append(failures, validate.FieldError{
+			Name:  "class",
+			Error: err,
+		})
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
+	}
+	return nil
+}
+
+func (s RealityClass) Validate() error {
+	switch s {
+	case "fresh":
+		return nil
+	case "stale":
+		return nil
+	case "likely-evergreen":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s RealityItem) Validate() error {
+	switch s {
+	case "fresh":
+		return nil
+	case "stale":
+		return nil
+	case "likely-evergreen":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s RegionsItem) Validate() error {
+	switch s {
+	case "global":
+		return nil
+	case "north_america":
+		return nil
+	case "latam":
+		return nil
+	case "eu":
+		return nil
+	case "uk":
+		return nil
+	case "mena":
+		return nil
+	case "africa":
+		return nil
+	case "apac":
+		return nil
+	case "cis":
+		return nil
+	case "none":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s RelocationItem) Validate() error {
+	switch s {
+	case "not_supported":
+		return nil
+	case "supported":
+		return nil
+	case "required":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SalaryPeriodItem) Validate() error {
+	switch s {
+	case "year":
+		return nil
+	case "month":
+		return nil
+	case "day":
+		return nil
+	case "hour":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s *SearchCitiesOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
 	}
@@ -227,6 +767,46 @@ func (s *JobListEnvelope) Validate() error {
 	return nil
 }
 
+func (s SearchCompaniesCompanySizeItem) Validate() error {
+	switch s {
+	case "1-10":
+		return nil
+	case "11-50":
+		return nil
+	case "51-200":
+		return nil
+	case "201-500":
+		return nil
+	case "501-1000":
+		return nil
+	case "1000+":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SearchCompaniesCompanyTypeItem) Validate() error {
+	switch s {
+	case "product":
+		return nil
+	case "startup":
+		return nil
+	case "outsource":
+		return nil
+	case "outstaff":
+		return nil
+	case "agency":
+		return nil
+	case "inhouse":
+		return nil
+	case "government":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
 func (s *SearchCompaniesOK) Validate() error {
 	if s == nil {
 		return validate.ErrNilPointer
@@ -236,6 +816,23 @@ func (s *SearchCompaniesOK) Validate() error {
 	if err := func() error {
 		if s.Data == nil {
 			return errors.New("nil is invalid value")
+		}
+		var failures []validate.FieldError
+		for i, elem := range s.Data {
+			if err := func() error {
+				if err := elem.Validate(); err != nil {
+					return err
+				}
+				return nil
+			}(); err != nil {
+				failures = append(failures, validate.FieldError{
+					Name:  fmt.Sprintf("[%d]", i),
+					Error: err,
+				})
+			}
+		}
+		if len(failures) > 0 {
+			return &validate.Error{Fields: failures}
 		}
 		return nil
 	}(); err != nil {
@@ -248,4 +845,73 @@ func (s *SearchCompaniesOK) Validate() error {
 		return &validate.Error{Fields: failures}
 	}
 	return nil
+}
+
+func (s SearchCompaniesSort) Validate() error {
+	switch s {
+	case "rating":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SeniorityItem) Validate() error {
+	switch s {
+	case "intern":
+		return nil
+	case "junior":
+		return nil
+	case "middle":
+		return nil
+	case "senior":
+		return nil
+	case "lead":
+		return nil
+	case "staff":
+		return nil
+	case "principal":
+		return nil
+	case "c_level":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s SkillsMode) Validate() error {
+	switch s {
+	case "and":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s Sort) Validate() error {
+	switch s {
+	case "created_at":
+		return nil
+	case "posted_at":
+		return nil
+	case "salary_min":
+		return nil
+	case "salary_max":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s WorkModeItem) Validate() error {
+	switch s {
+	case "remote":
+		return nil
+	case "hybrid":
+		return nil
+	case "onsite":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }

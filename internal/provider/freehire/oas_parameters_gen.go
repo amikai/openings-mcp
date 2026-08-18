@@ -19,38 +19,99 @@ import (
 type AgentSearchJobsParams struct {
 	// Full-text query over title, company, and description.
 	Q OptString `json:",omitempty,omitzero"`
-	// Page size.
+	// Page size. Values above the maximum are clamped, not rejected.
 	Limit OptInt `json:",omitempty,omitzero"`
-	// Rows to skip.
+	// Rows to skip. On the job endpoints `offset + limit` may not exceed 10000; deeper paging is a 400.
 	Offset OptInt `json:",omitempty,omitzero"`
-	// Sort field. Omit for relevance or newest default.
-	Sort OptAgentSearchJobsSort `json:",omitempty,omitzero"`
-	// Sort direction.
-	Order OptAgentSearchJobsOrder `json:",omitempty,omitzero"`
-	// Hybrid semantic search ratio.
-	SemanticRatio OptFloat64 `json:",omitempty,omitzero"`
-	// Geographic regions.
-	Regions []AgentSearchJobsRegionsItem `json:",omitempty"`
-	// Work format.
-	WorkMode []AgentSearchJobsWorkModeItem `json:",omitempty"`
-	// Role category from getJobFacets.
-	Category []string `json:",omitempty"`
-	// Seniority levels.
-	Seniority []AgentSearchJobsSeniorityItem `json:",omitempty"`
-	// Canonical skill slugs from getJobFacets.
-	Skills []string `json:",omitempty"`
-	// Country codes from getJobFacets.
+	// Sort field. Omitted, a text query sorts by relevance and an empty query by `posted_at` descending.
+	Sort OptSort `json:",omitempty,omitzero"`
+	// Sort direction. Ignored without a valid `sort`.
+	Order OptOrder `json:",omitempty,omitzero"`
+	// Format of the full description. `html` is the stored verbatim markup; any unrecognized value falls
+	// back to it rather than erroring.
+	DescriptionFormat OptDescriptionFormat `json:",omitempty,omitzero"`
+	// Macro-regions. Country codes are NOT regions — use `countries`. `none` is the reserved value for
+	// postings with no resolved geography. Joins the geography OR-group with `countries` and `cities`.
+	Regions []RegionsItem `json:",omitempty"`
+	// ISO 3166-1 alpha-2, lowercase (`gb`, `de`). Matching is case-insensitive. Joins the geography
+	// OR-group.
 	Countries []string `json:",omitempty"`
-	// Company slugs from searchCompanies or getJobFacets.
-	CompanySlug []string `json:",omitempty"`
-	// Job source slugs from getJobFacets.
+	// Canonical city display names ("London", "Berlin") — resolve one with `searchCities` first. Joins
+	// the geography OR-group.
+	Cities []string `json:",omitempty"`
+	// Work format, resolved from a deterministic dictionary. Absent on a posting whose format could not be
+	// resolved, so this filter narrows to postings that stated it.
+	WorkMode []WorkModeItem `json:",omitempty"`
+	// Role category slug from `getJobFacets`.
+	Category []string `json:",omitempty"`
+	// Fine-grained role slug from `getJobFacets` (e.g. `backend`, `android_developer`, and
+	// seniority-qualified variants). Much narrower than `category`; the vocabulary is large and generated,
+	// so always read it from the facets endpoint.
+	Role      []string        `json:",omitempty"`
+	Seniority []SeniorityItem `json:",omitempty"`
+	// Canonical skill slugs from `getJobFacets`. Never invent one.
+	Skills []string `json:",omitempty"`
+	// `and` requires a posting to carry EVERY listed skill instead of any of them. The same
+	// `<facet>_mode=and` switch works on any non-geography facet.
+	SkillsMode OptSkillsMode `json:",omitempty,omitzero"`
+	// Technical vs non-technical, derived deterministically from title and category. Absent when unknown,
+	// so the filter never guesses.
+	IsTech []IsTechItem `json:",omitempty"`
+	// AI skill-signature archetype, derived from the posting's skill set.
+	AiArchetype []AIArchetypeItem `json:",omitempty"`
+	// Curated collection slugs of the posting's company, e.g. `yc`, `bigtech`, `unicorn`,
+	// `us-h1b-sponsor`. Read the live set from `getJobFacets`.
+	Collections []string `json:",omitempty"`
+	// Posting-reality class. `fresh` is recently posted and not obviously recycled; `stale` is old;
+	// `likely-evergreen` reads as an always-open pipeline ad. A large share of the catalogue is `stale`,
+	// so `?reality=fresh` is the cheapest quality filter available. Read the live split from
+	// `getJobFacets`.
+	Reality []RealityItem `json:",omitempty"`
+	// Origin slug of the posting — the ATS or board it was crawled from (`greenhouse`, `workday`,
+	// `adzuna`, …). Read the live set from `getJobFacets`. Pair with `source_exclude` to avoid
+	// double-counting a board you already query directly.
 	Source []string `json:",omitempty"`
-	// Minimum salary lower bound.
+	// Company slugs from `searchCompanies`. This facet has no distribution in `getJobFacets` — use the
+	// company search for a typeahead.
+	CompanySlug    []string             `json:",omitempty"`
+	EmploymentType []EmploymentTypeItem `json:",omitempty"`
+	Relocation     []RelocationItem     `json:",omitempty"`
+	EnglishLevel   []EnglishLevelItem   `json:",omitempty"`
+	EducationLevel []EducationLevelItem `json:",omitempty"`
+	// Language the posting is written in (ISO 639-1, e.g. `en`, `de`, `uk`).
+	PostingLanguage []string `json:",omitempty"`
+	// Business domain of the hiring company, as stated by the posting.
+	Domains     []DomainsItem     `json:",omitempty"`
+	CompanyType []CompanyTypeItem `json:",omitempty"`
+	CompanySize []CompanySizeItem `json:",omitempty"`
+	// ISO 4217 code, e.g. `USD`, `EUR`.
+	SalaryCurrency []string           `json:",omitempty"`
+	SalaryPeriod   []SalaryPeriodItem `json:",omitempty"`
+	// Whether the posting states it sponsors a visa. `false` is a real, stated value, not "unknown" —
+	// postings that say nothing match neither setting.
+	VisaSponsorship OptBool `json:",omitempty,omitzero"`
+	// Lower bound on the posting's minimum salary, in its own `salary_currency` and `salary_period` —
+	// the comparison does NOT normalize currencies. Pair with `salary_currency` and `salary_period` for a
+	// meaningful range.
 	SalaryMin OptInt `json:",omitempty,omitzero"`
-	// Maximum salary upper bound.
+	// Upper bound on the posting's maximum salary. Same currency caveat as `salary_min`.
 	SalaryMax OptInt `json:",omitempty,omitzero"`
-	// Format of the full description (html is the stored verbatim markup).
-	DescriptionFormat OptAgentSearchJobsDescriptionFormat `json:",omitempty,omitzero"`
+	// Lower bound on the years of experience the posting asks for.
+	ExperienceYearsMin OptInt `json:",omitempty,omitzero"`
+	// Restrict to postings published within the last N days. Omit for no freshness restriction.
+	PostedWithinDays OptInt `json:",omitempty,omitzero"`
+	// Regions to exclude. Excludes AND together, unlike included geography.
+	RegionsExclude []string `json:",omitempty"`
+	// Countries to exclude.
+	CountriesExclude []string `json:",omitempty"`
+	// Work formats to exclude, e.g. `onsite`.
+	WorkModeExclude []string `json:",omitempty"`
+	// Skill slugs to exclude.
+	SkillsExclude []string `json:",omitempty"`
+	// Source slugs to exclude.
+	SourceExclude []string `json:",omitempty"`
+	// Company slugs to exclude.
+	CompanySlugExclude []string `json:",omitempty"`
 }
 
 func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSearchJobsParams) {
@@ -87,7 +148,7 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Sort = v.(OptAgentSearchJobsSort)
+			params.Sort = v.(OptSort)
 		}
 	}
 	{
@@ -96,16 +157,16 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptAgentSearchJobsOrder)
+			params.Order = v.(OptOrder)
 		}
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "semantic_ratio",
+			Name: "description_format",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.SemanticRatio = v.(OptFloat64)
+			params.DescriptionFormat = v.(OptDescriptionFormat)
 		}
 	}
 	{
@@ -114,43 +175,7 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Regions = v.([]AgentSearchJobsRegionsItem)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "work_mode",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.WorkMode = v.([]AgentSearchJobsWorkModeItem)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "category",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Category = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "seniority",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Seniority = v.([]AgentSearchJobsSeniorityItem)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "skills",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Skills = v.([]string)
+			params.Regions = v.([]RegionsItem)
 		}
 	}
 	{
@@ -164,11 +189,101 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "company_slug",
+			Name: "cities",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.CompanySlug = v.([]string)
+			params.Cities = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "work_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.WorkMode = v.([]WorkModeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "category",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Category = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "role",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Role = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "seniority",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Seniority = v.([]SeniorityItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Skills = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SkillsMode = v.(OptSkillsMode)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "is_tech",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IsTech = v.([]IsTechItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "ai_archetype",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.AiArchetype = v.([]AIArchetypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "collections",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Collections = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "reality",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Reality = v.([]RealityItem)
 		}
 	}
 	{
@@ -178,6 +293,114 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 		}
 		if v, ok := packed[key]; ok {
 			params.Source = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_slug",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySlug = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "employment_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EmploymentType = v.([]EmploymentTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "relocation",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Relocation = v.([]RelocationItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "english_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EnglishLevel = v.([]EnglishLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "education_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EducationLevel = v.([]EducationLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posting_language",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostingLanguage = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "domains",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Domains = v.([]DomainsItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanyType = v.([]CompanyTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_size",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySize = v.([]CompanySizeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_currency",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryCurrency = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_period",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryPeriod = v.([]SalaryPeriodItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "visa_sponsorship",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.VisaSponsorship = v.(OptBool)
 		}
 	}
 	{
@@ -200,11 +423,74 @@ func unpackAgentSearchJobsParams(packed middleware.Parameters) (params AgentSear
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "description_format",
+			Name: "experience_years_min",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.DescriptionFormat = v.(OptAgentSearchJobsDescriptionFormat)
+			params.ExperienceYearsMin = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posted_within_days",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostedWithinDays = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "regions_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.RegionsExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "countries_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CountriesExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "work_mode_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.WorkModeExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SkillsExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "source_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SourceExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_slug_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySlugExclude = v.([]string)
 		}
 	}
 	return params
@@ -405,7 +691,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotSortVal AgentSearchJobsSort
+				var paramsDotSortVal Sort
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -417,7 +703,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 						return err
 					}
 
-					paramsDotSortVal = AgentSearchJobsSort(c)
+					paramsDotSortVal = Sort(c)
 					return nil
 				}(); err != nil {
 					return err
@@ -453,7 +739,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 	}
 	// Set default value for query: order.
 	{
-		val := AgentSearchJobsOrder("desc")
+		val := Order("desc")
 		params.Order.SetTo(val)
 	}
 	// Decode query: order.
@@ -466,7 +752,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOrderVal AgentSearchJobsOrder
+				var paramsDotOrderVal Order
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -478,7 +764,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 						return err
 					}
 
-					paramsDotOrderVal = AgentSearchJobsOrder(c)
+					paramsDotOrderVal = Order(c)
 					return nil
 				}(); err != nil {
 					return err
@@ -512,58 +798,48 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
-	// Set default value for query: semantic_ratio.
+	// Set default value for query: description_format.
 	{
-		val := float64(0)
-		params.SemanticRatio.SetTo(val)
+		val := DescriptionFormat("html")
+		params.DescriptionFormat.SetTo(val)
 	}
-	// Decode query: semantic_ratio.
+	// Decode query: description_format.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "semantic_ratio",
+			Name:    "description_format",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotSemanticRatioVal float64
+				var paramsDotDescriptionFormatVal DescriptionFormat
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToFloat64(val)
+					c, err := conv.ToString(val)
 					if err != nil {
 						return err
 					}
 
-					paramsDotSemanticRatioVal = c
+					paramsDotDescriptionFormatVal = DescriptionFormat(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.SemanticRatio.SetTo(paramsDotSemanticRatioVal)
+				params.DescriptionFormat.SetTo(paramsDotDescriptionFormatVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.SemanticRatio.Get(); ok {
+				if value, ok := params.DescriptionFormat.Get(); ok {
 					if err := func() error {
-						if err := (validate.Float{
-							MinSet:        true,
-							Min:           0,
-							MaxSet:        true,
-							Max:           1,
-							MinExclusive:  false,
-							MaxExclusive:  false,
-							MultipleOfSet: false,
-							MultipleOf:    nil,
-							Pattern:       nil,
-						}).Validate(float64(value)); err != nil {
-							return errors.Wrap(err, "float")
+						if err := value.Validate(); err != nil {
+							return err
 						}
 						return nil
 					}(); err != nil {
@@ -578,7 +854,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "semantic_ratio",
+			Name: "description_format",
 			In:   "query",
 			Err:  err,
 		}
@@ -595,7 +871,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.Regions = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotRegionsVal AgentSearchJobsRegionsItem
+					var paramsDotRegionsVal RegionsItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -607,7 +883,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 							return err
 						}
 
-						paramsDotRegionsVal = AgentSearchJobsRegionsItem(c)
+						paramsDotRegionsVal = RegionsItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -649,6 +925,94 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
+	// Decode query: countries.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Countries = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: cities.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Cities = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCitiesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCitiesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Cities = append(params.Cities, paramsDotCitiesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "cities",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Decode query: work_mode.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -661,7 +1025,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.WorkMode = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotWorkModeVal AgentSearchJobsWorkModeItem
+					var paramsDotWorkModeVal WorkModeItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -673,7 +1037,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 							return err
 						}
 
-						paramsDotWorkModeVal = AgentSearchJobsWorkModeItem(c)
+						paramsDotWorkModeVal = WorkModeItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -759,6 +1123,50 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
+	// Decode query: role.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Role = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRoleVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRoleVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Role = append(params.Role, paramsDotRoleVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "role",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Decode query: seniority.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -771,7 +1179,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.Seniority = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotSeniorityVal AgentSearchJobsSeniorityItem
+					var paramsDotSeniorityVal SeniorityItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -783,7 +1191,7 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 							return err
 						}
 
-						paramsDotSeniorityVal = AgentSearchJobsSeniorityItem(c)
+						paramsDotSeniorityVal = SeniorityItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -869,19 +1277,75 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
-	// Decode query: countries.
+	// Decode query: skills_mode.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "countries",
+			Name:    "skills_mode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				params.Countries = nil
+				var paramsDotSkillsModeVal SkillsMode
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSkillsModeVal = SkillsMode(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SkillsMode.SetTo(paramsDotSkillsModeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.SkillsMode.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills_mode",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: is_tech.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.IsTech = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotCountriesVal string
+					var paramsDotIsTechVal IsTechItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -893,12 +1357,144 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 							return err
 						}
 
-						paramsDotCountriesVal = c
+						paramsDotIsTechVal = IsTechItem(c)
 						return nil
 					}(); err != nil {
 						return err
 					}
-					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					params.IsTech = append(params.IsTech, paramsDotIsTechVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.IsTech {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "is_tech",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: ai_archetype.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.AiArchetype = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotAiArchetypeVal AIArchetypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotAiArchetypeVal = AIArchetypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.AiArchetype = append(params.AiArchetype, paramsDotAiArchetypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.AiArchetype {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "ai_archetype",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: collections.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Collections = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCollectionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCollectionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Collections = append(params.Collections, paramsDotCollectionsVal)
 					return nil
 				})
 			}); err != nil {
@@ -908,7 +1504,117 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "countries",
+			Name: "collections",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: reality.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Reality = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRealityVal RealityItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRealityVal = RealityItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Reality = append(params.Reality, paramsDotRealityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Reality {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "reality",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: source.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Source = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSourceVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSourceVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Source = append(params.Source, paramsDotSourceVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "source",
 			In:   "query",
 			Err:  err,
 		}
@@ -957,19 +1663,19 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
-	// Decode query: source.
+	// Decode query: employment_type.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "source",
+			Name:    "employment_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				params.Source = nil
+				params.EmploymentType = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotSourceVal string
+					var paramsDotEmploymentTypeVal EmploymentTypeItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -981,12 +1687,276 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 							return err
 						}
 
-						paramsDotSourceVal = c
+						paramsDotEmploymentTypeVal = EmploymentTypeItem(c)
 						return nil
 					}(); err != nil {
 						return err
 					}
-					params.Source = append(params.Source, paramsDotSourceVal)
+					params.EmploymentType = append(params.EmploymentType, paramsDotEmploymentTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EmploymentType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "employment_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: relocation.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Relocation = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRelocationVal RelocationItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRelocationVal = RelocationItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Relocation = append(params.Relocation, paramsDotRelocationVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Relocation {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "relocation",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: english_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EnglishLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEnglishLevelVal EnglishLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEnglishLevelVal = EnglishLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EnglishLevel = append(params.EnglishLevel, paramsDotEnglishLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EnglishLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "english_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: education_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EducationLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEducationLevelVal EducationLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEducationLevelVal = EducationLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EducationLevel = append(params.EducationLevel, paramsDotEducationLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EducationLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "education_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posting_language.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.PostingLanguage = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPostingLanguageVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPostingLanguageVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.PostingLanguage = append(params.PostingLanguage, paramsDotPostingLanguageVal)
 					return nil
 				})
 			}); err != nil {
@@ -996,7 +1966,356 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "source",
+			Name: "posting_language",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: domains.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Domains = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotDomainsVal DomainsItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotDomainsVal = DomainsItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Domains = append(params.Domains, paramsDotDomainsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Domains {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "domains",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanyType = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanyTypeVal CompanyTypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanyTypeVal = CompanyTypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanyType = append(params.CompanyType, paramsDotCompanyTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanyType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_size.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySize = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySizeVal CompanySizeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySizeVal = CompanySizeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySize = append(params.CompanySize, paramsDotCompanySizeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanySize {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_size",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_currency.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryCurrency = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryCurrencyVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryCurrencyVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryCurrency = append(params.SalaryCurrency, paramsDotSalaryCurrencyVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_currency",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_period.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryPeriod = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryPeriodVal SalaryPeriodItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryPeriodVal = SalaryPeriodItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryPeriod = append(params.SalaryPeriod, paramsDotSalaryPeriodVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.SalaryPeriod {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_period",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: visa_sponsorship.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotVisaSponsorshipVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotVisaSponsorshipVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.VisaSponsorship.SetTo(paramsDotVisaSponsorshipVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "visa_sponsorship",
 			In:   "query",
 			Err:  err,
 		}
@@ -1083,48 +2402,94 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 			Err:  err,
 		}
 	}
-	// Set default value for query: description_format.
-	{
-		val := AgentSearchJobsDescriptionFormat("html")
-		params.DescriptionFormat.SetTo(val)
-	}
-	// Decode query: description_format.
+	// Decode query: experience_years_min.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "description_format",
+			Name:    "experience_years_min",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotDescriptionFormatVal AgentSearchJobsDescriptionFormat
+				var paramsDotExperienceYearsMinVal int
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
 						return err
 					}
 
-					c, err := conv.ToString(val)
+					c, err := conv.ToInt(val)
 					if err != nil {
 						return err
 					}
 
-					paramsDotDescriptionFormatVal = AgentSearchJobsDescriptionFormat(c)
+					paramsDotExperienceYearsMinVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.DescriptionFormat.SetTo(paramsDotDescriptionFormatVal)
+				params.ExperienceYearsMin.SetTo(paramsDotExperienceYearsMinVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "experience_years_min",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posted_within_days.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPostedWithinDaysVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostedWithinDaysVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostedWithinDays.SetTo(paramsDotPostedWithinDaysVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.DescriptionFormat.Get(); ok {
+				if value, ok := params.PostedWithinDays.Get(); ok {
 					if err := func() error {
-						if err := value.Validate(); err != nil {
-							return err
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        false,
+							Max:           0,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
 						}
 						return nil
 					}(); err != nil {
@@ -1139,7 +2504,271 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "description_format",
+			Name: "posted_within_days",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: regions_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "regions_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.RegionsExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRegionsExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRegionsExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.RegionsExclude = append(params.RegionsExclude, paramsDotRegionsExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "regions_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: countries_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CountriesExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CountriesExclude = append(params.CountriesExclude, paramsDotCountriesExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: work_mode_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "work_mode_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.WorkModeExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotWorkModeExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotWorkModeExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.WorkModeExclude = append(params.WorkModeExclude, paramsDotWorkModeExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "work_mode_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: skills_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "skills_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SkillsExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSkillsExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSkillsExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SkillsExclude = append(params.SkillsExclude, paramsDotSkillsExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: source_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "source_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SourceExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSourceExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSourceExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SourceExclude = append(params.SourceExclude, paramsDotSourceExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "source_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_slug_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_slug_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySlugExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySlugExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySlugExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySlugExclude = append(params.CompanySlugExclude, paramsDotCompanySlugExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_slug_exclude",
 			In:   "query",
 			Err:  err,
 		}
@@ -1151,9 +2780,9 @@ func decodeAgentSearchJobsParams(args [0]string, argsEscaped bool, r *http.Reque
 type GetCompanyParams struct {
 	// Company slug.
 	Slug string
-	// Page size.
+	// Page size. Values above the maximum are clamped, not rejected.
 	Limit OptInt `json:",omitempty,omitzero"`
-	// Rows to skip.
+	// Rows to skip. On the job endpoints `offset + limit` may not exceed 10000; deeper paging is a 400.
 	Offset OptInt `json:",omitempty,omitzero"`
 }
 
@@ -1235,7 +2864,7 @@ func decodeGetCompanyParams(args [1]string, argsEscaped bool, r *http.Request) (
 	}
 	// Set default value for query: limit.
 	{
-		val := int(20)
+		val := int(10)
 		params.Limit.SetTo(val)
 	}
 	// Decode query: limit.
@@ -1447,17 +3076,83 @@ func decodeGetJobParams(args [1]string, argsEscaped bool, r *http.Request) (para
 // GetJobFacetsParams is parameters of getJobFacets operation.
 type GetJobFacetsParams struct {
 	// Full-text query over title, company, and description.
-	Q           OptString `json:",omitempty,omitzero"`
-	Regions     []string  `json:",omitempty"`
-	WorkMode    []string  `json:",omitempty"`
-	Category    []string  `json:",omitempty"`
-	Seniority   []string  `json:",omitempty"`
-	Skills      []string  `json:",omitempty"`
-	Countries   []string  `json:",omitempty"`
-	CompanySlug []string  `json:",omitempty"`
-	Source      []string  `json:",omitempty"`
-	SalaryMin   OptInt    `json:",omitempty,omitzero"`
-	SalaryMax   OptInt    `json:",omitempty,omitzero"`
+	Q OptString `json:",omitempty,omitzero"`
+	// Comma-separated facet names to count, e.g. `skills,seniority`. Omit for all of them. An unknown name
+	// is a 400. Cannot be combined with `disjunctive`.
+	Facets OptString `json:",omitempty,omitzero"`
+	// Count each facet under the full filter MINUS its own selection, so a selected facet still shows its
+	// siblings' counts — the behaviour a live filter sidebar wants. Costs one query per facet.
+	Disjunctive OptBool `json:",omitempty,omitzero"`
+	// Macro-regions. Country codes are NOT regions — use `countries`. `none` is the reserved value for
+	// postings with no resolved geography. Joins the geography OR-group with `countries` and `cities`.
+	Regions []RegionsItem `json:",omitempty"`
+	// ISO 3166-1 alpha-2, lowercase (`gb`, `de`). Matching is case-insensitive. Joins the geography
+	// OR-group.
+	Countries []string `json:",omitempty"`
+	// Canonical city display names ("London", "Berlin") — resolve one with `searchCities` first. Joins
+	// the geography OR-group.
+	Cities []string `json:",omitempty"`
+	// Work format, resolved from a deterministic dictionary. Absent on a posting whose format could not be
+	// resolved, so this filter narrows to postings that stated it.
+	WorkMode []WorkModeItem `json:",omitempty"`
+	// Role category slug from `getJobFacets`.
+	Category []string `json:",omitempty"`
+	// Fine-grained role slug from `getJobFacets` (e.g. `backend`, `android_developer`, and
+	// seniority-qualified variants). Much narrower than `category`; the vocabulary is large and generated,
+	// so always read it from the facets endpoint.
+	Role      []string        `json:",omitempty"`
+	Seniority []SeniorityItem `json:",omitempty"`
+	// Canonical skill slugs from `getJobFacets`. Never invent one.
+	Skills []string `json:",omitempty"`
+	// `and` requires a posting to carry EVERY listed skill instead of any of them. The same
+	// `<facet>_mode=and` switch works on any non-geography facet.
+	SkillsMode OptSkillsMode `json:",omitempty,omitzero"`
+	// Technical vs non-technical, derived deterministically from title and category. Absent when unknown,
+	// so the filter never guesses.
+	IsTech []IsTechItem `json:",omitempty"`
+	// AI skill-signature archetype, derived from the posting's skill set.
+	AiArchetype []AIArchetypeItem `json:",omitempty"`
+	// Curated collection slugs of the posting's company, e.g. `yc`, `bigtech`, `unicorn`,
+	// `us-h1b-sponsor`. Read the live set from `getJobFacets`.
+	Collections []string `json:",omitempty"`
+	// Posting-reality class. `fresh` is recently posted and not obviously recycled; `stale` is old;
+	// `likely-evergreen` reads as an always-open pipeline ad. A large share of the catalogue is `stale`,
+	// so `?reality=fresh` is the cheapest quality filter available. Read the live split from
+	// `getJobFacets`.
+	Reality []RealityItem `json:",omitempty"`
+	// Origin slug of the posting — the ATS or board it was crawled from (`greenhouse`, `workday`,
+	// `adzuna`, …). Read the live set from `getJobFacets`. Pair with `source_exclude` to avoid
+	// double-counting a board you already query directly.
+	Source []string `json:",omitempty"`
+	// Company slugs from `searchCompanies`. This facet has no distribution in `getJobFacets` — use the
+	// company search for a typeahead.
+	CompanySlug    []string             `json:",omitempty"`
+	EmploymentType []EmploymentTypeItem `json:",omitempty"`
+	Relocation     []RelocationItem     `json:",omitempty"`
+	EnglishLevel   []EnglishLevelItem   `json:",omitempty"`
+	EducationLevel []EducationLevelItem `json:",omitempty"`
+	// Language the posting is written in (ISO 639-1, e.g. `en`, `de`, `uk`).
+	PostingLanguage []string `json:",omitempty"`
+	// Business domain of the hiring company, as stated by the posting.
+	Domains     []DomainsItem     `json:",omitempty"`
+	CompanyType []CompanyTypeItem `json:",omitempty"`
+	CompanySize []CompanySizeItem `json:",omitempty"`
+	// ISO 4217 code, e.g. `USD`, `EUR`.
+	SalaryCurrency []string           `json:",omitempty"`
+	SalaryPeriod   []SalaryPeriodItem `json:",omitempty"`
+	// Whether the posting states it sponsors a visa. `false` is a real, stated value, not "unknown" —
+	// postings that say nothing match neither setting.
+	VisaSponsorship OptBool `json:",omitempty,omitzero"`
+	// Lower bound on the posting's minimum salary, in its own `salary_currency` and `salary_period` —
+	// the comparison does NOT normalize currencies. Pair with `salary_currency` and `salary_period` for a
+	// meaningful range.
+	SalaryMin OptInt `json:",omitempty,omitzero"`
+	// Upper bound on the posting's maximum salary. Same currency caveat as `salary_min`.
+	SalaryMax OptInt `json:",omitempty,omitzero"`
+	// Lower bound on the years of experience the posting asks for.
+	ExperienceYearsMin OptInt `json:",omitempty,omitzero"`
+	// Restrict to postings published within the last N days. Omit for no freshness restriction.
+	PostedWithinDays OptInt `json:",omitempty,omitzero"`
 }
 
 func unpackGetJobFacetsParams(packed middleware.Parameters) (params GetJobFacetsParams) {
@@ -1472,47 +3167,29 @@ func unpackGetJobFacetsParams(packed middleware.Parameters) (params GetJobFacets
 	}
 	{
 		key := middleware.ParameterKey{
+			Name: "facets",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Facets = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "disjunctive",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Disjunctive = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
 			Name: "regions",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Regions = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "work_mode",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.WorkMode = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "category",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Category = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "seniority",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Seniority = v.([]string)
-		}
-	}
-	{
-		key := middleware.ParameterKey{
-			Name: "skills",
-			In:   "query",
-		}
-		if v, ok := packed[key]; ok {
-			params.Skills = v.([]string)
+			params.Regions = v.([]RegionsItem)
 		}
 	}
 	{
@@ -1526,11 +3203,101 @@ func unpackGetJobFacetsParams(packed middleware.Parameters) (params GetJobFacets
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "company_slug",
+			Name: "cities",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.CompanySlug = v.([]string)
+			params.Cities = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "work_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.WorkMode = v.([]WorkModeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "category",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Category = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "role",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Role = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "seniority",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Seniority = v.([]SeniorityItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Skills = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SkillsMode = v.(OptSkillsMode)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "is_tech",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IsTech = v.([]IsTechItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "ai_archetype",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.AiArchetype = v.([]AIArchetypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "collections",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Collections = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "reality",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Reality = v.([]RealityItem)
 		}
 	}
 	{
@@ -1540,6 +3307,114 @@ func unpackGetJobFacetsParams(packed middleware.Parameters) (params GetJobFacets
 		}
 		if v, ok := packed[key]; ok {
 			params.Source = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_slug",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySlug = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "employment_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EmploymentType = v.([]EmploymentTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "relocation",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Relocation = v.([]RelocationItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "english_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EnglishLevel = v.([]EnglishLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "education_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EducationLevel = v.([]EducationLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posting_language",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostingLanguage = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "domains",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Domains = v.([]DomainsItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanyType = v.([]CompanyTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_size",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySize = v.([]CompanySizeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_currency",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryCurrency = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_period",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryPeriod = v.([]SalaryPeriodItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "visa_sponsorship",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.VisaSponsorship = v.(OptBool)
 		}
 	}
 	{
@@ -1558,6 +3433,24 @@ func unpackGetJobFacetsParams(packed middleware.Parameters) (params GetJobFacets
 		}
 		if v, ok := packed[key]; ok {
 			params.SalaryMax = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "experience_years_min",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.ExperienceYearsMin = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posted_within_days",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostedWithinDays = v.(OptInt)
 		}
 	}
 	return params
@@ -1606,6 +3499,93 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
+	// Decode query: facets.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "facets",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotFacetsVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotFacetsVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Facets.SetTo(paramsDotFacetsVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "facets",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: disjunctive.
+	{
+		val := bool(false)
+		params.Disjunctive.SetTo(val)
+	}
+	// Decode query: disjunctive.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "disjunctive",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotDisjunctiveVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotDisjunctiveVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Disjunctive.SetTo(paramsDotDisjunctiveVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "disjunctive",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Decode query: regions.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -1618,7 +3598,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.Regions = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotRegionsVal string
+					var paramsDotRegionsVal RegionsItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -1630,7 +3610,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 							return err
 						}
 
-						paramsDotRegionsVal = c
+						paramsDotRegionsVal = RegionsItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -1641,11 +3621,121 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			}); err != nil {
 				return err
 			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Regions {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
 		}
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "regions",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: countries.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Countries = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: cities.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Cities = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCitiesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCitiesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Cities = append(params.Cities, paramsDotCitiesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "cities",
 			In:   "query",
 			Err:  err,
 		}
@@ -1662,7 +3752,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.WorkMode = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotWorkModeVal string
+					var paramsDotWorkModeVal WorkModeItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -1674,7 +3764,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 							return err
 						}
 
-						paramsDotWorkModeVal = c
+						paramsDotWorkModeVal = WorkModeItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -1683,6 +3773,28 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 					return nil
 				})
 			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.WorkMode {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
 				return err
 			}
 		}
@@ -1738,6 +3850,50 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
+	// Decode query: role.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Role = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRoleVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRoleVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Role = append(params.Role, paramsDotRoleVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "role",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Decode query: seniority.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
@@ -1750,7 +3906,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
 				params.Seniority = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotSeniorityVal string
+					var paramsDotSeniorityVal SeniorityItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -1762,7 +3918,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 							return err
 						}
 
-						paramsDotSeniorityVal = c
+						paramsDotSeniorityVal = SeniorityItem(c)
 						return nil
 					}(); err != nil {
 						return err
@@ -1771,6 +3927,28 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 					return nil
 				})
 			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Seniority {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
 				return err
 			}
 		}
@@ -1826,19 +4004,75 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
-	// Decode query: countries.
+	// Decode query: skills_mode.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "countries",
+			Name:    "skills_mode",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				params.Countries = nil
+				var paramsDotSkillsModeVal SkillsMode
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSkillsModeVal = SkillsMode(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SkillsMode.SetTo(paramsDotSkillsModeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.SkillsMode.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills_mode",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: is_tech.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.IsTech = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotCountriesVal string
+					var paramsDotIsTechVal IsTechItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -1850,12 +4084,144 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 							return err
 						}
 
-						paramsDotCountriesVal = c
+						paramsDotIsTechVal = IsTechItem(c)
 						return nil
 					}(); err != nil {
 						return err
 					}
-					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					params.IsTech = append(params.IsTech, paramsDotIsTechVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.IsTech {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "is_tech",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: ai_archetype.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.AiArchetype = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotAiArchetypeVal AIArchetypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotAiArchetypeVal = AIArchetypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.AiArchetype = append(params.AiArchetype, paramsDotAiArchetypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.AiArchetype {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "ai_archetype",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: collections.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Collections = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCollectionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCollectionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Collections = append(params.Collections, paramsDotCollectionsVal)
 					return nil
 				})
 			}); err != nil {
@@ -1865,7 +4231,117 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "countries",
+			Name: "collections",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: reality.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Reality = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRealityVal RealityItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRealityVal = RealityItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Reality = append(params.Reality, paramsDotRealityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Reality {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "reality",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: source.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Source = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSourceVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSourceVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Source = append(params.Source, paramsDotSourceVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "source",
 			In:   "query",
 			Err:  err,
 		}
@@ -1914,19 +4390,19 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
-	// Decode query: source.
+	// Decode query: employment_type.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "source",
+			Name:    "employment_type",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				params.Source = nil
+				params.EmploymentType = nil
 				return d.DecodeArray(func(d uri.Decoder) error {
-					var paramsDotSourceVal string
+					var paramsDotEmploymentTypeVal EmploymentTypeItem
 					if err := func() error {
 						val, err := d.DecodeValue()
 						if err != nil {
@@ -1938,12 +4414,276 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 							return err
 						}
 
-						paramsDotSourceVal = c
+						paramsDotEmploymentTypeVal = EmploymentTypeItem(c)
 						return nil
 					}(); err != nil {
 						return err
 					}
-					params.Source = append(params.Source, paramsDotSourceVal)
+					params.EmploymentType = append(params.EmploymentType, paramsDotEmploymentTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EmploymentType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "employment_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: relocation.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Relocation = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRelocationVal RelocationItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRelocationVal = RelocationItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Relocation = append(params.Relocation, paramsDotRelocationVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Relocation {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "relocation",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: english_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EnglishLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEnglishLevelVal EnglishLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEnglishLevelVal = EnglishLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EnglishLevel = append(params.EnglishLevel, paramsDotEnglishLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EnglishLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "english_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: education_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EducationLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEducationLevelVal EducationLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEducationLevelVal = EducationLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EducationLevel = append(params.EducationLevel, paramsDotEducationLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EducationLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "education_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posting_language.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.PostingLanguage = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPostingLanguageVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPostingLanguageVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.PostingLanguage = append(params.PostingLanguage, paramsDotPostingLanguageVal)
 					return nil
 				})
 			}); err != nil {
@@ -1953,7 +4693,356 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "source",
+			Name: "posting_language",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: domains.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Domains = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotDomainsVal DomainsItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotDomainsVal = DomainsItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Domains = append(params.Domains, paramsDotDomainsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Domains {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "domains",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanyType = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanyTypeVal CompanyTypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanyTypeVal = CompanyTypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanyType = append(params.CompanyType, paramsDotCompanyTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanyType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_size.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySize = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySizeVal CompanySizeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySizeVal = CompanySizeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySize = append(params.CompanySize, paramsDotCompanySizeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanySize {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_size",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_currency.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryCurrency = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryCurrencyVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryCurrencyVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryCurrency = append(params.SalaryCurrency, paramsDotSalaryCurrencyVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_currency",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_period.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryPeriod = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryPeriodVal SalaryPeriodItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryPeriodVal = SalaryPeriodItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryPeriod = append(params.SalaryPeriod, paramsDotSalaryPeriodVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.SalaryPeriod {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_period",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: visa_sponsorship.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotVisaSponsorshipVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotVisaSponsorshipVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.VisaSponsorship.SetTo(paramsDotVisaSponsorshipVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "visa_sponsorship",
 			In:   "query",
 			Err:  err,
 		}
@@ -2040,6 +5129,113 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 			Err:  err,
 		}
 	}
+	// Decode query: experience_years_min.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "experience_years_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotExperienceYearsMinVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotExperienceYearsMinVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ExperienceYearsMin.SetTo(paramsDotExperienceYearsMinVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "experience_years_min",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posted_within_days.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPostedWithinDaysVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostedWithinDaysVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostedWithinDays.SetTo(paramsDotPostedWithinDaysVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.PostedWithinDays.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        false,
+							Max:           0,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "posted_within_days",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	return params, nil
 }
 
@@ -2047,7 +5243,7 @@ func decodeGetJobFacetsParams(args [0]string, argsEscaped bool, r *http.Request)
 type GetSimilarJobsParams struct {
 	// Job public_slug.
 	Slug string
-	// Maximum similar jobs to return.
+	// Maximum similar jobs to return. Values above the maximum are clamped.
 	Limit OptInt `json:",omitempty,omitzero"`
 }
 
@@ -2120,7 +5316,7 @@ func decodeGetSimilarJobsParams(args [1]string, argsEscaped bool, r *http.Reques
 	}
 	// Set default value for query: limit.
 	{
-		val := int(10)
+		val := int(6)
 		params.Limit.SetTo(val)
 	}
 	// Decode query: limit.
@@ -2162,7 +5358,7 @@ func decodeGetSimilarJobsParams(args [1]string, argsEscaped bool, r *http.Reques
 							MinSet:        true,
 							Min:           1,
 							MaxSet:        true,
-							Max:           50,
+							Max:           20,
 							MinExclusive:  false,
 							MaxExclusive:  false,
 							MultipleOfSet: false,
@@ -2192,14 +5388,159 @@ func decodeGetSimilarJobsParams(args [1]string, argsEscaped bool, r *http.Reques
 	return params, nil
 }
 
+// SearchCitiesParams is parameters of searchCities operation.
+type SearchCitiesParams struct {
+	// Case-insensitive city name prefix or substring.
+	Q OptString `json:",omitempty,omitzero"`
+	// Restrict matches to one country (ISO 3166-1 alpha-2, lowercase).
+	Country OptString `json:",omitempty,omitzero"`
+}
+
+func unpackSearchCitiesParams(packed middleware.Parameters) (params SearchCitiesParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "q",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Q = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "country",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Country = v.(OptString)
+		}
+	}
+	return params
+}
+
+func decodeSearchCitiesParams(args [0]string, argsEscaped bool, r *http.Request) (params SearchCitiesParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: q.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "q",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotQVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotQVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Q.SetTo(paramsDotQVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "q",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: country.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "country",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotCountryVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotCountryVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Country.SetTo(paramsDotCountryVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "country",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
 // SearchCompaniesParams is parameters of searchCompanies operation.
 type SearchCompaniesParams struct {
-	// Case-insensitive company name substring.
+	// Case-insensitive company name match.
 	Q OptString `json:",omitempty,omitzero"`
-	// Page size.
+	// Page size. Values above the maximum are clamped, not rejected.
 	Limit OptInt `json:",omitempty,omitzero"`
-	// Rows to skip.
+	// Rows to skip. On the job endpoints `offset + limit` may not exceed 10000; deeper paging is a 400.
 	Offset OptInt `json:",omitempty,omitzero"`
+	// `rating` orders by average feedback rating. Omit for the default order (open-role count descending,
+	// then name).
+	Sort OptSearchCompaniesSort `json:",omitempty,omitzero"`
+	// Curated collection slugs, e.g. `yc`, `bigtech`, `unicorn`.
+	Collections []string `json:",omitempty"`
+	// Regions the company posts roles in.
+	Regions []string `json:",omitempty"`
+	// Countries the company posts roles in (ISO 3166-1 alpha-2, lowercase).
+	Countries []string `json:",omitempty"`
+	// Regions the company hires REMOTELY in — derived from its open postings, unlike `regions`, which
+	// counts any posting.
+	RemoteRegions []string `json:",omitempty"`
+	// Curated company industry slugs, e.g. `fintech`, `developer-tools`.
+	Industries []string `json:",omitempty"`
+	// Job-derived domain slugs (the `domains` job facet, aggregated per company).
+	Domains     []string                         `json:",omitempty"`
+	CompanyType []SearchCompaniesCompanyTypeItem `json:",omitempty"`
+	CompanySize []SearchCompaniesCompanySizeItem `json:",omitempty"`
+	// Curated company maturity stage.
+	Maturity []string `json:",omitempty"`
+	// Y Combinator batch, e.g. `W21`. From the curated YC directory.
+	YcBatch []string `json:",omitempty"`
+	// Y Combinator company status, e.g. `Active`, `Acquired`.
+	YcStatus []string `json:",omitempty"`
+	// Y Combinator funding stage.
+	YcStage []string `json:",omitempty"`
+	// Y Combinator directory flags, e.g. `nonprofit`, `top_company`.
+	YcFlags []string `json:",omitempty"`
 }
 
 func unpackSearchCompaniesParams(packed middleware.Parameters) (params SearchCompaniesParams) {
@@ -2228,6 +5569,132 @@ func unpackSearchCompaniesParams(packed middleware.Parameters) (params SearchCom
 		}
 		if v, ok := packed[key]; ok {
 			params.Offset = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sort",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Sort = v.(OptSearchCompaniesSort)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "collections",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Collections = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "regions",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Regions = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "countries",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Countries = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "remote_regions",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.RemoteRegions = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "industries",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Industries = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "domains",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Domains = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanyType = v.([]SearchCompaniesCompanyTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_size",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySize = v.([]SearchCompaniesCompanySizeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "maturity",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Maturity = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "yc_batch",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.YcBatch = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "yc_status",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.YcStatus = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "yc_stage",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.YcStage = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "yc_flags",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.YcFlags = v.([]string)
 		}
 	}
 	return params
@@ -2278,7 +5745,7 @@ func decodeSearchCompaniesParams(args [0]string, argsEscaped bool, r *http.Reque
 	}
 	// Set default value for query: limit.
 	{
-		val := int(20)
+		val := int(10)
 		params.Limit.SetTo(val)
 	}
 	// Decode query: limit.
@@ -2414,6 +5881,3366 @@ func decodeSearchCompaniesParams(args [0]string, argsEscaped bool, r *http.Reque
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "offset",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: sort.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortVal SearchCompaniesSort
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortVal = SearchCompaniesSort(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Sort.SetTo(paramsDotSortVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Sort.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sort",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: collections.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Collections = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCollectionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCollectionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Collections = append(params.Collections, paramsDotCollectionsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collections",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: regions.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Regions = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRegionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRegionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Regions = append(params.Regions, paramsDotRegionsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "regions",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: countries.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Countries = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: remote_regions.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "remote_regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.RemoteRegions = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRemoteRegionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRemoteRegionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.RemoteRegions = append(params.RemoteRegions, paramsDotRemoteRegionsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "remote_regions",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: industries.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "industries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Industries = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotIndustriesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotIndustriesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Industries = append(params.Industries, paramsDotIndustriesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "industries",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: domains.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Domains = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotDomainsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotDomainsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Domains = append(params.Domains, paramsDotDomainsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "domains",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanyType = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanyTypeVal SearchCompaniesCompanyTypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanyTypeVal = SearchCompaniesCompanyTypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanyType = append(params.CompanyType, paramsDotCompanyTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanyType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_size.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySize = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySizeVal SearchCompaniesCompanySizeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySizeVal = SearchCompaniesCompanySizeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySize = append(params.CompanySize, paramsDotCompanySizeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanySize {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_size",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: maturity.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "maturity",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Maturity = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotMaturityVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotMaturityVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Maturity = append(params.Maturity, paramsDotMaturityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "maturity",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: yc_batch.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "yc_batch",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.YcBatch = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotYcBatchVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotYcBatchVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.YcBatch = append(params.YcBatch, paramsDotYcBatchVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "yc_batch",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: yc_status.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "yc_status",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.YcStatus = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotYcStatusVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotYcStatusVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.YcStatus = append(params.YcStatus, paramsDotYcStatusVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "yc_status",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: yc_stage.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "yc_stage",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.YcStage = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotYcStageVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotYcStageVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.YcStage = append(params.YcStage, paramsDotYcStageVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "yc_stage",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: yc_flags.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "yc_flags",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.YcFlags = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotYcFlagsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotYcFlagsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.YcFlags = append(params.YcFlags, paramsDotYcFlagsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "yc_flags",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	return params, nil
+}
+
+// SearchJobsParams is parameters of searchJobs operation.
+type SearchJobsParams struct {
+	// Full-text query over title, company, and description.
+	Q OptString `json:",omitempty,omitzero"`
+	// Page size. Values above the maximum are clamped, not rejected.
+	Limit OptInt `json:",omitempty,omitzero"`
+	// Rows to skip. On the job endpoints `offset + limit` may not exceed 10000; deeper paging is a 400.
+	Offset OptInt `json:",omitempty,omitzero"`
+	// Sort field. Omitted, a text query sorts by relevance and an empty query by `posted_at` descending.
+	Sort OptSort `json:",omitempty,omitzero"`
+	// Sort direction. Ignored without a valid `sort`.
+	Order OptOrder `json:",omitempty,omitzero"`
+	// Macro-regions. Country codes are NOT regions — use `countries`. `none` is the reserved value for
+	// postings with no resolved geography. Joins the geography OR-group with `countries` and `cities`.
+	Regions []RegionsItem `json:",omitempty"`
+	// ISO 3166-1 alpha-2, lowercase (`gb`, `de`). Matching is case-insensitive. Joins the geography
+	// OR-group.
+	Countries []string `json:",omitempty"`
+	// Canonical city display names ("London", "Berlin") — resolve one with `searchCities` first. Joins
+	// the geography OR-group.
+	Cities []string `json:",omitempty"`
+	// Work format, resolved from a deterministic dictionary. Absent on a posting whose format could not be
+	// resolved, so this filter narrows to postings that stated it.
+	WorkMode []WorkModeItem `json:",omitempty"`
+	// Role category slug from `getJobFacets`.
+	Category []string `json:",omitempty"`
+	// Fine-grained role slug from `getJobFacets` (e.g. `backend`, `android_developer`, and
+	// seniority-qualified variants). Much narrower than `category`; the vocabulary is large and generated,
+	// so always read it from the facets endpoint.
+	Role      []string        `json:",omitempty"`
+	Seniority []SeniorityItem `json:",omitempty"`
+	// Canonical skill slugs from `getJobFacets`. Never invent one.
+	Skills []string `json:",omitempty"`
+	// `and` requires a posting to carry EVERY listed skill instead of any of them. The same
+	// `<facet>_mode=and` switch works on any non-geography facet.
+	SkillsMode OptSkillsMode `json:",omitempty,omitzero"`
+	// Technical vs non-technical, derived deterministically from title and category. Absent when unknown,
+	// so the filter never guesses.
+	IsTech []IsTechItem `json:",omitempty"`
+	// AI skill-signature archetype, derived from the posting's skill set.
+	AiArchetype []AIArchetypeItem `json:",omitempty"`
+	// Curated collection slugs of the posting's company, e.g. `yc`, `bigtech`, `unicorn`,
+	// `us-h1b-sponsor`. Read the live set from `getJobFacets`.
+	Collections []string `json:",omitempty"`
+	// Posting-reality class. `fresh` is recently posted and not obviously recycled; `stale` is old;
+	// `likely-evergreen` reads as an always-open pipeline ad. A large share of the catalogue is `stale`,
+	// so `?reality=fresh` is the cheapest quality filter available. Read the live split from
+	// `getJobFacets`.
+	Reality []RealityItem `json:",omitempty"`
+	// Origin slug of the posting — the ATS or board it was crawled from (`greenhouse`, `workday`,
+	// `adzuna`, …). Read the live set from `getJobFacets`. Pair with `source_exclude` to avoid
+	// double-counting a board you already query directly.
+	Source []string `json:",omitempty"`
+	// Company slugs from `searchCompanies`. This facet has no distribution in `getJobFacets` — use the
+	// company search for a typeahead.
+	CompanySlug    []string             `json:",omitempty"`
+	EmploymentType []EmploymentTypeItem `json:",omitempty"`
+	Relocation     []RelocationItem     `json:",omitempty"`
+	EnglishLevel   []EnglishLevelItem   `json:",omitempty"`
+	EducationLevel []EducationLevelItem `json:",omitempty"`
+	// Language the posting is written in (ISO 639-1, e.g. `en`, `de`, `uk`).
+	PostingLanguage []string `json:",omitempty"`
+	// Business domain of the hiring company, as stated by the posting.
+	Domains     []DomainsItem     `json:",omitempty"`
+	CompanyType []CompanyTypeItem `json:",omitempty"`
+	CompanySize []CompanySizeItem `json:",omitempty"`
+	// ISO 4217 code, e.g. `USD`, `EUR`.
+	SalaryCurrency []string           `json:",omitempty"`
+	SalaryPeriod   []SalaryPeriodItem `json:",omitempty"`
+	// Whether the posting states it sponsors a visa. `false` is a real, stated value, not "unknown" —
+	// postings that say nothing match neither setting.
+	VisaSponsorship OptBool `json:",omitempty,omitzero"`
+	// Lower bound on the posting's minimum salary, in its own `salary_currency` and `salary_period` —
+	// the comparison does NOT normalize currencies. Pair with `salary_currency` and `salary_period` for a
+	// meaningful range.
+	SalaryMin OptInt `json:",omitempty,omitzero"`
+	// Upper bound on the posting's maximum salary. Same currency caveat as `salary_min`.
+	SalaryMax OptInt `json:",omitempty,omitzero"`
+	// Lower bound on the years of experience the posting asks for.
+	ExperienceYearsMin OptInt `json:",omitempty,omitzero"`
+	// Restrict to postings published within the last N days. Omit for no freshness restriction.
+	PostedWithinDays OptInt `json:",omitempty,omitzero"`
+	// Regions to exclude. Excludes AND together, unlike included geography.
+	RegionsExclude []string `json:",omitempty"`
+	// Countries to exclude.
+	CountriesExclude []string `json:",omitempty"`
+	// Work formats to exclude, e.g. `onsite`.
+	WorkModeExclude []string `json:",omitempty"`
+	// Skill slugs to exclude.
+	SkillsExclude []string `json:",omitempty"`
+	// Source slugs to exclude.
+	SourceExclude []string `json:",omitempty"`
+	// Company slugs to exclude.
+	CompanySlugExclude []string `json:",omitempty"`
+}
+
+func unpackSearchJobsParams(packed middleware.Parameters) (params SearchJobsParams) {
+	{
+		key := middleware.ParameterKey{
+			Name: "q",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Q = v.(OptString)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "limit",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Limit = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "offset",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Offset = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "sort",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Sort = v.(OptSort)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "order",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Order = v.(OptOrder)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "regions",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Regions = v.([]RegionsItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "countries",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Countries = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "cities",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Cities = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "work_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.WorkMode = v.([]WorkModeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "category",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Category = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "role",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Role = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "seniority",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Seniority = v.([]SeniorityItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Skills = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills_mode",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SkillsMode = v.(OptSkillsMode)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "is_tech",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IsTech = v.([]IsTechItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "ai_archetype",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.AiArchetype = v.([]AIArchetypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "collections",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Collections = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "reality",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Reality = v.([]RealityItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "source",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Source = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_slug",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySlug = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "employment_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EmploymentType = v.([]EmploymentTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "relocation",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Relocation = v.([]RelocationItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "english_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EnglishLevel = v.([]EnglishLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "education_level",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.EducationLevel = v.([]EducationLevelItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posting_language",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostingLanguage = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "domains",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Domains = v.([]DomainsItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_type",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanyType = v.([]CompanyTypeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_size",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySize = v.([]CompanySizeItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_currency",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryCurrency = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_period",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryPeriod = v.([]SalaryPeriodItem)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "visa_sponsorship",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.VisaSponsorship = v.(OptBool)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_min",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryMin = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "salary_max",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SalaryMax = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "experience_years_min",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.ExperienceYearsMin = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "posted_within_days",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PostedWithinDays = v.(OptInt)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "regions_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.RegionsExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "countries_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CountriesExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "work_mode_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.WorkModeExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "skills_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SkillsExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "source_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.SourceExclude = v.([]string)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "company_slug_exclude",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.CompanySlugExclude = v.([]string)
+		}
+	}
+	return params
+}
+
+func decodeSearchJobsParams(args [0]string, argsEscaped bool, r *http.Request) (params SearchJobsParams, _ error) {
+	q := uri.NewQueryDecoder(r.URL.Query())
+	// Decode query: q.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "q",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotQVal string
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotQVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Q.SetTo(paramsDotQVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "q",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: limit.
+	{
+		val := int(10)
+		params.Limit.SetTo(val)
+	}
+	// Decode query: limit.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "limit",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotLimitVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotLimitVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Limit.SetTo(paramsDotLimitVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Limit.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        true,
+							Max:           100,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "limit",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: offset.
+	{
+		val := int(0)
+		params.Offset.SetTo(val)
+	}
+	// Decode query: offset.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "offset",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOffsetVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOffsetVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Offset.SetTo(paramsDotOffsetVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Offset.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           0,
+							MaxSet:        false,
+							Max:           0,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "offset",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: sort.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "sort",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSortVal Sort
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSortVal = Sort(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Sort.SetTo(paramsDotSortVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Sort.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "sort",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: order.
+	{
+		val := Order("desc")
+		params.Order.SetTo(val)
+	}
+	// Decode query: order.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "order",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotOrderVal Order
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotOrderVal = Order(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Order.SetTo(paramsDotOrderVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Order.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "order",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: regions.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "regions",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Regions = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRegionsVal RegionsItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRegionsVal = RegionsItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Regions = append(params.Regions, paramsDotRegionsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Regions {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "regions",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: countries.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Countries = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Countries = append(params.Countries, paramsDotCountriesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: cities.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "cities",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Cities = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCitiesVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCitiesVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Cities = append(params.Cities, paramsDotCitiesVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "cities",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: work_mode.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "work_mode",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.WorkMode = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotWorkModeVal WorkModeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotWorkModeVal = WorkModeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.WorkMode = append(params.WorkMode, paramsDotWorkModeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.WorkMode {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "work_mode",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: category.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "category",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Category = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCategoryVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCategoryVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Category = append(params.Category, paramsDotCategoryVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "category",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: role.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "role",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Role = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRoleVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRoleVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Role = append(params.Role, paramsDotRoleVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "role",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: seniority.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "seniority",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Seniority = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSeniorityVal SeniorityItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSeniorityVal = SeniorityItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Seniority = append(params.Seniority, paramsDotSeniorityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Seniority {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "seniority",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: skills.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "skills",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Skills = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSkillsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSkillsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Skills = append(params.Skills, paramsDotSkillsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: skills_mode.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "skills_mode",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSkillsModeVal SkillsMode
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSkillsModeVal = SkillsMode(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SkillsMode.SetTo(paramsDotSkillsModeVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.SkillsMode.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills_mode",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: is_tech.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "is_tech",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.IsTech = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotIsTechVal IsTechItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotIsTechVal = IsTechItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.IsTech = append(params.IsTech, paramsDotIsTechVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.IsTech {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "is_tech",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: ai_archetype.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "ai_archetype",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.AiArchetype = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotAiArchetypeVal AIArchetypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotAiArchetypeVal = AIArchetypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.AiArchetype = append(params.AiArchetype, paramsDotAiArchetypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.AiArchetype {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "ai_archetype",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: collections.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "collections",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Collections = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCollectionsVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCollectionsVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Collections = append(params.Collections, paramsDotCollectionsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "collections",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: reality.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "reality",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Reality = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRealityVal RealityItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRealityVal = RealityItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Reality = append(params.Reality, paramsDotRealityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Reality {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "reality",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: source.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "source",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Source = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSourceVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSourceVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Source = append(params.Source, paramsDotSourceVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "source",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_slug.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_slug",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySlug = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySlugVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySlugVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySlug = append(params.CompanySlug, paramsDotCompanySlugVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_slug",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: employment_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "employment_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EmploymentType = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEmploymentTypeVal EmploymentTypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEmploymentTypeVal = EmploymentTypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EmploymentType = append(params.EmploymentType, paramsDotEmploymentTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EmploymentType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "employment_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: relocation.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "relocation",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Relocation = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRelocationVal RelocationItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRelocationVal = RelocationItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Relocation = append(params.Relocation, paramsDotRelocationVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Relocation {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "relocation",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: english_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "english_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EnglishLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEnglishLevelVal EnglishLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEnglishLevelVal = EnglishLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EnglishLevel = append(params.EnglishLevel, paramsDotEnglishLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EnglishLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "english_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: education_level.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "education_level",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.EducationLevel = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotEducationLevelVal EducationLevelItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotEducationLevelVal = EducationLevelItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.EducationLevel = append(params.EducationLevel, paramsDotEducationLevelVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.EducationLevel {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "education_level",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posting_language.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posting_language",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.PostingLanguage = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPostingLanguageVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPostingLanguageVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.PostingLanguage = append(params.PostingLanguage, paramsDotPostingLanguageVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "posting_language",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: domains.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "domains",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.Domains = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotDomainsVal DomainsItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotDomainsVal = DomainsItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.Domains = append(params.Domains, paramsDotDomainsVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Domains {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "domains",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_type.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_type",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanyType = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanyTypeVal CompanyTypeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanyTypeVal = CompanyTypeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanyType = append(params.CompanyType, paramsDotCompanyTypeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanyType {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_type",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_size.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_size",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySize = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySizeVal CompanySizeItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySizeVal = CompanySizeItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySize = append(params.CompanySize, paramsDotCompanySizeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.CompanySize {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_size",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_currency.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_currency",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryCurrency = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryCurrencyVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryCurrencyVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryCurrency = append(params.SalaryCurrency, paramsDotSalaryCurrencyVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_currency",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_period.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_period",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SalaryPeriod = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSalaryPeriodVal SalaryPeriodItem
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSalaryPeriodVal = SalaryPeriodItem(c)
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SalaryPeriod = append(params.SalaryPeriod, paramsDotSalaryPeriodVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.SalaryPeriod {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_period",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: visa_sponsorship.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "visa_sponsorship",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotVisaSponsorshipVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotVisaSponsorshipVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.VisaSponsorship.SetTo(paramsDotVisaSponsorshipVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "visa_sponsorship",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_min.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSalaryMinVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSalaryMinVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SalaryMin.SetTo(paramsDotSalaryMinVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_min",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: salary_max.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "salary_max",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotSalaryMaxVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotSalaryMaxVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.SalaryMax.SetTo(paramsDotSalaryMaxVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "salary_max",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: experience_years_min.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "experience_years_min",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotExperienceYearsMinVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotExperienceYearsMinVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.ExperienceYearsMin.SetTo(paramsDotExperienceYearsMinVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "experience_years_min",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: posted_within_days.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "posted_within_days",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPostedWithinDaysVal int
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToInt(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPostedWithinDaysVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PostedWithinDays.SetTo(paramsDotPostedWithinDaysVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.PostedWithinDays.Get(); ok {
+					if err := func() error {
+						if err := (validate.Int{
+							MinSet:        true,
+							Min:           1,
+							MaxSet:        false,
+							Max:           0,
+							MinExclusive:  false,
+							MaxExclusive:  false,
+							MultipleOfSet: false,
+							MultipleOf:    0,
+							Pattern:       nil,
+						}).Validate(int64(value)); err != nil {
+							return errors.Wrap(err, "int")
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "posted_within_days",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: regions_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "regions_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.RegionsExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotRegionsExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotRegionsExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.RegionsExclude = append(params.RegionsExclude, paramsDotRegionsExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "regions_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: countries_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "countries_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CountriesExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCountriesExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCountriesExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CountriesExclude = append(params.CountriesExclude, paramsDotCountriesExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "countries_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: work_mode_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "work_mode_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.WorkModeExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotWorkModeExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotWorkModeExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.WorkModeExclude = append(params.WorkModeExclude, paramsDotWorkModeExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "work_mode_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: skills_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "skills_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SkillsExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSkillsExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSkillsExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SkillsExclude = append(params.SkillsExclude, paramsDotSkillsExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "skills_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: source_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "source_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.SourceExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotSourceExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotSourceExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.SourceExclude = append(params.SourceExclude, paramsDotSourceExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "source_exclude",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: company_slug_exclude.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "company_slug_exclude",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				params.CompanySlugExclude = nil
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotCompanySlugExcludeVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotCompanySlugExcludeVal = c
+						return nil
+					}(); err != nil {
+						return err
+					}
+					params.CompanySlugExclude = append(params.CompanySlugExclude, paramsDotCompanySlugExcludeVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "company_slug_exclude",
 			In:   "query",
 			Err:  err,
 		}
