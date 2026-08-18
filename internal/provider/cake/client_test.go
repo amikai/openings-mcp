@@ -58,6 +58,14 @@ func TestSearchJobs(t *testing.T) {
 		got.Data[i].Page.Reset()
 	}
 
+	facets, ok := got.AvailableFacets.Get()
+	require.True(t, ok)
+	assert.NotEmpty(t, facets.JobTypes)
+	assert.NotEmpty(t, facets.SeniorityLevels)
+	assert.NotEmpty(t, facets.Remote)
+	assert.NotEmpty(t, facets.Locations)
+	got.AvailableFacets.Reset()
+
 	assert.Equal(t, wantSearch, got)
 }
 

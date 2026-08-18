@@ -4,16 +4,24 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 
-	"github.com/amikai/openings-mcp/internal/provider/cake"
 	"github.com/jaytaylor/html2text"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+
+	"github.com/amikai/openings-mcp/internal/provider/cake"
+)
+
+const (
+	cakeSearchToolName  = "cake_search_jobs"
+	cakeDetailToolName  = "cake_get_job_detail"
+	cakeFiltersToolName = "cake_get_search_filters"
 )
 
 // cakeSearchInputRawSchema is hand-written JSON kept aligned with
 // openapi.yaml's JobSearchRequest/JobSearchFilters: a flat property list
-// instead of the query/sort_by/filters nesting. Enum values are the API's
-// own slugs, which the converter casts back to the generated types.
+// instead of the query/sort_by/filters nesting. Enums are relaxed to open strings
+// and normalized in cakeMCPToHTTPRequest to support both human labels and API slugs.
 var cakeSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
@@ -29,28 +37,24 @@ var cakeSearchInputRawSchema = []byte(`{
 		},
 		"job_type": {
 			"type": "string",
-			"description": "Employment type.",
-			"enum": ["full_time", "part_time", "internship", "contract", "freelance", "temporary", "volunteer"]
+			"description": "Employment type slug or label, e.g. 'full_time' / '全職', 'part_time' / '兼職', 'internship' / '實習生', 'contract' / '約聘', 'freelance' / '接案'."
 		},
 		"seniority": {
 			"type": "array",
-			"description": "Seniority levels, OR'd together.",
+			"description": "Seniority levels or labels, OR'd together, e.g. 'mid_senior_level' / '中高階', 'entry_level' / '初階', 'director' / '總監'.",
 			"minItems": 1,
 			"uniqueItems": true,
 			"items": {
-				"type": "string",
-				"enum": ["internship_level", "entry_level", "associate", "mid_senior_level", "director", "executive"]
+				"type": "string"
 			}
 		},
 		"remote": {
 			"type": "string",
-			"description": "Remote-work policy. Omit to include all.",
-			"enum": ["no_remote_work", "partial_remote_work", "optional_remote_work", "full_remote_work"]
+			"description": "Remote-work policy slug or label, e.g. 'full_remote_work' / '純遠端', 'partial_remote_work' / '部分遠端', 'no_remote_work' / '無遠端'. Omit to include all."
 		},
 		"sort": {
 			"type": "string",
-			"description": "Result order. Defaults to popularity.",
-			"enum": ["popularity", "latest"],
+			"description": "Result order. Defaults to popularity ('popularity' / '熱門', 'latest' / '最新').",
 			"default": "popularity"
 		},
 		"page": {
@@ -109,10 +113,126 @@ type cakeJobSummary struct {
 	Description string `json:"description" jsonschema:"Plain-text preview; cake_get_job_detail returns the full description."`
 }
 
+type cakeFilterOption struct {
+	Value string `json:"value" jsonschema:"Raw slug to pass to cake_search_jobs."`
+	Name  string `json:"name" jsonschema:"Human-readable label."`
+}
+
+type cakeFiltersOutput struct {
+	JobTypes        []cakeFilterOption `json:"job_types" jsonschema:"Available employment types."`
+	SeniorityLevels []cakeFilterOption `json:"seniority_levels" jsonschema:"Available seniority levels."`
+	Remote          []cakeFilterOption `json:"remote" jsonschema:"Available remote-work policies."`
+	YearOfSeniority []cakeFilterOption `json:"year_of_seniority,omitempty" jsonschema:"Years of experience ranges."`
+	Locations       []string           `json:"locations,omitempty" jsonschema:"Sample location names."`
+	Professions     []cakeFilterOption `json:"professions,omitempty" jsonschema:"Sample profession categories."`
+}
+
+var cakeJobTypeLabels = map[string]string{
+	"full_time":  "全職 / Full-time",
+	"part_time":  "兼職 / Part-time",
+	"internship": "實習生 / Internship",
+	"contract":   "約聘 / Contract",
+	"freelance":  "接案 / Freelance",
+	"temporary":  "臨時工 / Temporary",
+	"volunteer":  "志願者 / Volunteer",
+}
+
+var cakeSeniorityLabels = map[string]string{
+	"internship_level": "實習 / Internship",
+	"entry_level":      "初階 / Entry level",
+	"associate":        "助理 / Associate",
+	"mid_senior_level": "中高階 / Mid-Senior level",
+	"director":         "經理 / 總監 / Director",
+	"executive":        "經營層 (VP, GM, C-Level) / Executive",
+}
+
+var cakeRemoteLabels = map[string]string{
+	"no_remote_work":       "無法遠端工作 / On-site only",
+	"partial_remote_work":  "部分遠端工作 / Partial remote",
+	"optional_remote_work": "彈性遠端工作 / Optional remote",
+	"full_remote_work":     "100% 遠端工作 / Remote only",
+}
+
+var cakeYearOfSeniorityLabels = map[string]string{
+	"0_1":  "< 1 年 (Less than 1 year)",
+	"1_3":  "1〜3 年 (1-3 years)",
+	"3_5":  "3〜5 年 (3-5 years)",
+	"5_10": "5〜10 年 (5-10 years)",
+	"10_":  "10+ 年 (More than 10 years)",
+}
+
+func normalizeCakeJobType(s string) string {
+	s = strings.TrimSpace(strings.ToLower(s))
+	switch s {
+	case "full_time", "full-time", "fulltime", "full time", "全職":
+		return "full_time"
+	case "part_time", "part-time", "parttime", "part time", "兼職":
+		return "part_time"
+	case "internship", "intern", "實習", "實習生":
+		return "internship"
+	case "contract", "約聘", "約聘工":
+		return "contract"
+	case "freelance", "接案", "自由職業者":
+		return "freelance"
+	case "temporary", "temp", "臨時工", "兼差":
+		return "temporary"
+	case "volunteer", "志工", "志願者":
+		return "volunteer"
+	default:
+		return s
+	}
+}
+
+func normalizeCakeSeniority(s string) string {
+	s = strings.TrimSpace(strings.ToLower(s))
+	switch s {
+	case "internship_level", "internship", "intern", "實習":
+		return "internship_level"
+	case "entry_level", "entry", "entry level", "entry-level", "junior", "初階", "初級":
+		return "entry_level"
+	case "associate", "assistant", "助理":
+		return "associate"
+	case "mid_senior_level", "mid_senior", "mid-senior", "mid senior", "mid-senior level", "mid senior level", "senior", "中高階", "資深", "中階":
+		return "mid_senior_level"
+	case "director", "manager", "經理", "總監", "主管":
+		return "director"
+	case "executive", "c-level", "c level", "vp", "gm", "經營層", "高階主管":
+		return "executive"
+	default:
+		return s
+	}
+}
+
+func normalizeCakeRemote(s string) string {
+	s = strings.TrimSpace(strings.ToLower(s))
+	switch s {
+	case "no_remote_work", "no_remote", "no remote", "onsite", "on-site", "on site", "無遠端", "無法遠端工作", "不遠端", "現場工作":
+		return "no_remote_work"
+	case "partial_remote_work", "partial_remote", "partial remote", "hybrid", "部分遠端", "部分遠端工作", "混合辦公":
+		return "partial_remote_work"
+	case "optional_remote_work", "optional_remote", "optional remote", "彈性遠端", "選擇性或彈性遠端工作":
+		return "optional_remote_work"
+	case "full_remote_work", "full_remote", "full remote", "remote", "remote_only", "remote only", "純遠端", "100% 遠端工作", "遠端", "完全遠端":
+		return "full_remote_work"
+	default:
+		return s
+	}
+}
+
+func normalizeCakeSort(s string) (cake.JobSearchRequestSortBy, error) {
+	s = strings.TrimSpace(strings.ToLower(s))
+	switch s {
+	case "", "popularity", "熱門", "最熱門":
+		return cake.JobSearchRequestSortByPopularity, nil
+	case "latest", "newest", "最新":
+		return cake.JobSearchRequestSortByLatest, nil
+	default:
+		return "", fmt.Errorf("invalid sort %q: must be popularity or latest", s)
+	}
+}
+
 func cakeMCPToHTTPRequest(in *cakeSearchInput) (*cake.JobSearchRequest, error) {
 	var req cake.JobSearchRequest
-	// The schema already marks keyword and location required; this guards
-	// direct callers and clients that skip schema validation.
 	if in.Keyword == "" {
 		return nil, errors.New("keyword is required")
 	}
@@ -123,39 +243,24 @@ func cakeMCPToHTTPRequest(in *cakeSearchInput) (*cake.JobSearchRequest, error) {
 	}
 	req.Filters.Locations = []string{in.Location}
 
-	// The Cake API rejects requests without sort_by, so default to
-	// popularity when sort is omitted.
-	req.SortBy = cake.JobSearchRequestSortByPopularity
-	if in.Sort != "" {
-		sort := cake.JobSearchRequestSortBy(in.Sort)
-		if err := sort.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid sort %q: %w", in.Sort, err)
-		}
-		req.SortBy = sort
+	sortBy, err := normalizeCakeSort(in.Sort)
+	if err != nil {
+		return nil, err
 	}
+	req.SortBy = sortBy
 
 	if in.JobType != "" {
-		jobType := cake.JobSearchFiltersJobTypesItem(in.JobType)
-		if err := jobType.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid job_type %q: %w", in.JobType, err)
-		}
-		req.Filters.JobTypes = []cake.JobSearchFiltersJobTypesItem{jobType}
+		req.Filters.JobTypes = []string{normalizeCakeJobType(in.JobType)}
 	}
 
 	for _, slug := range in.Seniority {
-		seniority := cake.JobSearchFiltersSeniorityLevelsItem(slug)
-		if err := seniority.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid seniority %q: %w", slug, err)
+		if norm := normalizeCakeSeniority(slug); norm != "" {
+			req.Filters.SeniorityLevels = append(req.Filters.SeniorityLevels, norm)
 		}
-		req.Filters.SeniorityLevels = append(req.Filters.SeniorityLevels, seniority)
 	}
 
 	if in.Remote != "" {
-		remote := cake.JobSearchFiltersRemoteItem(in.Remote)
-		if err := remote.Validate(); err != nil {
-			return nil, fmt.Errorf("invalid remote %q: %w", in.Remote, err)
-		}
-		req.Filters.Remote = []cake.JobSearchFiltersRemoteItem{remote}
+		req.Filters.Remote = []string{normalizeCakeRemote(in.Remote)}
 	}
 
 	if in.Page > 0 {
@@ -187,6 +292,63 @@ func cakeHTTPToMCPResponse(resp *cake.JobSearchResponse) *cakeSearchOutput {
 	return out
 }
 
+func cakeHTTPToMCPFilters(res *cake.JobSearchResponse) *cakeFiltersOutput {
+	out := &cakeFiltersOutput{}
+	facets, ok := res.AvailableFacets.Get()
+	if !ok {
+		for k, v := range cakeJobTypeLabels {
+			out.JobTypes = append(out.JobTypes, cakeFilterOption{Value: k, Name: v})
+		}
+		for k, v := range cakeSeniorityLabels {
+			out.SeniorityLevels = append(out.SeniorityLevels, cakeFilterOption{Value: k, Name: v})
+		}
+		for k, v := range cakeRemoteLabels {
+			out.Remote = append(out.Remote, cakeFilterOption{Value: k, Name: v})
+		}
+		return out
+	}
+
+	for _, item := range facets.JobTypes {
+		name := item
+		if label, exists := cakeJobTypeLabels[item]; exists {
+			name = label
+		}
+		out.JobTypes = append(out.JobTypes, cakeFilterOption{Value: item, Name: name})
+	}
+
+	for _, item := range facets.SeniorityLevels {
+		name := item
+		if label, exists := cakeSeniorityLabels[item]; exists {
+			name = label
+		}
+		out.SeniorityLevels = append(out.SeniorityLevels, cakeFilterOption{Value: item, Name: name})
+	}
+
+	for _, item := range facets.Remote {
+		name := item
+		if label, exists := cakeRemoteLabels[item]; exists {
+			name = label
+		}
+		out.Remote = append(out.Remote, cakeFilterOption{Value: item, Name: name})
+	}
+
+	for _, item := range facets.YearOfSeniority {
+		name := item
+		if label, exists := cakeYearOfSeniorityLabels[item]; exists {
+			name = label
+		}
+		out.YearOfSeniority = append(out.YearOfSeniority, cakeFilterOption{Value: item, Name: name})
+	}
+
+	out.Locations = facets.Locations
+
+	for _, item := range facets.Professions {
+		out.Professions = append(out.Professions, cakeFilterOption{Value: item, Name: item})
+	}
+
+	return out
+}
+
 func cakeHTTPToMCPDetail(detail *cake.JobDetail) *cakeDetailOutput {
 	descText, err := html2text.FromString(detail.Description.Value, html2text.Options{})
 	if err != nil {
@@ -214,10 +376,10 @@ func cakeJobURL(pagePath, path string) string {
 	return fmt.Sprintf("https://www.cake.me/companies/%s/jobs/%s", pagePath, path)
 }
 
-// RegisterCake registers the Cake.me search and job-detail tools.
+// RegisterCake registers the Cake.me search, filter discovery, and job-detail tools.
 func RegisterCake(s *mcp.Server, c *cake.Client) {
 	mcp.AddTool(s, &mcp.Tool{
-		Name:        "cake_search_jobs",
+		Name:        cakeSearchToolName,
 		Description: "Search jobs on Cake.me (formerly CakeResume), a Taiwan-focused job board.",
 		Annotations: &mcp.ToolAnnotations{Title: "Search Cake.me jobs", ReadOnlyHint: true},
 		InputSchema: cakeSearchInputSchema,
@@ -237,7 +399,27 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 	})
 
 	mcp.AddTool(s, &mcp.Tool{
-		Name:        "cake_get_job_detail",
+		Name:        cakeFiltersToolName,
+		Description: "Get Cake.me current search filter values (job types, seniority levels, remote policies, and locations). Call before filtered cake_search_jobs queries.",
+		Annotations: &mcp.ToolAnnotations{Title: "Get Cake.me search filters", ReadOnlyHint: true},
+	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *struct{}) (*mcp.CallToolResult, *cakeFiltersOutput, error) {
+		req := &cake.JobSearchRequest{
+			Query:   "",
+			SortBy:  cake.JobSearchRequestSortByPopularity,
+			Filters: cake.JobSearchFilters{},
+		}
+		res, err := c.SearchJobs(ctx, req)
+		if err != nil {
+			if ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err); ok {
+				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+			}
+			return errorResult(err), nil, nil
+		}
+		return nil, cakeHTTPToMCPFilters(res), nil
+	})
+
+	mcp.AddTool(s, &mcp.Tool{
+		Name:        cakeDetailToolName,
 		Description: "Get the full job description and requirements for a Cake.me job path (path from search results).",
 		Annotations: &mcp.ToolAnnotations{Title: "Get Cake.me job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeDetailInput) (*mcp.CallToolResult, *cakeDetailOutput, error) {

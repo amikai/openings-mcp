@@ -32,18 +32,18 @@ func run() int {
 		perPage        = fs.IntLong("per-page", 10, "jobs per page (0 = unset, server default 20)")
 		locations      = fs.StringSetLong("location", "Location name as shown on cake.me, e.g. Taiwan (repeatable)")
 		professions    = fs.StringSetLong("profession", "Profession slug, e.g. it_back-end-engineer (repeatable)")
-		jobTypes       = fs.StringSetLong("job-type", usageWithChoices("Employment type (repeatable)", choices(cake.JobSearchFiltersJobTypesItem("").AllValues())))
-		seniorities    = fs.StringSetLong("seniority", usageWithChoices("Seniority level (repeatable)", choices(cake.JobSearchFiltersSeniorityLevelsItem("").AllValues())))
-		years          = fs.StringSetLong("years", usageWithChoices("Years of experience bucket (repeatable)", choices(cake.JobSearchFiltersYearOfSeniorityItem("").AllValues())))
-		managements    = fs.StringSetLong("management", usageWithChoices("Number of people managed (repeatable)", choices(cake.JobSearchFiltersNumberOfManagementItem("").AllValues())))
-		remotes        = fs.StringSetLong("remote", usageWithChoices("Remote-work policy (repeatable)", choices(cake.JobSearchFiltersRemoteItem("").AllValues())))
-		inclusivities  = fs.StringSetLong("inclusivity", usageWithChoices("Inclusive-hiring trait (repeatable)", choices(cake.JobSearchFiltersInclusivityTraitsItem("").AllValues())))
+		jobTypes       = fs.StringSetLong("job-type", "Employment type, e.g. full_time, part_time (repeatable)")
+		seniorities    = fs.StringSetLong("seniority", "Seniority level, e.g. mid_senior_level, entry_level (repeatable)")
+		years          = fs.StringSetLong("years", "Years of experience bucket, e.g. 1_3, 3_5 (repeatable)")
+		managements    = fs.StringSetLong("management", "Number of people managed, e.g. none, one_five (repeatable)")
+		remotes        = fs.StringSetLong("remote", "Remote-work policy, e.g. full_remote_work, partial_remote_work (repeatable)")
+		inclusivities  = fs.StringSetLong("inclusivity", "Inclusive-hiring trait, e.g. lgbtq, foreign_talents (repeatable)")
 		langs          = fs.StringSetLong("lang", "Job description language, e.g. English, Chinese (repeatable)")
-		salaryType     = fs.StringEnumLong("salary-type", usageWithChoices("Salary period", choices(cake.JobSearchFiltersSalaryType("").AllValues())), enumChoices(cake.JobSearchFiltersSalaryType("").AllValues())...)
-		salaryCurrency = fs.StringEnumLong("salary-currency", usageWithChoices("Salary currency", choices(cake.JobSearchFiltersSalaryCurrency("").AllValues())), enumChoices(cake.JobSearchFiltersSalaryCurrency("").AllValues())...)
+		salaryType     = fs.StringLong("salary-type", "", "Salary period, e.g. per_month, per_year")
+		salaryCurrency = fs.StringLong("salary-currency", "", "Salary currency, e.g. TWD, USD")
 		salaryMin      = fs.IntLong("salary-min", 0, "minimum salary (0 = unset)")
 		salaryMax      = fs.IntLong("salary-max", 0, "maximum salary (0 = unset)")
-		companySizes   = fs.StringSetLong("company-size", usageWithChoices("Company size bucket (repeatable)", choices(cake.JobSearchFiltersPageNumberOfEmployeesItem("").AllValues())))
+		companySizes   = fs.StringSetLong("company-size", "Company size bucket, e.g. 51_200, 5001_ (repeatable)")
 		sectors        = fs.StringSetLong("sector", "Company sector slug, e.g. tech_software (repeatable)")
 		techLabels     = fs.StringSetLong("tech-label", "Technology the company uses, e.g. go (repeatable)")
 	)
@@ -154,34 +154,20 @@ func buildSearchRequest(f searchFlags) (cake.JobSearchRequest, error) {
 	req.Filters.Locations = f.locations
 	req.Filters.Professions = f.professions
 	req.Filters.LangNames = f.langs
-
-	var err error
-	if req.Filters.JobTypes, err = toEnums[cake.JobSearchFiltersJobTypesItem](f.jobTypes, "--job-type"); err != nil {
-		return req, err
-	}
-	if req.Filters.SeniorityLevels, err = toEnums[cake.JobSearchFiltersSeniorityLevelsItem](f.seniorities, "--seniority"); err != nil {
-		return req, err
-	}
-	if req.Filters.YearOfSeniority, err = toEnums[cake.JobSearchFiltersYearOfSeniorityItem](f.years, "--years"); err != nil {
-		return req, err
-	}
-	if req.Filters.NumberOfManagement, err = toEnums[cake.JobSearchFiltersNumberOfManagementItem](f.managements, "--management"); err != nil {
-		return req, err
-	}
-	if req.Filters.Remote, err = toEnums[cake.JobSearchFiltersRemoteItem](f.remotes, "--remote"); err != nil {
-		return req, err
-	}
-	if req.Filters.InclusivityTraits, err = toEnums[cake.JobSearchFiltersInclusivityTraitsItem](f.inclusivities, "--inclusivity"); err != nil {
-		return req, err
-	}
+	req.Filters.JobTypes = f.jobTypes
+	req.Filters.SeniorityLevels = f.seniorities
+	req.Filters.YearOfSeniority = f.years
+	req.Filters.NumberOfManagement = f.managements
+	req.Filters.Remote = f.remotes
+	req.Filters.InclusivityTraits = f.inclusivities
 
 	if f.salaryType != "" || f.salaryCurrency != "" || f.salaryMin != 0 || f.salaryMax != 0 {
 		salary := cake.JobSearchFiltersSalary{}
 		if f.salaryType != "" {
-			salary.Type = cake.NewOptJobSearchFiltersSalaryType(cake.JobSearchFiltersSalaryType(f.salaryType))
+			salary.Type = cake.NewOptString(f.salaryType)
 		}
 		if f.salaryCurrency != "" {
-			salary.Currency = cake.NewOptJobSearchFiltersSalaryCurrency(cake.JobSearchFiltersSalaryCurrency(f.salaryCurrency))
+			salary.Currency = cake.NewOptString(f.salaryCurrency)
 		}
 		if f.salaryMin != 0 {
 			salary.Min = cake.NewOptInt(f.salaryMin)
@@ -193,39 +179,15 @@ func buildSearchRequest(f searchFlags) (cake.JobSearchRequest, error) {
 	}
 
 	if len(f.companySizes) > 0 || len(f.sectors) > 0 || len(f.techLabels) > 0 {
-		page := cake.JobSearchFiltersPage{Sectors: f.sectors, TechLabels: f.techLabels}
-		if page.NumberOfEmployees, err = toEnums[cake.JobSearchFiltersPageNumberOfEmployeesItem](f.companySizes, "--company-size"); err != nil {
-			return req, err
+		page := cake.JobSearchFiltersPage{
+			NumberOfEmployees: f.companySizes,
+			Sectors:           f.sectors,
+			TechLabels:        f.techLabels,
 		}
 		req.Filters.Page = cake.NewOptJobSearchFiltersPage(page)
 	}
 
 	return req, nil
-}
-
-// toEnums validates each value against T's enum and converts it. A nil or
-// empty input returns nil, leaving the filter unset.
-func toEnums[T interface {
-	~string
-	AllValues() []T
-}](values []string, flag string) ([]T, error) {
-	if len(values) == 0 {
-		return nil, nil
-	}
-	var zero T
-	all := zero.AllValues()
-	valid := make(map[string]bool, len(all))
-	for _, v := range all {
-		valid[string(v)] = true
-	}
-	out := make([]T, 0, len(values))
-	for _, v := range values {
-		if !valid[v] {
-			return nil, fmt.Errorf("%s: unknown value %q, one of: %s", flag, v, strings.Join(choices(all), " | "))
-		}
-		out = append(out, T(v))
-	}
-	return out, nil
 }
 
 // choices converts a generated enum's AllValues into flag choice strings.
@@ -235,14 +197,6 @@ func choices[T ~string](values []T) []string {
 		out = append(out, string(v))
 	}
 	return out
-}
-
-// enumChoices is choices prefixed with "" so an ff.StringEnum flag can
-// default to unset (no filter) instead of silently falling back to the
-// first real value — ffval.Enum's zero Default only survives initialize()
-// if it's itself in the Valid list.
-func enumChoices[T ~string](values []T) []string {
-	return append([]string{""}, choices(values)...)
 }
 
 // usageWithChoices appends a comma-separated "one of: ..." list to base.

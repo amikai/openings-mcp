@@ -54,37 +54,27 @@ func TestBuildSearchRequestResolvesAllFilters(t *testing.T) {
 		Filters: cake.JobSearchFilters{
 			Locations:          []string{"台灣"},
 			Professions:        []string{"it_back-end-engineer"},
-			JobTypes:           []cake.JobSearchFiltersJobTypesItem{cake.JobSearchFiltersJobTypesItemFullTime},
-			SeniorityLevels:    []cake.JobSearchFiltersSeniorityLevelsItem{cake.JobSearchFiltersSeniorityLevelsItemMidSeniorLevel},
-			YearOfSeniority:    []cake.JobSearchFiltersYearOfSeniorityItem{cake.JobSearchFiltersYearOfSeniorityItem510},
-			NumberOfManagement: []cake.JobSearchFiltersNumberOfManagementItem{cake.JobSearchFiltersNumberOfManagementItemNone},
-			Remote:             []cake.JobSearchFiltersRemoteItem{cake.JobSearchFiltersRemoteItemPartialRemoteWork},
-			InclusivityTraits:  []cake.JobSearchFiltersInclusivityTraitsItem{cake.JobSearchFiltersInclusivityTraitsItemLgbtq},
+			JobTypes:           []string{"full_time"},
+			SeniorityLevels:    []string{"mid_senior_level"},
+			YearOfSeniority:    []string{"5_10"},
+			NumberOfManagement: []string{"none"},
+			Remote:             []string{"partial_remote_work"},
+			InclusivityTraits:  []string{"lgbtq"},
 			LangNames:          []string{"Chinese"},
 			Salary: cake.NewOptJobSearchFiltersSalary(cake.JobSearchFiltersSalary{
-				Type:     cake.NewOptJobSearchFiltersSalaryType(cake.JobSearchFiltersSalaryTypePerMonth),
-				Currency: cake.NewOptJobSearchFiltersSalaryCurrency(cake.JobSearchFiltersSalaryCurrencyTWD),
+				Type:     cake.NewOptString("per_month"),
+				Currency: cake.NewOptString("TWD"),
 				Min:      cake.NewOptInt(60000),
 				Max:      cake.NewOptInt(150000),
 			}),
 			Page: cake.NewOptJobSearchFiltersPage(cake.JobSearchFiltersPage{
-				NumberOfEmployees: []cake.JobSearchFiltersPageNumberOfEmployeesItem{cake.JobSearchFiltersPageNumberOfEmployeesItem51200},
+				NumberOfEmployees: []string{"51_200"},
 				Sectors:           []string{"tech_software"},
 				TechLabels:        []string{"go"},
 			}),
 		},
 	}
 	assert.Equal(t, want, got)
-}
-
-func TestBuildSearchRequestUnknownJobType(t *testing.T) {
-	_, err := buildSearchRequest(searchFlags{sort: "popularity", jobTypes: []string{"bogus"}})
-	require.ErrorContains(t, err, "--job-type")
-}
-
-func TestBuildSearchRequestUnknownCompanySize(t *testing.T) {
-	_, err := buildSearchRequest(searchFlags{sort: "popularity", companySizes: []string{"bogus"}})
-	require.ErrorContains(t, err, "--company-size")
 }
 
 func TestBuildSearchRequestZeroPagesLeftUnset(t *testing.T) {

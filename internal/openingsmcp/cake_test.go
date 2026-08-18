@@ -42,7 +42,7 @@ func TestRegisterCake(t *testing.T) {
 	require.NoError(t, err)
 	RegisterCake(server, client)
 
-	assertTools(t, server, "cake_search_jobs", "cake_get_job_detail")
+	assertTools(t, server, "cake_search_jobs", "cake_get_search_filters", "cake_get_job_detail")
 }
 
 func TestCakeSearchJobsE2E(t *testing.T) {
@@ -74,28 +74,24 @@ func TestCakeSearchJobsE2E(t *testing.T) {
 			},
 			"job_type": map[string]any{
 				"type":        "string",
-				"description": "Employment type.",
-				"enum":        []any{"full_time", "part_time", "internship", "contract", "freelance", "temporary", "volunteer"},
+				"description": "Employment type slug or label, e.g. 'full_time' / '全職', 'part_time' / '兼職', 'internship' / '實習生', 'contract' / '約聘', 'freelance' / '接案'.",
 			},
 			"seniority": map[string]any{
 				"type":        "array",
-				"description": "Seniority levels, OR'd together.",
+				"description": "Seniority levels or labels, OR'd together, e.g. 'mid_senior_level' / '中高階', 'entry_level' / '初階', 'director' / '總監'.",
 				"minItems":    float64(1),
 				"uniqueItems": true,
 				"items": map[string]any{
 					"type": "string",
-					"enum": []any{"internship_level", "entry_level", "associate", "mid_senior_level", "director", "executive"},
 				},
 			},
 			"remote": map[string]any{
 				"type":        "string",
-				"description": "Remote-work policy. Omit to include all.",
-				"enum":        []any{"no_remote_work", "partial_remote_work", "optional_remote_work", "full_remote_work"},
+				"description": "Remote-work policy slug or label, e.g. 'full_remote_work' / '純遠端', 'partial_remote_work' / '部分遠端', 'no_remote_work' / '無遠端'. Omit to include all.",
 			},
 			"sort": map[string]any{
 				"type":        "string",
-				"description": "Result order. Defaults to popularity.",
-				"enum":        []any{"popularity", "latest"},
+				"description": "Result order. Defaults to popularity ('popularity' / '熱門', 'latest' / '最新').",
 				"default":     "popularity",
 			},
 			"page": map[string]any{
@@ -530,21 +526,96 @@ func TestCakeSearchJobsMissingRequiredE2E(t *testing.T) {
 	}
 }
 
-func TestCakeSearchJobsInvalidEnumE2E(t *testing.T) {
+func TestCakeGetSearchFiltersE2E(t *testing.T) {
 	clientSession, _ := testCakeMCPClientServer(t)
 
-	// A value outside a property's enum is rejected by the SDK's
-	// input-schema validation before the handler runs, as an IsError
-	// tool result.
 	callRes, err := clientSession.CallTool(t.Context(), &mcp.CallToolParams{
-		Name:      "cake_search_jobs",
-		Arguments: map[string]any{"keyword": "Golang", "location": "台灣", "job_type": "valueNotInEnum"},
+		Name:      "cake_get_search_filters",
+		Arguments: map[string]any{},
 	})
 	require.NoError(t, err)
-	require.True(t, callRes.IsError)
-	text, ok := callRes.Content[0].(*mcp.TextContent)
-	require.True(t, ok)
-	assert.Equal(t, `validating "arguments": validating root: validating /properties/job_type: enum: valueNotInEnum does not equal any of: [full_time part_time internship contract freelance temporary volunteer]`, text.Text)
+	require.False(t, callRes.IsError)
+
+	data, err := json.Marshal(callRes.StructuredContent)
+	require.NoError(t, err)
+	var got cakeFiltersOutput
+	require.NoError(t, json.Unmarshal(data, &got))
+
+	require.NotEmpty(t, got.JobTypes)
+	assert.Contains(t, got.JobTypes, cakeFilterOption{Value: "full_time", Name: "全職 / Full-time"})
+	require.NotEmpty(t, got.SeniorityLevels)
+	assert.Contains(t, got.SeniorityLevels, cakeFilterOption{Value: "mid_senior_level", Name: "中高階 / Mid-Senior level"})
+	require.NotEmpty(t, got.Remote)
+	assert.Contains(t, got.Remote, cakeFilterOption{Value: "full_remote_work", Name: "100% 遠端工作 / Remote only"})
+	require.NotEmpty(t, got.Locations)
+	assert.Contains(t, got.Locations, "Taiwan")
+}
+
+func TestCakeMCPToHTTPRequestNormalization(t *testing.T) {
+	cases := []struct {
+		name          string
+		input         *cakeSearchInput
+		wantJobTypes  []string
+		wantSeniority []string
+		wantRemote    []string
+		wantSort      cake.JobSearchRequestSortBy
+	}{
+		{
+			name: "human readable labels (Chinese)",
+			input: &cakeSearchInput{
+				Keyword:   "Golang",
+				Location:  "台灣",
+				JobType:   "全職",
+				Seniority: []string{"中高階", "資深"},
+				Remote:    "純遠端",
+				Sort:      "最新",
+			},
+			wantJobTypes:  []string{"full_time"},
+			wantSeniority: []string{"mid_senior_level", "mid_senior_level"},
+			wantRemote:    []string{"full_remote_work"},
+			wantSort:      cake.JobSearchRequestSortByLatest,
+		},
+		{
+			name: "human readable labels (English)",
+			input: &cakeSearchInput{
+				Keyword:   "Golang",
+				Location:  "Taiwan",
+				JobType:   "Full-time",
+				Seniority: []string{"Senior", "Entry level"},
+				Remote:    "Remote",
+				Sort:      "popularity",
+			},
+			wantJobTypes:  []string{"full_time"},
+			wantSeniority: []string{"mid_senior_level", "entry_level"},
+			wantRemote:    []string{"full_remote_work"},
+			wantSort:      cake.JobSearchRequestSortByPopularity,
+		},
+		{
+			name: "raw slugs preserved",
+			input: &cakeSearchInput{
+				Keyword:   "Golang",
+				Location:  "Taiwan",
+				JobType:   "contract",
+				Seniority: []string{"director"},
+				Remote:    "partial_remote_work",
+			},
+			wantJobTypes:  []string{"contract"},
+			wantSeniority: []string{"director"},
+			wantRemote:    []string{"partial_remote_work"},
+			wantSort:      cake.JobSearchRequestSortByPopularity,
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			req, err := cakeMCPToHTTPRequest(tc.input)
+			require.NoError(t, err)
+			assert.Equal(t, tc.wantJobTypes, req.Filters.JobTypes)
+			assert.Equal(t, tc.wantSeniority, req.Filters.SeniorityLevels)
+			assert.Equal(t, tc.wantRemote, req.Filters.Remote)
+			assert.Equal(t, tc.wantSort, req.SortBy)
+		})
+	}
 }
 
 func TestCakeGetJobDetailE2E(t *testing.T) {
@@ -712,9 +783,9 @@ func TestCakeMCPToHTTPRequest(t *testing.T) {
 		SortBy: cake.JobSearchRequestSortByLatest,
 		Filters: cake.JobSearchFilters{
 			Locations:       []string{"Taiwan"},
-			JobTypes:        []cake.JobSearchFiltersJobTypesItem{cake.JobSearchFiltersJobTypesItemPartTime},
-			SeniorityLevels: []cake.JobSearchFiltersSeniorityLevelsItem{cake.JobSearchFiltersSeniorityLevelsItemMidSeniorLevel, cake.JobSearchFiltersSeniorityLevelsItemDirector},
-			Remote:          []cake.JobSearchFiltersRemoteItem{cake.JobSearchFiltersRemoteItemFullRemoteWork},
+			JobTypes:        []string{"part_time"},
+			SeniorityLevels: []string{"mid_senior_level", "director"},
+			Remote:          []string{"full_remote_work"},
 		},
 	}
 	assert.Equal(t, want, got)
@@ -755,22 +826,9 @@ func TestCakeMCPToHTTPRequestMissingRequired(t *testing.T) {
 	}
 }
 
-func TestCakeMCPToHTTPRequestInvalidLabels(t *testing.T) {
-	cases := []struct {
-		name string
-		in   cakeSearchInput
-		want string
-	}{
-		{"job_type", cakeSearchInput{Keyword: "x", Location: "Taiwan", JobType: "Full-time"}, `invalid job_type "Full-time"`},
-		{"seniority", cakeSearchInput{Keyword: "x", Location: "Taiwan", Seniority: []string{"mid_senior_level", "staff"}}, `invalid seniority "staff"`},
-		{"remote", cakeSearchInput{Keyword: "x", Location: "Taiwan", Remote: "hybrid"}, `invalid remote "hybrid"`},
-		{"sort", cakeSearchInput{Keyword: "x", Location: "Taiwan", Sort: "newest"}, `invalid sort "newest"`},
-	}
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			_, err := cakeMCPToHTTPRequest(&tc.in)
-			require.Error(t, err)
-			assert.Contains(t, err.Error(), tc.want)
-		})
-	}
+func TestCakeMCPToHTTPRequestInvalidSort(t *testing.T) {
+	in := cakeSearchInput{Keyword: "golang", Location: "Taiwan", Sort: "invalid_sort"}
+	_, err := cakeMCPToHTTPRequest(&in)
+	require.Error(t, err)
+	assert.Contains(t, err.Error(), `invalid sort "invalid_sort"`)
 }
