@@ -74,11 +74,11 @@ func TestCakeSearchJobsE2E(t *testing.T) {
 			},
 			"job_type": map[string]any{
 				"type":        "string",
-				"description": "Employment type slug or label, e.g. 'full_time' / '全職', 'part_time' / '兼職', 'internship' / '實習生', 'contract' / '約聘', 'freelance' / '接案'.",
+				"description": "Employment type value from cake_get_search_filters (e.g. 'full_time', 'part_time', 'internship', 'contract', 'freelance').",
 			},
 			"seniority": map[string]any{
 				"type":        "array",
-				"description": "Seniority levels or labels, OR'd together, e.g. 'mid_senior_level' / '中高階', 'entry_level' / '初階', 'director' / '總監'.",
+				"description": "Seniority level values from cake_get_search_filters, OR'd together (e.g. 'mid_senior_level', 'entry_level', 'director').",
 				"minItems":    float64(1),
 				"uniqueItems": true,
 				"items": map[string]any{
@@ -87,7 +87,7 @@ func TestCakeSearchJobsE2E(t *testing.T) {
 			},
 			"remote": map[string]any{
 				"type":        "string",
-				"description": "Remote-work policy slug or label, e.g. 'full_remote_work' / '純遠端', 'partial_remote_work' / '部分遠端', 'no_remote_work' / '無遠端'. Omit to include all.",
+				"description": "Remote-work policy value from cake_get_search_filters (e.g. 'full_remote_work', 'partial_remote_work', 'no_remote_work'). Omit to include all.",
 			},
 			"sort": map[string]any{
 				"type":        "string",
@@ -561,6 +561,21 @@ func TestCakeMCPToHTTPRequestNormalization(t *testing.T) {
 		wantSort      cake.JobSearchRequestSortBy
 	}{
 		{
+			name: "exact discovery Name outputs",
+			input: &cakeSearchInput{
+				Keyword:   "Golang",
+				Location:  "Taiwan",
+				JobType:   "全職 / Full-time",
+				Seniority: []string{"中高階 / Mid-Senior level", "初階 / Entry level"},
+				Remote:    "100% 遠端工作 / Remote only",
+				Sort:      "popularity",
+			},
+			wantJobTypes:  []string{"full_time"},
+			wantSeniority: []string{"mid_senior_level", "entry_level"},
+			wantRemote:    []string{"full_remote_work"},
+			wantSort:      cake.JobSearchRequestSortByPopularity,
+		},
+		{
 			name: "human readable labels (Chinese)",
 			input: &cakeSearchInput{
 				Keyword:   "Golang",
@@ -615,6 +630,21 @@ func TestCakeMCPToHTTPRequestNormalization(t *testing.T) {
 			assert.Equal(t, tc.wantRemote, req.Filters.Remote)
 			assert.Equal(t, tc.wantSort, req.SortBy)
 		})
+	}
+}
+
+func TestCakeFilterOptionNameRoundTrip(t *testing.T) {
+	for val, label := range cakeJobTypeLabels {
+		assert.Equal(t, val, normalizeCakeJobType(label), "job type label %q should normalize to %q", label, val)
+		assert.Equal(t, val, normalizeCakeJobType(val), "job type slug %q should normalize to %q", val, val)
+	}
+	for val, label := range cakeSeniorityLabels {
+		assert.Equal(t, val, normalizeCakeSeniority(label), "seniority label %q should normalize to %q", label, val)
+		assert.Equal(t, val, normalizeCakeSeniority(val), "seniority slug %q should normalize to %q", val, val)
+	}
+	for val, label := range cakeRemoteLabels {
+		assert.Equal(t, val, normalizeCakeRemote(label), "remote label %q should normalize to %q", label, val)
+		assert.Equal(t, val, normalizeCakeRemote(val), "remote slug %q should normalize to %q", val, val)
 	}
 }
 

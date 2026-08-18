@@ -37,11 +37,11 @@ var cakeSearchInputRawSchema = []byte(`{
 		},
 		"job_type": {
 			"type": "string",
-			"description": "Employment type slug or label, e.g. 'full_time' / '全職', 'part_time' / '兼職', 'internship' / '實習生', 'contract' / '約聘', 'freelance' / '接案'."
+			"description": "Employment type value from cake_get_search_filters (e.g. 'full_time', 'part_time', 'internship', 'contract', 'freelance')."
 		},
 		"seniority": {
 			"type": "array",
-			"description": "Seniority levels or labels, OR'd together, e.g. 'mid_senior_level' / '中高階', 'entry_level' / '初階', 'director' / '總監'.",
+			"description": "Seniority level values from cake_get_search_filters, OR'd together (e.g. 'mid_senior_level', 'entry_level', 'director').",
 			"minItems": 1,
 			"uniqueItems": true,
 			"items": {
@@ -50,7 +50,7 @@ var cakeSearchInputRawSchema = []byte(`{
 		},
 		"remote": {
 			"type": "string",
-			"description": "Remote-work policy slug or label, e.g. 'full_remote_work' / '純遠端', 'partial_remote_work' / '部分遠端', 'no_remote_work' / '無遠端'. Omit to include all."
+			"description": "Remote-work policy value from cake_get_search_filters (e.g. 'full_remote_work', 'partial_remote_work', 'no_remote_work'). Omit to include all."
 		},
 		"sort": {
 			"type": "string",
@@ -114,8 +114,8 @@ type cakeJobSummary struct {
 }
 
 type cakeFilterOption struct {
-	Value string `json:"value" jsonschema:"Raw slug to pass to cake_search_jobs."`
-	Name  string `json:"name" jsonschema:"Human-readable label."`
+	Value string `json:"value" jsonschema:"Value to pass to cake_search_jobs (e.g. 'full_time')."`
+	Name  string `json:"name" jsonschema:"Human-readable display name."`
 }
 
 type cakeFiltersOutput struct {
@@ -161,62 +161,139 @@ var cakeYearOfSeniorityLabels = map[string]string{
 	"10_":  "10+ 年 (More than 10 years)",
 }
 
+var cakeJobTypeAliases = map[string]string{
+	"full-time":  "full_time",
+	"fulltime":   "full_time",
+	"full time":  "full_time",
+	"全職":         "full_time",
+	"part-time":  "part_time",
+	"parttime":   "part_time",
+	"part time":  "part_time",
+	"兼職":         "part_time",
+	"intern":     "internship",
+	"實習":         "internship",
+	"實習生":        "internship",
+	"約聘":         "contract",
+	"約聘工":        "contract",
+	"接案":         "freelance",
+	"自由職業者":      "freelance",
+	"temp":       "temporary",
+	"臨時工":        "temporary",
+	"兼差":         "temporary",
+	"志工":         "volunteer",
+	"志願者":        "volunteer",
+}
+
+var cakeSeniorityAliases = map[string]string{
+	"intern":           "internship_level",
+	"internship":       "internship_level",
+	"實習":               "internship_level",
+	"entry":            "entry_level",
+	"entry level":      "entry_level",
+	"entry-level":      "entry_level",
+	"junior":           "entry_level",
+	"初階":               "entry_level",
+	"初級":               "entry_level",
+	"assistant":        "associate",
+	"助理":               "associate",
+	"mid_senior":       "mid_senior_level",
+	"mid-senior":       "mid_senior_level",
+	"mid senior":       "mid_senior_level",
+	"mid-senior level": "mid_senior_level",
+	"mid senior level": "mid_senior_level",
+	"senior":           "mid_senior_level",
+	"中高階":              "mid_senior_level",
+	"資深":               "mid_senior_level",
+	"中階":               "mid_senior_level",
+	"manager":          "director",
+	"經理":               "director",
+	"總監":               "director",
+	"主管":               "director",
+	"c-level":          "executive",
+	"c level":          "executive",
+	"vp":               "executive",
+	"gm":               "executive",
+	"經營層":              "executive",
+	"高階主管":             "executive",
+}
+
+var cakeRemoteAliases = map[string]string{
+	"no_remote":       "no_remote_work",
+	"no remote":       "no_remote_work",
+	"onsite":          "no_remote_work",
+	"on-site":         "no_remote_work",
+	"on site":         "no_remote_work",
+	"無遠端":             "no_remote_work",
+	"無法遠端工作":         "no_remote_work",
+	"不遠端":            "no_remote_work",
+	"現場工作":           "no_remote_work",
+	"partial_remote":  "partial_remote_work",
+	"partial remote":  "partial_remote_work",
+	"hybrid":          "partial_remote_work",
+	"部分遠端":           "partial_remote_work",
+	"部分遠端工作":         "partial_remote_work",
+	"混合辦公":           "partial_remote_work",
+	"optional_remote": "optional_remote_work",
+	"optional remote": "optional_remote_work",
+	"彈性遠端":           "optional_remote_work",
+	"選擇性或彈性遠端工作":     "optional_remote_work",
+	"full_remote":     "full_remote_work",
+	"full remote":     "full_remote_work",
+	"remote":          "full_remote_work",
+	"remote_only":     "full_remote_work",
+	"remote only":     "full_remote_work",
+	"純遠端":             "full_remote_work",
+	"100% 遠端工作":       "full_remote_work",
+	"遠端":              "full_remote_work",
+	"完全遠端":           "full_remote_work",
+}
+
 func normalizeCakeJobType(s string) string {
-	s = strings.TrimSpace(strings.ToLower(s))
-	switch s {
-	case "full_time", "full-time", "fulltime", "full time", "全職":
-		return "full_time"
-	case "part_time", "part-time", "parttime", "part time", "兼職":
-		return "part_time"
-	case "internship", "intern", "實習", "實習生":
-		return "internship"
-	case "contract", "約聘", "約聘工":
-		return "contract"
-	case "freelance", "接案", "自由職業者":
-		return "freelance"
-	case "temporary", "temp", "臨時工", "兼差":
-		return "temporary"
-	case "volunteer", "志工", "志願者":
-		return "volunteer"
-	default:
-		return s
+	lower := strings.TrimSpace(strings.ToLower(s))
+	if _, ok := cakeJobTypeLabels[lower]; ok {
+		return lower
 	}
+	for val, label := range cakeJobTypeLabels {
+		if strings.ToLower(label) == lower {
+			return val
+		}
+	}
+	if alias, ok := cakeJobTypeAliases[lower]; ok {
+		return alias
+	}
+	return s
 }
 
 func normalizeCakeSeniority(s string) string {
-	s = strings.TrimSpace(strings.ToLower(s))
-	switch s {
-	case "internship_level", "internship", "intern", "實習":
-		return "internship_level"
-	case "entry_level", "entry", "entry level", "entry-level", "junior", "初階", "初級":
-		return "entry_level"
-	case "associate", "assistant", "助理":
-		return "associate"
-	case "mid_senior_level", "mid_senior", "mid-senior", "mid senior", "mid-senior level", "mid senior level", "senior", "中高階", "資深", "中階":
-		return "mid_senior_level"
-	case "director", "manager", "經理", "總監", "主管":
-		return "director"
-	case "executive", "c-level", "c level", "vp", "gm", "經營層", "高階主管":
-		return "executive"
-	default:
-		return s
+	lower := strings.TrimSpace(strings.ToLower(s))
+	if _, ok := cakeSeniorityLabels[lower]; ok {
+		return lower
 	}
+	for val, label := range cakeSeniorityLabels {
+		if strings.ToLower(label) == lower {
+			return val
+		}
+	}
+	if alias, ok := cakeSeniorityAliases[lower]; ok {
+		return alias
+	}
+	return s
 }
 
 func normalizeCakeRemote(s string) string {
-	s = strings.TrimSpace(strings.ToLower(s))
-	switch s {
-	case "no_remote_work", "no_remote", "no remote", "onsite", "on-site", "on site", "無遠端", "無法遠端工作", "不遠端", "現場工作":
-		return "no_remote_work"
-	case "partial_remote_work", "partial_remote", "partial remote", "hybrid", "部分遠端", "部分遠端工作", "混合辦公":
-		return "partial_remote_work"
-	case "optional_remote_work", "optional_remote", "optional remote", "彈性遠端", "選擇性或彈性遠端工作":
-		return "optional_remote_work"
-	case "full_remote_work", "full_remote", "full remote", "remote", "remote_only", "remote only", "純遠端", "100% 遠端工作", "遠端", "完全遠端":
-		return "full_remote_work"
-	default:
-		return s
+	lower := strings.TrimSpace(strings.ToLower(s))
+	if _, ok := cakeRemoteLabels[lower]; ok {
+		return lower
 	}
+	for val, label := range cakeRemoteLabels {
+		if strings.ToLower(label) == lower {
+			return val
+		}
+	}
+	if alias, ok := cakeRemoteAliases[lower]; ok {
+		return alias
+	}
+	return s
 }
 
 func normalizeCakeSort(s string) (cake.JobSearchRequestSortBy, error) {
