@@ -21,7 +21,7 @@ const (
 // cakeSearchInputRawSchema is hand-written JSON kept aligned with
 // openapi.yaml's JobSearchRequest/JobSearchFilters: a flat property list
 // instead of the query/sort_by/filters nesting. Enums are relaxed to open strings
-// and normalized in cakeMCPToHTTPRequest to support both human labels and API slugs.
+// and normalized in cakeMCPToHTTPRequest to canonical API slugs.
 var cakeSearchInputRawSchema = []byte(`{
 	"type": "object",
 	"properties": {
