@@ -1,0 +1,147 @@
+{
+    "data": [
+        {
+            "public_slug": "golang-developer-sequoiaat-jfzun3rb",
+            "source": "freshteam",
+            "manually_added": false,
+            "external_id": "sequoiaat:d-QMraWxF2kA",
+            "url": "https://sequoiaat.freshteam.com/jobs/d-QMraWxF2kA/golang-developer?utm_source=freehire.me",
+            "title": "Golang Developer",
+            "company": "sequoiaat",
+            "company_slug": "sequoiaat",
+            "location": "Tamil Nadu, Chennai, India",
+            "description": "<div><strong>Job Description:</strong></div><div>We are looking for a <strong>Golang Developer</strong> with <strong>2 to 5 years</strong> of experience to develop and maintain high-performance backend systems. You will work on <strong>API development, microservices, and scalable applications</strong> using Golang.</div><div><strong>Responsibilities:</strong></div><ul><li>Develop and maintain backend services using <strong>Golang</strong>.</li><li>Design and implement <strong>RESTful APIs and microservices</strong>.</li><li>Work with <strong>databases</strong> (SQL/NoSQL) for efficient data handling.</li><li>Collaborate with teams to build scalable applications.</li><li>Optimize performance and troubleshoot issues.</li><li>Work with <strong>Docker, Kubernetes, and cloud platforms</strong> (AWS, GCP, or Azure).</li></ul><div><strong>Requirements:</strong></div><div>✔ <strong>2+ years</strong> of Golang development experience.<br>✔ Strong understanding of <strong>Goroutines and",
+            "countries": [
+                "in"
+            ],
+            "regions": [
+                "apac"
+            ],
+            "skills": [
+                "api",
+                "aws",
+                "azure",
+                "ci-cd",
+                "cloud",
+                "docker",
+                "gcp",
+                "git",
+                "go",
+                "kubernetes",
+                "microservices",
+                "nosql",
+                "rest",
+                "sql"
+            ],
+            "cities": [
+                "Chennai"
+            ],
+            "collections": [],
+            "is_tech": "tech",
+            "posted_at": "2026-08-18T06:55:20Z",
+            "created_at": "2026-07-22T04:12:04Z",
+            "updated_at": "2026-08-18T07:39:48Z",
+            "last_seen_at": "2026-08-18T10:43:59Z",
+            "closed_at": null,
+            "enrichment": {
+                "summary": "Builds and maintains high-performance backend systems in Go, designing RESTful APIs and microservices while optimizing performance and troubleshooting issues.",
+                "salary_min": 1000000,
+                "salary_max": 2000000,
+                "salary_currency": "INR",
+                "salary_period": "year",
+                "experience_years_min": 2,
+                "category": "software_engineering",
+                "domains": [
+                    "other"
+                ],
+                "posting_language": "en",
+                "company_type": "product",
+                "company_size": "51-200"
+            },
+            "enriched_at": "2026-07-23T03:14:14Z",
+            "enrichment_version": 2,
+            "view_count": 3,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "stale",
+                "age_days": 27,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        },
+        {
+            "public_slug": "golang-developer-marktine-technology-solutions-pvt-ltd-3jnmgyef",
+            "source": "zohorecruit",
+            "manually_added": false,
+            "external_id": "marktine.zohorecruit.com:634479000000375272",
+            "url": "https://marktine.zohorecruit.com/jobs/Careers/634479000000375272?utm_source=freehire.me",
+            "title": "Golang Developer",
+            "company": "Marktine Technology Solutions Pvt Ltd",
+            "company_slug": "marktine-technology-solutions-pvt-ltd",
+            "location": "",
+            "description": "\n \n \n  <span><p>This is a remote position.</p>\n   <div><br>\n   </div></span><br><span><h3>Requirements</h3>\n   <div><br>\n   </div>\n   <ul>\n    <li><span>Minimum 5 to 6 years of experience with atleast 2+ years of expertise in building applications using GOLang (mandatory)</span><br></li>\n    <li><span>Experience in building scalable service API’s using GOLang (mandatory)</span><br></li>\n    <li><span>Experience working on linux environment (mandatory)</span><br></li>\n    <li><span>Experience in developing Cloud Native applications using Micro services, Elastic BeanStalk, ElastiCache, Lambda, S3, SQS and SNS etc, AWS preference if any</span><br></li>\n    <li><span>Has expertise in handling applications being developed using Angular 7+ (optional)</span><br></li>\n    <li><span>Experience in using Databases like PostgreSql, My SQL &amp; No SQL DBs like Mongo DB</span><br></li>\n    <li><span>Familiar with Agile development skills (e.g. Scrum)</span><br></li>\n    <li><span>Expertise with",
+            "countries": [],
+            "regions": [],
+            "work_mode": "remote",
+            "skills": [
+                "agile",
+                "angular",
+                "api",
+                "aws",
+                "cloud",
+                "cloud-native",
+                "confluence",
+                "devops",
+                "ecs",
+                "eks",
+                "git",
+                "go",
+                "jira",
+                "lambda",
+                "linux",
+                "mongodb",
+                "postgresql",
+                "scrum",
+                "sns",
+                "sql",
+                "sqs"
+            ],
+            "cities": [],
+            "collections": [],
+            "is_tech": "tech",
+            "posted_at": "2026-08-18T02:33:10Z",
+            "created_at": "2026-08-18T02:33:10Z",
+            "updated_at": "2026-08-18T02:33:10Z",
+            "last_seen_at": "2026-08-18T02:33:10Z",
+            "closed_at": null,
+            "enrichment": {
+                "experience_years_min": 2,
+                "category": "software_engineering",
+                "posting_language": "en"
+            },
+            "enriched_at": null,
+            "enrichment_version": 0,
+            "view_count": 0,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "fresh",
+                "age_days": 0,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        }
+    ],
+    "meta": {
+        "limit": 2,
+        "offset": 0,
+        "total": 2857
+    }
+}

@@ -1,0 +1,68 @@
+{
+    "data": [
+        {
+            "public_slug": "project-finance-analyst-mobolutions-i66i6mwd",
+            "source": "zohorecruit",
+            "manually_added": false,
+            "external_id": "mobolutions.zohorecruit.com:670044000010659001",
+            "url": "https://mobolutions.zohorecruit.com/jobs/Careers/670044000010659001?utm_source=freehire.me",
+            "title": "Project Finance Analyst",
+            "company": "Mobolutions",
+            "company_slug": "mobolutions",
+            "location": "Chennai, India",
+            "description": "<span><p><b>Project Finance Analyst – Consulting Services (India)</b><br/></p><div><span><hr/></span><br/></div><p><b>Role Overview</b><br/></p><p>We are seeking a highly analytical and detail-oriented <b>Project\nFinance Analyst</b> to support financial governance across our consulting\nengagements.<br/></p><p>This role will focus on project costing, margin tracking,\nforecasting support, and financial reporting. You will work closely with\nProject Managers, Delivery Leadership, Operations, and Corporate Finance to\nensure financial visibility, cost discipline, and accuracy in project\nreporting.<br/></p><p>This is an execution-focused role with strong growth\npotential into a senior Project Controller position.<br/></p><div><span><hr/></span><br/></div><p><b>Key Responsibilities</b><br/></p><p><b>1. Project Budget &amp; Cost Tracking</b><br/></p><ul><li><span>Maintain detailed\n     project budgets in standardized templates</span><br/></li><li><span>Track actual costs vs\n     approved",
+            "countries": [
+                "in"
+            ],
+            "regions": [
+                "apac"
+            ],
+            "skills": [
+                "financial-modeling",
+                "financial-reporting",
+                "revenue-recognition",
+                "sap"
+            ],
+            "cities": [
+                "Chennai"
+            ],
+            "collections": [],
+            "is_tech": "non_tech",
+            "posted_at": "2026-08-18T11:40:33Z",
+            "created_at": "2026-08-18T11:40:33Z",
+            "updated_at": "2026-08-18T11:40:33Z",
+            "last_seen_at": "2026-08-18T11:40:33Z",
+            "closed_at": null,
+            "enrichment": {
+                "experience_years_min": 3,
+                "category": "finance",
+                "posting_language": "en"
+            },
+            "enriched_at": null,
+            "enrichment_version": 0,
+            "view_count": 0,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "fresh",
+                "age_days": 0,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        }
+    ],
+    "meta": {
+        "ignored_params": [
+            {
+                "param": "country",
+                "did_you_mean": "countries"
+            }
+        ],
+        "limit": 1,
+        "offset": 0,
+        "total": 1476309
+    }
+}

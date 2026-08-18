@@ -12,6 +12,8 @@ sites from any MCP client: Claude Code, Codex, Gemini CLI, and others.
   **[マイナビ転職](https://tenshoku.mynavi.jp)** (Japan),
   **[Flowxtra](https://flowxtra.com)** (board-wide across every company on the
   Flowxtra ATS),
+  **[freehire.me](https://freehire.me)** (IT/tech catalogue across company
+  ATS boards),
   **[LinkedIn](https://www.linkedin.com)**, and **[Indeed](https://www.indeed.com)**
   (public search).
 - **Company career sites**: 41,000+ companies hosted on the

@@ -153,6 +153,10 @@ func TestServerListsJobTools(t *testing.T) {
 		"jobindex_get_job_detail",
 		"mynavi_search_jobs",
 		"mynavi_get_job_detail",
+		"freehire_search_jobs",
+		"freehire_get_job_facets",
+		"freehire_search_companies",
+		"freehire_get_job_detail",
 		"search_jobs_by_company",
 		"get_filters_by_company",
 		"get_job_detail_by_company",
@@ -244,6 +248,21 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.NotContains(t, serverInstructions, "Eightfold")
 	assert.NotContains(t, serverInstructions, "SuccessFactors")
 	assert.NotContains(t, serverInstructions, "When the user names a site or company, use that provider's tools.")
+	// Company routing is ordered first-party first: a company's own tools,
+	// then the unified roster, then freehire, then the keyword boards.
+	// freehire crawls the same employer boards, so a company that has a
+	// first-party tool here must not be answered from freehire's snapshot.
+	firstParty := strings.Index(serverInstructions, "If that company has its own tools here")
+	unified := strings.Index(serverInstructions, "Otherwise try search_jobs_by_company")
+	freehire := strings.Index(serverInstructions, "Only if neither covers the company, try freehire")
+	boards := strings.Index(serverInstructions, "Fall back to the keyword boards")
+	require.Positive(t, firstParty)
+	assert.Less(t, firstParty, unified, "a company's own tools come before the unified roster")
+	assert.Less(t, unified, freehire, "the unified roster comes before freehire")
+	assert.Less(t, freehire, boards, "freehire comes before the keyword boards")
+	assert.Contains(t, serverInstructions, "never let it stand in for a first-party source that exists")
+	assert.Contains(t, serverInstructions, "freehire_search_jobs can return the same posting as search_jobs_by_company or as a company's own tool")
+	assert.Contains(t, serverInstructions, "dedupe by URL and keep the first-party row")
 }
 
 // TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry

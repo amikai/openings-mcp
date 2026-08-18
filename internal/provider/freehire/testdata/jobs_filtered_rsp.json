@@ -1,0 +1,109 @@
+{
+    "data": [
+        {
+            "public_slug": "account-executive-enterprise-grower-israel-stripe-lvjix47f",
+            "source": "greenhouse",
+            "manually_added": false,
+            "external_id": "stripe:8114458",
+            "url": "https://stripe.com/jobs/search?gh_jid=8114458&utm_source=freehire.me",
+            "title": "Account Executive, Enterprise Grower (Israel)",
+            "company": "Stripe",
+            "company_slug": "stripe",
+            "location": "Israel",
+            "description": "<h2><strong>Who we are</strong></h2>\n<h3><strong>About Stripe</strong></h3>\n<p>Stripe is a financial infrastructure platform for businesses. Millions of companies—from the world’s largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.</p>\n<h3><strong>About the team</strong></h3>\n<p>The Israel team is a highly consultative sales team that is responsible for the growth of Stripe’s largest customers within the region. We work with the most ambitious and fastest growing companies, from eToro, to Appcharge to Global-e - Stripe’s payments and financial infrastructure unlocks new revenue streams and growth opportunities for their",
+            "countries": [
+                "il"
+            ],
+            "regions": [
+                "mena"
+            ],
+            "skills": [
+                "account-executive"
+            ],
+            "cities": [],
+            "collections": [],
+            "is_tech": "non_tech",
+            "posted_at": "2026-08-18T10:49:04Z",
+            "created_at": "2026-08-18T09:50:07Z",
+            "updated_at": "2026-08-18T10:54:03Z",
+            "last_seen_at": "2026-08-18T10:54:03Z",
+            "closed_at": null,
+            "enrichment": {
+                "experience_years_min": 3,
+                "category": "sales",
+                "posting_language": "en"
+            },
+            "enriched_at": null,
+            "enrichment_version": 0,
+            "view_count": 0,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "fresh",
+                "age_days": 0,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        },
+        {
+            "public_slug": "strategic-account-executive-platforms-stripe-25un4jm3",
+            "source": "greenhouse",
+            "manually_added": false,
+            "external_id": "stripe:8129954",
+            "url": "https://stripe.com/jobs/search?gh_jid=8129954&utm_source=freehire.me",
+            "title": "Strategic Account Executive, Platforms",
+            "company": "Stripe",
+            "company_slug": "stripe",
+            "location": "London",
+            "description": "<p><strong>Who we are</strong></p>\n<p><strong>About Stripe</strong></p>\n<p>Stripe is a financial infrastructure platform for businesses. Millions of companies—from the world’s largest enterprises to the most ambitious startups—use Stripe to accept payments, grow their revenue, and accelerate new business opportunities. Our mission is to increase the GDP of the internet, and we have a staggering amount of work ahead. That means you have an unprecedented opportunity to put the global economy within everyone’s reach while doing the most important work of your career.</p>\n<p> </p>\n<p><strong>About the team</strong></p>\n<p>The Platform Sales team partners with Software Platforms to help them expand their value proposition towards payments and financial services by leveraging Stripe Connect. Platforms already using Stripe include Shopify, Treatwell, Sage &amp; Wix. </p>\n<p> </p>\n<p>As a member of the Strategic Account Platforms team, you will manage and elevate our relationships with a",
+            "countries": [
+                "gb"
+            ],
+            "regions": [
+                "uk"
+            ],
+            "skills": [
+                "account-executive",
+                "crm",
+                "shopify"
+            ],
+            "cities": [
+                "London"
+            ],
+            "collections": [],
+            "is_tech": "non_tech",
+            "posted_at": "2026-08-18T10:47:04Z",
+            "created_at": "2026-08-18T10:54:13Z",
+            "updated_at": "2026-08-18T10:54:13Z",
+            "last_seen_at": "2026-08-18T10:54:13Z",
+            "closed_at": null,
+            "enrichment": {
+                "experience_years_min": 10,
+                "category": "sales",
+                "posting_language": "en"
+            },
+            "enriched_at": null,
+            "enrichment_version": 0,
+            "view_count": 0,
+            "applied_count": 0,
+            "upvote_count": 0,
+            "downvote_count": 0,
+            "my_vote": 0,
+            "reality": {
+                "class": "fresh",
+                "age_days": 0,
+                "repost_count": 1,
+                "mass_posting_count": 1,
+                "fake_freshness": false
+            }
+        }
+    ],
+    "meta": {
+        "limit": 2,
+        "offset": 0,
+        "total": 531
+    }
+}
