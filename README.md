@@ -92,7 +92,7 @@ With `openings-mcp` on your PATH:
 **Claude Code**
 
 ```
-claude mcp add openings-mcp -- openings-mcp
+claude mcp add --scope user openings-mcp -- openings-mcp
 ```
 
 **Codex**
@@ -110,7 +110,7 @@ gemini mcp add openings-mcp openings-mcp
 With Docker instead, replace `openings-mcp` with `docker run -i --rm ghcr.io/amikai/openings-mcp`, e.g.:
 
 ```
-claude mcp add openings-mcp -- docker run -i --rm ghcr.io/amikai/openings-mcp
+claude mcp add --scope user openings-mcp -- docker run -i --rm ghcr.io/amikai/openings-mcp
 ```
 
 ## Disclaimer
