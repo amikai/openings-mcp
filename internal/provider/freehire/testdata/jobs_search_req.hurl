@@ -3,6 +3,7 @@
 # 1000 characters on a word boundary WITHOUT closing the tags it opened,
 # so a consumer has to run it through an HTML converter.
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 limit: 2

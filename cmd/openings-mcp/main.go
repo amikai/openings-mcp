@@ -338,7 +338,10 @@ func newProviderServer(logger *slog.Logger, dumpCache *ats.DumpCache) (*mcp.Serv
 		return nil, fmt.Errorf("create Flowxtra client: %w", err)
 	}
 
-	cFreehire, err := freehire.NewClient("https://freehire.me/api/v1", freehire.WithClient(hc))
+	// freehire asks callers to name themselves by User-Agent rather than
+	// requiring it, so it gets its own client rather than sharing hc.
+	hcFreehire := &http.Client{Timeout: 30 * time.Second, Transport: freehire.Transport{}}
+	cFreehire, err := freehire.NewClient("https://freehire.me/api/v1", freehire.WithClient(hcFreehire))
 	if err != nil {
 		return nil, fmt.Errorf("create freehire client: %w", err)
 	}

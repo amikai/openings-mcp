@@ -7,6 +7,7 @@
 # limit=1 keeps the fixture small on purpose: the jobs it returns carry
 # their FULL descriptions, so the upstream default of 20 is ~125 KB.
 GET https://freehire.me/api/v1/companies/stripe
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 limit: 1
 

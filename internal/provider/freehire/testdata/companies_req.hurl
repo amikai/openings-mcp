@@ -3,6 +3,7 @@
 # "strpie" finds stripe and "altinty" finds altinity-inc. Results come
 # back exact-match first, then by job_count descending.
 GET https://freehire.me/api/v1/companies
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: adria
 limit: 3
@@ -21,6 +22,7 @@ jsonpath "$.data[0].job_count" isInteger
 # The curated company facets filter without a q. yc_flags is one of the
 # four whose vocabulary no facets endpoint covers.
 GET https://freehire.me/api/v1/companies
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 collections: yc
 yc_flags: top_company
@@ -36,6 +38,7 @@ jsonpath "$.data[0].collections" contains "yc"
 # Company search checks against its OWN vocabulary, so a real JOB facet
 # sent here is dropped and reported.
 GET https://freehire.me/api/v1/companies
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 seniority: senior
 limit: 1

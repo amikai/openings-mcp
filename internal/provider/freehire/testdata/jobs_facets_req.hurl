@@ -4,6 +4,7 @@
 # cities, role, and skills carry ~1200 values each, so the unnarrowed
 # answer runs to thousands of values.
 GET https://freehire.me/api/v1/jobs/facets
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 
@@ -26,6 +27,7 @@ jsonpath "$.data.meta" not exists
 
 # facets= narrows which distributions are counted.
 GET https://freehire.me/api/v1/jobs/facets
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 facets: skills,seniority
@@ -39,6 +41,7 @@ jsonpath "$.data.facets.work_mode" not exists
 # Without disjunctive, a facet you filtered on collapses to the one value
 # you picked, which says nothing about what the alternatives would return.
 GET https://freehire.me/api/v1/jobs/facets
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 seniority: senior
 
@@ -51,6 +54,7 @@ jsonpath "$.data.facets.seniority.lead" not exists
 # so all eight seniority levels come back. It forces every facet to be
 # counted, which is why it cannot be combined with facets=.
 GET https://freehire.me/api/v1/jobs/facets
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 seniority: senior
 disjunctive: true
@@ -62,6 +66,7 @@ jsonpath "$.data.facets.seniority.lead" isInteger
 jsonpath "$.data.facets.seniority.intern" isInteger
 
 GET https://freehire.me/api/v1/jobs/facets
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 seniority: senior
 facets: skills
