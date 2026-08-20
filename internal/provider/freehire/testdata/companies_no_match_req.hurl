@@ -1,6 +1,7 @@
 # Fuzzy matching still bottoms out: a query with no near neighbour is an
 # empty page, so "not found" stays distinguishable from a typo.
 GET https://freehire.me/api/v1/companies
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: zzzzzzzzzz
 limit: 1

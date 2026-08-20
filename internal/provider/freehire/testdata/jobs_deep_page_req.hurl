@@ -2,6 +2,7 @@
 # openapi.yaml states the ceiling in the offset parameter's prose only —
 # there is no maximum in the schema — so it stays observable only here.
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 limit: 1
@@ -13,6 +14,7 @@ header "Content-Type" contains "application/json"
 jsonpath "$.meta.offset" == 9999
 
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 limit: 100
@@ -23,6 +25,7 @@ HTTP 400
 jsonpath "$.error" == "pagination too deep"
 
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: golang
 limit: 1

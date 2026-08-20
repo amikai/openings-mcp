@@ -2,6 +2,7 @@
 # display name such as "Altinity, Inc." lands here rather than erroring.
 # Only a bad parameter NAME is reported; a bad VALUE is silent.
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 company_slug: definitely-not-a-real-company-zzzz
 limit: 1

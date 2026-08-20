@@ -4,6 +4,7 @@
 # and the cities facet carries no country qualifier — hence the country
 # parameter on this endpoint but not on the filter.
 GET https://freehire.me/api/v1/geo/cities
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 q: lond
 country: gb

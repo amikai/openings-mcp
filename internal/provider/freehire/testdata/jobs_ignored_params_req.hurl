@@ -6,6 +6,7 @@
 # meta.ignored_params is the only way to tell the two apart, which is why
 # both the MCP tools and cmd/freehire turn its presence into an error.
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 country: it
 limit: 1
@@ -19,6 +20,7 @@ jsonpath "$.meta.ignored_params[0].did_you_mean" == "countries"
 
 # The plural spelling filters, and returns a far smaller total.
 GET https://freehire.me/api/v1/jobs/search
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 [QueryStringParams]
 countries: it
 limit: 1

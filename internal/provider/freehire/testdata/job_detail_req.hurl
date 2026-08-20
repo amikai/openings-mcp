@@ -1,6 +1,7 @@
 # Full posting by public_slug. /jobs/{slug} takes no description_format,
 # so the description is always the stored HTML.
 GET https://freehire.me/api/v1/jobs/program-manager-intake-portfolio-management-stripe-plftlklg
+User-Agent: amikai/openings-mcp (+https://github.com/amikai/openings-mcp)
 
 HTTP 200
 [Asserts]
