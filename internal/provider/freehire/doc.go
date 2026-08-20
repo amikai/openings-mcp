@@ -13,6 +13,12 @@
 //     picked.
 //   - getSimilarJobs is not wired into the MCP server yet.
 //
+// # Rate limits and identification
+//
+// freehire enforces per-caller rate limits (600 rpm across standard reads,
+// 300 rpm for agentSearchJobs) and requests callers identify themselves via
+// User-Agent. [Transport] injects [DefaultUserAgent] on all outgoing requests.
+//
 // # Two silent failure modes
 //
 // A filter VALUE upstream does not recognize matches nothing and is not

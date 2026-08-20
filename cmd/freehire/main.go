@@ -31,6 +31,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"sort"
 	"strings"
@@ -829,7 +830,8 @@ func summarize(j freehire.Job) jobJSON {
 }
 
 func newClient(ctx context.Context, f clientFlags) (*freehire.Client, context.Context, context.CancelFunc, error) {
-	client, err := freehire.NewClient(f.baseURL)
+	hc := &http.Client{Transport: freehire.Transport{}}
+	client, err := freehire.NewClient(f.baseURL, freehire.WithClient(hc))
 	if err != nil {
 		return nil, nil, nil, err
 	}
