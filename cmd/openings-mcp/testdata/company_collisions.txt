@@ -756,6 +756,7 @@ WinnCompanies	lever|WinnCompanies|https://jobs.lever.co/winnco	dayforce|WinnComp
 With Intelligence	bamboohr|With Intelligence|https://withintelligence.bamboohr.com/careers	workable|With Intelligence|https://apply.workable.com/with-intelligence/
 WorkWave	lever|WorkWave|https://jobs.lever.co/workwave	dayforce|WorkWave|https://jobs.dayforcehcm.com/en-US/workwave/CANDIDATEPORTAL
 Wristcheck	lever|Wristcheck|https://jobs.lever.co/wristcheck	bamboohr|Wristcheck|https://wristcheck.bamboohr.com/careers
+Yahoo	workable|Yahoo|https://apply.workable.com/yahoo/	workday|Yahoo|https://ouryahoo.wd5.myworkdayjobs.com/en-US/careers
 Yamaha Motor	adp_myjobs|Yamaha Motor|https://myjobs.adp.com/yamahaexternalcareersite/cx	successfactors|Yamaha Motor|https://careers.yamaha-motor.eu/search/
 Yapily	bamboohr|Yapily|https://yapily.bamboohr.com/careers	workable|Yapily|https://apply.workable.com/yapily/
 Yostar	hrmos|株式会社Yostar|https://hrmos.co/pages/yostar/jobs	mokahr|Yostar|https://app.mokahr.com/social-recruitment/yostar/145292
@@ -1713,6 +1714,7 @@ wristcheck	lever|Wristcheck|https://jobs.lever.co/wristcheck	bamboohr|Wristcheck
 wsc	workday|Wright Tree Service|https://wsc.wd1.myworkdayjobs.com/en-US/WTS	greenhouse|WSC|https://job-boards.greenhouse.io/watersystemsconsulting
 wwf	workable|WWF|https://apply.workable.com/wwf/	teamtailor|WWF|https://wwf.teamtailor.com/jobs
 xtm	bamboohr|XTM International Ltd|https://xtm.bamboohr.com/careers	workable|XTM International|https://apply.workable.com/xtm/
+yahoo	workable|Yahoo|https://apply.workable.com/yahoo/	workday|Yahoo|https://ouryahoo.wd5.myworkdayjobs.com/en-US/careers
 yapily	bamboohr|Yapily|https://yapily.bamboohr.com/careers	workable|Yapily|https://apply.workable.com/yapily/
 yostar	hrmos|株式会社Yostar|https://hrmos.co/pages/yostar/jobs	mokahr|Yostar|https://app.mokahr.com/social-recruitment/yostar/145292
 youthvillages	workday|Youth Villages Careers|https://youthvillages.wd1.myworkdayjobs.com/en-US/youthvillagescareers	icims|Youth Villages|https://careers-youthvillages.icims.com/jobs/search?ss=1
