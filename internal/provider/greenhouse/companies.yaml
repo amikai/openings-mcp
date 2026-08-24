@@ -868,6 +868,8 @@
   board_token: cannabisandglass
 - company: Cannondale
   board_token: cannondale
+- company: Canonical
+  board_token: canonical
 - company: Canopy
   board_token: canopytax
 - company: Canopy Connect
@@ -3172,6 +3174,8 @@
   board_token: netlify
 - company: NetSage
   board_token: netsage
+- company: Netskope
+  board_token: netskope
 - company: NeueHealth
   board_token: neuehealth
 - company: NeuraFlash, Part of Accenture
