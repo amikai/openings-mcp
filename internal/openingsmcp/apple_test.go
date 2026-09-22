@@ -191,6 +191,7 @@ func TestAppleGetJobDetailNotFoundE2E(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, result.IsError)
+	assert.Nil(t, result.StructuredContent)
 	content, ok := result.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
 	assert.Contains(t, content.Text, "job not found")

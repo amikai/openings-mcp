@@ -237,11 +237,11 @@ func RegisterAmazon(server *mcp.Server, client *amazon.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *amazonSearchInput) (*mcp.CallToolResult, *amazonSearchOutput, error) {
 		request, err := amazonMCPToSearchRequest(input)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		result, err := client.Search(ctx, *request)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, amazonHTTPToMCPResponse(result, request.Offset), nil
 	})
@@ -253,7 +253,7 @@ func RegisterAmazon(server *mcp.Server, client *amazon.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *amazonDetailInput) (*mcp.CallToolResult, *amazonDetailOutput, error) {
 		job, err := client.JobDetail(ctx, input.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, amazonHTTPToMCPDetail(job), nil
 	})

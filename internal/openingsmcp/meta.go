@@ -264,7 +264,7 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaSearchInput) (*mcp.CallToolResult, *metaSearchOutput, error) {
 		response, err := client.SearchJobs(ctx, metaMCPToHTTPRequest(input))
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		limit := cmp.Or(input.Limit, metaDefaultLimit)
 		return nil, metaHTTPToMCPResponse(response, limit, input.Offset), nil
@@ -277,7 +277,7 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *metaFiltersInput) (*mcp.CallToolResult, *metaFiltersOutput, error) {
 		filters, err := client.SearchFilters(ctx)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, metaHTTPToMCPFilters(filters), nil
 	})
@@ -289,11 +289,11 @@ func RegisterMeta(server *mcp.Server, client *meta.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *metaDetailInput) (*mcp.CallToolResult, *metaDetailOutput, error) {
 		detail, err := client.JobDetail(ctx, input.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		output, err := metaHTTPToMCPDetail(detail)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, output, nil
 	})

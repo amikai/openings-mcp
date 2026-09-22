@@ -171,7 +171,7 @@ func RegisterMynavi(s *mcp.Server, c *mynavi.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *mynaviSearchInput) (*mcp.CallToolResult, *mynaviSearchOutput, error) {
 		res, err := c.Jobs(ctx, mynaviMCPToHTTPRequest(in))
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, mynaviHTTPToMCPResponse(res), nil
 	})
@@ -183,7 +183,7 @@ func RegisterMynavi(s *mcp.Server, c *mynavi.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *mynaviDetailInput) (*mcp.CallToolResult, *mynaviDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, mynaviHTTPToMCPDetail(res), nil
 	})

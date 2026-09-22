@@ -448,14 +448,14 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104SearchInput) (*mcp.CallToolResult, *job104SearchOutput, error) {
 		params, err := job104MCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		resp, err := c.SearchJobs(ctx, *params)
 		if err != nil {
 			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
-				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+				return nil, nil, fmt.Errorf("upstream error: %d", ue.StatusCode)
 			}
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, job104HTTPToMCPResponse(resp), nil
 	})
@@ -468,9 +468,9 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		resp, err := c.GetJobDetail(ctx, job104.GetJobDetailParams{JobCode: in.JobCode})
 		if err != nil {
 			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
-				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
+				return nil, nil, fmt.Errorf("upstream error: %d", ue.StatusCode)
 			}
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, job104HTTPToMCPDetail(resp, in.JobCode), nil
 	})

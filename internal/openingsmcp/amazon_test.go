@@ -103,6 +103,7 @@ func TestAmazonGetJobDetailNotFound(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, response.IsError)
+	assert.Nil(t, response.StructuredContent)
 	assert.Contains(t, response.Content[0].(*mcp.TextContent).Text, "job not found")
 }
 

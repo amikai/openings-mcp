@@ -211,11 +211,11 @@ func RegisterTsmc(s *mcp.Server, c *tsmc.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *tsmcSearchInput) (*mcp.CallToolResult, *tsmcSearchOutput, error) {
 		req, err := tsmcMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.Jobs(ctx, req)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, tsmcHTTPToMCPResponse(res), nil
 	})
@@ -227,7 +227,7 @@ func RegisterTsmc(s *mcp.Server, c *tsmc.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *tsmcDetailInput) (*mcp.CallToolResult, *tsmcDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, tsmcHTTPToMCPDetail(res), nil
 	})

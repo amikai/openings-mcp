@@ -256,6 +256,7 @@ func TestLinkedinSearchJobsInvalidEnumE2E(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, callRes.IsError)
+	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
 	assert.Contains(t, text.Text, `validating /properties/workplace_type: enum`)

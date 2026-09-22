@@ -219,11 +219,11 @@ func RegisterFlowxtra(s *mcp.Server, c *flowxtra.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *flowxtraSearchInput) (*mcp.CallToolResult, *flowxtraSearchOutput, error) {
 		params, err := flowxtraMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.ListJobs(ctx, params)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, flowxtraHTTPToMCPResponse(res), nil
 	})
@@ -234,15 +234,15 @@ func RegisterFlowxtra(s *mcp.Server, c *flowxtra.Client) {
 		Annotations: &mcp.ToolAnnotations{Title: "Get Flowxtra job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *flowxtraDetailInput) (*mcp.CallToolResult, *flowxtraDetailOutput, error) {
 		if in.JobID == "" {
-			return errorResult(fmt.Errorf("job_id is required (take it from a flowxtra_search_jobs result)")), nil, nil
+			return nil, nil, fmt.Errorf("job_id is required (take it from a flowxtra_search_jobs result)")
 		}
 		res, err := c.GetJobDetail(ctx, flowxtra.GetJobDetailParams{HasId: in.JobID})
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		envelope, ok := res.(*flowxtra.JobDetailEnvelope)
 		if !ok {
-			return errorResult(fmt.Errorf("job %q not found (it may have expired)", in.JobID)), nil, nil
+			return nil, nil, fmt.Errorf("job %q not found (it may have expired)", in.JobID)
 		}
 		return nil, flowxtraHTTPToMCPDetail(envelope.Data), nil
 	})
