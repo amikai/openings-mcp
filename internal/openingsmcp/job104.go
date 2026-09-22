@@ -452,10 +452,7 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 		}
 		resp, err := c.SearchJobs(ctx, *params)
 		if err != nil {
-			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
-				return nil, nil, fmt.Errorf("upstream error: %d", ue.StatusCode)
-			}
-			return nil, nil, err
+			return nil, nil, job104UpstreamError(err)
 		}
 		return nil, job104HTTPToMCPResponse(resp), nil
 	})
@@ -467,11 +464,21 @@ func RegisterJob104(s *mcp.Server, c *job104.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *job104DetailInput) (*mcp.CallToolResult, *job104DetailOutput, error) {
 		resp, err := c.GetJobDetail(ctx, job104.GetJobDetailParams{JobCode: in.JobCode})
 		if err != nil {
-			if ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err); ok {
-				return nil, nil, fmt.Errorf("upstream error: %d", ue.StatusCode)
-			}
-			return nil, nil, err
+			return nil, nil, job104UpstreamError(err)
 		}
 		return nil, job104HTTPToMCPDetail(resp, in.JobCode), nil
 	})
+}
+
+// job104UpstreamError reports a 104 error response by status and, when 104
+// sent one, its own message.
+func job104UpstreamError(err error) error {
+	ue, ok := errors.AsType[*job104.ErrorResponseStatusCode](err)
+	if !ok {
+		return err
+	}
+	if v, ok := ue.Response.Message.Get(); ok && v != "" {
+		return fmt.Errorf("upstream error: %d: %s", ue.StatusCode, v)
+	}
+	return fmt.Errorf("upstream error: %d", ue.StatusCode)
 }

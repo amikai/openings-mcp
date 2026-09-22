@@ -330,7 +330,7 @@ func TestJob104SearchJobsUpstreamErrorE2E(t *testing.T) {
 	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
-	assert.Equal(t, "upstream error: 500", text.Text)
+	assert.Equal(t, "upstream error: 500: internal error", text.Text)
 }
 
 func TestJob104GetJobDetailUpstreamErrorE2E(t *testing.T) {
@@ -345,7 +345,7 @@ func TestJob104GetJobDetailUpstreamErrorE2E(t *testing.T) {
 	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
-	assert.Equal(t, "upstream error: 404", text.Text)
+	assert.Equal(t, "upstream error: 404: job not found", text.Text)
 }
 
 func TestJob104ExperienceLabel(t *testing.T) {
