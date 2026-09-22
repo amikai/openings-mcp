@@ -196,9 +196,10 @@ func (a *WorkdayAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDe
 	}, nil
 }
 
-// ParseCareersURL recognizes myworkdayjobs.com careers URLs. Roster
-// tenants fold back to their roster slug so display names stay identical
-// to name-based resolution; unknown tenants get the canonical URL as a
+// ParseCareersURL recognizes myworkdayjobs.com careers URLs. A URL naming
+// a roster tenant's own career site folds back to its roster slug so
+// display names stay identical to name-based resolution; anything else,
+// including another site of a roster tenant, gets the canonical URL as a
 // self-describing slug (workday config is three values, which a bare
 // tenant slug can't carry).
 func (a *WorkdayAdapter) ParseCareersURL(u *url.URL) (string, bool) {
@@ -206,9 +207,11 @@ func (a *WorkdayAdapter) ParseCareersURL(u *url.URL) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	// site.Tenant is already lowercase: the provider parse lowercases the
-	// whole host before splitting.
-	if _, ok := workday.CompaniesByTenant[site.Tenant]; ok {
+	// site.Tenant and site.Host are already lowercase: the provider parse
+	// lowercases the whole host before splitting.
+	if c, ok := workday.CompaniesByTenant[site.Tenant]; ok &&
+		site.Host == strings.ToLower(c.Tenant+"."+c.Instance+".myworkdayjobs.com") &&
+		strings.EqualFold(site.Site, c.Site) {
 		return site.Tenant, true
 	}
 	return site.CanonicalURL(), true

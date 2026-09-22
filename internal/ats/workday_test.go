@@ -220,6 +220,11 @@ func TestWorkdayParseCareersURL(t *testing.T) {
 	require.True(t, ok)
 	assert.Equal(t, "nvidia", slug)
 
+	// Another site of a roster tenant keeps its own site, not the roster's.
+	slug, ok = a.ParseCareersURL(mustParseURL(t, "https://nvidia.wd5.myworkdayjobs.com/en-US/NVIDIAInternalSite"))
+	require.True(t, ok)
+	assert.Equal(t, "https://nvidia.wd5.myworkdayjobs.com/NVIDIAInternalSite", slug)
+
 	// An unknown tenant gets the canonical URL as a self-describing slug.
 	slug, ok = a.ParseCareersURL(mustParseURL(t, "https://stripe.wd5.myworkdayjobs.com/en-US/Stripe_Careers/job/SF/Eng_1"))
 	require.True(t, ok)
