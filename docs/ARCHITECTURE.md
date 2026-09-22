@@ -35,6 +35,27 @@ Both families use the same two-step flow. Search returns summaries carrying
 an upstream-native identifier. Detail exchanges that identifier for the full
 posting. Identifiers are never interchangeable across providers.
 
+## Scope
+
+Every tool call is a live query. The answer is whatever the upstream returns
+at that moment. Nothing is written to disk, and no job data lives in the
+repo. The only state is a short-TTL in-process cache of full-board dumps,
+which keeps a paginated walk of one board from refetching it; it is bounded,
+never consulted across restarts, and invisible in the tool schema.
+
+That rules out everything a stored history would be needed for: no "what
+changed since last week", no recall of a search run ten days ago, no
+duplicate detection across calls, no alerting on new postings. The
+aggregator does crawl boards the first-party tools also serve, so the same
+posting can come back twice, but deduping it is the client's job — the tool
+descriptions say to dedupe by URL and keep the first-party row. The server
+never compares one response against another.
+
+Keeping real state would mean owning a copy of other sites' job data, with
+the staleness, storage, and redistribution questions that follow. The tools
+stay a lens onto live boards instead. A client that wants history keeps its
+own.
+
 ## Design decisions
 
 ### Mirror the upstream
