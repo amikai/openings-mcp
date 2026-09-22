@@ -435,6 +435,7 @@ func atsAdapters(hc, hcEightfold *http.Client, dumpCache *ats.DumpCache) ([]ats.
 		ats.NewEngageAdapter(hc, dumpCache),
 		ats.NewBambooHRAdapter(hc, dumpCache),
 		ats.NewADPMyJobsAdapter(hc, dumpCache),
+		ats.NewADPWFNAdapter(hc),
 		ats.NewEightfoldAdapter(hcEightfold),
 		ats.NewSuccessFactorsAdapter(hc),
 		smartrecruitersAdapter,

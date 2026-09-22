@@ -48,6 +48,7 @@ type Registry struct {
 var careersHostPatternsByAdapter = map[string]string{
 	"workday":         "<tenant>.<wd*>.myworkdayjobs.com/<site>",
 	"adp_myjobs":      "myjobs.adp.com/<slug>",
+	"adp_wfn":         "workforcenow.adp.com/mascsr/.../recruitment.html?cid=<guid>",
 	"avature":         "<tenant>.avature.net/<portal> (custom-domain portals via roster only)",
 	"bamboohr":        "<company>.bamboohr.com/careers",
 	"greenhouse":      "job-boards.greenhouse.io/<board>",

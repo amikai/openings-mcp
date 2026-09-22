@@ -1,6 +1,6 @@
 // Package adp_myjobs accesses public ADP MyJobs career boards
 // (myjobs.adp.com), not the partner/HCM APIs on developers.adp.com and not
-// Workforce Now (workforcenow.adp.com; future package adp_wfn).
+// Workforce Now (workforcenow.adp.com), which package adp_wfn serves.
 //
 // # Public surface
 //
