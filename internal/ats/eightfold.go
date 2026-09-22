@@ -46,10 +46,9 @@ const upstreamPageSize = 10
 // Some tenants have the pcsx API this all otherwise runs on disabled
 // (403 "PCSX is not enabled for this user.") and serve postings exclusively
 // through the newer, unfiltered-only v2 API instead; Search and Detail fall
-// back to it on that specific error (see openapi.yaml's v2 tag). Filters
-// and filtered Search still require pcsx and simply fail for v2-only
-// tenants — narrower than not supporting them at all, since plain search
-// still works.
+// back to it on that specific error (see openapi.yaml's v2 tag). v2 has no
+// facets, so for v2-only tenants Filters reports none and a filtered Search
+// fails with a retry-without-filters error; plain search still works.
 //
 // Roster membership is required, unlike Workday/Greenhouse/Lever: every
 // PCSX request needs the tenant's registered `domain` value alongside its
@@ -179,6 +178,10 @@ func (a *EightfoldAdapter) Filters(ctx context.Context, slug string) (FilterSet,
 	}
 	res, err := a.fetchSearch(ctx, c, eightfold.SearchParams{Domain: c.Domain}, nil)
 	if err != nil {
+		// A v2-only tenant still searches, just without facets.
+		if isPCSXDisabled(err) {
+			return FilterSet{}, nil
+		}
 		return nil, err
 	}
 	seen := make(map[string]map[string]struct{})
@@ -369,6 +372,9 @@ func (a *EightfoldAdapter) fetchSearchV2(ctx context.Context, c eightfold.Roster
 func (a *EightfoldAdapter) resolveFilters(ctx context.Context, c eightfold.RosterCompany, filters map[string][]string) (map[string][]string, error) {
 	probe, err := a.fetchSearch(ctx, c, eightfold.SearchParams{Domain: c.Domain}, nil)
 	if err != nil {
+		if isPCSXDisabled(err) {
+			return nil, fmt.Errorf("eightfold: company %q publishes no filter dimensions; retry without filters", c.Name)
+		}
 		return nil, err
 	}
 
