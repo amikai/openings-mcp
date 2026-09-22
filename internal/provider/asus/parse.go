@@ -3,6 +3,7 @@ package asus
 import (
 	"cmp"
 	"fmt"
+	"html"
 	"io"
 	"net/url"
 	"regexp"
@@ -15,6 +16,7 @@ import (
 var (
 	jobNoPattern = regexp.MustCompile(`^([A-Z0-9]{5,10})\s+`)
 	pagePattern  = regexp.MustCompile(`[?&]page=(\d+)`)
+	tagPattern   = regexp.MustCompile(`<[^>]*>`)
 )
 
 func parseSearchHTML(r io.Reader, baseURL string) (*SearchResponse, error) {
@@ -219,21 +221,18 @@ func cleanBlockText(s *goquery.Selection) string {
 	if s.Length() == 0 {
 		return ""
 	}
-	html, err := s.Html()
+	raw, err := s.Html()
 	if err != nil {
 		return cleanText(s.Text())
 	}
 	// Convert <br> or <br/> or <p> tags to newlines
 	replacer := strings.NewReplacer("<br>", "\n", "<br/>", "\n", "<br />", "\n", "</p>", "\n", "<p>", "")
-	text := replacer.Replace(html)
-	// Strip any remaining html tags
-	tagPattern := regexp.MustCompile(`<[^>]*>`)
+	text := replacer.Replace(raw)
+	// Strip any remaining html tags, then decode every entity Html() wrote
+	// (it escapes ' and " as &#39; and &#34;, not just &amp; and friends).
 	text = tagPattern.ReplaceAllString(text, "")
+	text = html.UnescapeString(text)
 	text = strings.ReplaceAll(text, "\u00a0", " ")
-	text = strings.ReplaceAll(text, "&nbsp;", " ")
-	text = strings.ReplaceAll(text, "&lt;", "<")
-	text = strings.ReplaceAll(text, "&gt;", ">")
-	text = strings.ReplaceAll(text, "&amp;", "&")
 
 	lines := strings.Split(text, "\n")
 	var cleaned []string

@@ -5,6 +5,8 @@ import (
 	"slices"
 	"strings"
 	"testing"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 func TestParseSearchHTML_Success(t *testing.T) {
@@ -164,6 +166,18 @@ func TestParseDetailHTML_Success(t *testing.T) {
 	}
 	if detail.Requirements == "" {
 		t.Error("expected non-empty requirements")
+	}
+}
+
+func TestCleanBlockTextDecodesEntities(t *testing.T) {
+	doc, err := goquery.NewDocumentFromReader(strings.NewReader(`<div><p>The candidate's "role" &amp; more<br>next&nbsp;line</p></div>`))
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := cleanBlockText(doc.Find("div"))
+	want := "The candidate's \"role\" & more\nnext line"
+	if got != want {
+		t.Errorf("cleanBlockText = %q, want %q", got, want)
 	}
 }
 
