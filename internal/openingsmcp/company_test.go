@@ -206,6 +206,7 @@ func TestCompanyToolsRejectedWhileAmbiguous(t *testing.T) {
 			result := callCompanyTool(t, reg, tt.tool, tt.arguments)
 
 			require.True(t, result.IsError)
+			assert.Nil(t, result.StructuredContent)
 			require.Len(t, result.Content, 1)
 			text, ok := result.Content[0].(*mcp.TextContent)
 			require.True(t, ok)

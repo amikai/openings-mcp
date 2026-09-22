@@ -5,7 +5,7 @@
 //	openings-mcp
 //
 // The --http flag switches to streamable HTTP instead. It works bare, on
-// :8080, and takes an optional address that must be attached with '='
+// 127.0.0.1:8080, and takes an optional address that must be attached with '='
 // rather than passed as a separate argument:
 //
 //	openings-mcp --http
@@ -208,7 +208,10 @@ func runStdio(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpC
 }
 
 // defaultHTTPAddr is where --http listens when given no address of its own.
-const defaultHTTPAddr = ":8080"
+const defaultHTTPAddr = "127.0.0.1:8080"
+
+// httpShutdownGrace bounds how long a stop signal waits on in-flight requests.
+const httpShutdownGrace = 10 * time.Second
 
 // httpFlag backs --http, which reads as a bool that carries an optional
 // address: plain --http listens on defaultHTTPAddr, --http=:9000 on :9000,
@@ -278,8 +281,14 @@ func runHTTP(addr string, logger *slog.Logger, dumpCache *ats.DumpCache) error {
 		return httpServer.ListenAndServe()
 	}, func(error) {
 		logger.Info("shutting down HTTP server")
-		if err := httpServer.Shutdown(context.Background()); err != nil {
+		// In-flight tool calls get a grace period, then are cut off: a
+		// company search walking a multi-page board can outlast a user's
+		// patience with Ctrl-C.
+		ctx, cancel := context.WithTimeout(context.Background(), httpShutdownGrace)
+		defer cancel()
+		if err := httpServer.Shutdown(ctx); err != nil {
 			logger.Warn("HTTP shutdown failed", "error", err)
+			_ = httpServer.Close()
 		}
 	})
 

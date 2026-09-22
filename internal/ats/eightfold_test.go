@@ -2,6 +2,7 @@ package ats
 
 import (
 	"net/http"
+	"net/http/httptest"
 	"strconv"
 	"testing"
 	"time"
@@ -175,4 +176,54 @@ func TestEightfoldSearchRejectsHugePage(t *testing.T) {
 	a := testEightfoldAdapter(t)
 	_, err := a.Search(t.Context(), "eaton", SearchParams{Page: 1 << 40})
 	require.NoError(t, err, "a huge page is just an empty result, not an error, for a fixed-size upstream page")
+}
+
+// testEightfoldV2OnlyAdapter points the adapter at a tenant that 403s every
+// pcsx call (as Vale, Bayer, and HSBC do) and serves postings only through
+// the v2 API.
+func testEightfoldV2OnlyAdapter(t *testing.T) *EightfoldAdapter {
+	t.Helper()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/pcsx/", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = w.Write([]byte(`{"message": "PCSX is not enabled for this user."}`))
+	})
+	mux.HandleFunc("/api/apply/v2/jobs", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"count": 1, "positions": [{"id": 42, "name": "Geologist", "locations": ["Belo Horizonte"], "t_create": 1767225600, "canonicalPositionUrl": "https://vale.eightfold.ai/careers/job/42"}]}`))
+	})
+	mux.HandleFunc("/api/apply/v2/jobs/42", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		_, _ = w.Write([]byte(`{"id": 42, "name": "Geologist", "locations": ["Belo Horizonte"], "t_create": 1767225600, "canonicalPositionUrl": "https://vale.eightfold.ai/careers/job/42", "job_description": "<p>Map the ore body.</p>"}`))
+	})
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	a := NewEightfoldAdapter(&http.Client{Timeout: 5 * time.Second})
+	a.baseURL = func(string) string { return srv.URL }
+	return a
+}
+
+func TestEightfoldV2OnlyTenant(t *testing.T) {
+	a := testEightfoldV2OnlyAdapter(t)
+
+	res, err := a.Search(t.Context(), "vale", SearchParams{})
+	require.NoError(t, err)
+	require.Len(t, res.Jobs, 1)
+	assert.Equal(t, "42", res.Jobs[0].JobID)
+	assert.Equal(t, "https://vale.eightfold.ai/careers/job/42", res.Jobs[0].URL)
+	assert.Equal(t, 1, res.TotalCount)
+
+	d, err := a.Detail(t.Context(), "vale", "42")
+	require.NoError(t, err)
+	assert.Equal(t, "Vale", d.Company)
+	assert.Equal(t, "Geologist", d.Title)
+	assert.Contains(t, d.Description, "Map the ore body.")
+
+	fs, err := a.Filters(t.Context(), "vale")
+	require.NoError(t, err, "a v2-only tenant has no facets, which is not an error")
+	assert.Empty(t, fs)
+
+	_, err = a.Search(t.Context(), "vale", SearchParams{Filters: map[string][]string{"category": {"Mining"}}})
+	require.ErrorContains(t, err, "publishes no filter dimensions")
 }

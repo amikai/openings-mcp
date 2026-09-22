@@ -200,11 +200,11 @@ func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinSearchInput) (*mcp.CallToolResult, *linkedinSearchOutput, error) {
 		req, err := linkedinMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.Jobs(ctx, req)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, linkedinHTTPToMCPResponse(res), nil
 	})
@@ -216,7 +216,7 @@ func RegisterLinkedin(s *mcp.Server, c *linkedin.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *linkedinDetailInput) (*mcp.CallToolResult, *linkedinDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, linkedinHTTPToMCPDetail(res), nil
 	})

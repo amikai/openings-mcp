@@ -123,11 +123,11 @@ func RegisterJobindex(s *mcp.Server, c *jobindex.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *jobindexSearchInput) (*mcp.CallToolResult, *jobindexSearchOutput, error) {
 		req, err := jobindexMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.Jobs(ctx, req)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, jobindexHTTPToMCPResponse(res), nil
 	})
@@ -139,7 +139,7 @@ func RegisterJobindex(s *mcp.Server, c *jobindex.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *jobindexDetailInput) (*mcp.CallToolResult, *jobindexDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.Tid)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, jobindexHTTPToMCPDetail(res), nil
 	})

@@ -224,14 +224,11 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeSearchInput) (*mcp.CallToolResult, *cakeSearchOutput, error) {
 		req, err := cakeMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.SearchJobs(ctx, req)
 		if err != nil {
-			if ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err); ok {
-				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
-			}
-			return errorResult(err), nil, nil
+			return nil, nil, cakeUpstreamError(err)
 		}
 		return nil, cakeHTTPToMCPResponse(res), nil
 	})
@@ -243,11 +240,23 @@ func RegisterCake(s *mcp.Server, c *cake.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *cakeDetailInput) (*mcp.CallToolResult, *cakeDetailOutput, error) {
 		res, err := c.GetJobDetail(ctx, cake.GetJobDetailParams{Path: in.Path})
 		if err != nil {
-			if ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err); ok {
-				return errorResult(fmt.Errorf("upstream error: %d", ue.StatusCode)), nil, nil
-			}
-			return errorResult(err), nil, nil
+			return nil, nil, cakeUpstreamError(err)
 		}
 		return nil, cakeHTTPToMCPDetail(res), nil
 	})
+}
+
+// cakeUpstreamError reports a Cake error response by status and, when Cake
+// sent one, its own message (e.g. "Resource not found" for an expired path).
+func cakeUpstreamError(err error) error {
+	ue, ok := errors.AsType[*cake.ErrorResponseStatusCode](err)
+	if !ok {
+		return err
+	}
+	for _, m := range []cake.OptNilString{ue.Response.Msg, ue.Response.Error} {
+		if v, ok := m.Get(); ok && v != "" {
+			return fmt.Errorf("upstream error: %d: %s", ue.StatusCode, v)
+		}
+	}
+	return fmt.Errorf("upstream error: %d", ue.StatusCode)
 }

@@ -245,6 +245,7 @@ func TestJob104SearchJobsMissingRequiredE2E(t *testing.T) {
 			})
 			require.NoError(t, err)
 			require.True(t, callRes.IsError)
+			assert.Nil(t, callRes.StructuredContent)
 			text, ok := callRes.Content[0].(*mcp.TextContent)
 			require.True(t, ok)
 			assert.Equal(t, tc.want, text.Text)
@@ -264,6 +265,7 @@ func TestJob104SearchJobsInvalidEnumE2E(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, callRes.IsError)
+	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
 	assert.Equal(t, `validating "arguments": validating root: validating /properties/job_type: enum: valueNotInEnum does not equal any of: [Full-time Part-time Senior Dispatch]`, text.Text)
@@ -325,9 +327,10 @@ func TestJob104SearchJobsUpstreamErrorE2E(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, callRes.IsError)
+	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
-	assert.Equal(t, "upstream error: 500", text.Text)
+	assert.Equal(t, "upstream error: 500: internal error", text.Text)
 }
 
 func TestJob104GetJobDetailUpstreamErrorE2E(t *testing.T) {
@@ -339,9 +342,10 @@ func TestJob104GetJobDetailUpstreamErrorE2E(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.True(t, callRes.IsError)
+	assert.Nil(t, callRes.StructuredContent)
 	text, ok := callRes.Content[0].(*mcp.TextContent)
 	require.True(t, ok)
-	assert.Equal(t, "upstream error: 404", text.Text)
+	assert.Equal(t, "upstream error: 404: job not found", text.Text)
 }
 
 func TestJob104ExperienceLabel(t *testing.T) {

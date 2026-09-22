@@ -1130,15 +1130,15 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *freehireSearchInput) (*mcp.CallToolResult, *freehireSearchOutput, error) {
 		params, err := freehireSearchParams(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.SearchJobs(ctx, params)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		out, err := freehireSearchOutputOf(res)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, out, nil
 	})
@@ -1151,15 +1151,15 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *freehireFacetsInput) (*mcp.CallToolResult, *freehireFacetsOutput, error) {
 		params, err := freehireFacetsParams(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.GetJobFacets(ctx, params)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		out, err := freehireFacetsOutputOf(res)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, out, nil
 	})
@@ -1172,15 +1172,15 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *freehireCompaniesInput) (*mcp.CallToolResult, *freehireCompaniesOutput, error) {
 		params, err := freehireCompaniesParams(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.SearchCompanies(ctx, params)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		out, err := freehireCompaniesOutputOf(res)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, out, nil
 	})
@@ -1192,7 +1192,7 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 		InputSchema: freehireCompanyDetailInputSchema,
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *freehireCompanyDetailInput) (*mcp.CallToolResult, *freehireCompanyDetailOutput, error) {
 		if in.CompanySlug == "" {
-			return errorResult(fmt.Errorf("company_slug is required (take it from a freehire_search_companies result)")), nil, nil
+			return nil, nil, fmt.Errorf("company_slug is required (take it from a freehire_search_companies result)")
 		}
 		res, err := c.GetCompany(ctx, freehire.GetCompanyParams{
 			Slug:   in.CompanySlug,
@@ -1200,7 +1200,7 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 			Offset: freehireOptInt(in.Offset),
 		})
 		if err != nil {
-			return errorResult(freehireDetailError(err, "company", in.CompanySlug)), nil, nil
+			return nil, nil, freehireDetailError(err, "company", in.CompanySlug)
 		}
 		return nil, freehireCompanyDetailOutputOf(res), nil
 	})
@@ -1216,7 +1216,7 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 			Country: freehireOptString(in.Country),
 		})
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		out := &freehireCitiesOutput{Data: make([]freehireCity, 0, len(res.Data))}
 		for _, city := range res.Data {
@@ -1231,11 +1231,11 @@ func RegisterFreehire(s *mcp.Server, c *freehire.Client) {
 		Annotations: &mcp.ToolAnnotations{Title: "Get freehire.me job details", ReadOnlyHint: true},
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *freehireDetailInput) (*mcp.CallToolResult, *freehireJob, error) {
 		if in.JobID == "" {
-			return errorResult(fmt.Errorf("job_id is required (take it from a freehire_search_jobs result)")), nil, nil
+			return nil, nil, fmt.Errorf("job_id is required (take it from a freehire_search_jobs result)")
 		}
 		res, err := c.GetJob(ctx, freehire.GetJobParams{Slug: in.JobID})
 		if err != nil {
-			return errorResult(freehireDetailError(err, "job", in.JobID)), nil, nil
+			return nil, nil, freehireDetailError(err, "job", in.JobID)
 		}
 		job := freehireJobOf(res.Data)
 		return nil, &job, nil

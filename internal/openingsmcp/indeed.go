@@ -273,11 +273,11 @@ func RegisterIndeed(s *mcp.Server, c *indeed.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *indeedSearchInput) (*mcp.CallToolResult, *indeedSearchOutput, error) {
 		req, err := indeedMCPToHTTPRequest(in)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		res, err := c.Jobs(ctx, req)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, indeedHTTPToMCPResponse(res), nil
 	})
@@ -290,10 +290,10 @@ func RegisterIndeed(s *mcp.Server, c *indeed.Client) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, in *indeedDetailInput) (*mcp.CallToolResult, *indeedDetailOutput, error) {
 		res, err := c.JobDetail(ctx, in.Country, in.JobKey)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		if res == nil {
-			return errorResult(fmt.Errorf("job %q not found", in.JobKey)), nil, nil
+			return nil, nil, fmt.Errorf("job %q not found", in.JobKey)
 		}
 		return nil, indeedHTTPToMCPDetail(res), nil
 	})

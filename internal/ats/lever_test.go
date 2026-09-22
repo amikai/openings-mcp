@@ -31,6 +31,23 @@ func TestLeverRoster(t *testing.T) {
 	}
 }
 
+func TestLeverParseCareersURLFoldsCase(t *testing.T) {
+	a := testLeverAdapter(t)
+
+	// A roster board comes back in the roster's own casing, whatever the URL's.
+	slug, ok := a.ParseCareersURL(mustParseURL(t, "https://jobs.lever.co/aifund"))
+	require.True(t, ok)
+	assert.Equal(t, "AIFund", slug)
+	url, ok := a.CareersURL("aifund")
+	require.True(t, ok)
+	assert.Equal(t, "https://jobs.lever.co/AIFund", url)
+
+	// A board off the roster keeps the URL's casing.
+	slug, ok = a.ParseCareersURL(mustParseURL(t, "https://jobs.lever.co/SomeStartup"))
+	require.True(t, ok)
+	assert.Equal(t, "SomeStartup", slug)
+}
+
 func TestLeverSearchAll(t *testing.T) {
 	a := testLeverAdapter(t)
 	res, err := a.Search(t.Context(), "leverdemo", SearchParams{})

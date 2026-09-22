@@ -172,18 +172,16 @@ func (c *Client) GetCareerSite(ctx context.Context, slug string) (*CareerSite, e
 // built.
 func (c *Client) GetCustomFilters(ctx context.Context, slug string) (*CustomFilterCatalog, error) {
 	slug = strings.ToLower(strings.TrimSpace(slug))
-	sess, err := c.ensureSession(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
 	q := url.Values{}
 	q.Set("tz", defaultTZ)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.listingBase+customFiltersPath+"?"+encodeQuery(q), nil)
-	if err != nil {
-		return nil, err
-	}
-	c.setListingHeaders(req, sess)
-	res, err := c.hc.Do(req)
+	res, err := c.doListing(ctx, slug, func(sess session) (*http.Request, error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.listingBase+customFiltersPath+"?"+encodeQuery(q), nil)
+		if err != nil {
+			return nil, err
+		}
+		c.setListingHeaders(req, sess)
+		return req, nil
+	})
 	if err != nil {
 		return nil, fmt.Errorf("adp_myjobs: custom filters %q: %w", slug, err)
 	}
@@ -208,11 +206,7 @@ func (c *Client) ListJobRequisitions(ctx context.Context, slug string, p ListPar
 	if p.Skip < 0 {
 		p.Skip = 0
 	}
-	sess, err := c.ensureSession(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
-	return c.listOnce(ctx, slug, sess, p)
+	return c.listOnce(ctx, slug, p)
 }
 
 // ListAllJobRequisitions fully paginates a board.
@@ -257,18 +251,16 @@ func (c *Client) GetJobRequisition(ctx context.Context, slug, reqID string) (*Jo
 	if slug == "" || reqID == "" {
 		return nil, fmt.Errorf("adp_myjobs: slug and reqId are required")
 	}
-	sess, err := c.ensureSession(ctx, slug)
-	if err != nil {
-		return nil, err
-	}
 	u := c.listingBase + searchMetaPathPrefix + url.PathEscape(reqID)
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	c.setListingHeaders(req, sess)
-	req.Header.Set("Accept-Language", "en-US")
-	res, err := c.hc.Do(req)
+	res, err := c.doListing(ctx, slug, func(sess session) (*http.Request, error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+		if err != nil {
+			return nil, err
+		}
+		c.setListingHeaders(req, sess)
+		req.Header.Set("Accept-Language", "en-US")
+		return req, nil
+	})
 	if err != nil {
 		return nil, fmt.Errorf("adp_myjobs: detail %q for %q: %w", reqID, slug, err)
 	}
@@ -285,6 +277,38 @@ func (c *Client) GetJobRequisition(ctx context.Context, slug, reqID string) (*Jo
 	}
 	j := raw.JobRequisitions[0].toJobRequisition(reqID)
 	return &j, nil
+}
+
+// doListing sends a listing-host request built by newReq for slug's cached
+// session. The token is short-lived, so on a 401 or 403 it fetches a fresh
+// session and sends the request once more; the caller checks the status of
+// whichever response comes back.
+func (c *Client) doListing(ctx context.Context, slug string, newReq func(session) (*http.Request, error)) (*http.Response, error) {
+	sess, err := c.ensureSession(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	req, err := newReq(sess)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode != http.StatusUnauthorized && res.StatusCode != http.StatusForbidden {
+		return res, nil
+	}
+	res.Body.Close()
+	cs, err := c.GetCareerSite(ctx, slug)
+	if err != nil {
+		return nil, err
+	}
+	req, err = newReq(session{token: cs.MyJobsToken, orgOID: cs.OrgOID})
+	if err != nil {
+		return nil, err
+	}
+	return c.hc.Do(req)
 }
 
 func (c *Client) ensureSession(ctx context.Context, slug string) (session, error) {
@@ -322,7 +346,7 @@ func encodeQuery(q url.Values) string {
 	return strings.ReplaceAll(q.Encode(), "+", "%20")
 }
 
-func (c *Client) listOnce(ctx context.Context, slug string, sess session, p ListParams) (*ListResult, error) {
+func (c *Client) listOnce(ctx context.Context, slug string, p ListParams) (*ListResult, error) {
 	q := url.Values{}
 	q.Set("$orderby", defaultOrderBy)
 	q.Set("$select", defaultSelect)
@@ -337,13 +361,14 @@ func (c *Client) listOnce(ctx context.Context, slug string, sess session, p List
 	}
 	u := c.listingBase + listingPath + "?" + encodeQuery(q)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
-	if err != nil {
-		return nil, err
-	}
-	c.setListingHeaders(req, sess)
-
-	res, err := c.hc.Do(req)
+	res, err := c.doListing(ctx, slug, func(sess session) (*http.Request, error) {
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+		if err != nil {
+			return nil, err
+		}
+		c.setListingHeaders(req, sess)
+		return req, nil
+	})
 	if err != nil {
 		return nil, fmt.Errorf("adp_myjobs: list %q: %w", slug, err)
 	}

@@ -252,11 +252,11 @@ func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *appleSearchInput) (*mcp.CallToolResult, *appleSearchOutput, error) {
 		request, err := appleMCPToHTTPRequest(input)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		response, err := client.SearchJobs(ctx, request)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, appleHTTPToMCPResponse(request.Page, response), nil
 	})
@@ -268,7 +268,7 @@ func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, _ *struct{}) (*mcp.CallToolResult, *appleFiltersOutput, error) {
 		teams, err := client.ListTeams(ctx)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, appleHTTPToMCPFilters(teams), nil
 	})
@@ -280,7 +280,7 @@ func RegisterApple(server *mcp.Server, client *apple.JobsClient) {
 	}, func(ctx context.Context, _ *mcp.CallToolRequest, input *appleDetailInput) (*mcp.CallToolResult, *appleDetailOutput, error) {
 		response, err := client.JobDetail(ctx, input.JobID)
 		if err != nil {
-			return errorResult(err), nil, nil
+			return nil, nil, err
 		}
 		return nil, appleHTTPToMCPDetail(response), nil
 	})

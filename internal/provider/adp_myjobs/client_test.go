@@ -176,6 +176,33 @@ func TestUnknownCareerSite(t *testing.T) {
 	assert.Contains(t, err.Error(), "HTTP 400")
 }
 
+// staleTokenRoundTripper answers 401 to any listing request carrying the
+// stale token, standing in for an upstream whose myJobsToken expired.
+type staleTokenRoundTripper struct{ stale string }
+
+func (s staleTokenRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+	if req.Header.Get("myjobstoken") == s.stale {
+		return &http.Response{StatusCode: http.StatusUnauthorized, Body: http.NoBody, Request: req}, nil
+	}
+	return http.DefaultTransport.RoundTrip(req)
+}
+
+func TestExpiredTokenRefreshesSession(t *testing.T) {
+	srv := NewMockServer()
+	t.Cleanup(srv.Close)
+	c := NewClient(Config{
+		CareerSiteBase: srv.URL,
+		ListingBase:    srv.URL,
+		HTTPClient:     &http.Client{Transport: staleTokenRoundTripper{stale: "EXPIRED"}},
+	})
+	c.tokens[MockSlug] = session{token: "EXPIRED"}
+
+	page, err := c.ListJobRequisitions(context.Background(), MockSlug, ListParams{Top: 5})
+	require.NoError(t, err)
+	assert.Equal(t, 3, page.Count)
+	assert.Equal(t, "TEST_MYJOBS_TOKEN", c.tokens[MockSlug].token, "the refreshed token replaces the expired one")
+}
+
 type recordingRoundTripper struct {
 	requests []*http.Request
 }

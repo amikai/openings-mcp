@@ -55,14 +55,23 @@ func (a *LeverAdapter) Roster() []CompanyInfo {
 }
 
 // ParseCareersURL recognizes Lever-hosted board URLs; the first path
-// segment is the organization, which is already this adapter's slug form.
+// segment is the organization. A roster board folds back to its roster
+// slug whatever the URL's casing, so display names and cache keys match
+// name-based resolution.
 func (a *LeverAdapter) ParseCareersURL(u *url.URL) (string, bool) {
-	return matchCareersSlug(leverCareersURLRE, u)
+	slug, ok := matchCareersSlug(leverCareersURLRE, u)
+	if !ok {
+		return "", false
+	}
+	if c, ok := lever.CompaniesBySite[strings.ToLower(slug)]; ok {
+		return c.Site, true
+	}
+	return slug, true
 }
 
 // CareersURL renders the roster company's public job board page.
 func (a *LeverAdapter) CareersURL(slug string) (string, bool) {
-	c, ok := lever.CompaniesBySite[slug]
+	c, ok := lever.CompaniesBySite[strings.ToLower(slug)]
 	if !ok {
 		return "", false
 	}
@@ -97,7 +106,7 @@ func (a *LeverAdapter) Detail(ctx context.Context, slug, jobID string) (*JobDeta
 	return &JobDetail{
 		JobID:       p.ID,
 		Title:       p.Text.Value,
-		Company:     cmp.Or(lever.CompaniesBySite[slug].Name, slug),
+		Company:     cmp.Or(lever.CompaniesBySite[strings.ToLower(slug)].Name, slug),
 		Location:    leverLocations(p),
 		PostedAt:    leverPostedAt(p),
 		URL:         p.HostedUrl.Value,

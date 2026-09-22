@@ -15,7 +15,7 @@ var companiesYAML []byte
 // Company is a confirmed Lever tenant from the curated
 // internal/provider/lever/companies.yaml. Site is the slug that namespaces
 // the company's postings, e.g. "leverdemo" for jobs.lever.co/leverdemo —
-// slugs are unique and lowercase, unlike display names. Every entry was
+// slugs are unique ignoring case, unlike display names. Every entry was
 // verified to return a non-empty postings array from the global instance
 // (api.lever.co) at collection time.
 type Company struct {
@@ -36,7 +36,8 @@ func (c Company) CareersURL() string {
 var Companies = mustLoadCompanies()
 
 // CompaniesBySite looks up a confirmed tenant by site slug. Keys are
-// lowercase slugs as they appear in companies.yaml.
+// lowercased (companies.yaml keeps Lever's own casing, e.g. "AIFund"), so
+// callers must lowercase their input before indexing.
 var CompaniesBySite = buildSiteIndex(Companies)
 
 // mustLoadCompanies parses the embedded companies.yaml. A parse failure is
@@ -54,7 +55,7 @@ func mustLoadCompanies() []Company {
 func buildSiteIndex(cs []Company) map[string]Company {
 	m := make(map[string]Company, len(cs))
 	for _, c := range cs {
-		m[c.Site] = c
+		m[strings.ToLower(c.Site)] = c
 	}
 	return m
 }
