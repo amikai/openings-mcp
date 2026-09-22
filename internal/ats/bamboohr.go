@@ -118,20 +118,38 @@ func (a *BambooHRAdapter) Search(
 	slug string,
 	p SearchParams,
 ) (*SearchResult, error) {
-	jobs, err := a.dump(ctx, slug)
+	// The list feed has no JD text. A query needs descriptions so the
+	// unified query contract (titles + skills/technologies) holds.
+	load := a.dump
+	if strings.TrimSpace(p.Query) != "" {
+		load = a.describedDump
+	}
+	jobs, err := load(ctx, slug)
 	if err != nil {
 		return nil, err
 	}
-	// The list feed has no JD text. Populate descriptions from detail so
-	// the unified query contract (titles + skills/technologies) holds.
-	// dump() results are read-only (may be cache-shared); clone before mutate.
-	if strings.TrimSpace(p.Query) != "" {
+	return searchDump(jobs, p)
+}
+
+// describedDump is dump with every job's description filled from the
+// detail endpoint. It is cached on its own key, so paging through one
+// query's results, or running a second query, fetches each detail once per
+// cache lifetime rather than once per call.
+func (a *BambooHRAdapter) describedDump(ctx context.Context, slug string) ([]dumpJob, error) {
+	slug = strings.ToLower(slug)
+	jobs, _, err := a.dumpCache.getOrLoadDump(ctx, a.Name()+"-described", slug, func(ctx context.Context) ([]dumpJob, any, error) {
+		jobs, err := a.dump(ctx, slug)
+		if err != nil {
+			return nil, nil, err
+		}
+		// dump() results are read-only (may be cache-shared); clone before mutate.
 		jobs = cloneDumpJobs(jobs)
 		if err := a.enrichDescriptions(ctx, slug, jobs); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-	}
-	return searchDump(jobs, p)
+		return jobs, nil, nil
+	})
+	return jobs, err
 }
 
 func (a *BambooHRAdapter) Filters(ctx context.Context, slug string) (FilterSet, error) {
@@ -280,7 +298,6 @@ func (a *BambooHRAdapter) enrichDescriptions(
 	g, gCtx := errgroup.WithContext(ctx)
 	g.SetLimit(bambooHRDetailConcurrency)
 	for i := range jobs {
-		i := i
 		g.Go(func() error {
 			id := jobs[i].summary.JobID
 			res, err := client.GetJobDetail(gCtx, bamboohr.GetJobDetailParams{ID: id})

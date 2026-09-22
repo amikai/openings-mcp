@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -81,6 +82,35 @@ func TestBambooHRSearchAll(t *testing.T) {
 		assert.Empty(t, j.PostedAt)
 		assert.NotEmpty(t, j.URL)
 	}
+}
+
+// TestBambooHRQuerySearchCachesDescriptions checks that the per-job detail
+// fetches a query search needs happen once per cache lifetime, not once per
+// call: a second page, or a different query, reuses them.
+func TestBambooHRQuerySearchCachesDescriptions(t *testing.T) {
+	var hits atomic.Int32
+	srv := bamboohr.NewMockServer()
+	t.Cleanup(srv.Close)
+	hc := &http.Client{
+		Timeout: 5 * time.Second,
+		Transport: roundTripFunc(func(r *http.Request) (*http.Response, error) {
+			hits.Add(1)
+			return http.DefaultTransport.RoundTrip(r)
+		}),
+	}
+	a := NewBambooHRAdapter(hc, NewDumpCache(DumpCacheConfig{TTL: time.Hour}))
+	a.baseURL = func(string) string { return srv.URL }
+
+	_, err := a.Search(t.Context(), bamboohr.MockSlug, SearchParams{Query: "IT Operations"})
+	require.NoError(t, err)
+	first := hits.Load()
+	require.Greater(t, first, int32(1), "a query search fetches the list and every job's detail")
+
+	_, err = a.Search(t.Context(), bamboohr.MockSlug, SearchParams{Query: "IT Operations", Page: 2})
+	require.NoError(t, err)
+	_, err = a.Search(t.Context(), bamboohr.MockSlug, SearchParams{Query: "concrete"})
+	require.NoError(t, err)
+	assert.Equal(t, first, hits.Load(), "later query searches reuse the cached descriptions")
 }
 
 func TestBambooHRSearchQueryLocationAndFilters(t *testing.T) {
