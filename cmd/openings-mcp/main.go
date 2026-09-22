@@ -5,7 +5,7 @@
 //	openings-mcp
 //
 // The --http flag switches to streamable HTTP instead. It works bare, on
-// :8080, and takes an optional address that must be attached with '='
+// 127.0.0.1:8080, and takes an optional address that must be attached with '='
 // rather than passed as a separate argument:
 //
 //	openings-mcp --http
@@ -208,7 +208,7 @@ func runStdio(transport mcp.Transport, logger *slog.Logger, dumpCache *ats.DumpC
 }
 
 // defaultHTTPAddr is where --http listens when given no address of its own.
-const defaultHTTPAddr = ":8080"
+const defaultHTTPAddr = "127.0.0.1:8080"
 
 // httpFlag backs --http, which reads as a bool that carries an optional
 // address: plain --http listens on defaultHTTPAddr, --http=:9000 on :9000,
