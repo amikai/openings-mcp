@@ -1,6 +1,6 @@
 module github.com/amikai/openings-mcp
 
-go 1.26.5
+go 1.27.3
 
 tool (
 	github.com/Khan/genqlient
