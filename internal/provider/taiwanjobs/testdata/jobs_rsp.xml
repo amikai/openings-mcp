@@ -1,0 +1,70 @@
+<?xml version='1.0' ?><DataList>
+<Data>
+<OCCU_DESC（職務名稱）><![CDATA[家庭幫傭]]></OCCU_DESC（職務名稱）>
+<WK_TYPE（職務性質）><![CDATA[全職]]></WK_TYPE（職務性質）>
+<CJOB1_COUNT（職務大類別代碼）><![CDATA[19]]></CJOB1_COUNT（職務大類別代碼）>
+<CJOB_NAME1（職務大類別名稱）><![CDATA[清潔／家事／托育(保母)]]></CJOB_NAME1（職務大類別名稱）>
+<CJOB2_COUNT（職務小類別代碼）><![CDATA[190201]]></CJOB2_COUNT（職務小類別代碼）>
+<CJOB_NAME2（職務小類別名稱）><![CDATA[家事服務員/家庭清潔人員]]></CJOB_NAME2（職務小類別名稱）>
+<JOB_PERSON（雇用人數）><![CDATA[1]]></JOB_PERSON（雇用人數）>
+<STOP_DATE（應徵截止日期）><![CDATA[20260724]]></STOP_DATE（應徵截止日期）>
+<JOB_DETAIL（工作內容）><![CDATA[在家庭，從事房舍清理、食物烹調、家庭成員起居照料或其他與家事服務有關工作]]></JOB_DETAIL（工作內容）>
+<CITYNAME（工作地點）><![CDATA[台北市北投區]]></CITYNAME（工作地點）>
+<EXPERIENCE（工作經驗）><![CDATA[無]]></EXPERIENCE（工作經驗）>
+<WKTIME（工作時間）><![CDATA[日班]]></WKTIME（工作時間）>
+<SALARYCD（核薪方式）><![CDATA[月薪]]></SALARYCD（核薪方式）>
+<NT_L（薪資範圍下限）><![CDATA[35000]]></NT_L（薪資範圍下限）>
+<NT_U（薪資範圍上限）><![CDATA[35000]]></NT_U（薪資範圍上限）>
+<EDGRDESC（最低學歷要求）><![CDATA[不拘]]></EDGRDESC（最低學歷要求）>
+<URL_QUERY（職缺資料URL）><![CDATA[https://job.taiwanjobs.gov.tw/Internet/jobwanted/JobDetail.aspx?EMPLOYER_ID=2686073&HIRE_ID=14526011]]></URL_QUERY（職缺資料URL）>
+<COMPNAME（公司名稱）><![CDATA[魏小姐]]></COMPNAME（公司名稱）>
+<TRANDATE（職缺更新日期）><![CDATA[20260716]]></TRANDATE（職缺更新日期）>
+</Data>
+<Data>
+<OCCU_DESC（職務名稱）><![CDATA[芳療師]]></OCCU_DESC（職務名稱）>
+<WK_TYPE（職務性質）><![CDATA[兼職]]></WK_TYPE（職務性質）>
+<CJOB1_COUNT（職務大類別代碼）><![CDATA[17]]></CJOB1_COUNT（職務大類別代碼）>
+<CJOB_NAME1（職務大類別名稱）><![CDATA[醫療／美容／保健]]></CJOB_NAME1（職務大類別名稱）>
+<CJOB2_COUNT（職務小類別代碼）><![CDATA[170208]]></CJOB2_COUNT（職務小類別代碼）>
+<CJOB_NAME2（職務小類別名稱）><![CDATA[美療／芳療師]]></CJOB_NAME2（職務小類別名稱）>
+<JOB_PERSON（雇用人數）><![CDATA[5]]></JOB_PERSON（雇用人數）>
+<STOP_DATE（應徵截止日期）><![CDATA[20260831]]></STOP_DATE（應徵截止日期）>
+<JOB_DETAIL（工作內容）><![CDATA[美容美體精油芳療技術服務]]></JOB_DETAIL（工作內容）>
+<CITYNAME（工作地點）><![CDATA[台北市中山區]]></CITYNAME（工作地點）>
+<EXPERIENCE（工作經驗）><![CDATA[無]]></EXPERIENCE（工作經驗）>
+<WKTIME（工作時間）><![CDATA[部份工時：13時00分至18時00分]]></WKTIME（工作時間）>
+<SALARYCD（核薪方式）><![CDATA[時薪]]></SALARYCD（核薪方式）>
+<NT_L（薪資範圍下限）><![CDATA[196]]></NT_L（薪資範圍下限）>
+<NT_U（薪資範圍上限）><![CDATA[196]]></NT_U（薪資範圍上限）>
+<EDGRDESC（最低學歷要求）><![CDATA[不拘]]></EDGRDESC（最低學歷要求）>
+<URL_QUERY（職缺資料URL）><![CDATA[https://job.taiwanjobs.gov.tw/Internet/jobwanted/JobDetail.aspx?EMPLOYER_ID=2262487&HIRE_ID=13558301]]></URL_QUERY（職缺資料URL）>
+<COMPNAME（公司名稱）><![CDATA[康是富有限公司]]></COMPNAME（公司名稱）>
+<TRANDATE（職缺更新日期）><![CDATA[20250521]]></TRANDATE（職缺更新日期）>
+</Data>
+<Data>
+<OCCU_DESC（職務名稱）><![CDATA[Java網頁開發工程師(1)台北市內湖區(2)桃園市中壢區(3)台中市西區(4)高雄市前金區]]></OCCU_DESC（職務名稱）>
+<WK_TYPE（職務性質）><![CDATA[全職]]></WK_TYPE（職務性質）>
+<CJOB1_COUNT（職務大類別代碼）><![CDATA[08]]></CJOB1_COUNT（職務大類別代碼）>
+<CJOB_NAME1（職務大類別名稱）><![CDATA[資訊／軟體／系統]]></CJOB_NAME1（職務大類別名稱）>
+<CJOB2_COUNT（職務小類別代碼）><![CDATA[080304]]></CJOB2_COUNT（職務小類別代碼）>
+<CJOB_NAME2（職務小類別名稱）><![CDATA[Internet程式設計師]]></CJOB_NAME2（職務小類別名稱）>
+<JOB_PERSON（雇用人數）><![CDATA[4]]></JOB_PERSON（雇用人數）>
+<STOP_DATE（應徵截止日期）><![CDATA[額滿為止]]></STOP_DATE（應徵截止日期）>
+<JOB_DETAIL（工作內容）><![CDATA[工作內容
+1.     負責金融機構應用程式之設計、開發與維護。
+2.     進行 Java Web 應用程式開發，並應用 Spring Framework， Spring Boot 建立穩定與高效能之系統功能。
+3.     配合系統分析師與專案團隊進行需求分析、技術設計與系統整合測試。
+4.     撰寫技術文件，並提供後續維運支援。
+5.    參與產官學資源整合相關教育訓練。]]></JOB_DETAIL（工作內容）>
+<CITYNAME（工作地點）><![CDATA[台北市內湖區]]></CITYNAME（工作地點）>
+<EXPERIENCE（工作經驗）><![CDATA[無]]></EXPERIENCE（工作經驗）>
+<WKTIME（工作時間）><![CDATA[日班]]></WKTIME（工作時間）>
+<SALARYCD（核薪方式）><![CDATA[依學經歷、證照核薪(每月經常性薪資達4萬元以上)]]></SALARYCD（核薪方式）>
+<NT_L（薪資範圍下限）><![CDATA[-]]></NT_L（薪資範圍下限）>
+<NT_U（薪資範圍上限）><![CDATA[-]]></NT_U（薪資範圍上限）>
+<EDGRDESC（最低學歷要求）><![CDATA[大學]]></EDGRDESC（最低學歷要求）>
+<URL_QUERY（職缺資料URL）><![CDATA[https://job.taiwanjobs.gov.tw/Internet/jobwanted/JobDetail.aspx?EMPLOYER_ID=497576&HIRE_ID=14463501]]></URL_QUERY（職缺資料URL）>
+<COMPNAME（公司名稱）><![CDATA[指南動力有限公司]]></COMPNAME（公司名稱）>
+<TRANDATE（職缺更新日期）><![CDATA[20260619]]></TRANDATE（職缺更新日期）>
+</Data>
+</DataList>
