@@ -265,15 +265,16 @@ func TestServerInstructionsDisambiguateCompanyAndSourceRouting(t *testing.T) {
 	assert.Contains(t, serverInstructions, "dedupe by URL and keep the first-party row")
 }
 
-// TestAmbiguousCompanyRetryInstructionIsTaught asserts the ambiguity retry
-// instruction — retry with one of the careers URLs listed in the error —
-// reaches the host LLM through both channels it can come from:
-// serverInstructions, and each unified company tool's own company
-// parameter description. All three tools need it independently since a
-// host may only ever read the tool description for the one it calls.
+// TestAmbiguousCompanyRetryInstructionIsTaught asserts that both ambiguity
+// paths — form elicitation when the client supports it, and retrying with one
+// of the careers URLs listed in the error otherwise — reach the host LLM
+// through serverInstructions and each unified company tool's own company
+// parameter description. All three tools need it independently since a host
+// may only ever read the tool description for the one it calls.
 func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
-	const retryInstruction = "If the company is ambiguous, retry with one of the careers URLs listed in the error."
+	const retryInstruction = "otherwise, retry with one of the careers URLs listed in the error."
 
+	assert.Contains(t, serverInstructions, "every unified company tool asks the user to choose from human-readable company names and public careers URLs when the client supports form elicitation")
 	assert.Contains(t, serverInstructions, "retry the same tool with one of the listed careers URLs, not with the original name")
 
 	ctx := t.Context()
@@ -309,6 +310,8 @@ func TestAmbiguousCompanyRetryInstructionIsTaught(t *testing.T) {
 		require.True(t, ok, name)
 		companyProperty, ok := properties["company"].(map[string]any)
 		require.True(t, ok, name)
+		assert.Contains(t, companyProperty["description"], "client supports form elicitation", name)
+		assert.Contains(t, companyProperty["description"], "asks the user to choose", name)
 		assert.Contains(t, companyProperty["description"], retryInstruction, name)
 	}
 }

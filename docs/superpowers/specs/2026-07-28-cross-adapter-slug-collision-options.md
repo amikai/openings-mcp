@@ -747,3 +747,19 @@ returns a `CompanyResolution`, and `Single`, `Candidates`, `IsAmbiguous`, and
   when a client that can ask its user arrives, it consumes the same
   resolution and skips the error entirely — which is the point of resolution
   and presentation being separate.
+
+## Decision update — 2026-10-26: MRTR form elicitation restored alongside `AmbiguousCompanyError`
+
+`internal/openingsmcp` now wires both presentation paths off
+`CompanyResolution` rather than picking one globally:
+
+- When `req.ClientCapabilities()` advertises form elicitation, all three
+  unified company tools (`search_jobs_by_company`, `get_filters_by_company`,
+  `get_job_detail_by_company`) return an MRTR `CallToolResult` with
+  `InputRequests` (`company_selection` → `*mcp.ElicitParams`) on the first
+  pass and consume `req.Params.InputResponses["company_selection"]` via
+  `CompanyResolution.Select` on the resumed call.
+- When the client does not advertise form elicitation (or supports URL-only
+  elicitation), `resolveCompanyForTool` falls back to `AmbiguousCompanyError`
+  with its aligned candidate table and tool-specific `Hint`, preserving the
+  teaching-error retry flow for clients that cannot render forms.
