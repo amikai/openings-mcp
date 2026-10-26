@@ -87,30 +87,32 @@ docker pull ghcr.io/amikai/openings-mcp
 
 ## Add the MCP server to your tool
 
-With `openings-mcp` on your PATH:
+Run openings-mcp as a local HTTP server, then point your tools at it. Every
+session in every tool shares that one process.
+
+**1. Start the server:** run `openings-mcp --http=127.0.0.1:8080` and leave
+it running in its own terminal. With Docker, run
+`docker run -d --rm --name openings-mcp -p 127.0.0.1:8080:8080 ghcr.io/amikai/openings-mcp --http`
+and stop it with `docker stop openings-mcp`.
+
+**2. Add it to your tool**
 
 **Claude Code**
 
 ```
-claude mcp add --scope user openings-mcp -- openings-mcp
+claude mcp add --transport http --scope user openings-mcp http://127.0.0.1:8080
 ```
 
 **Codex**
 
 ```
-codex mcp add openings-mcp -- openings-mcp
+codex mcp add openings-mcp --url http://127.0.0.1:8080
 ```
 
 **Gemini CLI**
 
 ```
-gemini mcp add openings-mcp openings-mcp
-```
-
-With Docker instead, replace `openings-mcp` with `docker run -i --rm ghcr.io/amikai/openings-mcp`, e.g.:
-
-```
-claude mcp add --scope user openings-mcp -- docker run -i --rm ghcr.io/amikai/openings-mcp
+gemini mcp add --transport http openings-mcp http://127.0.0.1:8080
 ```
 
 ## Disclaimer
